@@ -225,6 +225,7 @@
         <h2>Esta es una prueba de los cambios de git</h2>
         <h3>hola mundo</h3>
         <h1>PROYECTO DE DAVID Y KELVIN</h1>
+        <h2>Otro cambio mas</h2>
 
     </div>
 
