@@ -226,6 +226,7 @@
         <h3>hola mundo</h3>
         <h1>PROYECTO DE DAVID Y KELVIN</h1>
         <h2>Otro cambio mas</h2>
+        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Unde sit odit obcaecati quisquam deleniti voluptas quos omnis. Pariatur ipsa eum esse quod repudiandae, tenetur fugiat, unde enim autem et nihil!</p>
 
     </div>
 
