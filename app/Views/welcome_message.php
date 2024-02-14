@@ -220,9 +220,10 @@
 
     <div class="heroe">
 
-        <h1>Welcome to CodeIgniter <?= CodeIgniter\CodeIgniter::CI_VERSION ?></h1>
+        <h1>Bienvenidos a los cambios de git <?= CodeIgniter\CodeIgniter::CI_VERSION ?></h1>
 
-        <h2>The small framework with powerful features</h2>
+        <h2>Esta es una prueba de los cambios de git</h2>
+        <h3>hola mundo</h3>
 
     </div>
 
@@ -278,8 +279,7 @@
              Contribute
         </h2>
 
-        <p>CodeIgniter is a community driven project and accepts contributions
-             of code and documentation from the community. Why not
+        <p>Comunidad. Why not
              <a href="https://codeigniter.com/contribute" target="_blank">
              join us</a> ?</p>
 
