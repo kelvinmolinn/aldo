@@ -5,7 +5,7 @@ namespace Config;
 $routes = Services::routes();
 
 $routes->setDefaultNamespace('App\Controllers');
-$routes->setDefaultController('Home');
+$routes->setDefaultController('login');
 $routes->setDefaultMethod('index');
 $routes->setTranslateURIDashes(false);
 $routes->set404Override();
@@ -15,7 +15,7 @@ $routes->set404Override();
  * @var RouteCollection $routes
  */
 
-$routes->get('/', 'Home::index');
+$routes->get('/', 'login::index');
 $routes->get('/productos', 'Productos::index');
 $routes->get('/productos/(:num)','Productos::show/$1');
 $routes->get('/productos/(:alpha)/(:num)','Productos::cat/$1/$2');
