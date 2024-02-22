@@ -135,7 +135,7 @@
     <div class="float-right d-none d-sm-block">
       <b>Version</b> 1.0.0
     </div>
-    <strong>Copyright &copy; DK delevopment 2024.
+    <strong>Copyright &copy; DK development 2024.
   </footer>
 
   <!-- Control Sidebar -->
