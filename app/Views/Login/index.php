@@ -10,11 +10,11 @@
   <!-- Font Awesome -->
   <link rel="stylesheet" href="<?php echo base_url();?>../assets/plugins/fontawesome-free/css/all.min.css">
   <!-- icheck bootstrap -->
-  <link rel="stylesheet" href="<?php echo base_url();?>../assets/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+  <link rel="stylesheet" href="<?php echo base_url();?>../assets/plugins/bootstrap/css/bootstrap.min.css">
   <!-- Theme style -->
-  <link rel="stylesheet" href="<?php echo base_url();?>../assets/plugins/template/css/adminlte.min.css">
+  <link rel="stylesheet" href="<?php echo base_url();?>../assets/plugins/bootstrap/css/adminlte.min.css">
 
-  <link rel="stylesheet" href="<?php echo base_url();?>../assets/plugins/template/css/login.css">
+  <link rel="stylesheet" href="<?php echo base_url();?>../assets/plugins/bootstrap/css/login.css">
 </head>
 <body class="hold-transition login-page">
 <div class="login-box">
@@ -24,9 +24,9 @@
   <!-- /.login-logo -->
   <div class="card">
     <div class="card-body login-card-body">
-        <img class="login mb-4" src="<?php echo base_url();?>../assets/plugins/template/img/algo_game_store.jpg">
+        <img class="login mb-4" src="<?php echo base_url();?>../assets/plugins/img/algo_game_store.jpg">
 
-      <form action="../../index3.html" method="post">
+      <form action="" method="post">
         <div class="input-group mb-3">
           <input type="email" class="form-control" placeholder="Correo electrónico">
           <div class="input-group-append">
@@ -71,10 +71,10 @@
 <!-- /.login-box -->
 
 <!-- jQuery -->
-<script src="<?php echo base_url();?>../assets/plugins/jquery/jquery.min.js"></script>
+<script src="<?php echo base_url();?>../assets/plugins/bootstrap/js/jquery.min.js"></script>
 <!-- Bootstrap 4 -->
-<script src="<?php echo base_url();?>../assets/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="<?php echo base_url();?>../assets/plugins/bootstrap/js/popper.min.js"></script>
 <!-- AdminLTE App -->
-<script src="<?php echo base_url();?>../assets/plugins/template/js/adminlte.min.js"></script>
+<script src="<?php echo base_url();?>../assets/plugins/bootstrap/js/bootstrap.min.js"></script>
 </body>
 </html>
