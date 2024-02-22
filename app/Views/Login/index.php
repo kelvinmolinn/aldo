@@ -26,9 +26,9 @@
     <div class="card-body login-card-body">
         <img class="login mb-4" src="<?php echo base_url();?>../assets/plugins/img/algo_game_store.jpg">
 
-      <form action="" method="post">
+      <form action="<?php echo base_url();?>login/validarIngreso" method="post">
         <div class="input-group mb-3">
-          <input type="email" class="form-control" placeholder="Correo electrónico">
+          <input type="email" name="correoUsuario" id="correoUsuario" class="form-control" placeholder="Correo electrónico" required>
           <div class="input-group-append">
             <div class="input-group-text">
               <span class="fas fa-envelope"></span>
@@ -36,7 +36,7 @@
           </div>
         </div>
         <div class="input-group mb-3">
-          <input type="password" class="form-control" placeholder="Contraseña">
+          <input type="password" name="claveUsuario" id="claveUsuario" class="form-control" placeholder="Contraseña" required>
           <div class="input-group-append">
             <div class="input-group-text">
               <span class="fas fa-lock"></span>
@@ -60,7 +60,21 @@
             <button type="submit" class="btn btn-primary btn-block">Iniciar Sesion</button>
         </div>          
       </form>
+      <br>
+      <div class="row">
+          <div class="col-12" style="text-aling: center;" >
+              <?php 
+                if(isset($mensaje)){ ?>
+                <div class="alert alert-<?php $tipo; ?>" >
+                    <?php echo $mensaje; ?>
+                </div>
+              <?php
 
+                }
+                ?>
+                
+          </div>
+      </div>
       <p class="mt-4">
         <a href="forgot-password.html">¿Olvidó su contraseña?</a>
       </p>

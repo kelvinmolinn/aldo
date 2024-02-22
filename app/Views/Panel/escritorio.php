@@ -25,7 +25,7 @@ $this->extend('Views/Panel/plantilla');
         </li>
         
         <li class="nav-item">
-        <a href="#" class="nav-link">
+        <a href="#" onclick="cerrarSession();" class="nav-link">
             <i class="fas fa-sign-out-alt text-danger"></i>
             <p>Cerrar Sesión</p>
         </a>
@@ -48,10 +48,27 @@ $this->extend('Views/Panel/plantilla');
             </div>
             </div>
         </div><!-- /.container-fluid -->
+
         </section>
 
         <!-- Main content -->
         <section class="content">
 
         </section>
+        <script>
+            function cerrarSession(){
+                Swal.fire({
+                    title: 'Desea cerrar session',
+                    text: 'La session terminará!',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    cancelButton: '#d33',
+                    confirmButtonText: 'Sí, salir' 
+                }).then((result) =>{
+                    if(result.isConfirmed){
+                        window.location.href = "<?php echo base_url('login/cerrarSession'); ?>"
+                    }
+                })
+            }
+        </script>
     <?php $this->endSection(); ?>

@@ -11,6 +11,8 @@
   <link rel="stylesheet" href="<?php echo base_url();?>../assets/plugins/fontawesome-free/css/all.min.css">
   <!-- Theme style -->
   <link rel="stylesheet" href="<?php echo base_url();?>../assets/plugins/bootstrap/css/adminlte.min.css">
+
+  <link rel="stylesheet" href="<?php echo base_url();?>../assets/plugins/sweetalert2/sweetalert2.min.css">
 </head>
 <body class="hold-transition sidebar-mini">
 <!-- Site wrapper -->
@@ -61,10 +63,12 @@
       <!-- Sidebar user (optional) -->
       <div class="user-panel mt-3 pb-3 mb-3 d-flex">
         <div class="image">
-          <img src="<?php echo base_url();?>../assets/plugins/img/avatar4.png" class="img-circle elevation-2" alt="User Image">
+          <img src="<?php echo base_url();?>../public/usuarios/fotos/<?php echo session('fotoUsuario') ? session('fotoUsuario') : 'IMG1.PNG'; ?>" class="img-circle elevation-2" alt="User Image">
         </div>
         <div class="info">
-          <a href="#" class="d-block">Kelvin Molina</a>
+          <a href="#" class="d-block">
+            <?= session('nombreUsuario');?>
+          </a>
         </div>
       </div>
 
@@ -105,6 +109,7 @@
 <!-- AdminLTE App -->
 <script src="<?php echo base_url();?>../assets/plugins/bootstrap/js/bootstrap.min.js"></script>
 <script src="<?php echo base_url();?>../assets/plugins/bootstrap/js/adminlte.min.js"></script>
+<script src="<?php echo base_url();?>../assets/plugins/sweetalert2/sweetalert2.all.min.js"></script>
 
 </body>
 </html>
