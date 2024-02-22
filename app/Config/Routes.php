@@ -16,12 +16,13 @@ $routes->set404Override();
  */
 
 $routes->get('/', 'login::index');
-$routes->get('/productos', 'Productos::index');
-$routes->get('/productos/(:num)','Productos::show/$1');
-$routes->get('/productos/(:alpha)/(:num)','Productos::cat/$1/$2');
+$routes->get('escritorio', 'Panel::index');
+//$routes->get('/productos', 'Productos::index');
+//$routes->get('/productos/(:num)','Productos::show/$1');
+//$routes->get('/productos/(:alpha)/(:num)','Productos::cat/$1/$2');
 
-$routes->view('productosList/(:alpha)','lista_productos');
+//$routes->view('productosList/(:alpha)','lista_productos');
 
-$routes->group('admin', static function($routes){
-$routes->get('/productos','Admin\Productos::index');
-});
+//$routes->group('admin', static function($routes){
+//$routes->get('/productos','Admin\Productos::index');
+//});
