@@ -36,19 +36,20 @@ class Login extends BaseController{
                     return redirect()->to(base_url().'escritorio');
                     
                 }else{
-                    $data = ['tipo'=> 'danger', 'mensaje'=> 'Clave incorrecta'];
+                    $data = ['tipo'=> 'danger', 'mensaje'=> 'Usuario o contraseña incorrecta'];
                     return view('Login/index', $data);
                 }
         }else{
-            $data = ['tipo'=> 'danger', 'mensaje'=> 'Usuario incorrecto o inactivo'];
+            $data = ['tipo'=> 'danger', 'mensaje'=> 'Usuario o contraseña incorrecta'];
             return view('Login/index', $data);
         }
     }
 
     public function cerrarSession(){
         session()->destroy();
-        return redirect()->to(base_url());
+        return redirect()->to(base_url('Login/index'));
     }
+    
 }
 
 

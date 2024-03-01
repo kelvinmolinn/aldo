@@ -15,6 +15,7 @@ $routes->setAutoRoute(true);
  * @var RouteCollection $routes
  */
 
+
 $routes->get('/', 'login::index');
 $routes->get('escritorio', 'Panel::index');
 //$routes->get('/productos', 'Productos::index');
