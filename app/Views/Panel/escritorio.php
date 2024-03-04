@@ -7,21 +7,38 @@ $this->extend('Views/Panel/plantilla');
         <!-- Add icons to the links using the .nav-icon class
             with font-awesome or any other icon font library -->
         <li class="nav-item">
-        <a href="#" class="nav-link">
-            <i class="nav-icon fas fa-tachometer-alt"></i>
-            <p>
-            Administración
-            <i class="right fas fa-angle-left"></i>
-            </p>
-        </a>
-        <ul class="nav nav-treeview">
-            <li class="nav-item">
             <a href="#" class="nav-link">
-                <i class="far fa-circle nav-icon"></i>
-                <p>Gestión de usuarios</p>
+                <i class="nav-icon fas fa-cog"></i>
+                    <p>Configuración usuario
+                        <i class="right fas fa-angle-left"></i>
+                    </p>
             </a>
-            </li>
-        </ul>
+            <ul class="nav nav-treeview">
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                    <i class="nav-icon fas fa-user-cog"></i>
+                        <p> Admin. usuario
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" onclick="cargarAdminUsuarios()">
+                                <i class="fas fa-user nav-icon"></i>
+                                <p>Usuarios</p>
+                            </a>
+                        </li>
+                    </ul>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" onclick="cargarPermisosUsuarios()">
+                                <i class="fas fa-user nav-icon"></i>
+                                <p>Permisos</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
         </li>
         
         <li class="nav-item">
@@ -37,16 +54,11 @@ $this->extend('Views/Panel/plantilla');
         <section class="content-header">
         <div class="container-fluid">
             <div class="row mb-2">
-            <div class="col-sm-6">
-                <h1>Inicio</h1>
+                <div id = "contenidoGeneral" class="col-sm-12">
+                    <h1></h1>
+                </div>
             </div>
-            <div class="col-sm-6">
-                <ol class="breadcrumb float-sm-right">
-                <li class="breadcrumb-item"><a href="#">Inicio</a></li>
-                <li class="breadcrumb-item active">Escritorio</li>
-                </ol>
-            </div>
-            </div>
+
         </div><!-- /.container-fluid -->
 
         </section>
@@ -56,6 +68,28 @@ $this->extend('Views/Panel/plantilla');
 
         </section>
         <script>
+            function cargarAdminUsuarios() {
+                // Realizar la solicitud AJAX
+                $.ajax({
+                    url: "<?php echo base_url(); ?>../app/Views/configuracion-general/admin-usuarios/vistas/administracionUsuarios.php",
+                    type: "GET",
+                    success: function(response) {
+                        // Insertar el contenido dentro del h1
+                        $('#contenidoGeneral').html(response);
+                    }
+                });
+            }
+            function cargarPermisosUsuarios() {
+                // Realizar la solicitud AJAX
+                $.ajax({
+                    url: "<?php echo base_url(); ?>../app/Views/configuracion-general/permisos-usuarios/vistas/permisosUsuario.php",
+                    type: "GET",
+                    success: function(response) {
+                        // Insertar el contenido dentro del h1
+                        $('#contenidoGeneral').html(response);
+                    }
+                });
+            }
             function cerrarSession(){
                 Swal.fire({
                     title: 'Desea cerrar session',
