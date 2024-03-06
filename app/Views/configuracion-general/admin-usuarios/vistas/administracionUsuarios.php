@@ -1,3 +1,13 @@
+<?php 
+/*$bd = \Config\Database::connect();
+$consulta = $bd->query("
+    SELECT 
+        primerNombre,
+        primerApellido
+    FROM cof_empleados 
+    WHERE estadoEmpleado = 'Activo'
+");*/
+?>
 <h2>Gestión de usuarios</h2>
 <hr>
 <div class="row mb-4">
@@ -20,31 +30,33 @@
             </tr>
         </thead>
         <tbody>
-    <tr>
-        <th></th>
-      <td>  Nombre completo:    <br>
-            Sucursal:           <br>
-            DUI:
-      </td>
-      <td>
-        Correo:         <br>
-        Rol:            <br>
-        En linea:       <br>
-      </td>
-      <td>
-        Activo
-      </td>
-      <td>
-        <button class="btn btn-primary mb-1">
-            <i class="fas fa-pencil-alt"></i>
-            <span class="">Editar Usuario</span>
-        </button><br>
-        <button class="btn btn-success mb-1">Restablecer acceso</button><br>
-        <button class="btn btn-primary mb-1">0 Sucursales</button><br>
-        <button class="btn btn-primary mb-1">Activar</button>
-      </td>
-    </tr>
-  </tbody>
+            <?php foreach($usuarios as $usuarios){ ?>
+                <tr>
+                    <td></td>
+                    <td>Nombre completo: <?php echo $usuarios['primerNombre'];?><br>
+                        Sucursal:               <br>
+                        DUI:
+                    </td>
+                    <!--<td>
+                        Correo:         <br>
+                        Rol:            <br>
+                        En linea:       <br>
+                    </td>
+                    <td>
+                        Activo
+                    </td>-->
+                    <td>
+                        <button class="btn btn-primary mb-1">
+                            <i class="fas fa-pencil-alt"></i>
+                            <span class="">Editar Usuario</span>
+                        </button><br>
+                        <button class="btn btn-success mb-1">Restablecer acceso</button><br>
+                        <button class="btn btn-primary mb-1">0 Sucursales</button><br>
+                        <button class="btn btn-primary mb-1">Activar</button>
+                    </td>
+                </tr>
+            <?php } ?>
+        </tbody>
     </table>
 </div>
 

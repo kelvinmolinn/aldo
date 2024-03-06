@@ -8,9 +8,13 @@
             $usuario->where($data);
             return $usuario->get()->getResultArray();
         }
+
+        public function obtenerDatos($data){
+            $usuario = $this->db->table('cof_empleados');
+            $usuario->where($data);
+            return $usuario->get()->getResultArray();
+        }
     }
-
-
 
     /*  protected $table = 'usuario';
         protected $primaryKey = 'usuarioId';
