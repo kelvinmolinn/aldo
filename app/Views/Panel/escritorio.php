@@ -9,7 +9,7 @@
         <li class="nav-item">
             <a href="#" class="nav-link">
                 <i class="nav-icon fas fa-cog"></i>
-                    <p>Configuración usuario
+                    <p>Configuración General
                         <i class="right fas fa-angle-left"></i>
                     </p>
             </a>
@@ -24,7 +24,7 @@
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
                             <a href="#" class="nav-link" onclick="cargarAdminUsuarios()">
-                                <i class="fas fa-user nav-icon"></i>
+                                <i class="fas fa-user-edit nav-icon"></i>
                                 <p>Usuarios</p>
                             </a>
                         </li>
@@ -32,15 +32,15 @@
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
                             <a href="#" class="nav-link" onclick="">
-                                <i class="fas fa-user nav-icon"></i>
-                                <p>UsuariosSucursales</p>
+                                <i class="fas fa-user-friends nav-icon"></i>
+                                <p>Usuarios Sucursales</p>
                             </a>
                         </li>
                     </ul>
                 </li>
                 <li class="nav-item">
                     <a href="#" class="nav-link">
-                    <i class="nav-icon fas fa-user-cog"></i>
+                    <i class="nav-icon fas fa-list"></i>
                         <p> Admin. módulos
                             <i class="right fas fa-angle-left"></i>
                         </p>
@@ -48,19 +48,19 @@
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
                             <a href="#" class="nav-link" onclick="cargarModulosUsuarios()">
-                                <i class="fas fa-user nav-icon"></i>
+                                <i class="fas fa-tasks nav-icon"></i>
                                 <p>Módulos</p>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a href="#" class="nav-link" onclick="cargarMenusUsuarios()">
-                                <i class="fas fa-user nav-icon"></i>
+                                <i class="fas fa-tasks nav-icon"></i>
                                 <p>Menús</p>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a href="#" class="nav-link" onclick="cargarPermisosUsuarios()">
-                                <i class="fas fa-user nav-icon"></i>
+                                <i class="fas fa-user-times nav-icon"></i>
                                 <p>Permisos</p>
                             </a>
                         </li>
