@@ -18,6 +18,7 @@ $routes->setAutoRoute(true);
 
 $routes->get('/', 'login::index');
 $routes->get('escritorio', 'Panel::index');
+
 //$routes->get('/productos', 'Productos::index');
 //$routes->get('/productos/(:num)','Productos::show/$1');
 //$routes->get('/productos/(:alpha)/(:num)','Productos::cat/$1/$2');

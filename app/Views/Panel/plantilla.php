@@ -13,6 +13,8 @@
   <link rel="stylesheet" href="<?php echo base_url();?>../assets/plugins/bootstrap/css/adminlte.min.css">
 
   <link rel="stylesheet" href="<?php echo base_url();?>../assets/plugins/sweetalert2/sweetalert2.min.css">
+
+  <link rel="stylesheet" href="<?php echo base_url();?>../assets/plugins/select2/css/select2.min.css">
 </head>
 <body class="hold-transition sidebar-mini">
 <!-- Site wrapper -->
@@ -97,6 +99,7 @@
 <script src="<?php echo base_url();?>../assets/plugins/bootstrap/js/bootstrap.min.js"></script>
 <script src="<?php echo base_url();?>../assets/plugins/bootstrap/js/adminlte.min.js"></script>
 <script src="<?php echo base_url();?>../assets/plugins/sweetalert2/sweetalert2.all.min.js"></script>
+<script src="<?php echo base_url();?>../assets/plugins/select2/js/select2.min.js"></script>
 
 </body>
 </html>
