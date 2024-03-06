@@ -31,7 +31,7 @@
                     </ul>
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
-                            <a href="#" class="nav-link" onclick="cargarPermisosUsuarios()">
+                            <a href="#" class="nav-link" onclick="">
                                 <i class="fas fa-user nav-icon"></i>
                                 <p>UsuariosSucursales</p>
                             </a>
@@ -47,19 +47,19 @@
                     </a>
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
-                            <a href="#" class="nav-link" onclick="cargarPermisosUsuarios()">
+                            <a href="#" class="nav-link" onclick="cargarModulosUsuarios()">
                                 <i class="fas fa-user nav-icon"></i>
                                 <p>Módulos</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="#" class="nav-link" onclick="">
+                            <a href="#" class="nav-link" onclick="cargarMenusUsuarios()">
                                 <i class="fas fa-user nav-icon"></i>
                                 <p>Menús</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="#" class="nav-link" onclick="">
+                            <a href="#" class="nav-link" onclick="cargarPermisosUsuarios()">
                                 <i class="fas fa-user nav-icon"></i>
                                 <p>Permisos</p>
                             </a>
@@ -111,6 +111,30 @@
                 // Realizar la solicitud AJAX
                 $.ajax({
                     url: "<?php echo base_url(); ?>../app/Views/configuracion-general/permisos-usuarios/vistas/permisosUsuario.php",
+                    type: "GET",
+                    success: function(response) {
+                        // Insertar el contenido dentro del h1
+                        $('#contenidoGeneral').html(response);
+                    }
+                });
+            }
+
+            function cargarModulosUsuarios() {
+                // Realizar la solicitud AJAX
+                $.ajax({
+                    url: "<?php echo base_url(); ?>../app/Views/configuracion-general/permisos-usuarios/vistas/modulosUsuario.php",
+                    type: "GET",
+                    success: function(response) {
+                        // Insertar el contenido dentro del h1
+                        $('#contenidoGeneral').html(response);
+                    }
+                });
+            }
+            
+            function cargarMenusUsuarios() {
+                // Realizar la solicitud AJAX
+                $.ajax({
+                    url: "<?php echo base_url(); ?>../app/Views/configuracion-general/permisos-usuarios/vistas/menusUsuario.php",
                     type: "GET",
                     success: function(response) {
                         // Insertar el contenido dentro del h1
