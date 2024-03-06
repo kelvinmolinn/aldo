@@ -93,8 +93,9 @@
 
         <!-- Main content -->
         <section class="content">
-
+            
         </section>
+
         <script>
             function cargarAdminUsuarios() {
                 // Realizar la solicitud AJAX
