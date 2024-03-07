@@ -1,28 +1,19 @@
 <?php 
     namespace App\Models;
+
     use CodeIgniter\Model;
-
-    class Usuario extends Model{
-        public function obtenerUsuario($data){
-            $usuario = $this->db->table('conf_usuarios');
+    
+    class Usuario extends Model
+    {
+        protected $table = 'conf_usuarios';
+    
+        public function obtenerUsuario($data)
+        {
+            // Agregar JOIN a conf_empleados (cambiar cof a conf) 
+            $usuario = $this->db->table('conf_usuarios'); // Establecer la tabla 'conf_usuarios'
             $usuario->where($data);
-            return $usuario->get()->getResultArray();
-        }
-
-        public function obtenerDatos($data){
-            $usuario = $this->db->table('cof_empleados');
-            $usuario->where($data);
-            return $usuario->get()->getResultArray();
+            $usuario->limit(1);
+            return $usuario->get()->getRowArray();
         }
     }
-
-    /*  protected $table = 'usuario';
-        protected $primaryKey = 'usuarioId';
-
-        public function buscarUsuarioProEmail($correo){
-            $db = db_connect();
-            $builder = $db->table($this->table)->where('correoUsuario', $correo)->where('estadoUsuario', 'Activo');
-            $resultado = $builder->get();
-            return $resultado->getResult() ? $resultado->getResult()[0] : false; 
-        }*/
 ?>

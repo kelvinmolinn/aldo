@@ -1,7 +1,7 @@
 <?php 
     $this->extend('Panel/plantilla');
-    $this->section('menu');
 ?>
+<<<<<<< Updated upstream
 <nav class="mt-2">
     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
         <!-- Add icons to the links using the .nav-icon class
@@ -78,6 +78,8 @@
     </ul>
     </nav>
     <?php $this->endSection(); ?>
+=======
+>>>>>>> Stashed changes
     <?php $this->section('contenido'); ?>
         <section class="content-header">
         <div class="container-fluid">
@@ -95,6 +97,7 @@
         <section class="content">
             
         </section>
+<<<<<<< Updated upstream
 
         <script>
             function cargarAdminUsuarios() {
@@ -158,4 +161,6 @@
                 })
             }
         </script>
+=======
+>>>>>>> Stashed changes
     <?php $this->endSection(); ?>

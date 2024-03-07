@@ -7,15 +7,13 @@ class Panel extends BaseController{
         $session = session();
         
         if(!$session->get('nombreUsuario')) {
-            return redirect()->to(base_url('Login/index'));
+            return view('login');
         }
         $usuario = new Usuario();
-    
-        $usuarios = $usuario->obtenerDatos();
         
-        var_dump($usuarios);
-        
-        return view("Panel/escritorio", ['usuarios' => $usuarios]);
+        //$data['usuarios'] = $usuario->obtenerDatos();
+
+        return view("Panel/escritorio");
     }
 }
 

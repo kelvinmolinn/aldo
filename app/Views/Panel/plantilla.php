@@ -15,6 +15,17 @@
   <link rel="stylesheet" href="<?php echo base_url();?>../assets/plugins/sweetalert2/sweetalert2.min.css">
 
   <link rel="stylesheet" href="<?php echo base_url();?>../assets/plugins/select2/css/select2.min.css">
+
+  <!-- jQuery -->
+  <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>-->
+  <script src="<?php echo base_url();?>../assets/plugins/bootstrap/js/jquery.min.js"></script>
+  <!-- Bootstrap 4 -->
+  <script src="<?php echo base_url();?>../assets/plugins/bootstrap/js/popper.min.js"></script>
+  <!-- AdminLTE App -->
+  <script src="<?php echo base_url();?>../assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+  <script src="<?php echo base_url();?>../assets/plugins/bootstrap/js/adminlte.min.js"></script>
+  <script src="<?php echo base_url();?>../assets/plugins/sweetalert2/sweetalert2.all.min.js"></script>
+  <script src="<?php echo base_url();?>../assets/plugins/select2/js/select2.min.js"></script>
 </head>
 <body class="hold-transition sidebar-mini">
 <!-- Site wrapper -->
@@ -42,7 +53,7 @@
   <!-- Main Sidebar Container -->
   <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
-    <a href="#" class="brand-link">
+    <a href="<?= site_url('escritorio/dashboard'); ?>" class="brand-link">
       <img class="brand-image img-circle elevation-3" style="opacity: .8" src="<?php echo base_url();?>../assets/plugins/img/algo_game_store.jpg">
       <span class="brand-text font-weight-light">Aldo Games</span>
     </a>
@@ -62,7 +73,81 @@
       </div>
 
       <!-- Sidebar Menu -->
-     <?php $this->renderSection('menu'); ?>
+      <nav class="mt-2">
+    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+        <!-- Add icons to the links using the .nav-icon class
+            with font-awesome or any other icon font library -->
+        <li class="nav-item">
+            <a href="#" class="nav-link">
+                <i class="nav-icon fas fa-cog"></i>
+                    <p>Configuración usuario
+                        <i class="right fas fa-angle-left"></i>
+                    </p>
+            </a>
+            <ul class="nav nav-treeview">
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                    <i class="nav-icon fas fa-user-cog"></i>
+                        <p> Admin. usuario
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="<?= site_url('conf-general/administracion-usuarios'); ?>" class="nav-link">
+                                <i class="fas fa-user nav-icon"></i>
+                                <p>Usuarios</p>
+                            </a>
+                        </li>
+                    </ul>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" onclick="">
+                                <i class="fas fa-user nav-icon"></i>
+                                <p>UsuariosSucursales</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                    <i class="nav-icon fas fa-user-cog"></i>
+                        <p> Admin. módulos
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" onclick="cargarModulosUsuarios()">
+                                <i class="fas fa-user nav-icon"></i>
+                                <p>Módulos</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" onclick="cargarMenusUsuarios()">
+                                <i class="fas fa-user nav-icon"></i>
+                                <p>Menús</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" onclick="cargarPermisosUsuarios()">
+                                <i class="fas fa-user nav-icon"></i>
+                                <p>Permisos</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </li>
+        
+        <li class="nav-item">
+        <a href="#" onclick="cerrarSession();" class="nav-link">
+            <i class="fas fa-sign-out-alt text-danger"></i>
+            <p>Cerrar Sesión</p>
+        </a>
+        </li>
+    </ul>
+    </nav>
       <!-- /.sidebar-menu -->
     </div>
     <!-- /.sidebar -->
@@ -74,6 +159,7 @@
   <?php $this->renderSection('contenido'); ?>
     <!-- /.content -->
   </div>
+  <div id="divModalContent"></div>
   <!-- /.content-wrapper -->
 
   <footer class="main-footer">
@@ -90,16 +176,21 @@
   <!-- /.control-sidebar -->
 </div>
 <!-- ./wrapper -->
-
-<!-- jQuery -->
-<script src="<?php echo base_url();?>../assets/plugins/bootstrap/js/jquery.min.js"></script>
-<!-- Bootstrap 4 -->
-<script src="<?php echo base_url();?>../assets/plugins/bootstrap/js/popper.min.js"></script>
-<!-- AdminLTE App -->
-<script src="<?php echo base_url();?>../assets/plugins/bootstrap/js/bootstrap.min.js"></script>
-<script src="<?php echo base_url();?>../assets/plugins/bootstrap/js/adminlte.min.js"></script>
-<script src="<?php echo base_url();?>../assets/plugins/sweetalert2/sweetalert2.all.min.js"></script>
-<script src="<?php echo base_url();?>../assets/plugins/select2/js/select2.min.js"></script>
-
 </body>
+<script>
+    function cerrarSession(){
+        Swal.fire({
+            title: 'Desea cerrar session',
+            text: 'La session terminará!',
+            icon: 'warning',
+            showCancelButton: true,
+            cancelButton: '#d33',
+            confirmButtonText: 'Sí, salir' 
+        }).then((result) =>{
+            if(result.isConfirmed){
+                window.location.href = '<?= site_url('cerrarSession'); ?>';
+            }
+        })
+    }
+</script>
 </html>

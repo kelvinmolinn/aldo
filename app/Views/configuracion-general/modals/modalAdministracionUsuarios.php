@@ -1,65 +1,3 @@
-<?php 
-/*$bd = \Config\Database::connect();
-$consulta = $bd->query("
-    SELECT 
-        primerNombre,
-        primerApellido
-    FROM cof_empleados 
-    WHERE estadoEmpleado = 'Activo'
-");*/
-?>
-<h2>Gestión de usuarios</h2>
-<hr>
-<div class="row mb-4">
-    <div class="col-md-12 text-right">
-        <button type= "button" id="btn" class="btn btn-primary" onclick="modal();">
-            <i class="fas fa-save"></i>
-            Nuevo usuario
-        </button>
-    </div>
-</div>
-<div class="table-responsive">
-    <table class="table table-hover" style="width: 100%;">
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>Empleado</th>
-                <th>Usuario</th>
-                <th>Estado</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php foreach($usuarios as $usuarios){ ?>
-                <tr>
-                    <td></td>
-                    <td>Nombre completo: <?php echo $usuarios['primerNombre'];?><br>
-                        Sucursal:               <br>
-                        DUI:
-                    </td>
-                    <!--<td>
-                        Correo:         <br>
-                        Rol:            <br>
-                        En linea:       <br>
-                    </td>
-                    <td>
-                        Activo
-                    </td>-->
-                    <td>
-                        <button class="btn btn-primary mb-1">
-                            <i class="fas fa-pencil-alt"></i>
-                            <span class="">Editar Usuario</span>
-                        </button><br>
-                        <button class="btn btn-success mb-1">Restablecer acceso</button><br>
-                        <button class="btn btn-primary mb-1">0 Sucursales</button><br>
-                        <button class="btn btn-primary mb-1">Activar</button>
-                    </td>
-                </tr>
-            <?php } ?>
-        </tbody>
-    </table>
-</div>
-
 <div id="modalUsuario" class="modal" tabindex="-1">
   <div class="modal-dialog  modal-lg">
     <div class="modal-content">
@@ -130,8 +68,8 @@ $consulta = $bd->query("
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-        <button type="button" class="btn btn-primary">Guardar</button>
+          <button type="button" class="btn btn-primary">Guardar</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
       </div>
     </div>
   </div>
@@ -139,20 +77,11 @@ $consulta = $bd->query("
 
 <script>
     $(document).ready(function() {
-        $('#selectGenero').select2({
-            placeholder: 'Fecha',
-            dropdownParent: $('.modal-content')   
-        });
-
-        $('#selectRol').select2({
-            placeholder: 'Roles',
-            dropdownParent: $('.modal-content')
+        $("#selectGenero").select2({
+            placeholder: 'Genero'
+        })
+        $("#selectRol").select2({
+            placeholder: 'Roles'
         })
     });
-
-    function modal(){
-        $('#modalUsuario').modal(
-
-        );
-    }
 </script>

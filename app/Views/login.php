@@ -26,7 +26,7 @@
     <div class="card-body login-card-body">
         <img class="login mb-4" src="<?php echo base_url();?>../assets/plugins/img/algo_game_store.jpg">
 
-      <form action="<?php echo base_url();?>login/validarIngreso" method="post">
+      <form action="<?php echo base_url('login/validarIngreso'); ?>" method="post">
         <div class="input-group mb-3">
           <input type="email" name="correoUsuario" id="correoUsuario" class="form-control" placeholder="Correo electrónico" required>
           <div class="input-group-append">
@@ -56,6 +56,10 @@
         
           <!-- /.col -->
         </div>
+        <!-- Mensaje de error si lo hay -->
+        <?php if (session()->has('mensaje')): ?>
+            <p style="color: red;"><?php echo session('mensaje'); ?></p>
+        <?php endif; ?>
         <div class="row">
             <button type="submit" class="btn btn-primary btn-block">Iniciar Sesion</button>
         </div>          
