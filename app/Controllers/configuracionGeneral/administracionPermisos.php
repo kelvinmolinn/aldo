@@ -17,4 +17,42 @@ class AdministracionPermisos extends Controller
         return view('configuracion-general/modals/modalAdministracionModulos');
     }
 
+    public function insertarNuevoModulo()
+    {
+    
+        $model = new InsertNuevoModulo();
+
+        $modulo = $this->request->getPost('modulo');
+            
+        if ($model->moduloExiste($modulo)) {
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'El Módulo ya está registrado en la base de datos'
+            ]);
+        }
+        $data = [
+            'modulo'            => $this->request->getPost('modulo'),
+            'iconoModulo'       => $this->request->getPost('iconoModulo'),
+            'urlModulo'         => $this->request->getPost('urlModulo')
+            
+            //'contrasena' => password_hash($this->request->getPost('contrasena'), PASSWORD_DEFAULT) // Encriptar contraseña
+        ];
+        // Insertar datos en la base de datos
+        $insertModulo = $model->insert($data);
+        if ($insertModulo) {
+            // Si el insert fue exitoso, devuelve el último ID insertado
+            return $this->response->setJSON([
+                'success' => true,
+                'mensaje' => 'Modulo Agregado correctamente',
+                'moduloId' => $model->insertID()
+            ]);
+        } else {
+            // Si el insert falló, devuelve un mensaje de error
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'No se pudo insertar el empleado'
+            ]);
+        }
+    }
+
 }

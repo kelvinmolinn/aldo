@@ -111,7 +111,7 @@
                 </li>
                 <li class="nav-item">
                     <a href="#" class="nav-link">
-                    <i class="nav-icon fas fa-user-cog"></i>
+                    <i class="nav-icon fas fa-wrench"></i>
                         <p> Admin. módulos
                             <i class="right fas fa-angle-left"></i>
                         </p>
@@ -119,19 +119,19 @@
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
                                 <a href="<?= site_url('conf-general/administracion-modulos'); ?>" class="nav-link">
-                                <i class="fas fa-user nav-icon"></i>
+                                <i class="fas fa-tasks nav-icon"></i>
                                 <p>Módulos</p>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a href="#" class="nav-link" onclick="cargarMenusUsuarios()">
-                                <i class="fas fa-user nav-icon"></i>
+                                <i class="fas fa-tasks nav-icon"></i>
                                 <p>Menús</p>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a href="#" class="nav-link" onclick="cargarPermisosUsuarios()">
-                                <i class="fas fa-user nav-icon"></i>
+                                <i class="fas fa-user-check nav-icon"></i>
                                 <p>Permisos</p>
                             </a>
                         </li>

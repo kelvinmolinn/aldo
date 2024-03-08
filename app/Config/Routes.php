@@ -55,7 +55,11 @@ $routes->post('nuevo-usuario/guardar-usuario', 'configuracionGeneral\Administrac
 $routes->get('conf-general/administracion-modulos', 'configuracionGeneral\AdministracionPermisos::configuracionModulos');
 
 // Ruta para modals de nuevo modulo
-$routes->get('administracion-usuarios/nuevo-modulo', 'configuracionGeneral\AdministracionPermisos::modalnuevoModulo');
+$routes->get('administracion-modulos/nuevo-modulo', 'configuracionGeneral\AdministracionPermisos::modalnuevoModulo');
+
+//
+$routes->post('obtener-ruta/nueva-ruta', 'configuracionGeneral\AdministracionPermisos::insertarNuevoModulo');
+
 
 // Rutas de errores
 $routes->get('404', 'Errores::error404');
