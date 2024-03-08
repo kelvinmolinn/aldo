@@ -16,6 +16,6 @@ class Modulos extends Model
     protected $createdField  = 'fhAgrega'; // Campo creado automáticamente al insertar
     protected $updatedField  = 'fhEdita'; // Campo actualizado automáticamente al actualizar
     
-    // YA CERRE TODO NO VA A ENCONTRAR NADA JAJAJAJAAJA XDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD
+   
 }
 

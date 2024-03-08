@@ -14,12 +14,12 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-outline">
-                                <input type="text" class="form-control" id="icono" name="icono" placeholder="Icono" required>
+                                <input type="text" class="form-control" id="iconoModulo" name="iconoModulo" placeholder="Icono" required>
                             </div>
                         </div>
                         <div class="col-md-12 mt-4">
                             <div class="form-select-control">
-                                <select name="selectRuta" id="selectRuta" style="width: 100%;">
+                                <select name="urlModulo" id="urlModulo" style="width: 100%;">
                                     <option value=""></option>
                                     <option value="ruta">Url (select de las carpetas en la raíz de /modulos)</option>
                                     <option value="ruta2">Url (select de las carpetas en la raíz de /modulos)</option>
@@ -45,7 +45,7 @@
 
 <script>
     $(document).ready(function() {
-        $("#selectRuta").select2({
+        $("#urlModulo").select2({
             placeholder: 'Ruta'
         })
         $('#btnguardarUsuario').on('click', function() {
@@ -57,15 +57,26 @@
                 success: function(response) {
                     console.log(response);
                     if (response.success) {
-                        // Insert exitoso, ocultar modal y mostrar mensaje
+                        // Insert exitoso, ocultar modal y mostrar mensaje con Sweet Alert
                         $('#modalModulos').modal('hide');
-                        alert(response.mensaje);
-                        console.log("Último ID insertado:", response.empleadoId);
+                        Swal.fire({
+                            icon: 'success',
+                            title: '¡Módulo creado con Éxito!',
+                            text: response.mensaje
+                        }).then((result) => {
+    
+                        });
+                        console.log("Último ID insertado:", response.moduloId);
                     } else {
-                        // Insert fallido, mostrar mensaje de error
-                        alert(response.mensaje);
+                        // Insert fallido, mostrar mensaje de error con Sweet Alert
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.mensaje
+                        });
                     }
                 },
+
                 error: function(xhr, status, error) {
                     // Manejar errores si los hay
                     console.error(xhr.responseText);

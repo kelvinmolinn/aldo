@@ -22,7 +22,6 @@
                 <th>Acciones</th>
             </tr>
         </thead>
-        <tbody>
     </table>
 </div>
 <script>
