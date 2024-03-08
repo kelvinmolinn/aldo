@@ -58,7 +58,7 @@ $routes->get('conf-general/administracion-modulos', 'configuracionGeneral\Admini
 $routes->get('administracion-modulos/nuevo-modulo', 'configuracionGeneral\AdministracionPermisos::modalnuevoModulo');
 
 //
-$routes->post('obtener-ruta/nueva-ruta', 'configuracionGeneral\AdministracionPermisos::insertarNuevoModulo');
+$routes->post('xd/nuevo-xd', 'configuracionGeneral\AdministracionPermisos::insertarNuevoModulo');
 
 
 // Rutas de errores

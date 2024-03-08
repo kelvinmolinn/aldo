@@ -51,7 +51,7 @@
         $('#btnguardarUsuario').on('click', function() {
             // Realizar una petición AJAX para obtener el contenido de la modal
             $.ajax({
-                url: '<?php echo base_url('obtener-ruta/nueva-ruta'); ?>',
+                url: '<?php echo base_url('xd/nuevo-xd'); ?>',
                 type: 'POST',
                 data: $("#frmModal").serialize(),
                 success: function(response) {

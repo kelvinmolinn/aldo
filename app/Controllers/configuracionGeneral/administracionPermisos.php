@@ -3,6 +3,7 @@
 namespace App\Controllers\configuracionGeneral;
 
 use CodeIgniter\Controller;
+use App\Models\Modulos;
 
 class AdministracionPermisos extends Controller
 {
@@ -19,17 +20,10 @@ class AdministracionPermisos extends Controller
 
     public function insertarNuevoModulo()
     {
-    
-        $model = new InsertNuevoModulo();
+        $model = new Modulos();
 
         $modulo = $this->request->getPost('modulo');
             
-        if ($model->moduloExiste($modulo)) {
-            return $this->response->setJSON([
-                'success' => false,
-                'mensaje' => 'El Módulo ya está registrado en la base de datos'
-            ]);
-        }
         $data = [
             'modulo'            => $this->request->getPost('modulo'),
             'iconoModulo'       => $this->request->getPost('iconoModulo'),

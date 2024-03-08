@@ -4,6 +4,7 @@ namespace App\Controllers\configuracionGeneral;
 
 use CodeIgniter\Controller;
 use App\Models\InsertNuevoUsuario;
+use App\Models\Roles;
 
 class AdministracionUsuarios extends Controller
 {
@@ -30,10 +31,11 @@ class AdministracionUsuarios extends Controller
 
     public function modalAdministracionUsuarios()
     {
-                // Llamar al método mensaje y pasar su resultado a la vista
-                
-        // Cargar la modal
-        return view('configuracion-general/modals/modalAdministracionUsuarios');
+        // Cargar el modelo de roles
+        $rolesModel = new Roles();
+
+        $data['roles'] = $rolesModel->where('flgElimina', 0)->findAll();
+        return view('configuracion-general/modals/modalAdministracionUsuarios', $data);
     }
 
     public function insertarNuevoUsuario()
@@ -64,11 +66,27 @@ class AdministracionUsuarios extends Controller
         $insertEmpleado = $model->insert($data);
         if ($insertEmpleado) {
             // Si el insert fue exitoso, devuelve el último ID insertado
-            return $this->response->setJSON([
-                'success' => true,
-                'mensaje' => 'Usuario insertado correctamente',
-                'empleadoId' => $model->insertID()
-            ]);
+            $empleadoId = $model->insertID();
+
+            $dataUsuario = [
+                'empleadoId'               => $empleadoId,
+                'correo'                    => $this->request->getPost('correocorreoUsuario')
+            ];
+            $insertUsuario = $model->insert($dataUsuario);
+            if($insertUsuario){
+                return $this->response->setJSON([
+                    'success' => true,
+                    'mensaje' => 'Usuario insertado correctamente',
+                    'empleadoId' => $model->insertID()
+                ]);
+            }else{
+                return $this->response->setJSON([
+                    'success' => false,
+                    'mensaje' => 'No se pudo insertar el empleado'
+                ]);
+    
+            }
+
         } else {
             // Si el insert falló, devuelve un mensaje de error
             return $this->response->setJSON([
@@ -77,4 +95,5 @@ class AdministracionUsuarios extends Controller
             ]);
         }
     }
+
 }
