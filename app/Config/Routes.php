@@ -49,6 +49,8 @@ $routes->get('conf-general/administracion-usuarios', 'configuracionGeneral\Admin
 // Rutas para modals
 $routes->get('administracion-usuarios/nuevo-usuario', 'configuracionGeneral\AdministracionUsuarios::modalAdministracionUsuarios');
 
+//insert 
+$routes->post('nuevo-usuario/guardar-usuario', 'configuracionGeneral\AdministracionUsuarios::insertarNuevoUsuario');
 
 // Rutas de errores
 $routes->get('404', 'Errores::error404');
