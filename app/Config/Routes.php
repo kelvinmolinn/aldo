@@ -45,12 +45,17 @@ $routes->get('escritorio/dashboard', 'Panel::index');
 // Rutas para Conf general
 $routes->get('conf-general/administracion-usuarios', 'configuracionGeneral\AdministracionUsuarios::index');
 
-
 // Rutas para modals
 $routes->get('administracion-usuarios/nuevo-usuario', 'configuracionGeneral\AdministracionUsuarios::modalAdministracionUsuarios');
 
 //insert 
 $routes->post('nuevo-usuario/guardar-usuario', 'configuracionGeneral\AdministracionUsuarios::insertarNuevoUsuario');
+
+// Rutas para configuracion de modulos
+$routes->get('conf-general/administracion-modulos', 'configuracionGeneral\AdministracionPermisos::configuracionModulos');
+
+// Ruta para modals de nuevo modulo
+$routes->get('administracion-usuarios/nuevo-modulo', 'configuracionGeneral\AdministracionPermisos::modalnuevoModulo');
 
 // Rutas de errores
 $routes->get('404', 'Errores::error404');

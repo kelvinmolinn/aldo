@@ -118,7 +118,7 @@
                     </a>
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
-                            <a href="#" class="nav-link" onclick="cargarModulosUsuarios()">
+                                <a href="<?= site_url('conf-general/administracion-modulos'); ?>" class="nav-link">
                                 <i class="fas fa-user nav-icon"></i>
                                 <p>Módulos</p>
                             </a>
