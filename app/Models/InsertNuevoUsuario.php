@@ -9,12 +9,7 @@ class InsertNuevoUsuario extends Model
     protected $table = 'conf_empleados';
     protected $primaryKey = 'empleadoId'; // si el nombre de la clave primaria es diferente
 
-    protected $allowedFields = ['dui','primerNombre','segundoNombre','primerApellido','segundoApellido','fechaNacimiento','sexoEmpleado']; // Campos permitidos para la inserción
-
-    protected $tableUsuarios = 'conf_usuarios';
-    protected $primaryKeyUsuarios = 'usuarioId'; // si el nombre de la clave primaria es diferente
-    
-    protected $allowedFieldsUsuarios = ['empleadoId','correo']; // Campos permitidos para la inserción
+    protected $allowedFields = ['dui','primerNombre','segundoNombre','primerApellido','segundoApellido','fechaNacimiento','sexoEmpleado','estadoEmpleado']; // Campos permitidos para la inserción
 
 
     protected $useTimestamps = true; // Utiliza campos de timestamp para created_at y updated_at
@@ -30,6 +25,6 @@ class InsertNuevoUsuario extends Model
         return $resultado > 0; // Devuelve true si el DUI existe, false en caso contrario
     }
 
-
 }
+
 

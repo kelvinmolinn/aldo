@@ -24,17 +24,21 @@
             </tr>
         </thead>
         <tbody>
-            <?php //foreach($data as $usuarios){ ?>
+            <?php 
+                $n = 0;
+                //var_dump($empleados);
+                foreach($empleados as $empleados){ 
+                    $n++;
+            ?>
                 <tr>
-                    <td></td>
-                    <td>Nombre completo: <?php //echo $usuarios->primerNombre;?><br>
-                        Sucursal:               <br>
-                        DUI:
+                    <td><?php echo $n; ?></td>
+                    <td><b>Nombre completo: </b><?php echo $empleados['primerNombre'].' '.$empleados['segundoNombre'].' '.$empleados['primerApellido'].' '.$empleados['segundoApellido']; ?><br>
+                        <b>DUI: </b><?php echo $empleados['dui']; ?>
                     </td>
                     <td>
-                        Correo:         <br>
-                        Rol:            <br>
-                        En linea:       <br>
+                        <b>Correo: </b><?php echo $empleados['correo']; ?>  <br>
+                        <b>Rol: </b><?php echo $empleados['rol']; ?>     <br>
+                        <b>En linea: </b>                                   <br>
                     </td>
                     <td>
                         Activo
@@ -49,7 +53,7 @@
                         <button class="btn btn-primary mb-1">Activar</button>
                     </td>
                 </tr>
-            <?php //} ?>
+            <?php } ?>
         </tbody>
     </table>
 </div>

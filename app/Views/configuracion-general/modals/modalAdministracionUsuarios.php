@@ -60,10 +60,10 @@
                 <div class="col-md-6">
                     <div class="form-select-control">
                         <select name="selectRol" id="selectRol" style = "width: 100%;">
-                        <option></option>
-                        <?php foreach ($roles as $rol) : ?>
-                            <option value="<?php echo $rol['rolId']; ?>"><?php echo $rol['rol']; ?></option>
-                        <?php endforeach; ?>
+                            <option></option>
+                            <?php foreach ($roles as $rol) : ?>
+                                <option value="<?php echo $rol['rolId']; ?>"><?php echo $rol['rol']; ?></option>
+                            <?php endforeach; ?>
                         </select>
                     </div>
                 </div>
