@@ -13,7 +13,7 @@
     </div>
 </div>
 <div class="table-responsive">
-    <table id="tblEmpleados" class="table table-hover" style="width: 100%;">
+    <table id="tblEmpleados" name = "tblEmpleados" class="table table-hover" style="width: 100%;">
         <thead>
             <tr>
                 <th>#</th>
@@ -50,7 +50,8 @@
                         </button>
                         <button class="btn btn-success mb-1">Restablecer acceso</button>
                         <a href="<?= site_url('conf-general/usuario-sucursal?nombre=' . urlencode($empleados['primerNombre'] . ' ' . $empleados['segundoNombre'] . ' ' . $empleados['primerApellido'] . ' ' . $empleados['segundoApellido'])); ?>" class="btn btn-primary mb-1" data-toggle="tooltip" data-placement="top" title="Sucursales">
-                            <i class="fas fa-user nav-icon"></i>
+                            <span>0</span>
+                            <i class="fas fa-store"></i>
                         </a>
                         <button class="btn btn-primary mb-1">Activar</button>
                     </td>

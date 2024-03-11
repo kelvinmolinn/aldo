@@ -103,11 +103,22 @@
                     if (response.success) {
                         // Insert exitoso, ocultar modal y mostrar mensaje
                         $('#modalUsuario').modal('hide');
-                        alert(response.mensaje);
+                        Swal.fire({
+                            icon: 'success',
+                            title: '¡Usuario agregado con Éxito!',
+                            text: response.mensaje
+                        }).then((result) => {
+                              // Recargar la DataTable después del insert
+                              $('#tblEmpleados').DataTable().ajax.reload(); // Recargar la tabla
+                        });
                         console.log("Último ID insertado:", response.empleadoId);
                     } else {
                         // Insert fallido, mostrar mensaje de error
-                        alert(response.mensaje);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.mensaje
+                        });
                     }
                 },
                 error: function(xhr, status, error) {
