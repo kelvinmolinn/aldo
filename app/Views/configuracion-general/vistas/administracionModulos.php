@@ -41,9 +41,9 @@
                         <i class="fas fa-pencil-alt"></i>
                     </button>
 
-                        <button class="btn btn-secondary mb-1" data-toggle="tooltip" data-placement="top" title="0 Menús">
-                            <i class="fas fa-bars"></i> 
-                        </button>
+                        <a href="<?= site_url('conf-general/page-menus-modulos?modulo=' .$modulos['modulo']); ?>" class="btn btn-secondary mb-1" data-toggle="tooltip" data-placement="top" title="0 Menús">
+                            <i class="fas fa-bars nav-icon"></i>
+                        </a>
 
                         <button class="btn btn-danger mb-1" data-toggle="tooltip" data-placement="top" title="Eliminar">
                             <i class="fas fa-trash"></i> 

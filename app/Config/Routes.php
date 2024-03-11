@@ -57,7 +57,7 @@ $routes->get('conf-general/administracion-modulos', 'configuracionGeneral\Admini
 // Ruta para modals de nuevo modulo
 $routes->get('administracion-modulos/nuevo-modulo', 'configuracionGeneral\AdministracionPermisos::modalnuevoModulo');
 
-//
+//modl modulo
 $routes->post('xd/nuevo-xd', 'configuracionGeneral\AdministracionPermisos::insertarNuevoModulo');
 
 // Ruta para usuarios sucursales
@@ -68,6 +68,13 @@ $routes->get('conf-general/administracion-menus', 'configuracionGeneral\Administ
 
 // Rutas para configuracion de permisos
 $routes->get('conf-general/administracion-permisos', 'configuracionGeneral\AdministracionPermisos::administracionPermisos');
+
+// Rutas para configuracion de permisos
+$routes->get('conf-general/page-menus-modulos', 'configuracionGeneral\AdministracionPermisos::menusModulos');
+
+// Ruta para modals de nuevo menu
+$routes->get('administracion-modulos/nuevo-menu', 'configuracionGeneral\AdministracionPermisos::modalnuevoMenu');
+
 
 
 // Rutas de errores

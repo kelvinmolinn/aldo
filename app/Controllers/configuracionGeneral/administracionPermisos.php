@@ -25,6 +25,12 @@ class AdministracionPermisos extends Controller
         return view('configuracion-general/modals/modalAdministracionModulos');
     }
 
+    public function modalnuevoMenu()
+    {
+        // Cargar la vista 'administracionMenus.php' desde la carpeta 'Views/configuracion-general/vistas'
+        return view('configuracion-general/modals/modalAdministracionMenus');
+    }
+
     public function AdministracionMenus()
     {
         // Cargar la vista 'administracionUsuarios.php' desde la carpeta 'Views/configuracion-general/vistas'
@@ -77,6 +83,15 @@ class AdministracionPermisos extends Controller
         return view('administracionModulos', ['datos' => $datos]);
     }
     
+    public function menusModulos()
+    {
+
+        $request = \Config\Services::request();
+
+        // Cargar la vista 'administracionUsuarios.php' desde la carpeta 'Views/configuracion-general/vistas'
+        return view('configuracion-general/vistas/pageMenusModulos', ['request' => $request]);
+    }
+
 
 
 }
