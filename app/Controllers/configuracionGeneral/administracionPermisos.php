@@ -10,8 +10,14 @@ class AdministracionPermisos extends Controller
 {
     public function configuracionModulos()
     {
+        $mostrarModulos = new Modulos();
+
+        $data['modulos'] = $mostrarModulos
+        ->select('conf_modulos.*')
+        ->where('conf_modulos.flgElimina', 0)
+        ->findAll();
         // Cargar la vista 'administracionUsuarios.php' desde la carpeta 'Views/configuracion-general/vistas'
-        return view('configuracion-general/vistas/administracionModulos');
+        return view('configuracion-general/vistas/administracionModulos', $data);
     }
     public function modalnuevoModulo()
     {

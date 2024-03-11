@@ -7,6 +7,8 @@
 
   <!-- Google Font: Source Sans Pro -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+
+
   <!-- Font Awesome -->
   <link rel="stylesheet" href="<?php echo base_url();?>../assets/plugins/fontawesome-free/css/all.min.css">
   <!-- Theme style -->
@@ -15,6 +17,9 @@
   <link rel="stylesheet" href="<?php echo base_url();?>../assets/plugins/sweetalert2/sweetalert2.min.css">
 
   <link rel="stylesheet" href="<?php echo base_url();?>../assets/plugins/select2/css/select2.min.css">
+  <!-- En el head de tu vista -->
+  <link rel="stylesheet"  href="<?php echo base_url();?>../assets/plugins/datatables/css/dataTables.min.css">
+
 
   <!-- jQuery -->
   <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>-->
@@ -26,6 +31,8 @@
   <script src="<?php echo base_url();?>../assets/plugins/bootstrap/js/adminlte.min.js"></script>
   <script src="<?php echo base_url();?>../assets/plugins/sweetalert2/sweetalert2.all.min.js"></script>
   <script src="<?php echo base_url();?>../assets/plugins/select2/js/select2.min.js"></script>
+  <script src="<?php echo base_url();?>../assets/plugins/datatables/js/dataTables.min.js"></script>
+
 </head>
 <body class="hold-transition sidebar-mini">
 <!-- Site wrapper -->

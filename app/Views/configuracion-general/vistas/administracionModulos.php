@@ -13,7 +13,7 @@
     </div>
 </div>
 <div class="table-responsive">
-    <table class="table table-hover" style="width: 100%;">
+    <table class="table table-hover" id="miTabla" style="width: 100%;">
         <thead>
             <tr>
                 <th>#</th>
@@ -22,10 +22,41 @@
                 <th>Acciones</th>
             </tr>
         </thead>
+        <tbody>
+            <?php 
+                $n = 0;
+                //var_dump($empleados);
+                foreach($modulos as $modulos){ 
+                    $n++;
+            ?>
+                <tr>
+                    <td><?php echo $n; ?></td>
+                    <td><b>Módulo: </b><?php echo $modulos['modulo']; ?><br>
+                    </td>
+                    <td>
+                        <b>Url: </b><?php echo $modulos['urlModulo']; ?>  <br>
+                    </td>
+                    <td>
+                        <button class="btn btn-primary mb-1">
+                            <i class="fas fa-pencil-alt"></i>
+                            <span class="">Editar Usuario</span>
+                        </button><br>
+                        <button class="btn btn-success mb-1">Restablecer acceso</button><br>
+                        <button class="btn btn-primary mb-1">0 Sucursales</button><br>
+                        <button class="btn btn-primary mb-1">Activar</button>
+                    </td>
+                </tr>
+            <?php } ?>
+        </tbody>
     </table>
 </div>
 <script>
      $(document).ready(function() {
+        $('#miTabla').DataTable({
+        "language": {
+            "url": "../../assets/plugins/datatables/js/spanish.json"
+        }
+    });
         $('#btnAbrirModal').on('click', function() {
             // Realizar una petición AJAX para obtener el contenido de la modal
             $.ajax({
@@ -47,6 +78,7 @@
                 }
             });
         });
+
     });
 </script>
 <?= $this->endSection(); ?>
