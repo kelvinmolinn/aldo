@@ -4,7 +4,7 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class InsertNuevoUsuario extends Model
+class conf_empleados extends Model
 {
     protected $table = 'conf_empleados';
     protected $primaryKey = 'empleadoId'; // si el nombre de la clave primaria es diferente
