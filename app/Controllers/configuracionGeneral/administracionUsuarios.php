@@ -118,4 +118,9 @@ class AdministracionUsuarios extends Controller
         }
     }
 
+    public function usuarioSucursal(){
+
+        return view('configuracion-general/vistas/pageUsuariosSucursales');
+    }
+
 }

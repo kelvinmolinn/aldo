@@ -60,6 +60,9 @@ $routes->get('administracion-modulos/nuevo-modulo', 'configuracionGeneral\Admini
 //
 $routes->post('xd/nuevo-xd', 'configuracionGeneral\AdministracionPermisos::insertarNuevoModulo');
 
+// Ruta para usuarios sucursales
+$routes->get('conf-general/usuario-sucursal', 'configuracionGeneral\AdministracionUsuarios::usuarioSucursal');
+
 
 // Rutas de errores
 $routes->get('404', 'Errores::error404');

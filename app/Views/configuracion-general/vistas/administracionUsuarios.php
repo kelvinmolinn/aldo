@@ -13,7 +13,7 @@
     </div>
 </div>
 <div class="table-responsive">
-    <table class="table table-hover" style="width: 100%;">
+    <table id="tblEmpleados" class="table table-hover" style="width: 100%;">
         <thead>
             <tr>
                 <th>#</th>
@@ -44,13 +44,15 @@
                         Activo
                     </td>
                     <td>
-                        <button class="btn btn-primary estilo-btn mb-1">
+                        <button class="btn btn-primary mb-1">
                             <i class="fas fa-pencil-alt"></i>
-                            <span class="">Editar Usuario</span>
-                        </button><br>
-                        <button class="btn btn-success estilo-btn mb-1">Restablecer acceso</button><br>
-                        <button class="btn btn-primary estilo-btn mb-1">0 Sucursales</button><br>
-                        <button class="btn btn-primary estilo-btn mb-1">Activar</button>
+                            <span class=""></span>
+                        </button>
+                        <button class="btn btn-success mb-1">Restablecer acceso</button>
+                        <button class="btn btn-primary mb-1" id="btnUsuarioSucursal" name= "btnUsuarioSucursal">
+                            0
+                        </button>
+                        <button class="btn btn-primary mb-1">Activar</button>
                     </td>
                 </tr>
             <?php } ?>
@@ -76,6 +78,30 @@
                 }
             });
         });
+        
+        $('#btnUsuarioSucursal').on('click', function() {
+            // Realizar una petición AJAX para obtener la URL de la vista
+            $.ajax({
+                url: '<?php echo base_url('conf-general/usuario-sucursal'); ?>',
+                type: 'GET',
+                success: function(response) {
+                    // Redireccionar a la URL obtenida
+                    window.location.href = response;
+                }
+            });
+        });
+
+        $('#tblEmpleados').DataTable({
+            "language": {
+                "url": "../../assets/plugins/datatables/js/spanish.json"
+            },
+            "columnDefs": [
+                { "width": "10%"}, 
+                { "width": "40%"}, 
+                { "width": "35%"}, 
+                { "width": "15%"}  
+            ]
+        });
     });
-</script>
+</script>conf-general/usuario-sucursal
 <?= $this->endSection(); ?>
