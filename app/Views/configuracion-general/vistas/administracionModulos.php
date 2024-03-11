@@ -37,13 +37,22 @@
                         <b>Url: </b><?php echo $modulos['urlModulo']; ?>  <br>
                     </td>
                     <td>
-                        <button class="btn btn-primary mb-1">
-                            <i class="fas fa-pencil-alt"></i>
-                            <span class="">Editar Usuario</span>
-                        </button><br>
-                        <button class="btn btn-success mb-1">Restablecer acceso</button><br>
-                        <button class="btn btn-primary mb-1">0 Sucursales</button><br>
-                        <button class="btn btn-primary mb-1">Activar</button>
+                        <button class="btn btn-primary estilo-btn mb-1">
+                            <i class="fas fa-pencil-alt"></i> Editar Usuario
+                        </button> <br>
+
+                        <button class="btn btn-success estilo-btn mb-1">
+                            <i class="fas fa-sync-alt"></i> Restablecer acceso
+                        </button> <br>
+
+                        <button class="btn btn-secondary estilo-btn mb-1">
+                            <i class="fas fa-store"></i> 0 Sucursales
+                        </button> <br>
+
+                        <button class="btn btn-info estilo-btn mb-1">
+                            <i class="fas fa-toggle-on"></i> Activar
+                        </button> <br>
+
                     </td>
                 </tr>
             <?php } ?>
