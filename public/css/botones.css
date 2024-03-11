@@ -1,4 +1,25 @@
 
-    .estilo-btn {
-        width: 200px; /* Define el ancho deseado */
-    }
+
+    /* Estilo para botones personalizados */
+.estilo-btn {
+    /* Fondo */
+   
+    border: none; /* Sin borde */
+    color: white; /* Texto blanco */
+    width: 200px; /* Define el ancho deseado */
+
+    /* Espaciado y tamaño de texto */
+    padding: 10px 20px; /* Espaciado interno */
+    font-size: 16px; /* Tamaño de fuente */
+
+    /* Bordes redondeados */
+    border-radius: 5px;
+
+    /* Transición suave al pasar el ratón */
+    transition: background-color 0.3s;
+}
+
+/* Estilo al pasar el ratón sobre el botón */
+.estilo-btn:hover {
+    background-color: #130363; /* Color verde ligeramente más oscuro */
+}

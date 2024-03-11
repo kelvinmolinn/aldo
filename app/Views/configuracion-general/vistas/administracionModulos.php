@@ -6,7 +6,7 @@
 <hr>
 <div class="row mb-4">
     <div class="col-md-12 text-right">
-        <button type= "button" id="btnAbrirModal" class="btn btn-primary">
+        <button type= "button" id="btnAbrirModal" class="btn btn-primary estilo-btn">
             <i class="fas fa-save"></i>
             Nuevo módulo
         </button>
@@ -38,7 +38,7 @@
                     </td>
                     <td>
                         <button class="btn btn-primary estilo-btn mb-1">
-                            <i class="fas fa-pencil-alt"></i> Editar Usuario
+                            <i class="fas fa-pencil-alt" ></i> Editar Usuario
                         </button> <br>
 
                         <button class="btn btn-success estilo-btn mb-1">
@@ -64,7 +64,13 @@
         $('#miTabla').DataTable({
         "language": {
             "url": "../../assets/plugins/datatables/js/spanish.json"
-        }
+        },
+        "columnDefs": [
+            { "width": "10%", "targets": 0 }, 
+            { "width": "40%", "targets": 1 }, 
+            { "width": "35%", "targets": 2 }, 
+            { "width": "15%", "targets": 3 }  
+        ]
     });
         $('#btnAbrirModal').on('click', function() {
             // Realizar una petición AJAX para obtener el contenido de la modal
