@@ -3,9 +3,9 @@
 namespace App\Controllers\configuracionGeneral;
 
 use CodeIgniter\Controller;
-use App\Models\InsertNuevoUsuario;
-use App\Models\Roles;
-use App\Models\TblUsuarios;
+use App\Models\conf_empleados;
+use App\Models\conf_roles;
+use App\Models\conf_usuarios;
 
 class AdministracionUsuarios extends Controller
 {
@@ -21,7 +21,7 @@ class AdministracionUsuarios extends Controller
         // Llamar al método mensaje y pasar su resultado a la vista
         //$data['mensaje'] = $this->mensaje();
         
-        $mostrarUsuario = new TblUsuarios();
+        $mostrarUsuario = new conf_usuarios();
         /*
         //$mostrarUsuario->join('conf_usuarios', 'conf_usuarios.empleadoId = conf_empleados.empleadoId');
         //$mostrarUsuario->select('conf_empleados','conf_usuarios.correo');
@@ -57,7 +57,7 @@ class AdministracionUsuarios extends Controller
     public function modalAdministracionUsuarios()
     {
         // Cargar el modelo de roles
-        $rolesModel = new Roles();
+        $rolesModel = new conf_roles();
 
         $data['roles'] = $rolesModel->where('flgElimina', 0)->findAll();
         return view('configuracion-general/modals/modalAdministracionUsuarios', $data);
@@ -66,8 +66,8 @@ class AdministracionUsuarios extends Controller
     public function insertarNuevoUsuario()
     {
     
-        $model = new InsertNuevoUsuario();
-        $modelUsuario = new TblUsuarios();
+        $model = new conf_empleados();
+        $modelUsuario = new conf_usuarios();
 
         $dui = $this->request->getPost('duiUsuario');
             

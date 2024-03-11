@@ -48,7 +48,7 @@ $routes->get('conf-general/administracion-usuarios', 'configuracionGeneral\Admin
 // Rutas para modals
 $routes->get('administracion-usuarios/nuevo-usuario', 'configuracionGeneral\AdministracionUsuarios::modalAdministracionUsuarios');
 
-//insert 
+//insert Nuevo usuario
 $routes->post('nuevo-usuario/guardar-usuario', 'configuracionGeneral\AdministracionUsuarios::insertarNuevoUsuario');
 
 // Rutas para configuracion de modulos

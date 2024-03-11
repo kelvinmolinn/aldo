@@ -3,14 +3,14 @@
 namespace App\Controllers\configuracionGeneral;
 
 use CodeIgniter\Controller;
-use App\Models\Modulos;
+use App\Models\conf_modulos;
 
 
 class AdministracionPermisos extends Controller
 {
     public function configuracionModulos()
     {
-        $mostrarModulos = new Modulos();
+        $mostrarModulos = new conf_modulos();
 
         $data['modulos'] = $mostrarModulos
         ->select('conf_modulos.*')
@@ -27,7 +27,7 @@ class AdministracionPermisos extends Controller
 
     public function insertarNuevoModulo()
     {
-        $model = new Modulos();
+        $model = new conf_modulos();
 
         $modulo = $this->request->getPost('modulo');
             
@@ -58,7 +58,7 @@ class AdministracionPermisos extends Controller
     public function mostrarDatos()
     {
         // Aquí obtienes los datos de tu base de datos, ya sea usando un modelo o directamente
-        $Modulos = new Modulos(); // Ajusta el nombre del modelo según sea necesario
+        $Modulos = new conf_modulos(); // Ajusta el nombre del modelo según sea necesario
         $datos = $Modulos->findAll(); // Esto es un ejemplo, ajusta según tu situación
     
         // Pasar los datos a la vista

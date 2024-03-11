@@ -2,7 +2,7 @@
 
 namespace App\Controllers;
 
-use App\Models\Usuario;
+use App\Models\UsuarioLogin;
 
 class Login extends BaseController
 {
@@ -19,7 +19,7 @@ class Login extends BaseController
         $clave = $this->request->getPost("claveUsuario");
     
         // Crear una instancia del modelo Usuario
-        $usuarioModel = new Usuario();
+        $usuarioModel = new UsuarioLogin();
     
         // Obtener los datos del usuario desde la base de datos
         $dataUsuario = $usuarioModel->obtenerUsuario(['correo' => $correoUsuario]); 

@@ -3,7 +3,7 @@
 
     use CodeIgniter\Model;
     
-    class Usuario extends Model
+    class UsuarioLogin extends Model
     {
         protected $table = 'conf_usuarios';
     

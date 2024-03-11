@@ -6,7 +6,7 @@
 <hr>
 <div class="row mb-4">
     <div class="col-md-12 text-right">
-        <button type= "button" id="btnAbrirModal" class="btn btn-primary">
+        <button type= "button" id="btnAbrirModal" class="btn btn-primary estilo-btn">
             <i class="fas fa-save"></i>
             Nuevo usuario
         </button>
@@ -44,13 +44,13 @@
                         Activo
                     </td>
                     <td>
-                        <button class="btn btn-primary mb-1">
+                        <button class="btn btn-primary estilo-btn mb-1">
                             <i class="fas fa-pencil-alt"></i>
                             <span class="">Editar Usuario</span>
                         </button><br>
-                        <button class="btn btn-success mb-1">Restablecer acceso</button><br>
-                        <button class="btn btn-primary mb-1">0 Sucursales</button><br>
-                        <button class="btn btn-primary mb-1">Activar</button>
+                        <button class="btn btn-success estilo-btn mb-1">Restablecer acceso</button><br>
+                        <button class="btn btn-primary estilo-btn mb-1">0 Sucursales</button><br>
+                        <button class="btn btn-primary estilo-btn mb-1">Activar</button>
                     </td>
                 </tr>
             <?php } ?>

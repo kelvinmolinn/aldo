@@ -1,6 +1,6 @@
 <?php 
 namespace App\Controllers;
-use App\Models\Usuario;
+use App\Models\UsuarioLogin;
 
 class Panel extends BaseController{
     public function index(){        
@@ -9,7 +9,7 @@ class Panel extends BaseController{
         if(!$session->get('nombreUsuario')) {
             return view('login');
         }
-        $usuario = new Usuario();
+        $usuario = new UsuarioLogin();
         
         //$data['usuarios'] = $usuario->obtenerDatos();
 
