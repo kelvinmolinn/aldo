@@ -49,8 +49,8 @@
                             <span class=""></span>
                         </button>
                         <button class="btn btn-success mb-1">Restablecer acceso</button>
-                        <button class="btn btn-primary mb-1" id="btnUsuarioSucursal" name= "btnUsuarioSucursal">
-                            0
+                        <button class="btn btn-primary mb-1" data-toggle="tooltip" data-placement="top" title="Sucursales" id="btnUsuarioSucursal" name= "btnUsuarioSucursal">
+                            <i class="fas fa-pencil-alt"></i>
                         </button>
                         <button class="btn btn-primary mb-1">Activar</button>
                     </td>
