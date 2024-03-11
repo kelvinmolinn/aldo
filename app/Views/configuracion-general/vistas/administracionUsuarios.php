@@ -49,9 +49,9 @@
                             <span class=""></span>
                         </button>
                         <button class="btn btn-success mb-1">Restablecer acceso</button>
-                        <button class="btn btn-primary mb-1" data-toggle="tooltip" data-placement="top" title="Sucursales" id="btnUsuarioSucursal" name= "btnUsuarioSucursal">
-                            <i class="fas fa-pencil-alt"></i>
-                        </button>
+                        <a href="<?= site_url('conf-general/usuario-sucursal?nombre=' . urlencode($empleados['primerNombre'] . ' ' . $empleados['segundoNombre'] . ' ' . $empleados['primerApellido'] . ' ' . $empleados['segundoApellido'])); ?>" class="btn btn-primary mb-1" data-toggle="tooltip" data-placement="top" title="Sucursales">
+                            <i class="fas fa-user nav-icon"></i>
+                        </a>
                         <button class="btn btn-primary mb-1">Activar</button>
                     </td>
                 </tr>
@@ -78,18 +78,6 @@
                 }
             });
         });
-        
-        $('#btnUsuarioSucursal').on('click', function() {
-            // Realizar una petición AJAX para obtener la URL de la vista
-            $.ajax({
-                url: '<?php echo base_url('conf-general/usuario-sucursal'); ?>',
-                type: 'GET',
-                success: function(response) {
-                    // Redireccionar a la URL obtenida
-                    window.location.href = response;
-                }
-            });
-        });
 
         $('#tblEmpleados').DataTable({
             "language": {
@@ -103,5 +91,5 @@
             ]
         });
     });
-</script>conf-general/usuario-sucursal
+</script>
 <?= $this->endSection(); ?>

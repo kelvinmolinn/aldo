@@ -119,8 +119,9 @@ class AdministracionUsuarios extends Controller
     }
 
     public function usuarioSucursal(){
+        $request = \Config\Services::request();
 
-        return view('configuracion-general/vistas/pageUsuariosSucursales');
+        return view('configuracion-general/vistas/pageUsuariosSucursales', ['request' => $request]);
     }
 
 }
