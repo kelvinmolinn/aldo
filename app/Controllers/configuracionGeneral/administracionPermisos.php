@@ -25,6 +25,18 @@ class AdministracionPermisos extends Controller
         return view('configuracion-general/modals/modalAdministracionModulos');
     }
 
+    public function AdministracionMenus()
+    {
+        // Cargar la vista 'administracionUsuarios.php' desde la carpeta 'Views/configuracion-general/vistas'
+        return view('configuracion-general/vistas/administracionMenus');
+    }
+
+    public function AdministracionPermisos()
+    {
+        // Cargar la vista 'administracionUsuarios.php' desde la carpeta 'Views/configuracion-general/vistas'
+        return view('configuracion-general/vistas/administracionPermisos');
+    }
+
     public function insertarNuevoModulo()
     {
         $model = new conf_modulos();

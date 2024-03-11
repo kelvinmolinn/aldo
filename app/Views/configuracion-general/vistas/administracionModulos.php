@@ -37,19 +37,16 @@
                         <b>Url: </b><?php echo $modulos['urlModulo']; ?>  <br>
                     </td>
                     <td>
-                    <button class="btn btn-primary ttip mb-1" title="Editar Usuario">
+                    <button class="btn btn-primary mb-1" data-toggle="tooltip" data-placement="top" title="Editar Usuario">
                         <i class="fas fa-pencil-alt"></i>
                     </button>
-                        <button class="btn btn-success ttip mb-1" title="Restablecer acceso">
-                            <i class="fas fa-sync-alt"></i> 
+
+                        <button class="btn btn-secondary mb-1" data-toggle="tooltip" data-placement="top" title="0 Menús">
+                            <i class="fas fa-bars"></i> 
                         </button>
 
-                        <button class="btn btn-secondary ttip mb-1" title="0 Sucursales">
-                            <i class="fas fa-store"></i> 
-                        </button>
-
-                        <button class="btn btn-info ttip  mb-1" title="Activar">
-                            <i class="fas fa-toggle-on"></i> 
+                        <button class="btn btn-danger mb-1" data-toggle="tooltip" data-placement="top" title="Eliminar">
+                            <i class="fas fa-trash"></i> 
                         </button>
 
                     </td>

@@ -63,6 +63,12 @@ $routes->post('xd/nuevo-xd', 'configuracionGeneral\AdministracionPermisos::inser
 // Ruta para usuarios sucursales
 $routes->get('conf-general/usuario-sucursal', 'configuracionGeneral\AdministracionUsuarios::usuarioSucursal');
 
+// Rutas para configuracion de menus
+$routes->get('conf-general/administracion-menus', 'configuracionGeneral\AdministracionPermisos::administracionMenus');
+
+// Rutas para configuracion de permisos
+$routes->get('conf-general/administracion-permisos', 'configuracionGeneral\AdministracionPermisos::administracionPermisos');
+
 
 // Rutas de errores
 $routes->get('404', 'Errores::error404');
