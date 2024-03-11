@@ -9,12 +9,12 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-outline">
-                                <input type="text" Id="modulo" name="modulo" class="form-control ttip" placeholder="Módulo" required>
+                                <input type="text" Id="modulo" name="modulo" class="form-control " placeholder="Módulo" required>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-outline">
-                                <input type="text" class="form-control ttip" id="iconoModulo" name="iconoModulo" placeholder="Icono" required>
+                                <input type="text" class="form-control " id="iconoModulo" name="iconoModulo" placeholder="Icono" required>
                             </div>
                         </div>
                         <div class="col-md-12 mt-4">

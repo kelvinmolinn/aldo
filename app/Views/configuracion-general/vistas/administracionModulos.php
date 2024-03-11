@@ -6,7 +6,7 @@
 <hr>
 <div class="row mb-4">
     <div class="col-md-12 text-right">
-        <button type= "button" id="btnAbrirModal" class="btn btn-primary estilo-btn">
+        <button type= "button" id="btnAbrirModal" class="btn btn-primary ttip">
             <i class="fas fa-save"></i>
             Nuevo módulo
         </button>
@@ -37,21 +37,20 @@
                         <b>Url: </b><?php echo $modulos['urlModulo']; ?>  <br>
                     </td>
                     <td>
-                        <button class="btn btn-primary estilo-btn mb-1">
-                            <i class="fas fa-pencil-alt" ></i> Editar Usuario
-                        </button> <br>
+                    <button class="btn btn-primary ttip mb-1" title="Editar Usuario">
+                        <i class="fas fa-pencil-alt"></i>
+                    </button>
+                        <button class="btn btn-success ttip mb-1" title="Restablecer acceso">
+                            <i class="fas fa-sync-alt"></i> 
+                        </button>
 
-                        <button class="btn btn-success estilo-btn mb-1">
-                            <i class="fas fa-sync-alt"></i> Restablecer acceso
-                        </button> <br>
+                        <button class="btn btn-secondary ttip mb-1" title="0 Sucursales">
+                            <i class="fas fa-store"></i> 
+                        </button>
 
-                        <button class="btn btn-secondary estilo-btn mb-1">
-                            <i class="fas fa-store"></i> 0 Sucursales
-                        </button> <br>
-
-                        <button class="btn btn-info estilo-btn mb-1">
-                            <i class="fas fa-toggle-on"></i> Activar
-                        </button> <br>
+                        <button class="btn btn-info ttip  mb-1" title="Activar">
+                            <i class="fas fa-toggle-on"></i> 
+                        </button>
 
                     </td>
                 </tr>
