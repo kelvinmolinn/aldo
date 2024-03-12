@@ -29,6 +29,8 @@
                 //var_dump($empleados);
                 foreach($empleados as $empleados){ 
                     $n++;
+                    $nombreCompleto = $empleados['primerNombre'].' '.$empleados['segundoNombre'].' '.$empleados['primerApellido'].' '.$empleados['segundoApellido'];
+                    $usuarioId = $empleados['usuarioId'];
             ?>
                 <tr>
                     <td><?php echo $n; ?></td>
@@ -37,11 +39,11 @@
                     </td>
                     <td>
                         <b>Correo: </b><?php echo $empleados['correo']; ?>  <br>
-                        <b>Rol: </b><?php echo $empleados['rol']; ?>     <br>
+                        <b>Rol: </b><?php echo $empleados['rol']; ?>        <br>
                         <b>En linea: </b>                                   <br>
                     </td>
                     <td>
-                        Activo
+                        <?php echo $empleados['estadoEmpleado'];?>
                     </td>
                     <td>
                         <button class="btn btn-primary mb-1">
@@ -49,11 +51,21 @@
                             <span class=""></span>
                         </button>
                         <button class="btn btn-success mb-1">Restablecer acceso</button>
-                        <a href="<?= site_url('conf-general/usuario-sucursal?nombre=' . urlencode($empleados['primerNombre'] . ' ' . $empleados['segundoNombre'] . ' ' . $empleados['primerApellido'] . ' ' . $empleados['segundoApellido'])); ?>" class="btn btn-primary mb-1" data-toggle="tooltip" data-placement="top" title="Sucursales">
+                        <a href="<?= site_url('conf-general/usuario-sucursal?usuarioId=' . urlencode($usuarioId). '&nombreCompleto=' . urlencode($nombreCompleto)); ?>" class="btn btn-primary mb-1" data-toggle="tooltip" data-placement="top" title="Sucursales">
                             <span>0</span>
                             <i class="fas fa-store"></i>
                         </a>
-                        <button class="btn btn-primary mb-1">Activar</button>
+                        <?php
+                            if($empleados['estadoEmpleado'] == 'Activo'){
+                        ?>
+                        <button class="btn btn-danger" data-toggle="tooltip" data-placement="top" title="Desactivar">
+                            <i class="fas fa-ban"></i>
+                        </button>
+                        <?php }else{?>
+                        <button class="btn btn-success mb-1" data-toggle="tooltip" data-placement="top" title="Activar">
+                            <i class="fas fa-check"></i>
+                        </button>
+                        <?php }?>
                     </td>
                 </tr>
             <?php } ?>

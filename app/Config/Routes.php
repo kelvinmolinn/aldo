@@ -81,6 +81,8 @@ $routes->get('conf-general/page-menus-modulos', 'configuracionGeneral\Administra
 // Ruta para modals de nuevo menu
 $routes->get('administracion-modulos/nuevo-menu', 'configuracionGeneral\AdministracionPermisos::modalnuevoMenu');
 
+// ruta para modals de Usuario sucursales
+$routes->get('usuarios-sucursales/agregar-UsuarioSucursal', 'configuracionGeneral\AdministracionUsuarios::modalUsuariosSucursales');
 
 
 // Rutas de errores

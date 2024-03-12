@@ -6,42 +6,17 @@ use CodeIgniter\Controller;
 use App\Models\conf_empleados;
 use App\Models\conf_roles;
 use App\Models\conf_usuarios;
+use App\Models\conf_sucursales;
+use App\Models\conf_sucursales_usuario;
 
 class AdministracionUsuarios extends Controller
 {
     public function index()
-    {
-        // Aquí puedes cargar cualquier modelo necesario
-        // $usuarioModel = new UsuarioModel();
-        // $usuarios = $usuarioModel->getUsuarios();
-
-        // Puedes pasar datos a la vista si es necesario
-        // $data['usuarios'] = $usuarios;
-
-        // Llamar al método mensaje y pasar su resultado a la vista
-        //$data['mensaje'] = $this->mensaje();
-        
+    {        
         $mostrarUsuario = new conf_usuarios();
-        /*
-        //$mostrarUsuario->join('conf_usuarios', 'conf_usuarios.empleadoId = conf_empleados.empleadoId');
-        //$mostrarUsuario->select('conf_empleados','conf_usuarios.correo');
 
-        //$data['empleados'] = $mostrarUsuario->where('flgElimina', 0)->findAll();
-
-        $consultaEmpleados = $mostrarUsuario->select('emp.*, u.correo, r.rol')
-            ->from('conf_usuarios as u') // Aquí asignamos el alias 'e' a la tabla 'conf_empleados'
-            ->join('conf_empleados as emp', 'emp.empleadoId = u.empleadoId')
-            ->join('conf_roles as r', 'r.rolId = u.rolId')
-            ->where('u.flgElimina', 0)
-            ->get();
-
-        $data['empleados'] = $consultaEmpleados->getResult();
-
-        // Cargar la vista 'administracionUsuarios.php' desde la carpeta 'Views/configuracion-general/vistas'
-        return view('configuracion-general/vistas/administracionUsuarios', $data);
-        */
         $data['empleados'] = $mostrarUsuario
-        ->select('conf_empleados.*, conf_usuarios.correo, conf_roles.rol')
+        ->select('conf_empleados.*,conf_usuarios.usuarioId, conf_usuarios.correo, conf_roles.rol')
         ->join('conf_empleados', 'conf_empleados.empleadoId = conf_usuarios.empleadoId')
         ->join('conf_roles', 'conf_roles.rolId = conf_usuarios.rolId')
         ->where('conf_usuarios.flgElimina', 0)
@@ -119,9 +94,44 @@ class AdministracionUsuarios extends Controller
     }
 
     public function usuarioSucursal(){
-        $request = \Config\Services::request();
+        $request = \Config\Services::request(); 
 
         return view('configuracion-general/vistas/pageUsuariosSucursales', ['request' => $request]);
+    }
+
+    public function modalUsuariosSucursales(){
+        
+        $sucursales = new conf_sucursales();
+        $data['sucursales'] = $sucursales->where('flgElimina', 0)->findAll();
+
+        return view('configuracion-general/modals/modalUsuariosSucursales',$data);
+
+    }
+
+    public function insertUsuariosSucursal(){
+
+        $asignarSucursal = new conf_sucursales_usuarios();
+
+         $data = [
+            'sucursalId'     => $this->request->getPost('duiUsuario'),
+            'usuarioId'      => $this->request->getPost('sucursalId')
+        ];
+        // Insertar datos en la base de datos
+        $insertAsignarSucursal = $asignarSucursal->insert($data);
+        if ($insertAsignarSucursal) {
+                
+            return $this->response->setJSON([
+                'success' => true,
+                'mensaje' => 'Sucursal asignada correctamente'
+            ]);
+
+        } else {
+            // Si el insert falló, devuelve un mensaje de error
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'No se pudo asignar la sucursal al empleado'
+            ]);
+        }
     }
 
 }
