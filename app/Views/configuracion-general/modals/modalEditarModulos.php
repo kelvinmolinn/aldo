@@ -44,6 +44,7 @@
 </form>
 
 <script>
+    
     $(document).ready(function() {
         $("#urlModulo").select2({
             placeholder: 'Ruta'

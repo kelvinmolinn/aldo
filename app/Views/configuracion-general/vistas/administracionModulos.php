@@ -37,9 +37,14 @@
                         <b>Url: </b><?php echo $modulos['urlModulo']; ?>  <br>
                     </td>
                     <td>
-                    <button class="btn btn-primary mb-1" data-toggle="tooltip" data-placement="top" title="Editar Usuario">
+                <!--  <button class="btn btn-primary mb-1" id="btnEditarModal" data-toggle="tooltip" data-placement="top" title="Editar modulo" >
+                        <i class="fas fa-pencil-alt"></i>
+                    </button>  -->
+
+                    <button class="btn btn-primary mb-1 btn-editar-modal"  data-toggle="tooltip" data-placement="top" title="Editar modulo" data-id="<?= $modulos['moduloId']; ?>">
                         <i class="fas fa-pencil-alt"></i>
                     </button>
+
 
                         <a href="<?= site_url('conf-general/page-menus-modulos?modulo=' .$modulos['modulo']); ?>" class="btn btn-secondary mb-1" data-toggle="tooltip" data-placement="top" title="0 Menús">
                             <i class="fas fa-bars nav-icon"></i>
@@ -89,6 +94,33 @@
                 }
             });
         });
+        $('.btn-editar-modal').on('click', function() {
+        var moduloId = $(this).data('id');
+
+        // Realizar una petición AJAX para obtener los datos del módulo por su ID
+        $.ajax({
+            url: '<?php echo base_url('administracion-modulos/editar-modulo'); ?>',
+            type: 'GET',
+            data: { id: moduloId }, // Pasar el ID del módulo como parámetro
+            success: function(response) {
+                // Insertar los detalles del módulo en los campos de la modal de edición
+                $('#modalModulos #modulo').val(response.modulo);
+                $('#modalModulos #iconoModulo').val(response.iconoModulo);
+                $('#modalModulos #urlModulo').val(response.urlModulo);
+                
+                // Mostrar la modal sin permitir cierre al hacer clic fuera o al presionar "Esc"
+                $('#modalModulos').modal({
+                    backdrop: 'static',
+                    keyboard: false
+                });
+            },
+        error: function(xhr, status, error) {
+            // Manejar errores si los hay
+            console.error(xhr.responseText);
+        }
+    });
+});
+
 
     });
 </script>

@@ -57,6 +57,12 @@ $routes->get('conf-general/administracion-modulos', 'configuracionGeneral\Admini
 // Ruta para modals de nuevo modulo
 $routes->get('administracion-modulos/nuevo-modulo', 'configuracionGeneral\AdministracionPermisos::modalnuevoModulo');
 
+// Ruta para modals de nuevo modulo
+$routes->get('administracion-modulos/editar-modulo', 'configuracionGeneral\AdministracionPermisos::modalEditarModulo');
+
+$routes->get('administracion-permisos/obtener-modulo', 'configuracionGeneral\AdministracionPermisos::obtenerModulo');
+
+
 //modl modulo
 $routes->post('xd/nuevo-xd', 'configuracionGeneral\AdministracionPermisos::insertarNuevoModulo');
 
