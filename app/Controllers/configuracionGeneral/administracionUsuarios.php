@@ -7,7 +7,7 @@ use App\Models\conf_empleados;
 use App\Models\conf_roles;
 use App\Models\conf_usuarios;
 use App\Models\conf_sucursales;
-use App\Models\conf_sucursales_usuario;
+use App\Models\conf_sucursales_usuarios;
 
 class AdministracionUsuarios extends Controller
 {
@@ -93,28 +93,29 @@ class AdministracionUsuarios extends Controller
         }
     }
 
-    public function usuarioSucursal(){
-        $request = \Config\Services::request(); 
+    public function usuarioSucursal($usuarioId, $nombreCompleto){
+        $data['usuarioId'] = $usuarioId;
+        $data['nombreCompleto'] = $nombreCompleto;
 
-        return view('configuracion-general/vistas/pageUsuariosSucursales', ['request' => $request]);
+        return view('configuracion-general/vistas/pageUsuariosSucursales', $data);
     }
 
     public function modalUsuariosSucursales(){
         
         $sucursales = new conf_sucursales();
         $data['sucursales'] = $sucursales->where('flgElimina', 0)->findAll();
+        $data['usuarioId'] = $this->request->getPost('usuarioId');
 
         return view('configuracion-general/modals/modalUsuariosSucursales',$data);
 
     }
 
     public function insertUsuariosSucursal(){
-
         $asignarSucursal = new conf_sucursales_usuarios();
 
          $data = [
-            'sucursalId'     => $this->request->getPost('duiUsuario'),
-            'usuarioId'      => $this->request->getPost('sucursalId')
+            'sucursalId'     => $this->request->getPost('selectSucursales'),
+            'usuarioId'      => $this->request->getPost('usuarioId')
         ];
         // Insertar datos en la base de datos
         $insertAsignarSucursal = $asignarSucursal->insert($data);
@@ -133,5 +134,4 @@ class AdministracionUsuarios extends Controller
             ]);
         }
     }
-
 }

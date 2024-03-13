@@ -51,7 +51,8 @@
                             <span class=""></span>
                         </button>
                         <button class="btn btn-success mb-1">Restablecer acceso</button>
-                        <a href="<?= site_url('conf-general/usuario-sucursal?usuarioId=' . urlencode($usuarioId). '&nombreCompleto=' . urlencode($nombreCompleto)); ?>" class="btn btn-primary mb-1" data-toggle="tooltip" data-placement="top" title="Sucursales">
+                        
+                        <a href="<?= site_url('conf-general/usuario-sucursal/' . $usuarioId . '/' . $nombreCompleto); ?>" class="btn btn-primary mb-1" data-toggle="tooltip" data-placement="top" title="Sucursales">
                             <span>0</span>
                             <i class="fas fa-store"></i>
                         </a>

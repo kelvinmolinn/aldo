@@ -2,9 +2,8 @@
     $this->extend('Panel/plantilla'); 
     $this->section('contenido');
 
-    $usuarioId = $request->getGet('usuarioId');
-    $nombreCompleto = $request->getGet('nombreCompleto');
-
+    //$usuarioId = $request->getGet('usuarioId');
+    //$nombreCompleto = $request->getGet('nombreCompleto');
 ?>
 <h2>Asignación de sucursales a usuario: <?php echo  $nombreCompleto;?></h2>
 <hr>
@@ -23,7 +22,7 @@
     </div>
 </div>
 <div class="table-responsive">
-    <table id="tblSucursales" class="table table-hover" style="width: 100%;">
+    <table id="tblSucursales" name="tblSucursales" class="table table-hover" style="width: 100%;">
         <thead>
             <tr>
                 <th>#</th>
@@ -40,7 +39,9 @@
             ?>
                 <tr>
                     <td><?php echo $n; ?></td>
-                        <td><b>Sucursal:</b></td>
+                    
+                    <td><b>Sucursal:</b></td>
+                    
                     <td>
                         <button class="btn btn-danger mb-1" data-toggle="tooltip" data-placement="top" title="Eliminar">
                             <i class="fas fa-trash"></i>
@@ -57,12 +58,16 @@
             // Realizar una petición AJAX para obtener el contenido de la modal
             $.ajax({
                 url: '<?php echo base_url('usuarios-sucursales/agregar-UsuarioSucursal'); ?>',
-                type: 'GET',
+                data: {
+                    usuarioId: <?= $usuarioId; ?>
+                },
+                type: 'POST',
                 success: function(response) {
                     // Insertar el contenido de la modal en el cuerpo de la modal
                     $('#divModalContent').html(response);
                     // Mostrar la modal
                     $('#modalUsuario').modal('show');
+                    //$("#usuarioId").val('<?= $usuarioId; ?>');
                 },
                 error: function(xhr, status, error) {
                     // Manejar errores si los hay
@@ -78,12 +83,12 @@
 
         $('#tblSucursales').DataTable({
             "language": {
-                "url": "../../assets/plugins/datatables/js/spanish.json"
+                "url": "../../../../assets/plugins/datatables/js/spanish.json"
             },
             "columnDefs": [
                 { "width": "10%"}, 
-                { "width": "80%"}, 
-                { "width": "10%"}
+                { "width": "40%"}, 
+                { "width": "35%"}
             ]
         });
     });

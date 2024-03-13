@@ -67,7 +67,7 @@ $routes->get('administracion-permisos/obtener-modulo', 'configuracionGeneral\Adm
 $routes->post('xd/nuevo-xd', 'configuracionGeneral\AdministracionPermisos::insertarNuevoModulo');
 
 // Ruta para usuarios sucursales
-$routes->get('conf-general/usuario-sucursal', 'configuracionGeneral\AdministracionUsuarios::usuarioSucursal');
+$routes->get('conf-general/usuario-sucursal/(:any)', 'configuracionGeneral\AdministracionUsuarios::usuarioSucursal/$1');
 
 // Rutas para configuracion de menus
 $routes->get('conf-general/administracion-menus', 'configuracionGeneral\AdministracionPermisos::administracionMenus');
@@ -82,7 +82,10 @@ $routes->get('conf-general/page-menus-modulos', 'configuracionGeneral\Administra
 $routes->get('administracion-modulos/nuevo-menu', 'configuracionGeneral\AdministracionPermisos::modalnuevoMenu');
 
 // ruta para modals de Usuario sucursales
-$routes->get('usuarios-sucursales/agregar-UsuarioSucursal', 'configuracionGeneral\AdministracionUsuarios::modalUsuariosSucursales');
+$routes->post('usuarios-sucursales/agregar-UsuarioSucursal', 'configuracionGeneral\AdministracionUsuarios::modalUsuariosSucursales');
+
+//Insert Usuario a sucursal
+$routes->post('usuarios-sucursales/guardar-usuario-sucursal', 'configuracionGeneral\AdministracionUsuarios::insertUsuariosSucursal');
 
 
 // Rutas de errores
