@@ -33,26 +33,34 @@
         <tbody>
             <?php 
                 $n = 0;
-                //var_dump($empleados);
-                //foreach($empleados as $empleados){ 
+                foreach($sucursalUsuario as $sucursalUsuario){ 
                     $n++;
             ?>
                 <tr>
                     <td><?php echo $n; ?></td>
                     
-                    <td><b>Sucursal:</b></td>
+                    <td><b>Sucursal:</b><?= $sucursalUsuario['sucursal']?></td>
                     
                     <td>
-                        <button class="btn btn-danger mb-1" data-toggle="tooltip" data-placement="top" title="Eliminar">
+                        <button class="btn btn-danger" onclick="eliminarSucursal(`<?= $sucursalUsuario['sucursalUsuarioId']; ?>`);" data-toggle="tooltip" data-placement="top" title="Eliminar">
                             <i class="fas fa-trash"></i>
                         </button>
                     </td>
                 </tr>
-            <?php //} ?>
+            <?php } ?>
         </tbody>
     </table>
 </div>
 <script>
+    function eliminarSucursal(id) {
+        alert("Vamos a eliminar " + id);
+        /*
+            data: {
+                sucursalUsuarioId: id
+            }
+        */
+    }
+
     $(document).ready(function() {
         $('#btnAsignarSucursal').on('click', function() {
             // Realizar una petición AJAX para obtener el contenido de la modal

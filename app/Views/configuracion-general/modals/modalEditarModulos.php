@@ -9,7 +9,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-outline">
-                                <input type="text" Id="modulo" name="modulo" class="form-control " placeholder="Módulo" required>
+                                <input type="text" Id="modulo" name="modulo" class="form-control " placeholder="Módulo" value="<?= $modulo; ?>" required>
                             </div>
                         </div>
                         <div class="col-md-6">

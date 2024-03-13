@@ -93,9 +93,9 @@ class AdministracionPermisos extends Controller
         return view('configuracion-general/vistas/pageMenusModulos', ['request' => $request]);
     }
 
-    public function editarModulo($moduloId, $modulo){
-        $data['moduloId'] = $moduloId;
-        $data['modulo'] = $modulo;
+    public function editarModulo(){
+        $data['moduloId'] = $this->request->getPost('moduloId');
+        $data['modulo'] = $this->request->getPost('modulo');
 
         return view('configuracion-general/modals/modalEditarModulos', $data);
     }

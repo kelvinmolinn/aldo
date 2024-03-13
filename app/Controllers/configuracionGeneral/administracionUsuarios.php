@@ -97,6 +97,15 @@ class AdministracionUsuarios extends Controller
         $data['usuarioId'] = $usuarioId;
         $data['nombreCompleto'] = $nombreCompleto;
 
+        $mostrarSucursalUsuario = new conf_sucursales_usuarios();
+
+        $data['sucursalUsuario'] = $mostrarSucursalUsuario
+        ->select('conf_sucursales.sucursal, conf_sucursales_usuarios.sucursalUsuarioId')
+        ->join('conf_sucursales', 'conf_sucursales.sucursalId = conf_sucursales_usuarios.sucursalId')
+        ->where('conf_sucursales_usuarios.flgElimina', 0)
+        ->where('conf_sucursales_usuarios.usuarioId',$usuarioId)
+        ->findAll(); 
+
         return view('configuracion-general/vistas/pageUsuariosSucursales', $data);
     }
 
@@ -133,5 +142,16 @@ class AdministracionUsuarios extends Controller
                 'mensaje' => 'No se pudo asignar la sucursal al empleado'
             ]);
         }
+    }
+    public function eliminarUsuarioSucursal(){
+        //$data['sucursalUsuarioId'] = $sucursalUsuarioId;
+
+        $eliminarSucursal = new conf_sucursales_usuarios();
+
+        $data = ['flgElimina' => 1];
+        $eliminarSucursal->update($sucursalUsuarioId, $data);
+
+        return view('configuracion-general/vistas/pageUsuariosSucursales');
+
     }
 }
