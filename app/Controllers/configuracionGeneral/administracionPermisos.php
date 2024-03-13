@@ -26,12 +26,6 @@ class AdministracionPermisos extends Controller
     }
 
 
-    public function modalEditarModulo()
-    {
-        // Cargar la vista 'modalEditar.php' desde la carpeta 'Views/configuracion-general/vistas'
-        return view('configuracion-general/modals/modalAdministracionModulos');
-    }
-
     public function modalnuevoMenu()
     {
         // Cargar la vista 'administracionMenus.php' desde la carpeta 'Views/configuracion-general/vistas'
@@ -99,19 +93,46 @@ class AdministracionPermisos extends Controller
         return view('configuracion-general/vistas/pageMenusModulos', ['request' => $request]);
     }
 
-    public function editar_modulo()
-    {
-        $request = \Config\Services::request();
-        $moduloId = $request->getGet('moduloId');
-    
-        // Ahora, en lugar de simplemente devolver una vista, debes obtener los datos del módulo
-        $model = new conf_modulos();
-        $modulo = $model->find($moduloId);
-    
-        // Devolver los datos del módulo como una respuesta JSON
-        return $this->response->setJSON($modulo);
+    public function editarModulo($moduloId, $modulo){
+        $data['moduloId'] = $moduloId;
+        $data['modulo'] = $modulo;
+
+        return view('configuracion-general/modals/modalEditarModulos', $data);
     }
-    
+    public function modalEditarModulo(){
+        
+        $modulo = new conf_modulos();
+        $data['modulo'] = $modulo->where('flgElimina', 0)->findAll();
+        $data['moduloId'] = $this->request->getPost('moduloId');
+
+        return view('configuracion-general/modals/modalEditarModulos',$data);
+
+    }
+
+    public function insertUsuariosSucursal(){
+        $asignarSucursal = new conf_modulos_usuarios();
+
+         $data = [
+            'sucursalId'     => $this->request->getPost('selectmodulos'),
+            'moduloId'      => $this->request->getPost('moduloId')
+        ];
+        // Insertar datos en la base de datos
+        $insertAsignarSucursal = $asignarSucursal->insert($data);
+        if ($insertAsignarSucursal) {
+                
+            return $this->response->setJSON([
+                'success' => true,
+                'mensaje' => 'Sucursal asignada correctamente'
+            ]);
+
+        } else {
+            // Si el insert falló, devuelve un mensaje de error
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'No se pudo asignar la sucursal al empleado'
+            ]);
+        }
+    }
     
 
 }

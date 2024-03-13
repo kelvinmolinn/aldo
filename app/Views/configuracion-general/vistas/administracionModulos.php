@@ -25,9 +25,11 @@
         <tbody>
             <?php 
                 $n = 0;
-                //var_dump($empleados);
+               
                 foreach($modulos as $modulos){ 
                     $n++;
+                    $moduloId = $modulos['moduloId'];
+                    $modulo = $modulos['modulo'];
             ?>
                 <tr>
                     <td><?php echo $n; ?></td>
@@ -37,14 +39,11 @@
                         <b>Url: </b><?php echo $modulos['urlModulo']; ?>  <br>
                     </td>
                     <td>
-                <!--  <button class="btn btn-primary mb-1" id="btnEditarModal" data-toggle="tooltip" data-placement="top" title="Editar modulo" >
-                        <i class="fas fa-pencil-alt"></i>
-                    </button>  -->
 
-                    <button class="btn btn-primary mb-1 btn-editar-modal"  data-toggle="tooltip" data-placement="top" title="Editar modulo" data-id="<?= $modulos['moduloId']; ?>">
-                        <i class="fas fa-pencil-alt"></i>
-                    </button>
-
+                    <a href="<?= site_url('conf-general/editar-modulo/' . $moduloId . '/' . $modulo); ?>" class="btn btn-primary mb-1" data-toggle="tooltip" data-placement="top" title="Editar modulo">
+                            <span></span>
+                            <i class="fas fa-pencil-alt"></i>
+                        </a>
 
                         <a href="<?= site_url('conf-general/page-menus-modulos?modulo=' .$modulos['modulo']); ?>" class="btn btn-secondary mb-1" data-toggle="tooltip" data-placement="top" title="0 Menús">
                             <i class="fas fa-bars nav-icon"></i>
@@ -100,8 +99,8 @@
         // Realizar una petición AJAX para obtener los datos del módulo por su ID
         $.ajax({
             url: '<?php echo base_url('administracion-modulos/editar-modulo'); ?>',
-            type: 'GET',
-            data: { id: moduloId }, // Pasar el ID del módulo como parámetro
+            type: 'POST',
+            data: { moduloId: moduloId }, // Pasar el ID del módulo como parámetro
             success: function(response) {
                 // Insertar los detalles del módulo en los campos de la modal de edición
                 $('#modalModulos #modulo').val(response.modulo);

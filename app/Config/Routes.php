@@ -57,12 +57,6 @@ $routes->get('conf-general/administracion-modulos', 'configuracionGeneral\Admini
 // Ruta para modals de nuevo modulo
 $routes->get('administracion-modulos/nuevo-modulo', 'configuracionGeneral\AdministracionPermisos::modalnuevoModulo');
 
-// Ruta para modals de nuevo modulo
-$routes->get('administracion-modulos/editar-modulo', 'configuracionGeneral\AdministracionPermisos::modalEditarModulo');
-
-$routes->get('administracion-permisos/obtener-modulo', 'configuracionGeneral\AdministracionPermisos::obtenerModulo');
-
-
 //modl modulo
 $routes->post('xd/nuevo-xd', 'configuracionGeneral\AdministracionPermisos::insertarNuevoModulo');
 
@@ -86,6 +80,14 @@ $routes->post('usuarios-sucursales/agregar-UsuarioSucursal', 'configuracionGener
 
 //Insert Usuario a sucursal
 $routes->post('usuarios-sucursales/guardar-usuario-sucursal', 'configuracionGeneral\AdministracionUsuarios::insertUsuariosSucursal');
+
+// Ruta para editar modulos
+$routes->get('conf-general/editar-modulo/(:any)', 'configuracionGeneral\AdministracionPermisos::editarModulo/$1');
+
+
+// ruta para modals de editar modulos
+$routes->get('administracion-modulos/editar-modulo', 'configuracionGeneral\AdministracionPermisos::modalEditarModulo');
+
 
 
 // Rutas de errores
