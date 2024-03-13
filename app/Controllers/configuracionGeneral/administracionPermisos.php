@@ -49,6 +49,8 @@ class AdministracionPermisos extends Controller
         $model = new conf_modulos();
 
         $modulo = $this->request->getPost('modulo');
+        $iconoModulo = $this->request->getPost('iconoModulo');
+        $urlModulo = $this->request->getPost('urlModulo');
             
         $data = [
             'modulo'            => $this->request->getPost('modulo'),
@@ -96,6 +98,9 @@ class AdministracionPermisos extends Controller
     public function editarModulo(){
         $data['moduloId'] = $this->request->getPost('moduloId');
         $data['modulo'] = $this->request->getPost('modulo');
+        $data['iconoModulo'] = $this->request->getPost('iconoModulo');
+        $data['urlModulo'] = $this->request->getPost('urlModulo');
+
 
         return view('configuracion-general/modals/modalEditarModulos', $data);
     }
@@ -104,6 +109,8 @@ class AdministracionPermisos extends Controller
         $modulo = new conf_modulos();
         $data['modulo'] = $modulo->where('flgElimina', 0)->findAll();
         $data['moduloId'] = $this->request->getPost('moduloId');
+        $data['iconoModulo'] = $this->request->getPost('iconoModulo');
+        $data['urlModulo'] = $this->request->getPost('urlModulo');
 
         return view('configuracion-general/modals/modalEditarModulos',$data);
 

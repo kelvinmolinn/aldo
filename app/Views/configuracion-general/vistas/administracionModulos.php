@@ -30,6 +30,8 @@
                     $n++;
                     $moduloId = $modulos['moduloId'];
                     $modulo = $modulos['modulo'];
+                    $iconoModulo = $modulos['iconoModulo'];
+                    $urlModulo = $modulos['urlModulo'];
             ?>
                 <tr>
                     <td><?php echo $n; ?></td>
@@ -40,11 +42,10 @@
                     </td>
                     <td>
 
-                    <button class="btn btn-primary mb-1" onclick="modalEditarModulo(`<?= $moduloId; ?>`,`<?= $modulo; ?>`);" data-toggle="tooltip" data-placement="top" title="Editar modulo">
-                            <span></span>
-                            <i class="fas fa-pencil-alt"></i>
-                </button>
-
+                    <button class="btn btn-primary mb-1" onclick="modalEditarModulo('<?= $moduloId; ?>', '<?= $modulo; ?>', '<?= $iconoModulo; ?>', '<?= $urlModulo; ?>');" data-toggle="tooltip" data-placement="top" title="Editar modulo">
+                        <span></span>
+                        <i class="fas fa-pencil-alt"></i>
+                    </button>
                         <a href="<?= site_url('conf-general/page-menus-modulos?modulo=' .$modulos['modulo']); ?>" class="btn btn-secondary mb-1" data-toggle="tooltip" data-placement="top" title="0 Menús">
                             <i class="fas fa-bars nav-icon"></i>
                         </a>
@@ -60,12 +61,15 @@
     </table>
 </div>
 <script>
-    function modalEditarModulo(moduloId, modulo) {
+    function modalEditarModulo(moduloId, modulo, iconoModulo, urlModulo) {
         // Realizar una petición AJAX para obtener los datos del módulo por su ID
         $.ajax({
             url: '<?php echo base_url('conf-general/editar-modulo'); ?>',
             type: 'POST',
-            data: { moduloId: moduloId, modulo: modulo }, // Pasar el ID del módulo como parámetro
+            data: { moduloId: moduloId, 
+                    modulo: modulo, 
+                    iconoModulo: iconoModulo,
+                    urlModulo: urlModulo }, // Pasar el ID del módulo como parámetro
             success: function(response) {
                 // Insertar el contenido de la modal en el cuerpo de la modal
                 $('#divModalContent').html(response);

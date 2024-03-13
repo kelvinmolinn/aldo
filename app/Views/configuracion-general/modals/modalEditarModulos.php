@@ -14,12 +14,12 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-outline">
-                                <input type="text" class="form-control " id="iconoModulo" name="iconoModulo" placeholder="Icono" required>
+                                <input type="text" class="form-control " id="iconoModulo" name="iconoModulo" placeholder="Icono" value="<?= $iconoModulo; ?>" required>
                             </div>
                         </div>
                         <div class="col-md-12 mt-4">
                             <div class="form-select-control">
-                                <select name="urlModulo" id="urlModulo" style="width: 100%;">
+                                <select name="urlModulo" id="urlModulo" value="<?= $urlModulo; ?>" style="width: 100%;">
                                     <option value=""></option>
                                     <option value="ruta">Url (select de las carpetas en la raíz de /modulos)</option>
                                     <option value="ruta2">Url (select de las carpetas en la raíz de /modulos)</option>
@@ -86,5 +86,6 @@
                 }
             });
         });
+        $("#urlModulo").val('<?= $urlModulo; ?>').trigger("change");
     });
 </script>
