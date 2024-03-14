@@ -9,12 +9,13 @@
             <div class="row">
                 <div class="col-md-4">
                     <div class="form-outline">
-                        <input type="number" Id= "duiUsuario" name = "duiUsuario" class="form-control" placeholder="DUI" required>
+                        <input type="text" Id= "duiUsuario" name = "duiUsuario" class="form-control" placeholder="DUI" required>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-outline">
                         <input type="date" class="form-control" id = "fechaUsuario" name = "fechaUsuario" placeholder="Fecha de nacimiento" required>
+                        <label for="fechaUsuario" class="input-placeholder">Fecha de nacimiento</label>
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -109,7 +110,6 @@
                             text: response.mensaje
                         }).then((result) => {
                               // Recargar la DataTable después del insert
-                              $('#tblEmpleados').DataTable().ajax.reload(); // Recargar la tabla
                         });
                         console.log("Último ID insertado:", response.empleadoId);
                     } else {

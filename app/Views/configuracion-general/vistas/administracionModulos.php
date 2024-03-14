@@ -90,7 +90,7 @@
                                         text: response.mensaje
                                     }).then((result) => {
                                         // Recargar la DataTable después del insert
-                                        window.location.href = "<?= site_url('conf-general/administracion-modulos/' . $moduloId . '/' . $modulo); ?>";
+                                        window.location.href = "<?= site_url('conf-general/administracion-modulos'); ?>";
                                     });
                                 } else {
                                     // Insert fallido, mostrar mensaje de error

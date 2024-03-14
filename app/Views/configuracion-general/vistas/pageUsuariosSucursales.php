@@ -39,7 +39,7 @@
                 <tr>
                     <td><?php echo $n; ?></td>
                     
-                    <td><b>Sucursal:</b><?= $sucursalUsuario['sucursal']?></td>
+                    <td><b>Sucursal: </b><?= $sucursalUsuario['sucursal']?></td>
                     
                     <td>
                         <button class="btn btn-danger" onclick="eliminarSucursal(`<?= $sucursalUsuario['sucursalUsuarioId']; ?>`);" data-toggle="tooltip" data-placement="top" title="Eliminar">

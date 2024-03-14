@@ -9,7 +9,7 @@ class conf_modulos extends Model
     protected $table = 'conf_modulos';
     protected $primaryKey = 'moduloId'; // si el nombre de la clave primaria es diferente
 
-    protected $allowedFields = ['modulo','iconoModulo','urlModulo']; // Campos permitidos para la inserción
+    protected $allowedFields = ['modulo','iconoModulo','urlModulo', 'flgElimina']; // Campos permitidos para la inserción
 
     protected $useTimestamps = true; // Utiliza campos de timestamp para created_at y updated_at
 

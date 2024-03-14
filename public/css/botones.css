@@ -1,7 +1,17 @@
-.ttip {
-    cursor: help;
-    padding: 15px 20px;
+.form-outline {
     position: relative;
-    width: auto;
-    transition: background-color 0.3s;
+}
+
+.input-placeholder {
+    position: absolute;
+    top: 10px; /* Ajusta la posición vertical según tu diseño */
+    left: 10px; /* Ajusta la posición horizontal según tu diseño */
+    pointer-events: none; /* Evita que la etiqueta interfiera con la interacción del usuario */
+    transition: top 0.3s, font-size 0.3s; /* Agrega una transición suave */
+    color: #aaa; /* Color del marcador de posición */
+}
+
+.input-placeholder.active {
+    top: -10px; /* Ajusta la posición vertical cuando el campo está enfocado */
+    font-size: 0.75em; /* Ajusta el tamaño de la fuente cuando el campo está enfocado */
 }

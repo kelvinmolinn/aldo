@@ -145,10 +145,10 @@ class AdministracionPermisos extends Controller
         //$data['sucursalUsuarioId'] = $sucursalUsuarioId;
 
         $eliminarModulo = new conf_modulos();
-
+        
         $moduloId = $this->request->getPost('moduloId');
         $data = ['flgElimina' => 1];
-
+        
         $eliminarModulo->update($moduloId, $data);
 
         if($eliminarModulo) {
