@@ -9,7 +9,7 @@ class conf_sucursales extends Model
     protected $table = 'conf_sucursales';
     protected $primaryKey = 'sucursalId'; // si el nombre de la clave primaria es diferente
 
-    protected $allowedFields = ['sucursal','direccionSucursal'];
+    protected $allowedFields = ['sucursalId','sucursal','direccionSucursal'];
 
     protected $useTimestamps = true; // Utiliza campos de timestamp para created_at y updated_at
 

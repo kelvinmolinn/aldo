@@ -9,17 +9,17 @@
             <div class="row">
                 <div class="col-md-4">
                     <div class="form-outline">
-                        <input type="number" Id= "duiUsuario" name = "duiUsuario" class="form-control" placeholder="DUI">
+                        <input type="number" Id= "duiUsuario" name = "duiUsuario" class="form-control" placeholder="DUI" required>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-outline">
-                        <input type="date" class="form-control" id = "fechaUsuario" name = "fechaUsuario" placeholder="Fecha de nacimiento">
+                        <input type="date" class="form-control" id = "fechaUsuario" name = "fechaUsuario" placeholder="Fecha de nacimiento" required>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-select-control">
-                        <select name="selectGenero" id="selectGenero" style = "width: 100%;">
+                        <select name="selectGenero" id="selectGenero" style = "width: 100%;" required>
                             <option value=""></option>
                             <option value="hombre">Hombre</option>
                             <option value="mujer">Mujer</option>
@@ -30,31 +30,31 @@
             <div class="row mt-4">
                 <div class="col-md-6">
                     <div class="form-outline">
-                        <input type="text" id = "primerNombreUsuario" name = "primerNombreUsuario" class="form-control" placeholder="Primer nombre">
+                        <input type="text" id = "primerNombreUsuario" name = "primerNombreUsuario" class="form-control" placeholder="Primer nombre" required>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-outline">
-                        <input type="text"  id = "segundoNombreUsuario" name = "segundoNombreUsuario" class="form-control" placeholder="Segundo nombre">
-                    </div>
-                </div>
-            </div>
-            <div class="row mt-4">
-                <div class="col-md-6">
-                    <div class="form-outline">
-                        <input type="text" id = "primerApellidoUsuario" name="primerApellidoUsuario" class="form-control" placeholder="Primer apellido">
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-outline">
-                        <input type="text" id="segundoApellidoUsuario" name="segundoApellidoUsuario" class="form-control" placeholder="Segundo apellido">
+                        <input type="text"  id = "segundoNombreUsuario" name = "segundoNombreUsuario" class="form-control" placeholder="Segundo nombre" required>
                     </div>
                 </div>
             </div>
             <div class="row mt-4">
                 <div class="col-md-6">
                     <div class="form-outline">
-                        <input type="email" id="correoUsuario" name="correoUsuario" class="form-control" placeholder="Correo electrónico">
+                        <input type="text" id = "primerApellidoUsuario" name="primerApellidoUsuario" class="form-control" placeholder="Primer apellido" required>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-outline">
+                        <input type="text" id="segundoApellidoUsuario" name="segundoApellidoUsuario" class="form-control" placeholder="Segundo apellido" required>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="form-outline">
+                        <input type="email" id="correoUsuario" name="correoUsuario" class="form-control" placeholder="Correo electrónico" required>
                     </div>
                 </div>
                 <div class="col-md-6">

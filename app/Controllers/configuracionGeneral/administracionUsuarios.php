@@ -22,6 +22,16 @@ class AdministracionUsuarios extends Controller
         ->where('conf_usuarios.flgElimina', 0)
         ->findAll();
 
+        $sucursalesUsuarios = new conf_sucursales_usuarios();
+        // Obtener el conteo de sucursales para cada empleado
+        foreach ($data['empleados'] as &$empleado) {
+            $conteo = $sucursalesUsuarios->where('flgElimina', 0)
+                                    ->where('usuarioId', $empleado['usuarioId'])
+                                    ->countAllResults();
+            $empleado['conteo_sucursales'] = $conteo;
+        }
+
+
     return view('configuracion-general/vistas/administracionUsuarios', $data);
     }
 
@@ -99,12 +109,12 @@ class AdministracionUsuarios extends Controller
 
         $mostrarSucursalUsuario = new conf_sucursales_usuarios();
 
-        $data['sucursalUsuario'] = $mostrarSucursalUsuario
-        ->select('conf_sucursales.sucursal, conf_sucursales_usuarios.sucursalUsuarioId')
-        ->join('conf_sucursales', 'conf_sucursales.sucursalId = conf_sucursales_usuarios.sucursalId')
-        ->where('conf_sucursales_usuarios.flgElimina', 0)
-        ->where('conf_sucursales_usuarios.usuarioId',$usuarioId)
-        ->findAll(); 
+            $data['sucursalUsuario'] = $mostrarSucursalUsuario
+            ->select('conf_sucursales.sucursal, conf_sucursales_usuarios.sucursalUsuarioId')
+            ->join('conf_sucursales', 'conf_sucursales.sucursalId = conf_sucursales_usuarios.sucursalId')
+            ->where('conf_sucursales_usuarios.flgElimina', 0)
+            ->where('conf_sucursales_usuarios.usuarioId',$usuarioId)
+            ->findAll(); 
 
         return view('configuracion-general/vistas/pageUsuariosSucursales', $data);
     }
@@ -112,8 +122,21 @@ class AdministracionUsuarios extends Controller
     public function modalUsuariosSucursales(){
         
         $sucursales = new conf_sucursales();
-        $data['sucursales'] = $sucursales->where('flgElimina', 0)->findAll();
+
+        $data['sucursales'] = $sucursales
+            ->select('conf_sucursales.sucursalId, conf_sucursales.sucursal')
+            ->where('conf_sucursales.flgElimina', 0)
+            ->whereNotIn('conf_sucursales.sucursalId', function($builder) {
+                $builder->select('conf_sucursales_usuarios.sucursalId')
+                        ->from('conf_sucursales_usuarios')
+                        ->where('conf_sucursales_usuarios.flgElimina', 0)
+                        ->where('conf_sucursales_usuarios.usuarioId', $this->request->getPost('usuarioId'));
+            })
+            ->findAll();
+
+        //$data['sucursales'] = $sucursales->where('flgElimina', 0)->findAll();
         $data['usuarioId'] = $this->request->getPost('usuarioId');
+        $data['nombreCompleto'] = $this->request->getPost('nombreCompleto');
 
         return view('configuracion-general/modals/modalUsuariosSucursales',$data);
 
@@ -148,10 +171,21 @@ class AdministracionUsuarios extends Controller
 
         $eliminarSucursal = new conf_sucursales_usuarios();
 
+        $sucursalUsuarioId = $this->request->getPost('sucursalUsuarioId');
         $data = ['flgElimina' => 1];
+
         $eliminarSucursal->update($sucursalUsuarioId, $data);
 
-        return view('configuracion-general/vistas/pageUsuariosSucursales');
-
+        if($eliminarSucursal) {
+            return $this->response->setJSON([
+                'success' => true,
+                'mensaje' => 'Sucursal eliminada correctamente'
+            ]);
+        } else {
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'No se pudo eliminar la sucursal'
+            ]);
+        }
     }
 }

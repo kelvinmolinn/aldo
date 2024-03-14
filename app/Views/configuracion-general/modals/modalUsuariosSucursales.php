@@ -4,10 +4,11 @@
         <div class="modal-dialog  modal-lg">
             <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Asignar Sucursal al usuario: </h5>
+                <h5 class="modal-title">Asignar Sucursal al usuario: <?= $nombreCompleto; ?></h5>
             </div>
             <div class="modal-body">
             <input type="hidden" id="usuarioId" name="usuarioId" value="<?= $usuarioId; ?>">
+            <input type="hidden" id="nombreCompleto" name="nombreCompleto" value="<?= $nombreCompleto; ?>">
                 <div class="row">
                     <div class="col-md-12">
                         <div class="form-select-control">
@@ -54,11 +55,11 @@
                         $('#modalUsuario').modal('hide');
                         Swal.fire({
                             icon: 'success',
-                            title: '¡Usuario agregado con Éxito!',
+                            title: 'Sucursal agregada con Éxito!',
                             text: response.mensaje
                         }).then((result) => {
                               // Recargar la DataTable después del insert
-                              $('#tblSucursales').DataTable().ajax.reload(); // Recargar la tabla
+                              window.location.href = "<?= site_url('conf-general/usuario-sucursal/' . $usuarioId . '/' . $nombreCompleto); ?>";
                         });
                     } else {
                         // Insert fallido, mostrar mensaje de error

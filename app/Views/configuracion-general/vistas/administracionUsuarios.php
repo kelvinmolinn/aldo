@@ -53,7 +53,7 @@
                         <button class="btn btn-success mb-1">Restablecer acceso</button>
                         
                         <a href="<?= site_url('conf-general/usuario-sucursal/' . $usuarioId . '/' . $nombreCompleto); ?>" class="btn btn-primary mb-1" data-toggle="tooltip" data-placement="top" title="Sucursales">
-                            <span>0</span>
+                            <span><?= $empleados['conteo_sucursales'];?></span>
                             <i class="fas fa-store"></i>
                         </a>
                         <?php

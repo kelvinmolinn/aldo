@@ -78,8 +78,11 @@ $routes->get('administracion-modulos/nuevo-menu', 'configuracionGeneral\Administ
 // ruta para modals de Usuario sucursales
 $routes->post('usuarios-sucursales/agregar-UsuarioSucursal', 'configuracionGeneral\AdministracionUsuarios::modalUsuariosSucursales');
 
+//insert usuario sucursal 
+$routes->post('usuarios-sucursales/guardar-usuario-sucursal', 'configuracionGeneral\AdministracionUsuarios::insertUsuariosSucursal');
+
 //ELIMINAR sucursal del usuario
-$routes->post('usuarios-sucursales/eliminar-usuario-sucursal/(:any)', 'configuracionGeneral\AdministracionUsuarios::eliminarUsuarioSucursal/$1');
+$routes->post('usuarios-sucursales/eliminar-usuario-sucursal', 'configuracionGeneral\AdministracionUsuarios::eliminarUsuarioSucursal');
 
 // Ruta para editar modulos
 $routes->post('conf-general/editar-modulo', 'configuracionGeneral\AdministracionPermisos::editarModulo');
