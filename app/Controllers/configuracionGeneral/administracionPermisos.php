@@ -140,6 +140,28 @@ class AdministracionPermisos extends Controller
             ]);
         }
     }
-    
+
+    public function eliminarModulo(){
+        //$data['sucursalUsuarioId'] = $sucursalUsuarioId;
+
+        $eliminarModulo = new conf_modulos();
+
+        $moduloId = $this->request->getPost('moduloId');
+        $data = ['flgElimina' => 1];
+
+        $eliminarModulo->update($moduloId, $data);
+
+        if($eliminarModulo) {
+            return $this->response->setJSON([
+                'success' => true,
+                'mensaje' => 'Módulo eliminado correctamente'
+            ]);
+        } else {
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'No se pudo eliminar el módulo'
+            ]);
+        }
+    }
 
 }

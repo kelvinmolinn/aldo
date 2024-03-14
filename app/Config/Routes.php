@@ -92,7 +92,7 @@ $routes->post('conf-general/editar-modulo', 'configuracionGeneral\Administracion
 $routes->get('administracion-modulos/editar-modulo', 'configuracionGeneral\AdministracionPermisos::modalEditarModulo');
 
 //ELIMINAR MODULO
-$routes->post('administracion-modulos/eliminar-modulo', 'configuracionGeneral\AdministracionUsuarios::eliminarModulo');
+$routes->post('administracion-modulos/eliminar-modulo', 'configuracionGeneral\AdministracionPermisos::eliminarModulo');
 
 
 // Rutas de errores

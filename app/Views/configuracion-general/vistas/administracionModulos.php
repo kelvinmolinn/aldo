@@ -50,8 +50,8 @@
                             <i class="fas fa-bars nav-icon"></i>
                         </a>
 
-                        <button class="btn btn-danger mb-1" data-toggle="tooltip" data-placement="top" title="Eliminar">
-                            <i class="fas fa-trash"></i> 
+                        <button class="btn btn-danger" onclick="eliminarModulo(`<?= $modulos['moduloId']; ?>`);" data-toggle="tooltip" data-placement="top" title="Eliminar">
+                            <i class="fas fa-trash"></i>
                         </button>
 
                     </td>
@@ -61,6 +61,60 @@
     </table>
 </div>
 <script>
+        function eliminarModulo(id) {
+        //alert("Vamos a eliminar " + id);
+            Swal.fire({
+                title: '¿Estás seguro que desea eliminar el módulo?',
+                text: "Se eiminara el módulo seleccionado.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Si el usuario confirma, enviar la solicitud AJAX para eliminar el usuario de la sucursal
+                        $.ajax({
+                            url: '<?php echo base_url('administracion-modulos/eliminar-modulo'); ?>',
+                            type: 'POST',
+                            data: {
+                                moduloId: id
+                            },
+                            success: function(response) {
+                                console.log(response);
+                                if (response.success) {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: '¡Módulo eliminado con Éxito!',
+                                        text: response.mensaje
+                                    }).then((result) => {
+                                        // Recargar la DataTable después del insert
+                                        window.location.href = "<?= site_url('conf-general/administracion-modulos/' . $moduloId . '/' . $modulo); ?>";
+                                    });
+                                } else {
+                                    // Insert fallido, mostrar mensaje de error
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Error',
+                                        text: response.mensaje
+                                    });
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                // Manejar errores si los hay
+                                console.error(xhr.responseText);
+                            }
+                        });
+                }
+            });
+        /*
+            data: {
+                sucursalUsuarioId: id
+            }
+        */
+    }
+
     function modalEditarModulo(moduloId, modulo, iconoModulo, urlModulo) {
         // Realizar una petición AJAX para obtener los datos del módulo por su ID
         $.ajax({
