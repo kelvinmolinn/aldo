@@ -59,7 +59,7 @@
                         <?php
                             if($empleados['estadoEmpleado'] == 'Activo'){
                         ?>
-                        <button class="btn btn-danger" data-toggle="tooltip" data-placement="top" title="Desactivar">
+                        <button class="btn btn-danger" data-toggle="tooltip" data-placement="top" title="Desactivar" onclick="">
                             <i class="fas fa-ban"></i>
                         </button>
                         <?php }else{?>
@@ -74,6 +74,10 @@
     </table>
 </div>
 <script>
+    function ActivarDesactivar(){
+
+    }
+    
     $(document).ready(function() {
         $('#btnAbrirModal').on('click', function() {
             // Realizar una petición AJAX para obtener el contenido de la modal

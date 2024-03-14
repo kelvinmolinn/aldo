@@ -70,10 +70,12 @@ $routes->get('conf-general/administracion-menus', 'configuracionGeneral\Administ
 $routes->get('conf-general/administracion-permisos', 'configuracionGeneral\AdministracionPermisos::administracionPermisos');
 
 // Rutas para configuracion de permisos
-$routes->get('conf-general/page-menus-modulos', 'configuracionGeneral\AdministracionPermisos::menusModulos');
+$routes->get('conf-general/page-menus-modulos/(:any)', 'configuracionGeneral\AdministracionPermisos::menusModulos/$1');
 
 // Ruta para modals de nuevo menu
-$routes->get('administracion-modulos/nuevo-menu', 'configuracionGeneral\AdministracionPermisos::modalnuevoMenu');
+$routes->post('administracion-modulos/nuevo-menu', 'configuracionGeneral\AdministracionPermisos::modalnuevoMenu');
+$routes->post('administracion-modulos/guardar-menu', 'configuracionGeneral\AdministracionPermisos::modalnuevoMenu');
+
 
 // ruta para modals de Usuario sucursales
 $routes->post('usuarios-sucursales/agregar-UsuarioSucursal', 'configuracionGeneral\AdministracionUsuarios::modalUsuariosSucursales');

@@ -20,7 +20,7 @@
   <!-- En el head de tu vista -->
   <link rel="stylesheet" href="<?php echo base_url();?>../assets/plugins/datatables/css/dataTables.min.css">
 
-  <link rel="stylesheet" href="<?php echo base_url();?>../public/css/botones.css">
+  <link rel="stylesheet" href="<?php echo base_url();?>../public/css/input.css">
 
 
 

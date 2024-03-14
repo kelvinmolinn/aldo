@@ -28,8 +28,9 @@ class AdministracionPermisos extends Controller
 
     public function modalnuevoMenu()
     {
+        $data["moduloId"] = $this->request->getPost("moduloId");
         // Cargar la vista 'administracionMenus.php' desde la carpeta 'Views/configuracion-general/vistas'
-        return view('configuracion-general/modals/modalAdministracionMenus');
+        return view('configuracion-general/modals/modalAdministracionMenus', $data);
     }
 
     public function AdministracionMenus()
@@ -86,13 +87,12 @@ class AdministracionPermisos extends Controller
         return view('administracionModulos', ['datos' => $datos]);
     }
     
-    public function menusModulos()
+    public function menusModulos($moduloId, $modulo)
     {
-
-        $request = \Config\Services::request();
-
+        $data["moduloId"] = $moduloId;
+        $data["modulo"] = $modulo;
         // Cargar la vista 'administracionUsuarios.php' desde la carpeta 'Views/configuracion-general/vistas'
-        return view('configuracion-general/vistas/pageMenusModulos', ['request' => $request]);
+        return view('configuracion-general/vistas/pageMenusModulos', $data);
     }
 
     public function editarModulo(){

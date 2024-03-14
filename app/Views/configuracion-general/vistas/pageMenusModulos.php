@@ -2,9 +2,9 @@
     $this->extend('Panel/plantilla'); 
     $this->section('contenido');
 
-    $param1 = $request->getGet('modulo');
+    //$param1 = $request->getGet('modulo');
 ?>
-<h2>Asignación de menús a módulo: <?php echo  $param1;?></h2>
+<h2>Asignación de menús a módulo: <?php echo  $modulo;?></h2>
 <hr>
 <div class="row mb-4">
     <div class="col-md-6">
@@ -36,7 +36,7 @@
     $(document).ready(function() {
         $('#tblMenus').DataTable({
         "language": {
-            "url": "../../assets/plugins/datatables/js/spanish.json"
+            "url": "../../../../assets/plugins/datatables/js/spanish.json"
         },
         "columnDefs": [
             { "width": "10%", "targets": 0 }, 
@@ -53,7 +53,10 @@
             // Realizar una petición AJAX para obtener el contenido de la modal
             $.ajax({
                 url: '<?php echo base_url('administracion-modulos/nuevo-menu'); ?>',
-                type: 'GET',
+                type: 'POST',
+                data: {
+                    moduloId: <?= $moduloId; ?>
+                },
                 success: function(response) {
                     // Insertar el contenido de la modal en el cuerpo de la modal
                     $('#divModalContent').html(response);

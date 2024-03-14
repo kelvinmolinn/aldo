@@ -14,8 +14,10 @@
                 </div>
                 <div class="col-md-4">
                     <div class="form-outline">
-                        <input type="date" class="form-control" id = "fechaUsuario" name = "fechaUsuario" placeholder="Fecha de nacimiento" required>
-                        <label for="fechaUsuario" class="input-placeholder">Fecha de nacimiento</label>
+                        <div class="input-fiel">
+                            <label for="fechaUsuario">Fecha de nacimiento</label>
+                            <input type="date" class="form-control" id = "fechaUsuario" name = "fechaUsuario" placeholder="Fecha de nacimiento" required>
+                        </div>
                     </div>
                 </div>
                 <div class="col-md-4">

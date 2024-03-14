@@ -6,6 +6,7 @@
                     <h5 class="modal-title">Nuevo menú</h5>
                 </div>
                 <div class="modal-body">
+                    <input type="hidden" id="moduloId" name="moduloId" value="<?= $moduloId; ?>">
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-outline">

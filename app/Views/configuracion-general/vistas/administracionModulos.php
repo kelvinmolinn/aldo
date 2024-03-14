@@ -35,7 +35,7 @@
             ?>
                 <tr>
                     <td><?php echo $n; ?></td>
-                    <td><b>Módulo: </b><?php echo $modulos['modulo']; ?><br>
+                    <td><b>Módulo: </b><?php echo $modulo; ?><br>
                     </td>
                     <td>
                         <b>Url: </b><?php echo $modulos['urlModulo']; ?>  <br>
@@ -46,7 +46,7 @@
                         <span></span>
                         <i class="fas fa-pencil-alt"></i>
                     </button>
-                        <a href="<?= site_url('conf-general/page-menus-modulos?modulo=' .$modulos['modulo']); ?>" class="btn btn-secondary mb-1" data-toggle="tooltip" data-placement="top" title="0 Menús">
+                        <a href="<?= site_url('conf-general/page-menus-modulos/' . $moduloId . '/' . $modulo); ?>" class="btn btn-secondary mb-1" data-toggle="tooltip" data-placement="top" title="0 Menús">
                             <i class="fas fa-bars nav-icon"></i>
                         </a>
 
