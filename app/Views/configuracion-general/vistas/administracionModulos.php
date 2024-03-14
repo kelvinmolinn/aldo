@@ -7,7 +7,7 @@
 <div class="row mb-4">
     <div class="col-md-12 text-right">
         <button type= "button" id="btnAbrirModal" class="btn btn-primary ttip">
-            <i class="fas fa-save"></i>
+            <i class="fas fa-user-plus"></i>
             Nuevo módulo
         </button>
     </div>
@@ -50,7 +50,7 @@
                             <i class="fas fa-bars nav-icon"></i>
                         </a>
 
-                        <button class="btn btn-danger" onclick="eliminarModulo(`<?= $modulos['moduloId']; ?>`);" data-toggle="tooltip" data-placement="top" title="Eliminar">
+                        <button class="btn btn-danger mb-1" onclick="eliminarModulo(`<?= $modulos['moduloId']; ?>`);" data-toggle="tooltip" data-placement="top" title="Eliminar">
                             <i class="fas fa-trash"></i>
                         </button>
 
@@ -163,6 +163,7 @@
                         keyboard: false
                     });
                 },
+
                 error: function(xhr, status, error) {
                     // Manejar errores si los hay
                     console.error(xhr.responseText);

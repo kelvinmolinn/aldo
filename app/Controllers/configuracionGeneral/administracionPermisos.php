@@ -164,4 +164,39 @@ class AdministracionPermisos extends Controller
         }
     }
 
+    public function insertarNuevoMenu()
+    {
+        $model = new conf_menus();
+        $modelModulo = new conf_modulos(); 
+
+        $menu = $this->request->getPost('menu');
+        $iconoModulo = $this->request->getPost('iconoMenu');
+        $urlModulo = $this->request->getPost('urlMenu');
+            
+        $data = [
+            'menu'            => $this->request->getPost('menu'),
+            'moduloId'        => $this->request->getPost('menu'),
+            'iconoMenu'       => $this->request->getPost('iconoMenu'),
+            'urlMenu'         => $this->request->getPost('urlMenu')
+            
+            //'contrasena' => password_hash($this->request->getPost('contrasena'), PASSWORD_DEFAULT) // Encriptar contraseña
+        ];
+        // Insertar datos en la base de datos
+        $insertMenu = $model->insert($data);
+        if ($insertMenu) {
+            // Si el insert fue exitoso, devuelve el último ID insertado
+            return $this->response->setJSON([
+                'success' => true,
+                'mensaje' => 'Menú Agregado correctamente',
+                'menuId' => $model->insertID()
+            ]);
+        } else {
+            // Si el insert falló, devuelve un mensaje de error
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'No se pudo insertar el menú'
+            ]);
+        }
+    }
+
 }

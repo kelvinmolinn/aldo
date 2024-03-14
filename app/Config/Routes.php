@@ -94,6 +94,10 @@ $routes->get('administracion-modulos/editar-modulo', 'configuracionGeneral\Admin
 //ELIMINAR MODULO
 $routes->post('administracion-modulos/eliminar-modulo', 'configuracionGeneral\AdministracionPermisos::eliminarModulo');
 
+//insertar nuevo menu
+$routes->post('administracion-modulos/nuevo-menu', 'configuracionGeneral\AdministracionPermisos::insertarNuevoMenu');
+
+
 
 // Rutas de errores
 $routes->get('404', 'Errores::error404');

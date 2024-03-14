@@ -1,5 +1,5 @@
 <form id="frmModal">
-    <div id="modalModulos" class="modal" tabindex="-1">
+    <div id="modalMenus" class="modal" tabindex="-1">
         <div class="modal-dialog  modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
@@ -21,15 +21,15 @@
                             <div class="form-select-control">
                                 <select name="urlMenu" id="urlMenu" style="width: 100%;">
                                     <option value=""></option>
-                                    <option value="ruta">Url (select de las carpetas en la raíz de /modulos)</option>
-                                    <option value="ruta2">Url (select de las carpetas en la raíz de /modulos)</option>
+                                    <option value="menú">Url (select de las carpetas en la raíz de /menus)</option>
+                                    <option value="menú2">Url (select de las carpetas en la raíz de /menus)</option>
                                 </select>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" id="btnguardarUsuario" class="btn btn-primary">
+                    <button type="button" id="btnMenus" class="btn btn-primary">
                         <i class="fas fa-save"></i>
                         Guardar
                     </button>
@@ -48,20 +48,20 @@
         $("#urlMenu").select2({
             placeholder: 'Ruta'
         })
-        $('#btnguardarUsuario').on('click', function() {
+        $('#btnMenus').on('click', function() {
             // Realizar una petición AJAX para obtener el contenido de la modal
             $.ajax({
-                url: '<?php echo base_url('xd/nuevo-xd'); ?>',
+                url: '<?php echo base_url('administracion-modulos/nuevo-menu'); ?>',
                 type: 'POST',
                 data: $("#frmModal").serialize(),
                 success: function(response) {
                     console.log(response);
                     if (response.success) {
                         // Insert exitoso, ocultar modal y mostrar mensaje con Sweet Alert
-                        $('#modalModulos').modal('hide');
+                        $('#modalMenus').modal('hide');
                         Swal.fire({
                             icon: 'success',
-                            title: '¡Módulo creado con Éxito!',
+                            title: 'Menú creado con Éxito!',
                             text: response.mensaje
                         }).then((result) => {
                               // Recargar la DataTable después del insert
@@ -75,7 +75,9 @@
                             icon: 'error',
                             title: 'Error',
                             text: response.mensaje
+                            
                         });
+                        
                     }
                 },
 
