@@ -188,4 +188,29 @@ class AdministracionUsuarios extends Controller
             ]);
         }
     }
+    public function ActivarDesactivar(){
+        $desactivarActivar = new conf_empleados();
+
+        $usuarioId = $this->request->getPost('usuarioId');
+        $estadoUsuario = $this->request->getPost('estadoUsuario');
+        if($estadoUsuario == 'Activo'){
+            $data = ['estadoEmpleado' => 'Inactivo'];
+        }else{
+            $data = ['estadoEmpleado' => 'Activo'];
+        }
+
+        $desactivarActivar->update($usuarioId, $data);
+
+        if($desactivarActivar) {
+            return $this->response->setJSON([
+                'success' => true,
+                'mensaje' => 'Se cambió el estado con éxito'
+            ]);
+        } else {
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'No se pudo cambiar el estado'
+            ]);
+        }
+    }
 }

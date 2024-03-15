@@ -54,12 +54,6 @@ $routes->post('nuevo-usuario/guardar-usuario', 'configuracionGeneral\Administrac
 // Rutas para configuracion de modulos
 $routes->get('conf-general/administracion-modulos', 'configuracionGeneral\AdministracionPermisos::configuracionModulos');
 
-// Ruta para modals de nuevo modulo
-$routes->get('administracion-modulos/nuevo-modulo', 'configuracionGeneral\AdministracionPermisos::modalnuevoModulo');
-
-//modl modulo
-$routes->post('xd/nuevo-xd', 'configuracionGeneral\AdministracionPermisos::insertarNuevoModulo');
-
 // Ruta para usuarios sucursales
 $routes->get('conf-general/usuario-sucursal/(:any)', 'configuracionGeneral\AdministracionUsuarios::usuarioSucursal/$1');
 
@@ -86,12 +80,11 @@ $routes->post('usuarios-sucursales/guardar-usuario-sucursal', 'configuracionGene
 //ELIMINAR sucursal del usuario
 $routes->post('usuarios-sucursales/eliminar-usuario-sucursal', 'configuracionGeneral\AdministracionUsuarios::eliminarUsuarioSucursal');
 
-// Ruta para editar modulos
-$routes->post('conf-general/editar-modulo', 'configuracionGeneral\AdministracionPermisos::editarModulo');
+// Ruta para editar modulos: accion/operacion
+//$routes->post('conf-general/operacion/editar-modulo', 'configuracionGeneral\AdministracionPermisos::editarModulo');
 
-
-// ruta para modals de editar modulos
-$routes->get('administracion-modulos/editar-modulo', 'configuracionGeneral\AdministracionPermisos::modalEditarModulo');
+// ruta para modals de editar modulos: vista
+//$routes->post('conf-general/editar-modulo', 'configuracionGeneral\AdministracionPermisos::modalEditarModulo');
 
 //ELIMINAR MODULO
 $routes->post('administracion-modulos/eliminar-modulo', 'configuracionGeneral\AdministracionPermisos::eliminarModulo');
@@ -99,6 +92,14 @@ $routes->post('administracion-modulos/eliminar-modulo', 'configuracionGeneral\Ad
 //insertar nuevo menu
 $routes->post('administracion-modulos/nuevo-menu', 'configuracionGeneral\AdministracionPermisos::insertarNuevoMenu');
 
+//desactivar o activar usuario
+$routes->post('administracion-modulos/activar-desactivar-usuario', 'configuracionGeneral\AdministracionUsuarios::ActivarDesactivar');
+
+// Ruta general para abrir modal para insertar o editar, se llama con ajax que lleva el parametro operacion que indica que va a realizar
+$routes->post('conf-general/administracion-modulos/modulo', 'configuracionGeneral\AdministracionPermisos::modalModulo');
+
+// ruta general para realizar la operacion de la modal, en este caso, podemos llamarla asi
+$routes->post('conf-general-administracion-modulos/modulo/operacion', 'configuracionGeneral\AdministracionPermisos::modalModuloOperacion');
 
 
 // Rutas de errores

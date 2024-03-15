@@ -31,6 +31,7 @@
                     $n++;
                     $nombreCompleto = $empleados['primerNombre'].' '.$empleados['segundoNombre'].' '.$empleados['primerApellido'].' '.$empleados['segundoApellido'];
                     $usuarioId = $empleados['usuarioId'];
+                    $estadoUsuario = $empleados['estadoEmpleado'] ;
             ?>
                 <tr>
                     <td><?php echo $n; ?></td>
@@ -58,12 +59,17 @@
                         </a>
                         <?php
                             if($empleados['estadoEmpleado'] == 'Activo'){
+                            $mensaje = "¿Estás seguro que desea Desactivar el usuario?";
+                            $mensaje2 = "pasara a Desactivado";
                         ?>
-                        <button class="btn btn-danger" data-toggle="tooltip" data-placement="top" title="Desactivar" onclick="">
+                        <button class="btn btn-danger" data-toggle="tooltip" data-placement="top" title="Desactivar" onclick="ActivarDesactivarUsuario({usuarioId: <?= $usuarioId; ?>, estadoUsuario: '<?= $estadoUsuario; ?>'});">
                             <i class="fas fa-ban"></i>
                         </button>
-                        <?php }else{?>
-                        <button class="btn btn-success mb-1" data-toggle="tooltip" data-placement="top" title="Activar">
+                        <?php }else{
+                            $mensaje = "¿Estás seguro que desea Activar el usuario?";
+                            $mensaje2 = "pasara a Activo";
+                        ?>
+                        <button class="btn btn-success mb-1" data-toggle="tooltip" data-placement="top" title="Activar" onclick="ActivarDesactivarUsuario({usuarioId: <?= $usuarioId; ?>, estadoUsuario: '<?= $estadoUsuario; ?>'})">
                             <i class="fas fa-check"></i>
                         </button>
                         <?php }?>
@@ -74,8 +80,50 @@
     </table>
 </div>
 <script>
-    function ActivarDesactivar(){
-
+    function ActivarDesactivarUsuario(campos){
+        Swal.fire({
+                title: '<?= $mensaje; ?>',
+                text: '<?= $mensaje2; ?>',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Si el usuario confirma, enviar la solicitud AJAX para eliminar el usuario de la sucursal
+                        $.ajax({
+                            url: '<?php echo base_url('administracion-modulos/activar-desactivar-usuario'); ?>',
+                            type: 'POST',
+                            data: campos,
+                            success: function(response) {
+                                console.log(response);
+                                if (response.success) {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: '¡Se cambió el estado con éxito!',
+                                        text: response.mensaje
+                                    }).then((result) => {
+                                        // Recargar la DataTable después del update
+                                        window.location.href = "<?= site_url('conf-general/administracion-usuarios'); ?>";
+                                    });
+                                } else {
+                                    // update fallido, mostrar mensaje de error
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Error',
+                                        text: response.mensaje
+                                    });
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                // Manejar errores si los hay
+                                console.error(xhr.responseText);
+                            }
+                        });
+                }
+            });
     }
     
     $(document).ready(function() {

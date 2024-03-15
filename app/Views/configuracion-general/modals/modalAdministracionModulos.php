@@ -1,20 +1,29 @@
+<?php
+    if($operacion == "editar") {
+        $mensajeAlerta = "Modulo actualizado con exito";
+    } else {
+        $mensajeAlerta = "Modulo creado con exito";
+    }
+?>
 <form id="frmModal">
     <div id="modalModulos" class="modal" tabindex="-1">
         <div class="modal-dialog  modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Nuevo módulo</h5>
+                    <h5 class="modal-title"><?= ($operacion == 'editar' ? 'Editar módulo' : 'Nuevo módulo'); ?></h5>
                 </div>
                 <div class="modal-body">
+                    <input type="hidden" id="moduloId" name="moduloId" value="<?= $campos['moduloId']; ?>">
+                    <input type="hidden" id="operacion" name="operacion" value="<?= $operacion; ?>">
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-outline">
-                                <input type="text" Id="modulo" name="modulo" class="form-control " placeholder="Módulo" required>
+                                <input type="text" Id="modulo" name="modulo" class="form-control " placeholder="Módulo" value="<?= $campos['modulo']; ?>" required>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-outline">
-                                <input type="text" class="form-control " id="iconoModulo" name="iconoModulo" placeholder="Icono" required>
+                                <input type="text" class="form-control " id="iconoModulo" name="iconoModulo" placeholder="Icono" value="<?= $campos['iconoModulo']; ?>" required>
                             </div>
                         </div>
                         <div class="col-md-12 mt-4">
@@ -51,7 +60,7 @@
         $('#btnguardarUsuario').on('click', function() {
             // Realizar una petición AJAX para obtener el contenido de la modal
             $.ajax({
-                url: '<?php echo base_url('xd/nuevo-xd'); ?>',
+                url: '<?php echo base_url('conf-general-administracion-modulos/modulo/operacion'); ?>',
                 type: 'POST',
                 data: $("#frmModal").serialize(),
                 success: function(response) {
@@ -61,14 +70,11 @@
                         $('#modalModulos').modal('hide');
                         Swal.fire({
                             icon: 'success',
-                            title: '¡Módulo creado con Éxito!',
+                            title: '<?= $mensajeAlerta; ?>',
                             text: response.mensaje
                         }).then((result) => {
-                              // Recargar la DataTable después del insert
-                              $('#miTabla').DataTable().ajax.reload(); // Recargar la tabla
+                            window.location.href = "<?= site_url('conf-general/administracion-modulos'); ?>";
                         });
-                        console.log("Último ID insertado:", response.moduloId);
-
                     } else {
                         // Insert fallido, mostrar mensaje de error con Sweet Alert
                         Swal.fire({
@@ -85,5 +91,6 @@
                 }
             });
         });
+        $("#urlModulo").val('<?= $campos['urlModulo']; ?>').trigger("change");
     });
 </script>

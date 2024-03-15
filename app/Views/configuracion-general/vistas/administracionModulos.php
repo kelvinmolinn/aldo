@@ -6,7 +6,7 @@
 <hr>
 <div class="row mb-4">
     <div class="col-md-12 text-right">
-        <button type= "button" id="btnAbrirModal" class="btn btn-primary ttip">
+        <button type= "button" class="btn btn-primary ttip" onclick="modalModulo(0, 'insertar');">
             <i class="fas fa-user-plus"></i>
             Nuevo módulo
         </button>
@@ -42,7 +42,7 @@
                     </td>
                     <td>
 
-                    <button class="btn btn-primary mb-1" onclick="modalEditarModulo('<?= $moduloId; ?>', '<?= $modulo; ?>', '<?= $iconoModulo; ?>', '<?= $urlModulo; ?>');" data-toggle="tooltip" data-placement="top" title="Editar modulo">
+                    <button class="btn btn-primary mb-1" onclick="modalModulo('<?= $moduloId; ?>', 'editar');" data-toggle="tooltip" data-placement="top" title="Editar modulo">
                         <span></span>
                         <i class="fas fa-pencil-alt"></i>
                     </button>
@@ -115,15 +115,12 @@
         */
     }
 
-    function modalEditarModulo(moduloId, modulo, iconoModulo, urlModulo) {
+    function modalModulo(moduloId, operacion) {
         // Realizar una petición AJAX para obtener los datos del módulo por su ID
         $.ajax({
-            url: '<?php echo base_url('conf-general/editar-modulo'); ?>',
+            url: '<?php echo base_url('conf-general/administracion-modulos/modulo'); ?>',
             type: 'POST',
-            data: { moduloId: moduloId, 
-                    modulo: modulo, 
-                    iconoModulo: iconoModulo,
-                    urlModulo: urlModulo }, // Pasar el ID del módulo como parámetro
+            data: { moduloId: moduloId, operacion: operacion}, // Pasar el ID del módulo como parámetro
             success: function(response) {
                 // Insertar el contenido de la modal en el cuerpo de la modal
                 $('#divModalContent').html(response);
@@ -148,29 +145,6 @@
             { "width": "15%", "targets": 3 }  
         ]
     });
-        $('#btnAbrirModal').on('click', function() {
-            // Realizar una petición AJAX para obtener el contenido de la modal
-            $.ajax({
-                url: '<?php echo base_url('administracion-modulos/nuevo-modulo'); ?>',
-                type: 'GET',
-                success: function(response) {
-                    // Insertar el contenido de la modal en el cuerpo de la modal
-                    $('#divModalContent').html(response);
-                   
-                    // Mostrar la modal sin permitir cierre al hacer clic fuera o al presionar "Esc"
-                    $('#modalModulos').modal({
-                        backdrop: 'static',
-                        keyboard: false
-                    });
-                },
-
-                error: function(xhr, status, error) {
-                    // Manejar errores si los hay
-                    console.error(xhr.responseText);
-                }
-            });
-        });
-
 
     });
 </script>

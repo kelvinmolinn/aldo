@@ -19,12 +19,26 @@ class AdministracionPermisos extends Controller
         // Cargar la vista 'administracionUsuarios.php' desde la carpeta 'Views/configuracion-general/vistas'
         return view('configuracion-general/vistas/administracionModulos', $data);
     }
-    public function modalnuevoModulo()
-    {
-        // Cargar la vista 'administracionUsuarios.php' desde la carpeta 'Views/configuracion-general/vistas'
-        return view('configuracion-general/modals/modalAdministracionModulos');
-    }
 
+    public function modalModulo()
+    {
+        $operacion = $this->request->getPost('operacion');
+        if($operacion == 'editar') {
+            $moduloId = $this->request->getPost('moduloId');
+            $modulo = new conf_modulos();
+            $data['campos'] = $modulo->select('moduloId,modulo,iconoModulo, urlModulo')->where('flgElimina', 0)->where('moduloId', $moduloId)->first();
+        } else {
+            $data['campos'] = [
+                'moduloId'      => 0,
+                'modulo'        => '',
+                'iconoModulo'   => '', 
+                'urlModulo'     => ''
+            ];
+        }
+        $data['operacion'] = $operacion;
+        // Cargar la vista 'administracionUsuarios.php' desde la carpeta 'Views/configuracion-general/vistas'
+        return view('configuracion-general/modals/modalAdministracionModulos', $data);
+    }
 
     public function modalnuevoMenu()
     {
@@ -45,14 +59,11 @@ class AdministracionPermisos extends Controller
         return view('configuracion-general/vistas/administracionPermisos');
     }
 
-    public function insertarNuevoModulo()
+    public function modalModuloOperacion()
     {
+        $operacion = $this->request->getPost('operacion');
         $model = new conf_modulos();
 
-        $modulo = $this->request->getPost('modulo');
-        $iconoModulo = $this->request->getPost('iconoModulo');
-        $urlModulo = $this->request->getPost('urlModulo');
-            
         $data = [
             'modulo'            => $this->request->getPost('modulo'),
             'iconoModulo'       => $this->request->getPost('iconoModulo'),
@@ -60,14 +71,19 @@ class AdministracionPermisos extends Controller
             
             //'contrasena' => password_hash($this->request->getPost('contrasena'), PASSWORD_DEFAULT) // Encriptar contraseña
         ];
-        // Insertar datos en la base de datos
-        $insertModulo = $model->insert($data);
-        if ($insertModulo) {
+
+        if($operacion == 'editar') {
+            $operacionModulo = $model->update($this->request->getPost('moduloId'), $data);
+        } else {
+            // Insertar datos en la base de datos
+            $operacionModulo = $model->insert($data);
+        }
+        if ($operacionModulo) {
             // Si el insert fue exitoso, devuelve el último ID insertado
             return $this->response->setJSON([
                 'success' => true,
-                'mensaje' => 'Modulo Agregado correctamente',
-                'moduloId' => $model->insertID()
+                'mensaje' => 'Modulo '.($operacion == 'editar' ? 'actualizado' : 'agregado').' correctamente',
+                'moduloId' => ($operacion == 'editar' ? $this->request->getPost('moduloId') : $model->insertID())
             ]);
         } else {
             // Si el insert falló, devuelve un mensaje de error
@@ -93,27 +109,6 @@ class AdministracionPermisos extends Controller
         $data["modulo"] = $modulo;
         // Cargar la vista 'administracionUsuarios.php' desde la carpeta 'Views/configuracion-general/vistas'
         return view('configuracion-general/vistas/pageMenusModulos', $data);
-    }
-
-    public function editarModulo(){
-        $data['moduloId'] = $this->request->getPost('moduloId');
-        $data['modulo'] = $this->request->getPost('modulo');
-        $data['iconoModulo'] = $this->request->getPost('iconoModulo');
-        $data['urlModulo'] = $this->request->getPost('urlModulo');
-
-
-        return view('configuracion-general/modals/modalEditarModulos', $data);
-    }
-    public function modalEditarModulo(){
-        
-        $modulo = new conf_modulos();
-        $data['modulo'] = $modulo->where('flgElimina', 0)->findAll();
-        $data['moduloId'] = $this->request->getPost('moduloId');
-        $data['iconoModulo'] = $this->request->getPost('iconoModulo');
-        $data['urlModulo'] = $this->request->getPost('urlModulo');
-
-        return view('configuracion-general/modals/modalEditarModulos',$data);
-
     }
 
     public function insertUsuariosSucursal(){
