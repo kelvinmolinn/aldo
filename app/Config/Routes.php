@@ -68,7 +68,7 @@ $routes->get('conf-general/page-menus-modulos/(:any)', 'configuracionGeneral\Adm
 
 // Ruta para modals de nuevo menu
 $routes->post('administracion-modulos/nuevo-menu', 'configuracionGeneral\AdministracionPermisos::modalnuevoMenu');
-$routes->post('administracion-modulos/guardar-menu', 'configuracionGeneral\AdministracionPermisos::modalnuevoMenu');
+$routes->post('administracion-modulos/guardar-menu', 'configuracionGeneral\AdministracionPermisos::insertModuloMenu');
 
 
 // ruta para modals de Usuario sucursales

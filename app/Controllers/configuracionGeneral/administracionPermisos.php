@@ -4,6 +4,7 @@ namespace App\Controllers\configuracionGeneral;
 
 use CodeIgniter\Controller;
 use App\Models\conf_modulos;
+use App\Models\conf_menus;
 
 
 class AdministracionPermisos extends Controller
@@ -111,31 +112,6 @@ class AdministracionPermisos extends Controller
         return view('configuracion-general/vistas/pageMenusModulos', $data);
     }
 
-    public function insertUsuariosSucursal(){
-        $asignarSucursal = new conf_modulos_usuarios();
-
-         $data = [
-            'sucursalId'     => $this->request->getPost('selectmodulos'),
-            'moduloId'      => $this->request->getPost('moduloId')
-        ];
-        // Insertar datos en la base de datos
-        $insertAsignarSucursal = $asignarSucursal->insert($data);
-        if ($insertAsignarSucursal) {
-                
-            return $this->response->setJSON([
-                'success' => true,
-                'mensaje' => 'Sucursal asignada correctamente'
-            ]);
-
-        } else {
-            // Si el insert falló, devuelve un mensaje de error
-            return $this->response->setJSON([
-                'success' => false,
-                'mensaje' => 'No se pudo asignar la sucursal al empleado'
-            ]);
-        }
-    }
-
     public function eliminarModulo(){
         //$data['sucursalUsuarioId'] = $sucursalUsuarioId;
 
@@ -192,6 +168,41 @@ class AdministracionPermisos extends Controller
                 'mensaje' => 'No se pudo insertar el menú'
             ]);
         }
+    }
+
+    public function insertModuloMenu(){
+        $asignarMenu = new conf_menus();
+
+         $data = [
+            'menuId'     => $this->request->getPost('menuId'),
+            'moduloId'      => $this->request->getPost('moduloId')
+        ];
+        // Insertar datos en la base de datos
+        $insertAsignarMenu = $asignarMenu->insert($data);
+        if ($insertAsignarMenu) {
+                
+            return $this->response->setJSON([
+                'success' => true,
+                'mensaje' => 'Sucursal asignada correctamente'
+            ]);
+
+        } else {
+            // Si el insert falló, devuelve un mensaje de error
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'No se pudo asignar la sucursal al empleado'
+            ]);
+        }
+    }
+
+    public function mostrarDatosMenu()
+    {
+        // Aquí obtienes los datos de tu base de datos, ya sea usando un modelo o directamente
+        $Modulos = new conf_menus(); // Ajusta el nombre del modelo según sea necesario
+        $datos = $Modulos->findAll(); // Esto es un ejemplo, ajusta según tu situación
+    
+        // Pasar los datos a la vista
+        return view('modalAdministracionMenus', ['datos' => $datos]);
     }
 
 }
