@@ -17,8 +17,20 @@ class AdministracionPermisos extends Controller
         ->select('conf_modulos.*')
         ->where('conf_modulos.flgElimina', 0)
         ->findAll();
-        // Cargar la vista 'administracionUsuarios.php' desde la carpeta 'Views/configuracion-general/vistas'
+        // Cargar la vista 'administracionModulos.php' desde la carpeta 'Views/configuracion-general/vistas'
         return view('configuracion-general/vistas/administracionModulos', $data);
+    }
+
+    public function configuracionMenus()
+    {
+        $mostrarMenus = new conf_menus();
+
+        $data['menus'] = $mostrarMenus
+        ->select('conf_menus.*')
+        ->where('conf_menus.flgElimina', 0)
+        ->findAll();
+        // Cargar la vista 'pageMenusModulos.php' desde la carpeta 'Views/configuracion-general/vistas'
+        return view('configuracion-general/vistas/pageMenusModulos', $data);
     }
 
     public function modalModulo()
@@ -37,8 +49,28 @@ class AdministracionPermisos extends Controller
             ];
         }
         $data['operacion'] = $operacion;
-        // Cargar la vista 'administracionUsuarios.php' desde la carpeta 'Views/configuracion-general/vistas'
+        // Cargar la vista 'modalAdministracionModulos.php' desde la carpeta 'Views/configuracion-general/vistas'
         return view('configuracion-general/modals/modalAdministracionModulos', $data);
+    }
+
+    public function modalMenu()
+    {
+        $operacion = $this->request->getPost('operacion');
+        if($operacion == 'editar') {
+            $menuId = $this->request->getPost('menuId');
+            $modulo = new conf_menus();
+            $data['campos'] = $modulo->select('menuId,menu,iconoMenu, urlMenu')->where('flgElimina', 0)->where('menuId', $menuId)->first();
+        } else {
+            $data['campos'] = [
+                'menuId'      => 0,
+                'menu'        => '',
+                'iconoMenu'   => '', 
+                'urlMenu'     => ''
+            ];
+        }
+        $data['operacion'] = $operacion;
+        // Cargar la vista 'modalAdministracionMenus.php' desde la carpeta 'Views/configuracion-general/vistas'
+        return view('configuracion-general/modals/modalAdministracionMenus', $data);
     }
 
     public function modalnuevoMenu()

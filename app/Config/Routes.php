@@ -80,12 +80,6 @@ $routes->post('usuarios-sucursales/guardar-usuario-sucursal', 'configuracionGene
 //ELIMINAR sucursal del usuario
 $routes->post('usuarios-sucursales/eliminar-usuario-sucursal', 'configuracionGeneral\AdministracionUsuarios::eliminarUsuarioSucursal');
 
-// Ruta para editar modulos: accion/operacion
-//$routes->post('conf-general/operacion/editar-modulo', 'configuracionGeneral\AdministracionPermisos::editarModulo');
-
-// ruta para modals de editar modulos: vista
-//$routes->post('conf-general/editar-modulo', 'configuracionGeneral\AdministracionPermisos::modalEditarModulo');
-
 //ELIMINAR MODULO
 $routes->post('administracion-modulos/eliminar-modulo', 'configuracionGeneral\AdministracionPermisos::eliminarModulo');
 
@@ -100,6 +94,12 @@ $routes->post('conf-general/administracion-modulos/modulo', 'configuracionGenera
 
 // ruta general para realizar la operacion de la modal, en este caso, podemos llamarla asi
 $routes->post('conf-general-administracion-modulos/modulo/operacion', 'configuracionGeneral\AdministracionPermisos::modalModuloOperacion');
+
+// Rutas para configuracion de menus
+$routes->get('conf-general/administracion-menus', 'configuracionGeneral\AdministracionPermisos::configuracionMenus');
+
+// Ruta general para abrir modal para insertar o editar, se llama con ajax que lleva el parametro operacion que indica que va a realizar
+$routes->post('conf-general/administracion-menus/menu', 'configuracionGeneral\AdministracionPermisos::modalMenu');
 
 
 // Rutas de errores
