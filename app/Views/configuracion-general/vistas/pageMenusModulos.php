@@ -54,7 +54,7 @@
                         <span></span>
                         <i class="fas fa-pencil-alt"></i>
                     </button>
-                        <a href="<?= site_url('conf-general/page-permisos-modulos/' . $menuId . '/' . $menu); ?>" class="btn btn-secondary mb-1" data-toggle="tooltip" data-placement="top" title="0 permisos">
+                        <a href="<?= site_url('conf-general/page-permisos-menus/' . $menuId . '/' . $menu); ?>" class="btn btn-secondary mb-1" data-toggle="tooltip" data-placement="top" title="0 permisos">
                             <i class="fas fa-bars nav-icon"></i>
                         </a>
 

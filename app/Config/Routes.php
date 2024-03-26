@@ -109,6 +109,13 @@ $routes->get('conf-general/administracion-menus', 'configuracionGeneral\Administ
 // Ruta general para abrir modal para insertar o editar, se llama con ajax que lleva el parametro operacion que indica que va a realizar
 $routes->post('conf-general/administracion-menus/menu', 'configuracionGeneral\AdministracionPermisos::modalMenu');
 
+// Rutas para configuracion de permisos
+$routes->get('conf-general/page-menus-menus/(:any)', 'configuracionGeneral\AdministracionPermisos::menusMenus/$1');
+
+// ruta general para realizar la operacion de la modal, en este caso, podemos llamarla asi
+$routes->post('conf-general-administracion-menus/menu/operacion', 'configuracionGeneral\AdministracionPermisos::modalMenuOperacion');
+
+
 
 // Rutas de errores
 $routes->get('404', 'Errores::error404');

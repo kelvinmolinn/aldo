@@ -73,13 +73,6 @@ class AdministracionPermisos extends Controller
         return view('configuracion-general/modals/modalAdministracionMenus', $data);
     }
 
-    public function modalnuevoMenu()
-    {
-        $data["moduloId"] = $this->request->getPost("moduloId");
-        // Cargar la vista 'administracionMenus.php' desde la carpeta 'Views/configuracion-general/vistas'
-        return view('configuracion-general/modals/modalAdministracionMenus', $data);
-    }
-
     public function AdministracionMenus()
     {
         // Cargar la vista 'administracionUsuarios.php' desde la carpeta 'Views/configuracion-general/vistas'
@@ -126,6 +119,42 @@ class AdministracionPermisos extends Controller
             ]);
         }
     }
+
+    public function modalMenuOperacion()
+    {
+        $operacion = $this->request->getPost('operacion');
+        $model = new conf_menus();
+        $modelModulo = new conf_modulos();
+
+        $data = [
+            'menu'            => $this->request->getPost('menu'),
+            'iconoMenu'       => $this->request->getPost('iconoMenu'),
+            'urlMenu'         => $this->request->getPost('urlMenu')
+            
+            //'contrasena' => password_hash($this->request->getPost('contrasena'), PASSWORD_DEFAULT) // Encriptar contraseña
+        ];
+
+        if($operacion == 'editar') {
+            $operacionMenu = $model->update($this->request->getPost('menuId'), $data);
+        } else {
+            // Insertar datos en la base de datos
+            $operacionMenu = $model->insert($data);
+        }
+        if ($operacionMenu) {
+            // Si el insert fue exitoso, devuelve el último ID insertado
+            return $this->response->setJSON([
+                'success' => true,
+                'mensaje' => 'Menu '.($operacion == 'editar' ? 'actualizado' : 'agregado').' correctamente',
+                'menuId' => ($operacion == 'editar' ? $this->request->getPost('menuId') : $model->insertID())
+            ]);
+        } else {
+            // Si el insert falló, devuelve un mensaje de error
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'No se pudo insertar el menu'
+            ]);
+        }
+    }
     public function mostrarDatos()
     {
         // Aquí obtienes los datos de tu base de datos, ya sea usando un modelo o directamente
@@ -134,12 +163,28 @@ class AdministracionPermisos extends Controller
     
         // Pasar los datos a la vista
         return view('administracionModulos', ['datos' => $datos]);
+
+        // Aquí obtienes los datos de tu base de datos, ya sea usando un modelo o directamente
+        $Menus = new conf_menus(); // Ajusta el nombre del modelo según sea necesario
+        $datos = $Menus->findAll(); // Esto es un ejemplo, ajusta según tu situación
+    
+        // Pasar los datos a la vista
+        return view('pageMenuModulos', ['datos' => $datos]);
+
     }
     
     public function menusModulos($moduloId, $modulo)
     {
         $data["moduloId"] = $moduloId;
         $data["modulo"] = $modulo;
+        // Cargar la vista 'administracionUsuarios.php' desde la carpeta 'Views/configuracion-general/vistas'
+        return view('configuracion-general/vistas/pageMenusModulos', $data);
+    }
+
+    public function menusMenus($menuId, $menu)
+    {
+        $data["menuId"] = $menuId;
+        $data["menu"] = $menu;
         // Cargar la vista 'administracionUsuarios.php' desde la carpeta 'Views/configuracion-general/vistas'
         return view('configuracion-general/vistas/pageMenusModulos', $data);
     }
@@ -163,66 +208,6 @@ class AdministracionPermisos extends Controller
             return $this->response->setJSON([
                 'success' => false,
                 'mensaje' => 'No se pudo eliminar el módulo'
-            ]);
-        }
-    }
-
-    public function insertarNuevoMenu()
-    {
-        $model = new conf_menus();
-        $modelModulo = new conf_modulos(); 
-
-        $menu = $this->request->getPost('menu');
-        $iconoModulo = $this->request->getPost('iconoMenu');
-        $urlModulo = $this->request->getPost('urlMenu');
-            
-        $data = [
-            'menu'            => $this->request->getPost('menu'),
-            'moduloId'        => $this->request->getPost('menu'),
-            'iconoMenu'       => $this->request->getPost('iconoMenu'),
-            'urlMenu'         => $this->request->getPost('urlMenu')
-            
-            //'contrasena' => password_hash($this->request->getPost('contrasena'), PASSWORD_DEFAULT) // Encriptar contraseña
-        ];
-        // Insertar datos en la base de datos
-        $insertMenu = $model->insert($data);
-        if ($insertMenu) {
-            // Si el insert fue exitoso, devuelve el último ID insertado
-            return $this->response->setJSON([
-                'success' => true,
-                'mensaje' => 'Menú Agregado correctamente',
-                'menuId' => $model->insertID()
-            ]);
-        } else {
-            // Si el insert falló, devuelve un mensaje de error
-            return $this->response->setJSON([
-                'success' => false,
-                'mensaje' => 'No se pudo insertar el menú'
-            ]);
-        }
-    }
-
-    public function insertModuloMenu(){
-        $asignarMenu = new conf_menus();
-
-         $data = [
-            'menuId'     => $this->request->getPost('menuId'),
-            'moduloId'      => $this->request->getPost('moduloId')
-        ];
-        // Insertar datos en la base de datos
-        $insertAsignarMenu = $asignarMenu->insert($data);
-        if ($insertAsignarMenu) {
-                
-            return $this->response->setJSON([
-                'success' => true,
-                'mensaje' => 'Sucursal asignada correctamente'
-            ]);
-
-        } else {
-            // Si el insert falló, devuelve un mensaje de error
-            return $this->response->setJSON([
-                'success' => false,
-                'mensaje' => 'No se pudo asignar la sucursal al empleado'
             ]);
         }
     }
