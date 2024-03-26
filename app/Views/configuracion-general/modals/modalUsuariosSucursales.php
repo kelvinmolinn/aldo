@@ -7,7 +7,7 @@
                 <h5 class="modal-title">Asignar Sucursal al usuario: <?= $nombreCompleto; ?></h5>
             </div>
             <div class="modal-body">
-            <input type="hidden" id="usuarioId" name="usuarioId" value="<?= $usuarioId; ?>">
+            <input type="hidden" id="empleadoId" name="empleadoId" value="<?= $empleadoId; ?>">
             <input type="hidden" id="nombreCompleto" name="nombreCompleto" value="<?= $nombreCompleto; ?>">
                 <div class="row">
                     <div class="col-md-12">
@@ -59,7 +59,7 @@
                             text: response.mensaje
                         }).then((result) => {
                               // Recargar la DataTable después del insert
-                              window.location.href = "<?= site_url('conf-general/usuario-sucursal/' . $usuarioId . '/' . $nombreCompleto); ?>";
+                              window.location.href = "<?= site_url('conf-general/usuario-sucursal/' . $empleadoId . '/' . $nombreCompleto); ?>";
                         });
                     } else {
                         // Insert fallido, mostrar mensaje de error

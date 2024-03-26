@@ -1,31 +1,33 @@
 <form id="frmModal">
+    <input type="hidden" id="usuarioId" name="usuarioId" value="<?= $usuarioId; ?>">
+    <input type="hidden" id="operacion" name="operacion" value="<?= $operacion; ?>">
     <div id="modalUsuario" class="modal" tabindex="-1">
     <div class="modal-dialog  modal-lg">
         <div class="modal-content">
         <div class="modal-header">
-            <h5 class="modal-title">Nuevo usuario</h5>
+            <h5 class="modal-title"><?= ($operacion == 'editar' ? 'Editar usuario' : 'Nuevo usuario'); ?></h5>
         </div>
         <div class="modal-body">
             <div class="row">
                 <div class="col-md-4">
                     <div class="form-outline">
-                        <input type="text" Id= "duiUsuario" name = "duiUsuario" class="form-control" placeholder="DUI" required>
+                        <input type="text" Id= "duiUsuario" name = "duiUsuario" class="form-control" placeholder="DUI" value="<?= $campos['dui']; ?>" required>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-outline">
                         <div class="input-fiel">
-                            <label for="fechaUsuario">Fecha de nacimiento</label>
                             <input type="date" class="form-control" id = "fechaUsuario" name = "fechaUsuario" placeholder="Fecha de nacimiento" required>
                         </div>
                     </div>
+                    <small>Fecha de nacimiento</small>
                 </div>
                 <div class="col-md-4">
                     <div class="form-select-control">
                         <select name="selectGenero" id="selectGenero" style = "width: 100%;" required>
                             <option value=""></option>
-                            <option value="hombre">Hombre</option>
-                            <option value="mujer">Mujer</option>
+                            <option value="Hombre">Hombre</option>
+                            <option value="Mujer">Mujer</option>
                         </select>
                     </div>
                 </div>
@@ -77,7 +79,7 @@
             <i class="fas fa-save"></i>
                 Guardar
             </button>
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">
+            <button type="button" class="btn btn-secondary" onclick="$('#modalUsuario').modal('hide');">
                 <i class="fas fa-times-circle"></i>
                 Cerrar
             </button>
@@ -129,5 +131,7 @@
                 }
             });
         });
+
+        $("#selectRol").val('<?= $campos["rolId"]; ?>').trigger("change");
     });
 </script>

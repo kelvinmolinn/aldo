@@ -81,7 +81,7 @@
                                         text: response.mensaje
                                     }).then((result) => {
                                         // Recargar la DataTable después del insert
-                                        window.location.href = "<?= site_url('conf-general/usuario-sucursal/' . $usuarioId . '/' . $nombreCompleto); ?>";
+                                        window.location.href = "<?= site_url('conf-general/usuario-sucursal/' . $empleadoId . '/' . $nombreCompleto); ?>";
                                     });
                                 } else {
                                     // Insert fallido, mostrar mensaje de error
@@ -112,7 +112,7 @@
             $.ajax({
                 url: '<?php echo base_url('usuarios-sucursales/agregar-UsuarioSucursal'); ?>',
                 data: {
-                    usuarioId: <?= $usuarioId; ?>,
+                    empleadoId: <?= $empleadoId; ?>,
                     nombreCompleto: '<?= $nombreCompleto;?>'
                 },
                 type: 'POST',
@@ -121,7 +121,6 @@
                     $('#divModalContent').html(response);
                     // Mostrar la modal
                     $('#modalUsuario').modal('show');
-                    //$("#usuarioId").val('<?= $usuarioId; ?>');
                 },
                 error: function(xhr, status, error) {
                     // Manejar errores si los hay

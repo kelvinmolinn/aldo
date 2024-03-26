@@ -118,20 +118,20 @@
     function modalModulo(moduloId, operacion) {
         // Realizar una petición AJAX para obtener los datos del módulo por su ID
         $.ajax({
-            url: '<?php echo base_url('conf-general/administracion-modulos/modulo'); ?>',
-            type: 'POST',
-            data: { moduloId: moduloId, operacion: operacion}, // Pasar el ID del módulo como parámetro
-            success: function(response) {
-                // Insertar el contenido de la modal en el cuerpo de la modal
-                $('#divModalContent').html(response);
-                // Mostrar la modal
-                $('#modalModulos').modal('show');
-            },
-        error: function(xhr, status, error) {
-            // Manejar errores si los hay
-            console.error(xhr.responseText);
-        }
-    });
+                url: '<?php echo base_url('conf-general/administracion-modulos/modulo'); ?>',
+                type: 'POST',
+                data: { moduloId: moduloId, operacion: operacion}, // Pasar el ID del módulo como parámetro
+                success: function(response) {
+                    // Insertar el contenido de la modal en el cuerpo de la modal
+                    $('#divModalContent').html(response);
+                    // Mostrar la modal
+                    $('#modalModulos').modal('show');
+                },
+            error: function(xhr, status, error) {
+                // Manejar errores si los hay
+                console.error(xhr.responseText);
+            }
+        });
     }
      $(document).ready(function() {
         $('#miTabla').DataTable({

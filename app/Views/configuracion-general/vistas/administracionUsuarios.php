@@ -6,7 +6,7 @@
 <hr>
 <div class="row mb-4">
     <div class="col-md-12 text-right">
-        <button type= "button" id="btnAbrirModal" class="btn btn-primary estilo-btn">
+        <button type= "button" id="btnAbrirModal" class="btn btn-primary" onclick="modalUsuario(0, 'insertar');">
             <i class="fas fa-save"></i>
             Nuevo usuario
         </button>
@@ -30,6 +30,7 @@
                 foreach($empleados as $empleados){ 
                     $n++;
                     $nombreCompleto = $empleados['primerNombre'].' '.$empleados['segundoNombre'].' '.$empleados['primerApellido'].' '.$empleados['segundoApellido'];
+                    $empleadoId = $empleados['empleadoId'];
                     $usuarioId = $empleados['usuarioId'];
                     $estadoUsuario = $empleados['estadoEmpleado'] ;
             ?>
@@ -47,13 +48,13 @@
                         <?php echo $empleados['estadoEmpleado'];?>
                     </td>
                     <td>
-                        <button class="btn btn-primary mb-1">
+                        <button class="btn btn-primary mb-1" onclick="modalUsuario(<?= $usuarioId; ?>, 'editar');">
                             <i class="fas fa-pencil-alt"></i>
                             <span class=""></span>
                         </button>
                         <button class="btn btn-success mb-1">Restablecer acceso</button>
                         
-                        <a href="<?= site_url('conf-general/usuario-sucursal/' . $usuarioId . '/' . $nombreCompleto); ?>" class="btn btn-primary mb-1" data-toggle="tooltip" data-placement="top" title="Sucursales">
+                        <a href="<?= site_url('conf-general/usuario-sucursal/' . $empleadoId . '/' . $nombreCompleto); ?>" class="btn btn-primary mb-1" data-toggle="tooltip" data-placement="top" title="Sucursales">
                             <span><?= $empleados['conteo_sucursales'];?></span>
                             <i class="fas fa-store"></i>
                         </a>
@@ -124,6 +125,25 @@
                         });
                 }
             });
+    }
+
+    function modalUsuario(usuarioId, operacion) {
+        // Realizar una petición AJAX para obtener los datos del módulo por su ID
+        $.ajax({
+                url: '<?php echo base_url('conf-general/administracion-usuarios/form/empleado-usuario'); ?>',
+                type: 'POST',
+                data: { usuarioId: usuarioId, operacion: operacion}, // Pasar el ID del módulo como parámetro
+                success: function(response) {
+                    // Insertar el contenido de la modal en el cuerpo de la modal
+                    $('#divModalContent').html(response);
+                    // Mostrar la modal
+                    $('#modalUsuario').modal('show');
+                },
+            error: function(xhr, status, error) {
+                // Manejar errores si los hay
+                console.error(xhr.responseText);
+            }
+        });
     }
     
     $(document).ready(function() {

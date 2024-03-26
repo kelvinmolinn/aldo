@@ -7,8 +7,7 @@ use App\Models\conf_empleados;
 use App\Models\conf_roles;
 use App\Models\conf_usuarios;
 use App\Models\conf_sucursales;
-use App\Models\conf_sucursales_usuarios;
-
+use App\Models\conf_sucursales_empleados;
 class AdministracionUsuarios extends Controller
 {
     public function index()
@@ -22,11 +21,11 @@ class AdministracionUsuarios extends Controller
         ->where('conf_usuarios.flgElimina', 0)
         ->findAll();
 
-        $sucursalesUsuarios = new conf_sucursales_usuarios();
+        $sucursalesUsuarios = new conf_sucursales_empleados();
         // Obtener el conteo de sucursales para cada empleado
         foreach ($data['empleados'] as &$empleado) {
             $conteo = $sucursalesUsuarios->where('flgElimina', 0)
-                                    ->where('usuarioId', $empleado['usuarioId'])
+                                    ->where('empleadoId', $empleado['usuarioId'])
                                     ->countAllResults();
             $empleado['conteo_sucursales'] = $conteo;
         }
@@ -45,6 +44,27 @@ class AdministracionUsuarios extends Controller
         $rolesModel = new conf_roles();
 
         $data['roles'] = $rolesModel->where('flgElimina', 0)->findAll();
+        $data['operacion'] = $this->request->getPost('operacion');
+        $data['usuarioId'] = $this->request->getPost('usuarioId');
+
+        if($data['operacion'] == 'editar') {
+            $mostrarUsuario = new conf_usuarios();
+
+            // seleccionar solo los campos que estan en la modal (solo los input y select)
+            $data['campos'] = $mostrarUsuario
+            ->select('conf_empleados.dui, conf_usuarios.rolId')
+            ->join('conf_empleados', 'conf_empleados.empleadoId = conf_usuarios.empleadoId')
+            ->join('conf_roles', 'conf_roles.rolId = conf_usuarios.rolId')
+            ->where('conf_usuarios.flgElimina', 0)
+            ->where('conf_usuarios.usuarioId', $data['usuarioId'])
+            ->first();
+        } else {
+            // formar los campos que estan en la modal (input y select) con el nombre equivalente en la BD
+            $data['campos'] = [
+                'dui'           => '',
+                'rolId'         => ''
+            ];
+        }
         return view('configuracion-general/modals/modalAdministracionUsuarios', $data);
     }
 
@@ -103,17 +123,17 @@ class AdministracionUsuarios extends Controller
         }
     }
 
-    public function usuarioSucursal($usuarioId, $nombreCompleto){
-        $data['usuarioId'] = $usuarioId;
+    public function usuarioSucursal($empleadoId, $nombreCompleto){
+        $data['empleadoId'] = $empleadoId;
         $data['nombreCompleto'] = $nombreCompleto;
 
-        $mostrarSucursalUsuario = new conf_sucursales_usuarios();
+        $mostrarSucursalUsuario = new conf_sucursales_empleados();
 
             $data['sucursalUsuario'] = $mostrarSucursalUsuario
-            ->select('conf_sucursales.sucursal, conf_sucursales_usuarios.sucursalUsuarioId')
-            ->join('conf_sucursales', 'conf_sucursales.sucursalId = conf_sucursales_usuarios.sucursalId')
-            ->where('conf_sucursales_usuarios.flgElimina', 0)
-            ->where('conf_sucursales_usuarios.usuarioId',$usuarioId)
+            ->select('conf_sucursales.sucursal, conf_sucursales_empleados.sucursalUsuarioId')
+            ->join('conf_sucursales', 'conf_sucursales.sucursalId = conf_sucursales_empleados.sucursalId')
+            ->where('conf_sucursales_empleados.flgElimina', 0)
+            ->where('conf_sucursales_empleados.empleadoId',$empleadoId)
             ->findAll(); 
 
         return view('configuracion-general/vistas/pageUsuariosSucursales', $data);
@@ -127,15 +147,15 @@ class AdministracionUsuarios extends Controller
             ->select('conf_sucursales.sucursalId, conf_sucursales.sucursal')
             ->where('conf_sucursales.flgElimina', 0)
             ->whereNotIn('conf_sucursales.sucursalId', function($builder) {
-                $builder->select('conf_sucursales_usuarios.sucursalId')
-                        ->from('conf_sucursales_usuarios')
-                        ->where('conf_sucursales_usuarios.flgElimina', 0)
-                        ->where('conf_sucursales_usuarios.usuarioId', $this->request->getPost('usuarioId'));
+                $builder->select('conf_sucursales_empleados.sucursalId')
+                        ->from('conf_sucursales_empleados')
+                        ->where('conf_sucursales_empleados.flgElimina', 0)
+                        ->where('conf_sucursales_empleados.empleadoId', $this->request->getPost('empleadoId'));
             })
             ->findAll();
 
         //$data['sucursales'] = $sucursales->where('flgElimina', 0)->findAll();
-        $data['usuarioId'] = $this->request->getPost('usuarioId');
+        $data['empleadoId'] = $this->request->getPost('empleadoId');
         $data['nombreCompleto'] = $this->request->getPost('nombreCompleto');
 
         return view('configuracion-general/modals/modalUsuariosSucursales',$data);
@@ -143,11 +163,11 @@ class AdministracionUsuarios extends Controller
     }
 
     public function insertUsuariosSucursal(){
-        $asignarSucursal = new conf_sucursales_usuarios();
+        $asignarSucursal = new conf_sucursales_empleados();
 
          $data = [
             'sucursalId'     => $this->request->getPost('selectSucursales'),
-            'usuarioId'      => $this->request->getPost('usuarioId')
+            'empleadoId'      => $this->request->getPost('empleadoId')
         ];
         // Insertar datos en la base de datos
         $insertAsignarSucursal = $asignarSucursal->insert($data);
@@ -169,7 +189,7 @@ class AdministracionUsuarios extends Controller
     public function eliminarUsuarioSucursal(){
         //$data['sucursalUsuarioId'] = $sucursalUsuarioId;
 
-        $eliminarSucursal = new conf_sucursales_usuarios();
+        $eliminarSucursal = new conf_sucursales_empleados();
 
         $sucursalUsuarioId = $this->request->getPost('sucursalUsuarioId');
         $data = ['flgElimina' => 1];

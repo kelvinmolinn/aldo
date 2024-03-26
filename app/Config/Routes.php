@@ -48,6 +48,8 @@ $routes->get('conf-general/administracion-usuarios', 'configuracionGeneral\Admin
 // Rutas para modals
 $routes->get('administracion-usuarios/nuevo-usuario', 'configuracionGeneral\AdministracionUsuarios::modalAdministracionUsuarios');
 
+$routes->post('conf-general/administracion-usuarios/form/empleado-usuario', 'configuracionGeneral\AdministracionUsuarios::modalAdministracionUsuarios');
+
 //insert Nuevo usuario
 $routes->post('nuevo-usuario/guardar-usuario', 'configuracionGeneral\AdministracionUsuarios::insertarNuevoUsuario');
 
@@ -94,6 +96,12 @@ $routes->post('conf-general/administracion-modulos/modulo', 'configuracionGenera
 
 // ruta general para realizar la operacion de la modal, en este caso, podemos llamarla asi
 $routes->post('conf-general-administracion-modulos/modulo/operacion', 'configuracionGeneral\AdministracionPermisos::modalModuloOperacion');
+
+// Ruta general para abrir modal para insertar o editar, se llama con ajax que lleva el parametro operacion que indica que va a realizar
+$routes->post('conf-general/administracion-usuario/usuario', 'configuracionGeneral\AdministracionUsuarios::modalModulo');
+
+// ruta general para realizar la operacion de la modal, en este caso, podemos llamarla asi
+$routes->post('conf-general-administracion-usuario/usuario/operacion', 'configuracionGeneral\AdministracionUsuarios::modalModuloOperacion');
 
 // Rutas para configuracion de menus
 $routes->get('conf-general/administracion-menus', 'configuracionGeneral\AdministracionPermisos::configuracionMenus');
