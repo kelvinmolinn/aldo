@@ -11,6 +11,7 @@ class AdministracionPermisos extends Controller
 {
     public function configuracionModulos()
     {
+        $session = session();
         if(!$session->get('nombreUsuario')) {
             return view('login');
         } else {
@@ -71,17 +72,20 @@ class AdministracionPermisos extends Controller
                 'iconoMenu'   => '', 
                 'urlMenu'     => ''
             ];
+            $menuId = 0;
         }
-        $data['operacion'] = $operacion;
-        // Cargar la vista 'modalAdministracionMenus.php' desde la carpeta 'Views/configuracion-general/vistas'
-        return view('configuracion-general/modals/modalAdministracionMenus', $data);
+        return $this->response->setJSON([
+            'success' => true,
+            'mensaje' => 'Usuario'.($operacion == 'editar' ? 'actualizado' : 'agregado').' correctamente',
+            'menuId' => $menuId
+        ]);
     }
 
     public function AdministracionMenus()
     {
         // Cargar la vista 'administracionUsuarios.php' desde la carpeta 'Views/configuracion-general/vistas'
         return view('configuracion-general/vistas/administracionMenus');
-    }
+    }   
 
     public function AdministracionPermisos()
     {
@@ -181,6 +185,9 @@ class AdministracionPermisos extends Controller
     {
         $data["moduloId"] = $moduloId;
         $data["modulo"] = $modulo;
+
+        $Menus = new conf_menus(); // Ajusta el nombre del modelo según sea necesario
+        $data['menus'] = $Menus->findAll(); // Esto es un ejemplo, ajusta según tu situación
         // Cargar la vista 'administracionUsuarios.php' desde la carpeta 'Views/configuracion-general/vistas'
         return view('configuracion-general/vistas/pageMenusModulos', $data);
     }
@@ -215,15 +222,5 @@ class AdministracionPermisos extends Controller
             ]);
         }
     }
-
-    public function mostrarDatosMenu()
-    {
-        // Aquí obtienes los datos de tu base de datos, ya sea usando un modelo o directamente
-        $Menus = new conf_menus(); // Ajusta el nombre del modelo según sea necesario
-        $datos = $Menus->findAll(); // Esto es un ejemplo, ajusta según tu situación
-
-    // Pasar los datos a la vista
-    return view('configuracion-general/vistas/pageMenusModulos', ['menus' => $datos]);
-}
 
 }

@@ -125,18 +125,6 @@
                                 <p>Módulos</p>
                             </a>
                         </li>
-                        <li class="nav-item">
-                                <a href="<?= site_url('conf-general/administracion-menus'); ?>"class="nav-link">
-                                <i class="fas fa-tasks nav-icon"></i>
-                                <p>Menús</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                                <a href="<?= site_url('conf-general/administracion-permisos'); ?>"class="nav-link">
-                                <i class="fas fa-user-check nav-icon"></i>
-                                <p>Permisos</p>
-                            </a>
-                        </li>
                     </ul>
                 </li>
             </ul>

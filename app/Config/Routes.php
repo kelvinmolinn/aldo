@@ -69,8 +69,8 @@ $routes->get('conf-general/administracion-permisos', 'configuracionGeneral\Admin
 $routes->get('conf-general/page-menus-modulos/(:any)', 'configuracionGeneral\AdministracionPermisos::menusModulos/$1');
 
 // Ruta para modals de nuevo menu
-$routes->post('administracion-modulos/nuevo-menu', 'configuracionGeneral\AdministracionPermisos::modalnuevoMenu');
-$routes->post('administracion-modulos/guardar-menu', 'configuracionGeneral\AdministracionPermisos::insertModuloMenu');
+$routes->post('administracion-modulos/nuevo-menu', 'configuracionGeneral\AdministracionPermisos::ModalMenu');
+$routes->post('administracion-modulos/guardar-menu', 'configuracionGeneral\AdministracionPermisos::ModalMenu');
 
 
 // ruta para modals de Usuario sucursales
@@ -86,7 +86,7 @@ $routes->post('usuarios-sucursales/eliminar-usuario-sucursal', 'configuracionGen
 $routes->post('administracion-modulos/eliminar-modulo', 'configuracionGeneral\AdministracionPermisos::eliminarModulo');
 
 //insertar nuevo menu
-$routes->post('administracion-modulos/nuevo-menu', 'configuracionGeneral\AdministracionPermisos::insertarNuevoMenu');
+$routes->post('administracion-modulos/nuevo-menu', 'configuracionGeneral\AdministracionPermisos::modalMenu');
 
 //desactivar o activar usuario
 $routes->post('administracion-modulos/activar-desactivar-usuario', 'configuracionGeneral\AdministracionUsuarios::ActivarDesactivar');
@@ -112,7 +112,7 @@ $routes->post('conf-general/administracion-menus/menu', 'configuracionGeneral\Ad
 // Rutas para configuracion de permisos
 $routes->get('conf-general/page-menus-menus/(:any)', 'configuracionGeneral\AdministracionPermisos::menusMenus/$1');
 
-// ruta general para realizar la operacion de la modal, en este caso, podemos llamarla asi
+// ruta general para realizar la operacion de la modal
 $routes->post('conf-general-administracion-menus/menu/operacion', 'configuracionGeneral\AdministracionPermisos::modalMenuOperacion');
 
 

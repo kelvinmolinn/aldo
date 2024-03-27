@@ -133,7 +133,7 @@ function eliminarMenu(id) {
                 // Insertar el contenido de la modal en el cuerpo de la modal
                 $('#divModalContent').html(response);
                 // Mostrar la modal
-                $('#modalModulos').modal('show');
+                $('#modalMenus').modal('show');
             },
         error: function(xhr, status, error) {
             // Manejar errores si los hay
