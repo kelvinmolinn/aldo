@@ -169,7 +169,7 @@ class AdministracionPermisos extends Controller
         $datos = $Menus->findAll(); // Esto es un ejemplo, ajusta según tu situación
     
         // Pasar los datos a la vista
-        return view('pageMenuModulos', ['datos' => $datos]);
+        return view('pageMenusModulos', ['datos' => $datos]);
 
     }
     
@@ -215,11 +215,11 @@ class AdministracionPermisos extends Controller
     public function mostrarDatosMenu()
     {
         // Aquí obtienes los datos de tu base de datos, ya sea usando un modelo o directamente
-        $Modulos = new conf_menus(); // Ajusta el nombre del modelo según sea necesario
-        $datos = $Modulos->findAll(); // Esto es un ejemplo, ajusta según tu situación
-    
-        // Pasar los datos a la vista
-        return view('modalAdministracionMenus', ['datos' => $datos]);
-    }
+        $Menus = new conf_menus(); // Ajusta el nombre del modelo según sea necesario
+        $datos = $Menus->findAll(); // Esto es un ejemplo, ajusta según tu situación
+
+    // Pasar los datos a la vista
+    return view('configuracion-general/vistas/pageMenusModulos', ['menus' => $datos]);
+}
 
 }
