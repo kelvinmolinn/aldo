@@ -17,10 +17,10 @@ class conf_empleados extends Model
     protected $createdField  = 'fhAgrega'; // Campo creado automáticamente al insertar
     protected $updatedField  = 'fhEdita'; // Campo actualizado automáticamente al actualizar
 
-    public function duiExiste($dui)
+    public function duiExiste($dui, $empleadoId)
     {
         // Realizar una consulta para verificar si el DUI ya existe en la base de datos
-        $resultado = $this->where('dui', $dui)->countAllResults();
+        $resultado = $this->where('dui', $dui)->whereNotIn('empleadoId', [$empleadoId])->countAllResults();
 
         return $resultado > 0; // Devuelve true si el DUI existe, false en caso contrario
     }

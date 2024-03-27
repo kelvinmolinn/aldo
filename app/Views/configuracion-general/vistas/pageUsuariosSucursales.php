@@ -120,7 +120,7 @@
                     // Insertar el contenido de la modal en el cuerpo de la modal
                     $('#divModalContent').html(response);
                     // Mostrar la modal
-                    $('#modalUsuario').modal('show');
+                    $('#modalUsuarioSucursal').modal('show');
                 },
                 error: function(xhr, status, error) {
                     // Manejar errores si los hay

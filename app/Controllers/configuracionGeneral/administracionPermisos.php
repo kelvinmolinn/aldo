@@ -11,14 +11,18 @@ class AdministracionPermisos extends Controller
 {
     public function configuracionModulos()
     {
-        $mostrarModulos = new conf_modulos();
+        if(!$session->get('nombreUsuario')) {
+            return view('login');
+        } else {
+            $mostrarModulos = new conf_modulos();
 
-        $data['modulos'] = $mostrarModulos
-        ->select('conf_modulos.*')
-        ->where('conf_modulos.flgElimina', 0)
-        ->findAll();
-        // Cargar la vista 'administracionModulos.php' desde la carpeta 'Views/configuracion-general/vistas'
-        return view('configuracion-general/vistas/administracionModulos', $data);
+            $data['modulos'] = $mostrarModulos
+            ->select('conf_modulos.*')
+            ->where('conf_modulos.flgElimina', 0)
+            ->findAll();
+            // Cargar la vista 'administracionModulos.php' desde la carpeta 'Views/configuracion-general/vistas'
+            return view('configuracion-general/vistas/administracionModulos', $data);
+        }
     }
 
     public function configuracionMenus()

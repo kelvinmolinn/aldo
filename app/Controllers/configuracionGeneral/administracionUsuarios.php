@@ -12,26 +12,32 @@ class AdministracionUsuarios extends Controller
 {
     public function index()
     {        
-        $mostrarUsuario = new conf_usuarios();
+        $session = session();
+        
+        if(!$session->get('nombreUsuario')) {
+            return view('login');
+        } else {
+            $mostrarUsuario = new conf_empleados();
 
-        $data['empleados'] = $mostrarUsuario
-        ->select('conf_empleados.*,conf_usuarios.usuarioId, conf_usuarios.correo, conf_roles.rol')
-        ->join('conf_empleados', 'conf_empleados.empleadoId = conf_usuarios.empleadoId')
-        ->join('conf_roles', 'conf_roles.rolId = conf_usuarios.rolId')
-        ->where('conf_usuarios.flgElimina', 0)
-        ->findAll();
-
-        $sucursalesUsuarios = new conf_sucursales_empleados();
-        // Obtener el conteo de sucursales para cada empleado
-        foreach ($data['empleados'] as &$empleado) {
-            $conteo = $sucursalesUsuarios->where('flgElimina', 0)
-                                    ->where('empleadoId', $empleado['usuarioId'])
-                                    ->countAllResults();
-            $empleado['conteo_sucursales'] = $conteo;
+            $data['empleados'] = $mostrarUsuario
+            ->select('conf_empleados.*,conf_usuarios.usuarioId, conf_usuarios.correo, conf_roles.rol')
+            ->join('conf_usuarios', 'conf_usuarios.empleadoId = conf_empleados.empleadoId', 'left')
+            ->join('conf_roles', 'conf_roles.rolId = conf_usuarios.rolId', 'left')
+            ->where('conf_empleados.flgElimina', 0)
+            ->findAll();
+    
+            $sucursalesUsuarios = new conf_sucursales_empleados();
+            // Obtener el conteo de sucursales para cada empleado
+            foreach ($data['empleados'] as &$empleado) {
+                $conteo = $sucursalesUsuarios->where('flgElimina', 0)
+                                        ->where('empleadoId', $empleado['usuarioId'])
+                                        ->countAllResults();
+                $empleado['conteo_sucursales'] = $conteo;
+            }
+    
+    
+        return view('configuracion-general/vistas/administracionUsuarios', $data);
         }
-
-
-    return view('configuracion-general/vistas/administracionUsuarios', $data);
     }
 
     public function mensaje() {
@@ -46,13 +52,14 @@ class AdministracionUsuarios extends Controller
         $data['roles'] = $rolesModel->where('flgElimina', 0)->findAll();
         $data['operacion'] = $this->request->getPost('operacion');
         $data['usuarioId'] = $this->request->getPost('usuarioId');
+        $data['empleadoId'] = $this->request->getPost('empleadoId');
 
         if($data['operacion'] == 'editar') {
             $mostrarUsuario = new conf_usuarios();
 
             // seleccionar solo los campos que estan en la modal (solo los input y select)
             $data['campos'] = $mostrarUsuario
-            ->select('conf_empleados.dui, conf_usuarios.rolId')
+            ->select('conf_empleados.dui,conf_empleados.fechaNacimiento,conf_empleados.primerNombre,conf_empleados.segundoNombre,conf_empleados.primerApellido,conf_empleados.segundoApellido,conf_empleados.sexoEmpleado,conf_usuarios.correo, conf_usuarios.rolId')
             ->join('conf_empleados', 'conf_empleados.empleadoId = conf_usuarios.empleadoId')
             ->join('conf_roles', 'conf_roles.rolId = conf_usuarios.rolId')
             ->where('conf_usuarios.flgElimina', 0)
@@ -61,8 +68,16 @@ class AdministracionUsuarios extends Controller
         } else {
             // formar los campos que estan en la modal (input y select) con el nombre equivalente en la BD
             $data['campos'] = [
-                'dui'           => '',
-                'rolId'         => ''
+                'dui'               => '',
+                'rolId'             => '',
+                'primerNombre'      => '',
+                'segundoNombre'     => '',
+                'primerApellido'    => '',
+                'segundoApellido'   => '',
+                'fechaNacimiento'   => '',
+                'sexoEmpleado'      => '',
+                'correo'            => ''
+
             ];
         }
         return view('configuracion-general/modals/modalAdministracionUsuarios', $data);
@@ -70,56 +85,69 @@ class AdministracionUsuarios extends Controller
 
     public function insertarNuevoUsuario()
     {
-    
         $model = new conf_empleados();
         $modelUsuario = new conf_usuarios();
 
         $dui = $this->request->getPost('duiUsuario');
-            
-        if ($model->duiExiste($dui)) {
+        $operacion = $this->request->getPost('operacion');
+        $empleadoId = $this->request->getPost('empleadoId');
+
+        if ($model->duiExiste($dui, $empleadoId)) {
             return $this->response->setJSON([
                 'success' => false,
                 'mensaje' => 'El DUI ya está registrado en la base de datos'
             ]);
-        }
-        $data = [
-            'dui'               => $this->request->getPost('duiUsuario'),
-            'primerNombre'      => $this->request->getPost('primerNombreUsuario'),
-            'segundoNombre'     => $this->request->getPost('segundoNombreUsuario'),
-            'primerApellido'    => $this->request->getPost('primerApellidoUsuario'),
-            'segundoApellido'   => $this->request->getPost('segundoApellidoUsuario'),
-            'fechaNacimiento'   => $this->request->getPost('fechaUsuario'),
-            'sexoEmpleado'      => $this->request->getPost('selectGenero'),
-            'estadoEmpleado'    => "Activo"
-            //'contrasena' => password_hash('aldo'.date('Y').'$', PASSWORD_DEFAULT) // Encriptar contraseña
-        ];
-        // Insertar datos en la base de datos
-        $insertEmpleado = $model->insert($data);
-        if ($insertEmpleado) {
-            // Si el insert fue exitoso, devuelve el último ID insertado
-            $empleadoId =  $insertEmpleado;
-            $dataUsuarios = [
-                'empleadoId'        => $empleadoId,
-                'rolId'             => $this->request->getPost('selectRol'),
-                'correo'            => $this->request->getPost('correoUsuario'),
-                'clave'             => '123456',
-                'estadoUsuario'     => 'Activo'
-            ];
-
-            $insertUsuario = $modelUsuario->insert($dataUsuarios);
-                
-                return $this->response->setJSON([
-                    'success' => true,
-                    'mensaje' => 'Usuario insertado correctamente',
-                    'empleadoId' => $model->insertID()
-                ]);
-
         } else {
-            // Si el insert falló, devuelve un mensaje de error
-            return $this->response->setJSON([
-                'success' => false,
-                'mensaje' => 'No se pudo insertar el empleado'
-            ]);
+            $data = [
+                'dui'               => $this->request->getPost('duiUsuario'),
+                'primerNombre'      => $this->request->getPost('primerNombreUsuario'),
+                'segundoNombre'     => $this->request->getPost('segundoNombreUsuario'),
+                'primerApellido'    => $this->request->getPost('primerApellidoUsuario'),
+                'segundoApellido'   => $this->request->getPost('segundoApellidoUsuario'),
+                'fechaNacimiento'   => $this->request->getPost('fechaUsuario'),
+                'sexoEmpleado'      => $this->request->getPost('selectGenero'),
+                'estadoEmpleado'    => "Activo"
+                //'contrasena' => password_hash('aldo'.date('Y').'$', PASSWORD_DEFAULT) // Encriptar contraseña
+            ];
+            // Insertar datos en la base de datos
+            
+            if($operacion == 'editar'){
+                $insertEmpleado = $model->update($empleadoId, $data);
+            }else{
+                $insertEmpleado = $model->insert($data);
+                // sobreescribir el cero que viene como empleadoId
+                $empleadoId =  $model->insertID();
+            }
+            if ($insertEmpleado) {
+                // Si el insert fue exitoso, devuelve el último ID insertado
+                
+                $dataUsuarios = [
+                    'empleadoId'        => $empleadoId,
+                    'rolId'             => $this->request->getPost('selectRol'),
+                    'correo'            => $this->request->getPost('correoUsuario'),
+                    'clave'             => '123456',
+                    'estadoUsuario'     => 'Activo'
+                ];
+
+                if($operacion == 'editar'){
+                    $insertUsuario = $modelUsuario->update($this->request->getPost('usuarioId'), $dataUsuarios);
+                }else{
+                    $insertUsuario = $modelUsuario->insert($dataUsuarios);
+                }
+                    return $this->response->setJSON([
+                        'success' => true,
+                        'mensaje' => 'Usuario'.($operacion == 'editar' ? 'actualizado' : 'agregado').' correctamente',
+                        'empleadoId' => $model->insertID()
+                    ]);
+    
+            } else {
+                // Si el insert falló, devuelve un mensaje de error
+                return $this->response->setJSON([
+                    'success' => false,
+                    'mensaje' => 'No se pudo insertar el empleado'
+                ]);
+            }
+     
         }
     }
 

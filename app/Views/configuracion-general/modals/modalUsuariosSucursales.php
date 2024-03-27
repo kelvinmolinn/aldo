@@ -1,6 +1,6 @@
 
 <form id="frmModal">
-    <div id="modalUsuario" class="modal" tabindex="-1">
+    <div id="modalUsuarioSucursal" class="modal" tabindex="-1">
         <div class="modal-dialog  modal-lg">
             <div class="modal-content">
             <div class="modal-header">
@@ -27,7 +27,7 @@
                     <i class="fas fa-save"></i>
                         Guardar
                     </button>
-                    <button type="button" class="btn btn-secondary" onclick="$('#modalUsuario').modal('hide');">
+                    <button type="button" class="btn btn-secondary" onclick="$('#modalUsuarioSucursal').modal('hide');">
                         <i class="fas fa-times-circle"></i>
                         Cerrar
                     </button>
@@ -52,7 +52,7 @@
                     console.log(response);
                     if (response.success) {
                         // Insert exitoso, ocultar modal y mostrar mensaje
-                        $('#modalUsuario').modal('hide');
+                        $('#modalUsuarioSucursal').modal('hide');
                         Swal.fire({
                             icon: 'success',
                             title: 'Sucursal agregada con Éxito!',

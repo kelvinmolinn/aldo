@@ -6,7 +6,7 @@
 <hr>
 <div class="row mb-4">
     <div class="col-md-12 text-right">
-        <button type= "button" id="btnAbrirModal" class="btn btn-primary" onclick="modalUsuario(0, 'insertar');">
+        <button type= "button" id="btnAbrirModal" class="btn btn-primary" onclick="modalUsuario(0, 0, 'insertar');">
             <i class="fas fa-save"></i>
             Nuevo usuario
         </button>
@@ -48,7 +48,7 @@
                         <?php echo $empleados['estadoEmpleado'];?>
                     </td>
                     <td>
-                        <button class="btn btn-primary mb-1" onclick="modalUsuario(<?= $usuarioId; ?>, 'editar');">
+                        <button class="btn btn-primary mb-1" onclick="modalUsuario(<?= $usuarioId; ?>, <?= $empleadoId; ?>, 'editar');">
                             <i class="fas fa-pencil-alt"></i>
                             <span class=""></span>
                         </button>
@@ -127,12 +127,12 @@
             });
     }
 
-    function modalUsuario(usuarioId, operacion) {
+    function modalUsuario(usuarioId, empleadoId, operacion) {
         // Realizar una petición AJAX para obtener los datos del módulo por su ID
         $.ajax({
                 url: '<?php echo base_url('conf-general/administracion-usuarios/form/empleado-usuario'); ?>',
                 type: 'POST',
-                data: { usuarioId: usuarioId, operacion: operacion}, // Pasar el ID del módulo como parámetro
+                data: { usuarioId: usuarioId, empleadoId: empleadoId, operacion: operacion}, // Pasar el ID del módulo como parámetro
                 success: function(response) {
                     // Insertar el contenido de la modal en el cuerpo de la modal
                     $('#divModalContent').html(response);
@@ -147,24 +147,6 @@
     }
     
     $(document).ready(function() {
-        $('#btnAbrirModal').on('click', function() {
-            // Realizar una petición AJAX para obtener el contenido de la modal
-            $.ajax({
-                url: '<?php echo base_url('administracion-usuarios/nuevo-usuario'); ?>',
-                type: 'GET',
-                success: function(response) {
-                    // Insertar el contenido de la modal en el cuerpo de la modal
-                    $('#divModalContent').html(response);
-                    // Mostrar la modal
-                    $('#modalUsuario').modal('show');
-                },
-                error: function(xhr, status, error) {
-                    // Manejar errores si los hay
-                    console.error(xhr.responseText);
-                }
-            });
-        });
-
         $('#tblEmpleados').DataTable({
             "language": {
                 "url": "../../assets/plugins/datatables/js/spanish.json"
