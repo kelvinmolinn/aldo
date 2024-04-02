@@ -59,11 +59,6 @@
                     </div>
                     <div class="row mt-4">
                         <div class="col-md-6">
-                            <div class="form-outline">
-                                <input type="email" id="correoUsuario" name="correoUsuario" class="form-control" placeholder="Correo electrónico"  value="<?= $campos['correo']; ?>"required>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
                             <div class="form-select-control">
                                 <select name="selectRol" id="selectRol" style="width: 100%;">
                                     <option></option>
@@ -73,10 +68,28 @@
                                 </select>
                             </div>
                         </div>
+                        <div class="col-md-6">
+                            <label>¿Desearia crear usuario?</label>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="radioCrear" id="radioCrearSi" value="si">
+                                <label class="form-check-label" for="radioCrearSi">Sí</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="radioCrear" id="radioCrearNo" value="no" checked>
+                                <label class="form-check-label" for="radioCrearNo">No</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-4" id="divCorreoUsuario">
+                        <div class="col-md-6">
+                            <div class="form-outline">
+                                <input type="email" id="correoUsuario" name="correoUsuario" class="form-control" placeholder="Correo electrónico"  value="<?= $campos['correo']; ?>"required>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" id="btnguardarUsuario" class="btn btn-primary">
+                    <button type="submit" id="btnguardarUsuario" class="btn btn-primary">
                         <i class="fas fa-save"></i>
                         Guardar
                     </button>
@@ -91,6 +104,17 @@
 </form>
 <script>
     $(document).ready(function() {
+
+        $('#divCorreoUsuario').hide();
+
+        $('input[type=radio][name=radioCrear]').change(function() {
+            if (this.value == 'si') {
+                $('#divCorreoUsuario').show();
+            } else if (this.value == 'no') {
+                $('#divCorreoUsuario').hide();
+            }
+        });
+
         $("#selectGenero").select2({
             placeholder: 'Genero'
         });
@@ -98,8 +122,8 @@
             placeholder: 'Roles'
         });
 
-        $('#btnguardarUsuario').on('click', function() {
-            // Realizar una petición AJAX para obtener el contenido de la modal
+        $("#frmModal").submit(function(event) {
+
             $.ajax({
                 url: '<?php echo base_url('nuevo-usuario/guardar-usuario'); ?>',
                 type: 'POST',
@@ -133,6 +157,42 @@
                 }
             });
         });
+
+       /* $('#btnguardarUsuario').on('click', function() {
+            // Realizar una petición AJAX para obtener el contenido de la modal
+            $.ajax({
+                url: '<?php// echo base_url('nuevo-usuario/guardar-usuario'); ?>',
+                type: 'POST',
+                data: $("#frmModal").serialize(),
+                success: function(response) {
+                    console.log(response);
+                    if (response.success) {
+                        // Insert exitoso, ocultar modal y mostrar mensaje
+                        $('#modalUsuario').modal('hide');
+                        Swal.fire({
+                            icon: 'success',
+                            title: '¡Usuario agregado con Éxito!',
+                            text: response.mensaje
+                        }).then((result) => {
+                            // Recargar la DataTable después del insert
+
+                        });
+                        console.log("Último ID insertado:", response.empleadoId);
+                    } else {
+                        // Insert fallido, mostrar mensaje de error
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.mensaje
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    // Manejar errores si los hay
+                    console.error(xhr.responseText);
+                }
+            });
+        });*/
 
         $("#selectRol").val('<?= $campos["rolId"]; ?>').trigger("change");
         $("#selectGenero").val('<?= $campos["sexoEmpleado"]; ?>').trigger("change");
