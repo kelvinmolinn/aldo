@@ -67,7 +67,7 @@
                 if (result.isConfirmed) {
                     // Si el usuario confirma, enviar la solicitud AJAX para eliminar el usuario de la sucursal
                         $.ajax({
-                            url: '<?php echo base_url('usuarios-sucursales/eliminar-usuario-sucursal'); ?>',
+                            url: '<?php echo base_url('conf-general/admin-usuarios/operacion/eliminar/usuario/sucursal'); ?>',
                             type: 'POST',
                             data: {
                                 sucursalUsuarioId: id
@@ -81,7 +81,7 @@
                                         text: response.mensaje
                                     }).then((result) => {
                                         // Recargar la DataTable después del insert
-                                        window.location.href = "<?= site_url('conf-general/usuario-sucursal/' . $empleadoId . '/' . $nombreCompleto); ?>";
+                                        window.location.href = "<?= site_url('conf-general/admin-usuarios/vista/usuario/sucursal/' . $empleadoId . '/' . $nombreCompleto); ?>";
                                     });
                                 } else {
                                     // Insert fallido, mostrar mensaje de error
@@ -110,7 +110,7 @@
         $('#btnAsignarSucursal').on('click', function() {
             // Realizar una petición AJAX para obtener el contenido de la modal
             $.ajax({
-                url: '<?php echo base_url('usuarios-sucursales/agregar-UsuarioSucursal'); ?>',
+                url: '<?php echo base_url('conf-general/admin-usuarios/form/Usuario/sucursal'); ?>',
                 data: {
                     empleadoId: <?= $empleadoId; ?>,
                     nombreCompleto: '<?= $nombreCompleto;?>'
@@ -131,12 +131,12 @@
 
         $('#btnRegresarUsuarios').on('click', function() {
             // Redireccionar a la URL correspondiente
-            window.location.href = '<?php echo base_url('conf-general/administracion-usuarios'); ?>';
+            window.location.href = '<?php echo base_url('conf-general/admin-usuarios/index'); ?>';
         });
 
         $('#tblSucursales').DataTable({
             "language": {
-                "url": "../../../../assets/plugins/datatables/js/spanish.json"
+                "url": "../../../../../../../assets/plugins/datatables/js/spanish.json"
             },
             "columnDefs": [
                 { "width": "10%"}, 

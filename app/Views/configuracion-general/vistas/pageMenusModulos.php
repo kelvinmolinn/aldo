@@ -14,7 +14,7 @@
         </button>
     </div>
     <div class="col-md-6 text-right">
-        <button type= "button" id="btnAbrirModal" class="btn btn-primary estilo-btn" onclick="modalMenu(0, 'insertar');">
+        <button type= "button" id="btnAbrirModal" class="btn btn-primary estilo-btn" onclick="modalMenu({moduloId: '<?= $moduloId; ?>',menuId: 0, operacion: 'insertar'});">
             <i class="fas fa-save"></i>
             Nuevo menú
         </button>
@@ -50,18 +50,12 @@
                     </td>
                     <td>
 
-                    <button class="btn btn-primary mb-1" onclick="modalMenu('<?= $menuId; ?>', 'editar');" data-toggle="tooltip" data-placement="top" title="Editar menú">
-                        <span></span>
+                    <button class="btn btn-primary mb-1" onclick="modalMenu({moduloId: '<?= $moduloId; ?>', menuId: '<?= $menuId; ?>', operacion: 'editar'});" data-toggle="tooltip" data-placement="top" title="Editar menú">
                         <i class="fas fa-pencil-alt"></i>
                     </button>
-                        <a href="<?= site_url('conf-general/page-permisos-menus/' . $menuId . '/' . $menu); ?>" class="btn btn-secondary mb-1" data-toggle="tooltip" data-placement="top" title="0 permisos">
-                            <i class="fas fa-bars nav-icon"></i>
-                        </a>
-
-                        <button class="btn btn-danger mb-1" onclick="eliminarMenu(`<?= $menus['menuId']; ?>`);" data-toggle="tooltip" data-placement="top" title="Eliminar">
-                            <i class="fas fa-trash"></i>
-                        </button>
-
+                    <button class="btn btn-danger mb-1" onclick="eliminarMenu(`<?= $menus['menuId']; ?>`);" data-toggle="tooltip" data-placement="top" title="Eliminar">
+                        <i class="fas fa-trash"></i>
+                    </button>
                     </td>
                 </tr>
             <?php } ?>
@@ -71,7 +65,6 @@
 <script>
 
 function eliminarMenu(id) {
-        //alert("Vamos a eliminar " + id);
             Swal.fire({
                 title: '¿Estás seguro que desea eliminar el menú?',
                 text: "Se eiminara el menú seleccionado.",
@@ -85,7 +78,7 @@ function eliminarMenu(id) {
                 if (result.isConfirmed) {
                     // Si el usuario confirma, enviar la solicitud AJAX para eliminar el usuario de la sucursal
                         $.ajax({
-                            url: '<?php echo base_url('administracion-modulos/eliminar-menu'); ?>',
+                            url: '<?php echo base_url('conf-general/admin-modulos/operacion/eliminar/menu'); ?>',
                             type: 'POST',
                             data: {
                                 menuId: id
@@ -99,7 +92,7 @@ function eliminarMenu(id) {
                                         text: response.mensaje
                                     }).then((result) => {
                                         // Recargar la DataTable después del insert
-                                        window.location.href = "<?= site_url('conf-general/administracion-menus'); ?>";
+                                        window.location.href = "<?= site_url('conf-general/admin-modulos/vista/modulos/menus/' . $moduloId . '/' . $modulo); ?>";
                                     });
                                 } else {
                                     // Insert fallido, mostrar mensaje de error
@@ -123,12 +116,12 @@ function eliminarMenu(id) {
             }
         */
     }
-    function modalMenu(menuId, operacion) {
+    function modalMenu(campos) {
         // Realizar una petición AJAX para obtener los datos del módulo por su ID
         $.ajax({
-            url: '<?php echo base_url('conf-general/administracion-menus/menu'); ?>',
+            url: '<?php echo base_url('conf-general/admin-modulos/form/modulo/nuevo/menu'); ?>',
             type: 'POST',
-            data: { menuId: menuId, operacion: operacion}, // Pasar el ID del módulo como parámetro
+            data: campos, // Pasar el ID del módulo como parámetro
             success: function(response) {
                 // Insertar el contenido de la modal en el cuerpo de la modal
                 $('#divModalContent').html(response);
@@ -142,15 +135,19 @@ function eliminarMenu(id) {
     });
     }
      $(document).ready(function() {
-        $('#miTabla').DataTable({
+        $('#btnRegresarModulo').on('click', function() {
+            // Redireccionar a la URL correspondiente
+            window.location.href = '<?php echo base_url('conf-general/admin-modulos/index'); ?>';
+        });
+        $('#tblMenus').DataTable({
         "language": {
-            "url": "../../assets/plugins/datatables/js/spanish.json"
+            "url": "../../../../../../../assets/plugins/datatables/js/spanish.json"
         },
         "columnDefs": [
-            { "width": "10%", "targets": 0 }, 
-            { "width": "40%", "targets": 1 }, 
-            { "width": "35%", "targets": 2 }, 
-            { "width": "15%", "targets": 3 }  
+            { "width": "10%"}, 
+            { "width": "40%"}, 
+            { "width": "35%"}, 
+            { "width": "15%"}  
         ]
     });
     });

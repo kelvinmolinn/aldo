@@ -9,7 +9,7 @@ class conf_empleados extends Model
     protected $table = 'conf_empleados';
     protected $primaryKey = 'empleadoId'; // si el nombre de la clave primaria es diferente
 
-    protected $allowedFields = ['dui','primerNombre','segundoNombre','primerApellido','segundoApellido','fechaNacimiento','sexoEmpleado','estadoEmpleado']; // Campos permitidos para la inserción
+    protected $allowedFields = ['dui','primerNombre','segundoNombre','primerApellido','segundoApellido','fechaNacimiento','sexoEmpleado','estadoEmpleado','flgElimina']; // Campos permitidos para la inserción
 
 
     protected $useTimestamps = true; // Utiliza campos de timestamp para created_at y updated_at

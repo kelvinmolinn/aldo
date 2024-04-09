@@ -23,40 +23,6 @@
             </tr>
         </thead>
         <tbody>
-            <?php 
-                $n = 0;
-               
-                foreach($modulos as $modulos){ 
-                    $n++;
-                    $moduloId = $modulos['moduloId'];
-                    $modulo = $modulos['modulo'];
-                    $iconoModulo = $modulos['iconoModulo'];
-                    $urlModulo = $modulos['urlModulo'];
-            ?>
-                <tr>
-                    <td><?php echo $n; ?></td>
-                    <td><b>Módulo: </b><?php echo $modulo; ?><br>
-                    </td>
-                    <td>
-                        <b>Url: </b><?php echo $modulos['urlModulo']; ?>  <br>
-                    </td>
-                    <td>
-
-                    <button class="btn btn-primary mb-1" onclick="modalModulo('<?= $moduloId; ?>', 'editar');" data-toggle="tooltip" data-placement="top" title="Editar modulo">
-                        <span></span>
-                        <i class="fas fa-pencil-alt"></i>
-                    </button>
-                        <a href="<?= site_url('conf-general/page-menus-modulos/' . $moduloId . '/' . $modulo); ?>" class="btn btn-secondary mb-1" data-toggle="tooltip" data-placement="top" title="0 Menús">
-                            <i class="fas fa-bars nav-icon"></i>
-                        </a>
-
-                        <button class="btn btn-danger mb-1" onclick="eliminarModulo(`<?= $modulos['moduloId']; ?>`);" data-toggle="tooltip" data-placement="top" title="Eliminar">
-                            <i class="fas fa-trash"></i>
-                        </button>
-
-                    </td>
-                </tr>
-            <?php } ?>
         </tbody>
     </table>
 </div>
@@ -76,7 +42,7 @@
                 if (result.isConfirmed) {
                     // Si el usuario confirma, enviar la solicitud AJAX para eliminar el usuario de la sucursal
                         $.ajax({
-                            url: '<?php echo base_url('administracion-modulos/eliminar-modulo'); ?>',
+                            url: '<?php echo base_url('conf-general/admin-modulos/operacion/eliminar/modulo'); ?>',
                             type: 'POST',
                             data: {
                                 moduloId: id
@@ -89,8 +55,7 @@
                                         title: '¡Módulo eliminado con Éxito!',
                                         text: response.mensaje
                                     }).then((result) => {
-                                        // Recargar la DataTable después del insert
-                                        window.location.href = "<?= site_url('conf-general/administracion-modulos'); ?>";
+                                        $("#miTabla").DataTable().ajax.reload(null, false);
                                     });
                                 } else {
                                     // Insert fallido, mostrar mensaje de error
@@ -118,7 +83,7 @@
     function modalModulo(moduloId, operacion) {
         // Realizar una petición AJAX para obtener los datos del módulo por su ID
         $.ajax({
-                url: '<?php echo base_url('conf-general/administracion-modulos/modulo'); ?>',
+                url: '<?php echo base_url('conf-general/admin-modulos/form/nuevo/modulo'); ?>',
                 type: 'POST',
                 data: { moduloId: moduloId, operacion: operacion}, // Pasar el ID del módulo como parámetro
                 success: function(response) {
@@ -135,17 +100,23 @@
     }
      $(document).ready(function() {
         $('#miTabla').DataTable({
-        "language": {
-            "url": "../../assets/plugins/datatables/js/spanish.json"
-        },
-        "columnDefs": [
-            { "width": "10%", "targets": 0 }, 
-            { "width": "40%", "targets": 1 }, 
-            { "width": "35%", "targets": 2 }, 
-            { "width": "15%", "targets": 3 }  
-        ]
-    });
-
+            "ajax": {
+                "method": "POST",
+                "url": '<?php echo base_url('conf-general/admin-modulos/tabla/modulos'); ?>',
+                "data": {
+                    x: ''
+                }
+            },
+            "columnDefs": [
+                { "width": "10%", "targets": 0 }, 
+                { "width": "40%", "targets": 1 }, 
+                { "width": "35%", "targets": 2 }, 
+                { "width": "15%", "targets": 3 }  
+            ],
+            "language": {
+                "url": "../../../assets/plugins/datatables/js/spanish.json"
+            },
+        });
     });
 </script>
 <?= $this->endSection(); ?>

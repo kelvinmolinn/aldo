@@ -6,7 +6,6 @@ use CodeIgniter\Controller;
 use App\Models\conf_modulos;
 use App\Models\conf_menus;
 
-
 class AdministracionPermisos extends Controller
 {
     public function configuracionModulos()
@@ -15,12 +14,7 @@ class AdministracionPermisos extends Controller
         if(!$session->get('nombreUsuario')) {
             return view('login');
         } else {
-            $mostrarModulos = new conf_modulos();
-
-            $data['modulos'] = $mostrarModulos
-            ->select('conf_modulos.*')
-            ->where('conf_modulos.flgElimina', 0)
-            ->findAll();
+            $data['variable'] = 0;
             // Cargar la vista 'administracionModulos.php' desde la carpeta 'Views/configuracion-general/vistas'
             return view('configuracion-general/vistas/administracionModulos', $data);
         }
@@ -54,6 +48,26 @@ class AdministracionPermisos extends Controller
             ];
         }
         $data['operacion'] = $operacion;
+
+        $directorio = APPPATH . 'Views';
+        $data['directorio'] = $directorio;
+        $carpetas = [];
+
+        // Obtener el contenido del directorio
+        $contenido = scandir($directorio);
+    
+        // Iterar sobre el contenido
+        foreach ($contenido as $item) {
+            // Ignorar los directorios especiales (., ..)
+            if ($item !== '.' && $item !== '..') {
+                // Verificar si es un directorio
+                if (is_dir($directorio . '/' . $item)) {
+                    // Agregar a la lista de carpetas
+                    $carpetas[] = $item;
+                }
+            }
+        }
+        $data['carpetas'] = $carpetas;
         // Cargar la vista 'modalAdministracionModulos.php' desde la carpeta 'Views/configuracion-general/vistas'
         return view('configuracion-general/modals/modalAdministracionModulos', $data);
     }
@@ -61,6 +75,10 @@ class AdministracionPermisos extends Controller
     public function modalMenu()
     {
         $operacion = $this->request->getPost('operacion');
+        
+        $data['operacion'] = $operacion;
+        $data['moduloId'] = $this->request->getPost('moduloId');
+        $data['menuId'] = $this->request->getPost('menuId');
         if($operacion == 'editar') {
             $menuId = $this->request->getPost('menuId');
             $modulo = new conf_menus();
@@ -72,13 +90,8 @@ class AdministracionPermisos extends Controller
                 'iconoMenu'   => '', 
                 'urlMenu'     => ''
             ];
-            $menuId = 0;
         }
-        return $this->response->setJSON([
-            'success' => true,
-            'mensaje' => 'Usuario'.($operacion == 'editar' ? 'actualizado' : 'agregado').' correctamente',
-            'menuId' => $menuId
-        ]);
+        return view('configuracion-general/modals/modalAdministracionMenus', $data);
     }
 
     public function AdministracionMenus()
@@ -135,6 +148,7 @@ class AdministracionPermisos extends Controller
         $modelModulo = new conf_modulos();
 
         $data = [
+            'moduloId'        => $this->request->getPost('moduloId'),
             'menu'            => $this->request->getPost('menu'),
             'iconoMenu'       => $this->request->getPost('iconoMenu'),
             'urlMenu'         => $this->request->getPost('urlMenu')
@@ -187,15 +201,9 @@ class AdministracionPermisos extends Controller
         $data["modulo"] = $modulo;
 
         $Menus = new conf_menus(); // Ajusta el nombre del modelo según sea necesario
-        $data['menus'] = $Menus->findAll(); // Esto es un ejemplo, ajusta según tu situación
-        // Cargar la vista 'administracionUsuarios.php' desde la carpeta 'Views/configuracion-general/vistas'
-        return view('configuracion-general/vistas/pageMenusModulos', $data);
-    }
-
-    public function menusMenus($menuId, $menu)
-    {
-        $data["menuId"] = $menuId;
-        $data["menu"] = $menu;
+        $data['menus'] = $Menus->where('moduloId',$moduloId)
+                               ->where('flgElimina', 0)
+                               ->findAll(); // Esto es un ejemplo, ajusta según tu situación
         // Cargar la vista 'administracionUsuarios.php' desde la carpeta 'Views/configuracion-general/vistas'
         return view('configuracion-general/vistas/pageMenusModulos', $data);
     }
@@ -223,4 +231,81 @@ class AdministracionPermisos extends Controller
         }
     }
 
+    public function eliminarMenu(){
+        //$data['sucursalUsuarioId'] = $sucursalUsuarioId;
+
+        $eliminarMenu = new conf_menus();
+        
+        $menuId = $this->request->getPost('menuId');
+        $data = ['flgElimina' => 1];
+        
+        $eliminarMenu->update($menuId, $data);
+
+        if($eliminarMenu) {
+            return $this->response->setJSON([
+                'success' => true,
+                'mensaje' => 'Menu eliminado correctamente'
+            ]);
+        } else {
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'No se pudo eliminar el Menu'
+            ]);
+        }
+    }
+    public function tablaModulos()
+    {
+        $mostrarModulos = new conf_modulos();
+        $datos = $mostrarModulos
+        ->select('moduloId, modulo, iconoModulo, urlModulo')
+        ->where('flgElimina', 0)
+        ->findAll();
+    
+        // Construye el array de salida
+        $output['data'] = array();
+        $n = 1; // Variable para contar las filas
+        foreach ($datos as $columna) {
+            // Aquí construye tus columnas
+            $columna1 = $n;
+            $columna2 = "<b>Módulo: </b>" . $columna['modulo'];
+            $columna3 = "<b>Url: </b>" . $columna['urlModulo'];
+            // Aquí puedes construir tus botones en la última columna
+            $columna4 = '
+                <button class="btn btn-primary mb-1" onclick="modalModulo(`'.$columna['moduloId'].'`, `editar`);" data-toggle="tooltip" data-placement="top" title="Editar modulo">
+                    <span></span>
+                    <i class="fas fa-pencil-alt"></i>
+                </button>
+            ';
+            
+            $columna4 .= '
+                <a href="'.site_url('conf-general/admin-modulos/vista/modulos/menus/' . $columna['moduloId'] . '/' . $columna['modulo']).'" class="btn btn-secondary mb-1" data-toggle="tooltip" data-placement="top" title="0 Menús">
+                    <i class="fas fa-bars nav-icon"></i>
+                </a>
+            ';
+
+            $columna4 .= '
+                <button class="btn btn-danger mb-1" onclick="eliminarModulo(`'.$columna['moduloId'].'`);" data-toggle="tooltip" data-placement="top" title="Eliminar">
+                    <i class="fas fa-trash"></i>
+                </button>
+            ';
+
+            // Agrega la fila al array de salida
+            $output['data'][] = array(
+                $columna1,
+                $columna2,
+                $columna3,
+                $columna4
+            );
+    
+            $n++;
+        }
+    
+        // Verifica si hay datos
+        if ($n > 1) {
+            return $this->response->setJSON($output);
+        } else {
+            return $this->response->setJSON(array('data' => '')); // No hay datos, devuelve un array vacío
+        }
+    }
+    
 }

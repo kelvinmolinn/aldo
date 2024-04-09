@@ -6,7 +6,7 @@
 <hr>
 <div class="row mb-4">
     <div class="col-md-12 text-right">
-        <button type= "button" id="btnAbrirModal" class="btn btn-primary" onclick="modalUsuario(0, 0, 'insertar');">
+        <button type= "button" id="btnAbrirModal" class="btn btn-primary" onclick="modalUsuario({usuarioId: '0',empleadoId: '0', operacion: 'insertar'});">
             <i class="fas fa-save"></i>
             Nuevo usuario
         </button>
@@ -31,30 +31,35 @@
                     $n++;
                     $nombreCompleto = $empleados['primerNombre'].' '.$empleados['segundoNombre'].' '.$empleados['primerApellido'].' '.$empleados['segundoApellido'];
                     $empleadoId = $empleados['empleadoId'];
-                    $usuarioId = $empleados['usuarioId'];
                     $estadoUsuario = $empleados['estadoEmpleado'] ;
+
+                    if(!($empleados['usuarioId'] == "")) {
+                        $usuarioId = $empleados['usuarioId'];
+                        $columnaUsuario = "
+                            <b>Correo: </b> ".$empleados['correo']."  <br>
+                            <b>Rol: </b> ".$empleados['rol']. " <br>
+                            <b>En linea: </b>  <br>
+                        ";
+                    } else {
+                        // No tiene usuario
+                        $usuarioId = "0";
+                        $columnaUsuario = "<b>Usuario no creado</b>";
+                    }
             ?>
                 <tr>
                     <td><?php echo $n; ?></td>
                     <td><b>Nombre completo: </b><?php echo $empleados['primerNombre'].' '.$empleados['segundoNombre'].' '.$empleados['primerApellido'].' '.$empleados['segundoApellido']; ?><br>
                         <b>DUI: </b><?php echo $empleados['dui']; ?>
                     </td>
-                    <td>
-                        <b>Correo: </b><?php echo $empleados['correo']; ?>  <br>
-                        <b>Rol: </b><?php echo $empleados['rol']; ?>        <br>
-                        <b>En linea: </b>                                   <br>
-                    </td>
+                    <td><?php echo $columnaUsuario;?></td>
                     <td>
                         <?php echo $empleados['estadoEmpleado'];?>
                     </td>
                     <td>
-                        <button class="btn btn-primary mb-1" onclick="modalUsuario(<?= $usuarioId; ?>, <?= $empleadoId; ?>, 'editar');">
+                        <button class="btn btn-primary mb-1" onclick="modalUsuario({usuarioId: '<?= $usuarioId; ?>',empleadoId: <?= $empleadoId; ?>, operacion: 'editar'});">
                             <i class="fas fa-pencil-alt"></i>
-                            <span class=""></span>
                         </button>
-                        <button class="btn btn-success mb-1">Restablecer acceso</button>
-                        
-                        <a href="<?= site_url('conf-general/usuario-sucursal/' . $empleadoId . '/' . $nombreCompleto); ?>" class="btn btn-primary mb-1" data-toggle="tooltip" data-placement="top" title="Sucursales">
+                        <a href="<?= site_url('conf-general/admin-usuarios/vista/usuario/sucursal/' . $empleadoId . '/' . $nombreCompleto); ?>" class="btn btn-primary mb-1" data-toggle="tooltip" data-placement="top" title="Sucursales">
                             <span><?= $empleados['conteo_sucursales'];?></span>
                             <i class="fas fa-store"></i>
                         </a>
@@ -63,14 +68,14 @@
                             $mensaje = "¿Estás seguro que desea Desactivar el usuario?";
                             $mensaje2 = "pasara a Desactivado";
                         ?>
-                        <button class="btn btn-danger" data-toggle="tooltip" data-placement="top" title="Desactivar" onclick="ActivarDesactivarUsuario({usuarioId: <?= $usuarioId; ?>, estadoUsuario: '<?= $estadoUsuario; ?>'});">
+                        <button class="btn btn-danger" data-toggle="tooltip" data-placement="top" title="Desactivar" onclick="ActivarDesactivarUsuario({usuarioId: '<?= $usuarioId; ?>', estadoUsuario: '<?= $estadoUsuario; ?>', empleadoId:<?= $empleadoId;?>, mensaje: '<?= $mensaje; ?>', mensaje2: '<?= $mensaje2; ?>'});">
                             <i class="fas fa-ban"></i>
                         </button>
                         <?php }else{
                             $mensaje = "¿Estás seguro que desea Activar el usuario?";
                             $mensaje2 = "pasara a Activo";
                         ?>
-                        <button class="btn btn-success mb-1" data-toggle="tooltip" data-placement="top" title="Activar" onclick="ActivarDesactivarUsuario({usuarioId: <?= $usuarioId; ?>, estadoUsuario: '<?= $estadoUsuario; ?>'})">
+                        <button class="btn btn-success mb-1" data-toggle="tooltip" data-placement="top" title="Activar" onclick="ActivarDesactivarUsuario({usuarioId: '<?= $usuarioId; ?>', estadoUsuario: '<?= $estadoUsuario; ?>', empleadoId:<?= $empleadoId;?>, mensaje: '<?= $mensaje; ?>', mensaje2: '<?= $mensaje2; ?>'})">
                             <i class="fas fa-check"></i>
                         </button>
                         <?php }?>
@@ -83,8 +88,8 @@
 <script>
     function ActivarDesactivarUsuario(campos){
         Swal.fire({
-                title: '<?= $mensaje; ?>',
-                text: '<?= $mensaje2; ?>',
+                title: campos.mensaje,
+                text: campos.mensaje2,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
@@ -95,7 +100,7 @@
                 if (result.isConfirmed) {
                     // Si el usuario confirma, enviar la solicitud AJAX para eliminar el usuario de la sucursal
                         $.ajax({
-                            url: '<?php echo base_url('administracion-modulos/activar-desactivar-usuario'); ?>',
+                            url: '<?php echo base_url('conf-general/admin-usuarios/operacion/estado/usuario'); ?>',
                             type: 'POST',
                             data: campos,
                             success: function(response) {
@@ -107,7 +112,7 @@
                                         text: response.mensaje
                                     }).then((result) => {
                                         // Recargar la DataTable después del update
-                                        window.location.href = "<?= site_url('conf-general/administracion-usuarios'); ?>";
+                                        window.location.href = "<?= site_url('conf-general/admin-usuarios/index'); ?>";
                                     });
                                 } else {
                                     // update fallido, mostrar mensaje de error
@@ -127,12 +132,12 @@
             });
     }
 
-    function modalUsuario(usuarioId, empleadoId, operacion) {
+    function modalUsuario(campos) {
         // Realizar una petición AJAX para obtener los datos del módulo por su ID
         $.ajax({
-                url: '<?php echo base_url('conf-general/administracion-usuarios/form/empleado-usuario'); ?>',
+                url: '<?php echo base_url('conf-general/admin-usuarios/form/empleados/usuarios'); ?>',
                 type: 'POST',
-                data: { usuarioId: usuarioId, empleadoId: empleadoId, operacion: operacion}, // Pasar el ID del módulo como parámetro
+                data: campos, // Pasar el ID del módulo como parámetro
                 success: function(response) {
                     // Insertar el contenido de la modal en el cuerpo de la modal
                     $('#divModalContent').html(response);
@@ -149,7 +154,7 @@
     $(document).ready(function() {
         $('#tblEmpleados').DataTable({
             "language": {
-                "url": "../../assets/plugins/datatables/js/spanish.json"
+                "url": "../../../assets/plugins/datatables/js/spanish.json"
             },
             "columnDefs": [
                 { "width": "10%"}, 

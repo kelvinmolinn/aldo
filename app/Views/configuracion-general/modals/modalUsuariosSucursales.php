@@ -45,7 +45,7 @@
         $('#btnAgregarSucursal').on('click', function() {
             // Realizar una petición AJAX para obtener el contenido de la modal
             $.ajax({
-                url: '<?php echo base_url('usuarios-sucursales/guardar-usuario-sucursal'); ?>',
+                url: '<?php echo base_url('conf-general/admin-usuarios/operacion/agregar/usuario/sucursal'); ?>',
                 type: 'POST',
                 data: $("#frmModal").serialize(),
                 success: function(response) {
@@ -59,7 +59,7 @@
                             text: response.mensaje
                         }).then((result) => {
                               // Recargar la DataTable después del insert
-                              window.location.href = "<?= site_url('conf-general/usuario-sucursal/' . $empleadoId . '/' . $nombreCompleto); ?>";
+                              window.location.href = "<?= site_url('conf-general/admin-usuarios/vista/usuario/sucursal/' . $empleadoId . '/' . $nombreCompleto); ?>";
                         });
                     } else {
                         // Insert fallido, mostrar mensaje de error

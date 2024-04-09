@@ -10,7 +10,7 @@
         <div class="modal-dialog  modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title"><?= ($operacion == 'editar' ? 'Editar módulo' : 'Nuevo módulo'); ?></h5>
+                    <h5 class="modal-title"><?= ($operacion == 'editar' ? 'Editar módulo' : 'Nuevo módulo') . " " . $directorio; ?></h5>
                 </div>
                 <div class="modal-body">
                     <input type="hidden" id="moduloId" name="moduloId" value="<?= $campos['moduloId']; ?>">
@@ -29,9 +29,9 @@
                         <div class="col-md-12 mt-4">
                             <div class="form-select-control">
                                 <select name="urlModulo" id="urlModulo" style="width: 100%;">
-                                    <option value=""></option>
-                                    <option value="ruta">Url (select de las carpetas en la raíz de /modulos)</option>
-                                    <option value="ruta2">Url (select de las carpetas en la raíz de /modulos)</option>
+                                    <?php foreach ($carpetas as $carpeta) { ?>
+                                        <option value="<?= esc($carpeta) ?>"><?= esc($carpeta) ?></option>
+                                    <?php } ?>
                                 </select>
                             </div>
                         </div>
@@ -60,7 +60,7 @@
         $('#btnguardarUsuario').on('click', function() {
             // Realizar una petición AJAX para obtener el contenido de la modal
             $.ajax({
-                url: '<?php echo base_url('conf-general-administracion-modulos/modulo/operacion'); ?>',
+                url: '<?php echo base_url('conf-general/admin-modulos/operacion/guardar/modulo'); ?>',
                 type: 'POST',
                 data: $("#frmModal").serialize(),
                 success: function(response) {
@@ -73,7 +73,7 @@
                             title: '<?= $mensajeAlerta; ?>',
                             text: response.mensaje
                         }).then((result) => {
-                            window.location.href = "<?= site_url('conf-general/administracion-modulos'); ?>";
+                            $("#miTabla").DataTable().ajax.reload(null, false);
                         });
                     } else {
                         // Insert fallido, mostrar mensaje de error con Sweet Alert

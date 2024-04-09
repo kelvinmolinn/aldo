@@ -1,4 +1,4 @@
-<form id="frmModal">
+<form id="frmModal" method="post" action="<?php echo base_url('conf-general/admin-usuarios/operacion/usuarios'); ?>">
     <input type="hidden" id="usuarioId" name="usuarioId" value="<?= $usuarioId; ?>">
     <input type="hidden" id="empleadoId" name="empleadoId" value="<?= $empleadoId; ?>">
     <input type="hidden" id="operacion" name="operacion" value="<?= $operacion; ?>">
@@ -41,7 +41,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-outline">
-                                <input type="text" id="segundoNombreUsuario" name="segundoNombreUsuario" class="form-control" placeholder="Segundo nombre" value="<?= $campos['segundoNombre']; ?>" required>
+                                <input type="text" id="segundoNombreUsuario" name="segundoNombreUsuario" class="form-control" placeholder="Segundo nombre" value="<?= $campos['segundoNombre']; ?>">
                             </div>
                         </div>
                     </div>
@@ -53,21 +53,11 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-outline">
-                                <input type="text" id="segundoApellidoUsuario" name="segundoApellidoUsuario" class="form-control" placeholder="Segundo apellido" value="<?= $campos['segundoApellido']; ?>" required>
+                                <input type="text" id="segundoApellidoUsuario" name="segundoApellidoUsuario" class="form-control" placeholder="Segundo apellido" value="<?= $campos['segundoApellido']; ?>">
                             </div>
                         </div>
                     </div>
                     <div class="row mt-4">
-                        <div class="col-md-6">
-                            <div class="form-select-control">
-                                <select name="selectRol" id="selectRol" style="width: 100%;">
-                                    <option></option>
-                                    <?php foreach ($roles as $rol) : ?>
-                                        <option value="<?php echo $rol['rolId']; ?>"><?php echo $rol['rol']; ?></option>
-                                    <?php endforeach; ?>
-                                </select>
-                            </div>
-                        </div>
                         <div class="col-md-6">
                             <label>¿Desearia crear usuario?</label>
                             <div class="form-check form-check-inline">
@@ -83,7 +73,17 @@
                     <div class="row mt-4" id="divCorreoUsuario">
                         <div class="col-md-6">
                             <div class="form-outline">
-                                <input type="email" id="correoUsuario" name="correoUsuario" class="form-control" placeholder="Correo electrónico"  value="<?= $campos['correo']; ?>"required>
+                                <input type="email" id="correoUsuario" name="correoUsuario" class="form-control" placeholder="Correo electrónico"  value="<?= $campos['correo']; ?>">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-select-control">
+                                <select name="selectRol" id="selectRol" style="width: 100%;">
+                                    <option></option>
+                                    <?php foreach ($roles as $rol) : ?>
+                                        <option value="<?php echo $rol['rolId']; ?>"><?php echo $rol['rol']; ?></option>
+                                    <?php endforeach; ?>
+                                </select>
                             </div>
                         </div>
                     </div>
@@ -110,8 +110,12 @@
         $('input[type=radio][name=radioCrear]').change(function() {
             if (this.value == 'si') {
                 $('#divCorreoUsuario').show();
+                $("#correoUsuario").prop("required", true);
+                $("#selectRol").prop("required", true);
             } else if (this.value == 'no') {
                 $('#divCorreoUsuario').hide();
+                $("#correoUsuario").prop("required", false);
+                $("#selectRol").prop("required", false);
             }
         });
 
@@ -123,11 +127,11 @@
         });
 
         $("#frmModal").submit(function(event) {
-
+            event.preventDefault();
             $.ajax({
-                url: '<?php echo base_url('nuevo-usuario/guardar-usuario'); ?>',
-                type: 'POST',
-                data: $("#frmModal").serialize(),
+                url: $(this).attr('action'), 
+                type: $(this).attr('method'),
+                data: $(this).serialize(),
                 success: function(response) {
                     console.log(response);
                     if (response.success) {
@@ -139,7 +143,7 @@
                             text: response.mensaje
                         }).then((result) => {
                             // Recargar la DataTable después del insert
-
+                            
                         });
                         console.log("Último ID insertado:", response.empleadoId);
                     } else {

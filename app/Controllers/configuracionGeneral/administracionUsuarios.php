@@ -30,7 +30,7 @@ class AdministracionUsuarios extends Controller
             // Obtener el conteo de sucursales para cada empleado
             foreach ($data['empleados'] as &$empleado) {
                 $conteo = $sucursalesUsuarios->where('flgElimina', 0)
-                                        ->where('empleadoId', $empleado['usuarioId'])
+                                        ->where('empleadoId', $empleado['empleadoId'])
                                         ->countAllResults();
                 $empleado['conteo_sucursales'] = $conteo;
             }
@@ -55,15 +55,15 @@ class AdministracionUsuarios extends Controller
         $data['empleadoId'] = $this->request->getPost('empleadoId');
 
         if($data['operacion'] == 'editar') {
-            $mostrarUsuario = new conf_usuarios();
+            $mostrarEmpleado = new conf_empleados();
 
             // seleccionar solo los campos que estan en la modal (solo los input y select)
-            $data['campos'] = $mostrarUsuario
+            $data['campos'] = $mostrarEmpleado
             ->select('conf_empleados.dui,conf_empleados.fechaNacimiento,conf_empleados.primerNombre,conf_empleados.segundoNombre,conf_empleados.primerApellido,conf_empleados.segundoApellido,conf_empleados.sexoEmpleado,conf_usuarios.correo, conf_usuarios.rolId')
-            ->join('conf_empleados', 'conf_empleados.empleadoId = conf_usuarios.empleadoId')
-            ->join('conf_roles', 'conf_roles.rolId = conf_usuarios.rolId')
-            ->where('conf_usuarios.flgElimina', 0)
-            ->where('conf_usuarios.usuarioId', $data['usuarioId'])
+            ->join('conf_usuarios', 'conf_usuarios.empleadoId = conf_empleados.empleadoId', 'left')
+            ->join('conf_roles', 'conf_roles.rolId = conf_usuarios.rolId', 'left')
+            ->where('conf_empleados.flgElimina', 0)
+            ->where('conf_empleados.empleadoId', $data['empleadoId'])
             ->first();
         } else {
             // formar los campos que estan en la modal (input y select) con el nombre equivalente en la BD
@@ -91,6 +91,8 @@ class AdministracionUsuarios extends Controller
         $dui = $this->request->getPost('duiUsuario');
         $operacion = $this->request->getPost('operacion');
         $empleadoId = $this->request->getPost('empleadoId');
+        $usuarioId = $this->request->getPost('usuarioId');
+        $crearUsuario = $this->request->getPost('radioCrear');
 
         if ($model->duiExiste($dui, $empleadoId)) {
             return $this->response->setJSON([
@@ -120,26 +122,33 @@ class AdministracionUsuarios extends Controller
             }
             if ($insertEmpleado) {
                 // Si el insert fue exitoso, devuelve el último ID insertado
-                
-                $dataUsuarios = [
-                    'empleadoId'        => $empleadoId,
-                    'rolId'             => $this->request->getPost('selectRol'),
-                    'correo'            => $this->request->getPost('correoUsuario'),
-                    'clave'             => '123456',
-                    'estadoUsuario'     => 'Activo'
-                ];
+                if($crearUsuario == "si") {
+                    $dataUsuarios = [
+                        'empleadoId'        => $empleadoId,
+                        'rolId'             => $this->request->getPost('selectRol'),
+                        'correo'            => $this->request->getPost('correoUsuario'),
+                        'clave'             => '123456',
+                        'estadoUsuario'     => 'Activo'
+                    ];
 
-                if($operacion == 'editar'){
-                    $insertUsuario = $modelUsuario->update($this->request->getPost('usuarioId'), $dataUsuarios);
-                }else{
-                    $insertUsuario = $modelUsuario->insert($dataUsuarios);
+                    if($operacion == 'editar') {
+                        if($usuarioId == 0) {
+                            $insertUsuario = $modelUsuario->insert($dataUsuarios);
+                        } else {
+                            $insertUsuario = $modelUsuario->update($usuarioId, $dataUsuarios);
+                        }
+                    }else{
+                        $insertUsuario = $modelUsuario->insert($dataUsuarios);
+                    }
+                } else {
+                    // No crear usuario
                 }
-                    return $this->response->setJSON([
-                        'success' => true,
-                        'mensaje' => 'Usuario'.($operacion == 'editar' ? 'actualizado' : 'agregado').' correctamente',
-                        'empleadoId' => $model->insertID()
-                    ]);
-    
+
+                return $this->response->setJSON([
+                    'success' => true,
+                    'mensaje' => 'Usuario'.($operacion == 'editar' ? 'actualizado' : 'agregado').' correctamente',
+                    'empleadoId' => $model->insertID()
+                ]);
             } else {
                 // Si el insert falló, devuelve un mensaje de error
                 return $this->response->setJSON([
@@ -237,27 +246,45 @@ class AdministracionUsuarios extends Controller
         }
     }
     public function ActivarDesactivar(){
-        $desactivarActivar = new conf_empleados();
+        $desactivarActivarEmpleado = new conf_empleados();
+        $desactivarActivarUsuario = new conf_usuarios();
 
         $usuarioId = $this->request->getPost('usuarioId');
+        $empleadoId = $this->request->getPost('empleadoId');
         $estadoUsuario = $this->request->getPost('estadoUsuario');
+
         if($estadoUsuario == 'Activo'){
             $data = ['estadoEmpleado' => 'Inactivo'];
+            $dataUsuario = ['estadoUsuario' => 'Inactivo', 'clave' => 'random_para_impedir_acceso'];
         }else{
             $data = ['estadoEmpleado' => 'Activo'];
+            $dataUsuario = ['estadoUsuario' => 'Activo', 'clave' => '123456'];
         }
 
-        $desactivarActivar->update($usuarioId, $data);
+        $desactivarActivarEmpleado->update($empleadoId, $data);
 
-        if($desactivarActivar) {
-            return $this->response->setJSON([
-                'success' => true,
-                'mensaje' => 'Se cambió el estado con éxito'
-            ]);
+        if($desactivarActivarEmpleado) {
+            if(!($usuarioId == "")) {
+                $desactivarActivarUsuario->update($usuarioId, $dataUsuario);
+            } else {
+                // No tiene usuario, solo se cambia el estado del empleado
+            }
+
+            if($desactivarActivarUsuario) {
+                return $this->response->setJSON([
+                    'success' => true,
+                    'mensaje' => 'Se cambió el estado con éxito'
+                ]);
+            } else {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'mensaje' => 'No se pudo cambiar el estado del usuario'
+                ]);
+            }
         } else {
             return $this->response->setJSON([
                 'success' => false,
-                'mensaje' => 'No se pudo cambiar el estado'
+                'mensaje' => 'No se pudo cambiar el estado del empleado'
             ]);
         }
     }

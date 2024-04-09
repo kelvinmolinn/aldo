@@ -3,19 +3,21 @@
         <div class="modal-dialog  modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Nuevo menú</h5>
+                    <h5 class="modal-title"><?= ($operacion == 'editar' ? 'Editar menu' : 'Nuevo menú'); ?></h5>
                 </div>
                 <div class="modal-body">
-                    
+                    <input type="hidden" id="operacion" name="operacion" value="<?= $operacion; ?>">
+                    <input type="hidden" id="moduloId" name="moduloId" value="<?= $moduloId; ?>">
+                    <input type="text" id="menuId" name="menuId" value="<?= $menuId; ?>">
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-outline">
-                                <input type="text" Id="menu" name="menu" class="form-control " placeholder="Menú" required>
+                                <input type="text" Id="menu" name="menu" class="form-control " placeholder="Menú" value="<?= $campos['menu']; ?>" required>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-outline">
-                                <input type="text" class="form-control " id="iconoMenu" name="iconoMenu" placeholder="Icono" required>
+                                <input type="text" class="form-control " id="iconoMenu" name="iconoMenu" placeholder="Icono" value="<?= $campos['iconoMenu']; ?>" required>
                             </div>
                         </div>
                         <div class="col-md-12 mt-4">
@@ -52,7 +54,7 @@
         $('#btnMenus').on('click', function() {
             // Realizar una petición AJAX para obtener el contenido de la modal
             $.ajax({
-                url: '<?php echo base_url('administracion-modulos/guardar-menu'); ?>',
+                url: '<?php echo base_url('conf-general/admin-modulos/operacion/guardar/menu'); ?>',
                 type: 'POST',
                 data: $("#frmModal").serialize(),
                 success: function(response) {
@@ -88,5 +90,7 @@
                 }
             });
         });
+
+        $("#urlMenu").val('<?= $campos["urlMenu"]; ?>').trigger("change");
     });
 </script>
