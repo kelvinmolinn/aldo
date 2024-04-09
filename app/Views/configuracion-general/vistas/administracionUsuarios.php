@@ -2,7 +2,7 @@
     $this->extend('Panel/plantilla'); 
     $this->section('contenido');
 ?>
-<h2>Gestión de usuarios</h2>
+<h2>Administración de usuarios</h2>
 <hr>
 <div class="row mb-4">
     <div class="col-md-12 text-right">
