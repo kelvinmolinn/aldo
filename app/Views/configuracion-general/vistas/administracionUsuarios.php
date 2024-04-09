@@ -2,7 +2,11 @@
     $this->extend('Panel/plantilla'); 
     $this->section('contenido');
 ?>
+<<<<<<< Updated upstream
 <h2>Administración de usuarios</h2>
+=======
+<h2>Admin. de usuarios</h2>
+>>>>>>> Stashed changes
 <hr>
 <div class="row mb-4">
     <div class="col-md-12 text-right">
