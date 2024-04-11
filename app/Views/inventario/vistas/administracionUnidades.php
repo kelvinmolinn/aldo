@@ -3,7 +3,7 @@
     $this->section('contenido');
 ?>
 
-<h2>Unidades de medida</h2>
+<h2>Unidades de medidas PRUEBAS</h2>
 <hr>
 <div class="row mb-4">
     <div class="col-md-12 text-right">
