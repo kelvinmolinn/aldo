@@ -107,7 +107,8 @@ class AdministracionUnidades extends Controller
         foreach ($datos as $columna) {
             // Aquí construye tus columnas
             $columna1 = $n;
-            $columna2 = "<b>Unidad de medida: </b>" . $columna['unidadMedida'];
+            $columna2 = "<b>Unidad de medida:</b> " . $columna['unidadMedida'] . ' (' . $columna['abreviaturaUnidadMedida'] . ')';
+
             // Aquí puedes construir tus botones en la última columna
             $columna3 = '
                 <button class="btn btn-primary mb-1" onclick="modalUnidades(`'.$columna['unidadMedidaId'].'`, `editar`);" data-toggle="tooltip" data-placement="top" title="Editar UDM">
