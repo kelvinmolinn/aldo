@@ -68,6 +68,13 @@ $routes->group('conf-general/admin-modulos', function($routes) {
     //Llamada en HTML: conf-general/admin-usuarios/vista,sucursales,modal/usuario,tabla/usuarios
 });
 
+$routes->group('inventario/admin-unidades', function($routes) {
+    // Definir las rutas específicas para el grupo 'admin'
+    $routes->get('index', 'inventario\AdministracionUnidades::index');
+
+    //Llamada en HTML: conf-general/admin-usuarios/vista,sucursales,modal/usuario,tabla/usuarios
+});
+
 // Rutas de errores
 $routes->get('404', 'Errores::error404');
 

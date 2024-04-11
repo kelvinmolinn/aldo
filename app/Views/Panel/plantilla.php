@@ -32,6 +32,7 @@
 </head>
 <body class="hold-transition sidebar-mini">
 <!-- Site wrapper -->
+
 <div class="wrapper">
   <!-- Navbar -->
   <nav class="main-header navbar navbar-expand navbar-white navbar-light">
@@ -144,7 +145,7 @@
                 </a>
                 <ul class="nav nav-treeview">
                   <li class="nav-item">
-                    <a href="<?= site_url('conf-general/admin-usuarios/index'); ?>" class="nav-link">
+                    <a href="<?= site_url('inventario/admin-unidades/index'); ?>" class="nav-link">
                       <i class="fas fa-tag nav-icon"></i>
                       <p>Unidades de medida</p>
                     </a>
@@ -183,7 +184,7 @@
   </aside>
 
   <!-- Content Wrapper. Contains page content -->
-  <div class="content-wrapper">
+  <div class="content-wrapper" style="padding-left: 15px; padding-right: 15px;">
     <!-- Content Header (Page header) -->
     <?php $this->renderSection('contenido'); ?>
     <!-- /.content -->
