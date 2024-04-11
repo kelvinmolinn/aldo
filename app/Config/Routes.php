@@ -65,6 +65,7 @@ $routes->group('conf-general/admin-modulos', function($routes) {
     $routes->post('operacion/guardar/menu', 'configuracionGeneral\AdministracionPermisos::modalMenuOperacion');
     $routes->post('operacion/eliminar/menu', 'configuracionGeneral\AdministracionPermisos::eliminarMenu');
     $routes->post('tabla/modulos',  'configuracionGeneral\AdministracionPermisos::tablaModulos');
+    $routes->post('tabla/modulos/menus/(:any)',  'configuracionGeneral\AdministracionPermisos::tablaModulosMenus/$1');
     //Llamada en HTML: conf-general/admin-usuarios/vista,sucursales,modal/usuario,tabla/usuarios
 });
 

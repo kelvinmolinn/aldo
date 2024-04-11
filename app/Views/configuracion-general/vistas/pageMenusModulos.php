@@ -31,34 +31,6 @@
             </tr>
         </thead>
         <tbody>
-            <?php 
-                $n = 0;
-               
-                foreach($menus as $menus){ 
-                    $n++;
-                    $menuId = $menus['menuId'];
-                    $menu = $menus['menu'];
-                    $iconoMenu = $menus['iconoMenu'];
-                    $urlMenu = $menus['urlMenu'];
-            ?>
-                <tr>
-                    <td><?php echo $n; ?></td>
-                    <td><b>Módulo: </b><?php echo $menu; ?><br>
-                    </td>
-                    <td>
-                        <b>Url: </b><?php echo $menus['urlMenu']; ?>  <br>
-                    </td>
-                    <td>
-
-                    <button class="btn btn-primary mb-1" onclick="modalMenu({moduloId: '<?= $moduloId; ?>', menuId: '<?= $menuId; ?>', operacion: 'editar'});" data-toggle="tooltip" data-placement="top" title="Editar menú">
-                        <i class="fas fa-pencil-alt"></i>
-                    </button>
-                    <button class="btn btn-danger mb-1" onclick="eliminarMenu(`<?= $menus['menuId']; ?>`);" data-toggle="tooltip" data-placement="top" title="Eliminar">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                    </td>
-                </tr>
-            <?php } ?>
         </tbody>
     </table>
 </div>
@@ -92,8 +64,7 @@ function eliminarMenu(id) {
                                         text: response.mensaje
                                     }).then((result) => {
                                         // Recargar la DataTable después del insert
-                                        window.location.href = "<?= site_url('conf-general/admin-modulos/vista/modulos/menus/' . $moduloId . '/' . $modulo); ?>";
-                                    });
+                                        $("#tblMenus").DataTable().ajax.reload(null, false);                                    });
                                 } else {
                                     // Insert fallido, mostrar mensaje de error
                                     Swal.fire({
@@ -134,22 +105,29 @@ function eliminarMenu(id) {
         }
     });
     }
-     $(document).ready(function() {
+    $(document).ready(function() {
         $('#btnRegresarModulo').on('click', function() {
             // Redireccionar a la URL correspondiente
             window.location.href = '<?php echo base_url('conf-general/admin-modulos/index'); ?>';
         });
         $('#tblMenus').DataTable({
-        "language": {
-            "url": "../../../../../../../assets/plugins/datatables/js/spanish.json"
-        },
-        "columnDefs": [
-            { "width": "10%"}, 
-            { "width": "40%"}, 
-            { "width": "35%"}, 
-            { "width": "15%"}  
-        ]
-    });
+            "ajax": {
+                "method": "POST",
+                "url": '<?php echo base_url('conf-general/admin-modulos/tabla/modulos/menus'); ?>',
+                "data": {
+                    x: ''
+                }
+            },
+            "columnDefs": [
+                { "width": "10%"}, 
+                { "width": "40%"}, 
+                { "width": "35%"}, 
+                { "width": "15%"}  
+            ],
+            "language": {
+                "url": "../../../../../../../assets/plugins/datatables/js/spanish.json"
+            },
+        });
     });
 </script>
 <?= $this->endSection(); ?>

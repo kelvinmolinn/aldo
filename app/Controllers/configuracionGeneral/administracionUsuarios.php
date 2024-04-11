@@ -127,7 +127,7 @@ class AdministracionUsuarios extends Controller
                         'empleadoId'        => $empleadoId,
                         'rolId'             => $this->request->getPost('selectRol'),
                         'correo'            => $this->request->getPost('correoUsuario'),
-                        'clave'             => '123456',
+                        'clave'             => password_hash('aldo'.date('Y').'$', PASSWORD_DEFAULT),
                         'estadoUsuario'     => 'Activo'
                     ];
 

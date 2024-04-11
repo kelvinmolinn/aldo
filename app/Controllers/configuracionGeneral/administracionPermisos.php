@@ -203,7 +203,8 @@ class AdministracionPermisos extends Controller
         $Menus = new conf_menus(); // Ajusta el nombre del modelo según sea necesario
         $data['menus'] = $Menus->where('moduloId',$moduloId)
                                ->where('flgElimina', 0)
-                               ->findAll(); // Esto es un ejemplo, ajusta según tu situación
+                               ->findAll();
+         // Esto es un ejemplo, ajusta según tu situación
         // Cargar la vista 'administracionUsuarios.php' desde la carpeta 'Views/configuracion-general/vistas'
         return view('configuracion-general/vistas/pageMenusModulos', $data);
     }
@@ -278,7 +279,7 @@ class AdministracionPermisos extends Controller
             ';
             
             $columna4 .= '
-                <a href="'.site_url('conf-general/admin-modulos/vista/modulos/menus/' . $columna['moduloId'] . '/' . $columna['modulo']).'" class="btn btn-secondary mb-1" data-toggle="tooltip" data-placement="top" title="0 Menús">
+                <a href="'.site_url('conf-general/admin-modulos/vista/modulos/menus/' . $columna['moduloId'] . '/' . $columna['modulo']).'" class="btn btn-secondary mb-1" data-toggle="tooltip" data-placement="top" title="Menús">
                     <i class="fas fa-bars nav-icon"></i>
                 </a>
             ';
@@ -307,5 +308,72 @@ class AdministracionPermisos extends Controller
             return $this->response->setJSON(array('data' => '')); // No hay datos, devuelve un array vacío
         }
     }
+
+    public function tablaModulosMenus($moduloId, $modulo)
+    {
+        $datos["moduloId"] = $moduloId;
+        $datos["modulo"] = $modulo;
+
+        $Menus = new conf_menus(); // Ajusta el nombre del modelo según sea necesario
+        $datos['menus'] = $Menus->where('moduloId',$moduloId)
+                               ->where('flgElimina', 0)
+                               ->findAll();
+    
+        // Construye el array de salida
+        $output['data'] = array();
+        $n = 1; // Variable para contar las filas
+        foreach ($datos as $columna) {
+
+            $menuId = $menus['menuId'];
+            $menu = $menus['menu'];
+            $iconoMenu = $menus['iconoMenu'];
+            $urlMenu = $menus['urlMenu'];
+
+            // Aquí construye tus columnas
+            $columna1 = $n;
+            $columna2 = "<b>Menu: </b>" . $columna['menu'];
+            $columna3 = "<b>Url: </b>" . $columna['urlMenu'];
+            // Aquí puedes construir tus botones en la última columna
+            $columna4 = '
+                HOla
+            ';
+
+            // Agrega la fila al array de salida
+            $output['data'][] = array(
+                $columna1,
+                $columna2,
+                $columna3,
+                $columna4
+            );
+    
+            $n++;
+        }
+    
+        // Verifica si hay datos
+        if ($n > 1) {
+            return $this->response->setJSON($output);
+        } else {
+            return $this->response->setJSON(array('data' => '')); // No hay datos, devuelve un array vacío
+        }
+    }
     
 }
+
+/*<tr>
+    <td><?php echo $n; ?></td>
+    <td><b>Menu: </b><?php echo $menu; ?><br>
+    </td>
+    <td>
+        <b>Url: </b><?php echo $menus['urlMenu']; ?>  <br>
+    </td>
+    <td>
+
+    <button class="btn btn-primary mb-1" onclick="modalMenu({moduloId: '<?= $moduloId; ?>', menuId: '<?= $menuId; ?>', operacion: 'editar'});" data-toggle="tooltip" data-placement="top" title="Editar menú">
+        <i class="fas fa-pencil-alt"></i>
+    </button>
+    <button class="btn btn-danger mb-1" onclick="eliminarMenu(`<?= $menus['menuId']; ?>`);" data-toggle="tooltip" data-placement="top" title="Eliminar">
+        <i class="fas fa-trash"></i>
+    </button>
+    </td>
+</tr>
+<?php } ?>*/
