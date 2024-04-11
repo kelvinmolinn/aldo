@@ -108,7 +108,7 @@ class AdministracionUnidades extends Controller
             $columna2 = "<b>Unidad de medida: </b>" . $columna['unidadMedida'];
             // Aquí puedes construir tus botones en la última columna
             $columna3 = '
-                <button class="btn btn-primary mb-1" onclick="modalModulo(`'.$columna['moduloId'].'`, `editar`);" data-toggle="tooltip" data-placement="top" title="Editar modulo">
+                <button class="btn btn-primary mb-1" onclick="modalModulo(`'.$columna['unidadMedidaId'].'`, `editar`);" data-toggle="tooltip" data-placement="top" title="Editar modulo">
                     <span></span>
                     <i class="fas fa-pencil-alt"></i>
                 </button>
@@ -116,7 +116,7 @@ class AdministracionUnidades extends Controller
     
 
             $columna3 .= '
-                <button class="btn btn-danger mb-1" onclick="eliminarModulo(`'.$columna['moduloId'].'`);" data-toggle="tooltip" data-placement="top" title="Eliminar">
+                <button class="btn btn-danger mb-1" onclick="eliminarModulo(`'.$columna['unidadMedidaId'].'`);" data-toggle="tooltip" data-placement="top" title="Eliminar">
                     <i class="fas fa-trash"></i>
                 </button>
             ';
