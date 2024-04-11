@@ -8,7 +8,7 @@
 <hr>
 <div class="row mb-4">
     <div class="col-md-12 text-right">
-        <button type= "button" id="btnAbrirModal" class="btn btn-primary" onclick="modalUnidades({unidadMedidaId: '0', operacion: 'insertar'});">
+        <button type= "button" id="btnAbrirModal" class="btn btn-primary" onclick="modalUnidades(0, 'insertar');">
             <i class="fas fa-save"></i>
             Nueva UDM
         </button>
@@ -74,18 +74,13 @@
                         });
                 }
             });
-        /*
-            data: {
-                sucursalUsuarioId: id
-            }
-        */
     }
-function modalUnidades(campos) {
+function modalUnidades(unidadMedidaId, operacion) {
         // Realizar una petición AJAX para obtener los datos del módulo por su ID
         $.ajax({
                 url: '<?php echo base_url('inventario/admin-unidades/form/unidades'); ?>',
                 type: 'POST',
-                data: campos, // Pasar el ID del módulo como parámetro
+                data: { unidadMedidaId: unidadMedidaId, operacion: operacion}, // Pasar el ID del módulo como parámetro
                 success: function(response) {
                     // Insertar el contenido de la modal en el cuerpo de la modal
                     $('#divModalContent').html(response);

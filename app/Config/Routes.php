@@ -73,9 +73,9 @@ $routes->group('inventario/admin-unidades', function($routes) {
     // Definir las rutas específicas para el grupo 'admin'
     $routes->get('index', 'inventario\AdministracionUnidades::index');
     $routes->post('form/unidades', 'inventario\AdministracionUnidades::modalAdministracionUnidades');
-    $routes->post('operacion/unidades', 'inventario\AdministracionUnidades::insertarNuevaUnidad');
     $routes->post('tabla/unidades',  'inventario\AdministracionUnidades::tablaUnidades');
     $routes->post('operacion/eliminar/unidades', 'inventario\AdministracionUnidades::eliminarUnidades');
+    $routes->post('operacion/guardar/unidades', 'inventario\AdministracionUnidades::modalUnidadesOperacion');
     //Llamada en HTML: conf-general/admin-usuarios/vista,sucursales,modal/usuario,tabla/usuarios
 });
 
