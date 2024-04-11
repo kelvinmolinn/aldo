@@ -20,6 +20,7 @@ class AdministracionUnidades extends Controller
 
     public function modalAdministracionUnidades()
     {
+
         $operacion = $this->request->getPost('operacion');
         if($operacion == 'editar') {
             $unidadMedidaId = $this->request->getPost('unidadMedidaId');
@@ -62,26 +63,43 @@ class AdministracionUnidades extends Controller
 
     public function modalUnidadesOperacion()
     {
+        // Establecer reglas de validación
+        $validation = service('validation');
+        $validation->setRules([
+            'unidadMedida' => 'required|alpha_space|is_unique[cat_unidades_medida.unidadMedida]',
+            'abreviaturaUnidadMedida' => 'required|alpha_space|is_unique[cat_unidades_medida.abreviaturaUnidadMedida]'
+        ]);
+    
+        // Ejecutar la validación
+        if (!$validation->withRequest($this->request)->run()) {
+            // Si la validación falla, devolver los errores al cliente
+            return $this->response->setJSON([
+                'success' => false,
+                'errors' => $validation->getErrors()
+            ]);
+        }
+    
+        // Continuar con la operación de inserción o actualización en la base de datos
         $operacion = $this->request->getPost('operacion');
         $model = new cat_unidades_medida();
-
+    
         $data = [
-            'unidadMedida'            => $this->request->getPost('unidadMedida'),
-            'abreviaturaUnidadMedida'       => $this->request->getPost('abreviaturaUnidadMedida')
-            //'contrasena' => password_hash($this->request->getPost('contrasena'), PASSWORD_DEFAULT) // Encriptar contraseña
+            'unidadMedida' => $this->request->getPost('unidadMedida'),
+            'abreviaturaUnidadMedida' => $this->request->getPost('abreviaturaUnidadMedida')
         ];
-
-        if($operacion == 'editar') {
+    
+        if ($operacion == 'editar') {
             $operacionUnidad = $model->update($this->request->getPost('unidadMedidaId'), $data);
         } else {
             // Insertar datos en la base de datos
             $operacionUnidad = $model->insert($data);
         }
+    
         if ($operacionUnidad) {
             // Si el insert fue exitoso, devuelve el último ID insertado
             return $this->response->setJSON([
                 'success' => true,
-                'mensaje' => 'UDM '.($operacion == 'editar' ? 'actualizado' : 'agregado').' correctamente',
+                'mensaje' => 'UDM ' . ($operacion == 'editar' ? 'actualizado' : 'agregado') . ' correctamente',
                 'unidadMedidaId' => ($operacion == 'editar' ? $this->request->getPost('unidadMedidaId') : $model->insertID())
             ]);
         } else {
@@ -92,6 +110,7 @@ class AdministracionUnidades extends Controller
             ]);
         }
     }
+    
 
     public function tablaUnidades()
     {

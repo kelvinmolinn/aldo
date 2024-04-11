@@ -1,12 +1,12 @@
 <?php
-    if($operacion == "editar") {
-        $mensajeAlerta = "UDM actualizado con exito";
+    if ($operacion == "editar") {
+        $mensajeAlerta = "UDM actualizado con éxito";
     } else {
-        $mensajeAlerta = "UDM creado con exito";
+        $mensajeAlerta = "UDM creado con éxito";
     }
 ?>
 
-<form id="frmModal">
+<form id="frmModal" action="<?= base_url('inventario/admin-unidades/operacion/guardar/unidades')?>" method="POST">
     <div id="modalUnidades" class="modal" tabindex="-1">
         <div class="modal-dialog  modal-lg">
             <div class="modal-content">
@@ -19,7 +19,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-outline">
-                                <input type="text" Id="unidadMedida" name="unidadMedida" class="form-control " placeholder="Unidad de medida" value="<?= $campos['unidadMedida']; ?>" required>
+                                <input type="text" id="unidadMedida" name="unidadMedida" class="form-control " placeholder="Unidad de medida" value="<?= $campos['unidadMedida']; ?>" required>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -43,42 +43,47 @@
         </div>
     </div>
 </form>
+
 <script>
-        $(document).ready(function() {
+$(document).ready(function() {
+    $('#btnguardarUnidad').on('click', function() {
+        // Realizar una petición AJAX para obtener el contenido de la modal
+        $.ajax({
+            url: '<?php echo base_url('inventario/admin-unidades/operacion/guardar/unidades'); ?>',
+            type: 'POST',
+            data: $("#frmModal").serialize(),
+            success: function(response) {
+                console.log(response);
+                if (response.success) {
+                    // Insert exitoso, ocultar modal y mostrar mensaje con Sweet Alert
+                    $('#modalUnidades').modal('hide');
+                    Swal.fire({
+                        icon: 'success',
+                        title: '<?= $mensajeAlerta; ?>',
+                        text: response.mensaje
+                    }).then((result) => {
+                        $("#tblUnidades").DataTable().ajax.reload(null, false);
+                    });
+                } else {
+                    // Insert fallido, mostrar mensaje de error con Sweet Alert
+                    let errorMessage = '<ul>';
+                    $.each(response.errors, function(key, value) {
+                        errorMessage += '<li>' + value + '</li>';
+                    });
+                    errorMessage += '</ul>';
 
-        $('#btnguardarUnidad').on('click', function() {
-            // Realizar una petición AJAX para obtener el contenido de la modal
-            $.ajax({
-                url: '<?php echo base_url('inventario/admin-unidades/operacion/guardar/unidades'); ?>',
-                type: 'POST',
-                data: $("#frmModal").serialize(),
-                success: function(response) {
-                    console.log(response);
-                    if (response.success) {
-                        // Insert exitoso, ocultar modal y mostrar mensaje con Sweet Alert
-                        $('#modalUnidades').modal('hide');
-                        Swal.fire({
-                            icon: 'success',
-                            title: '<?= $mensajeAlerta; ?>',
-                            text: response.mensaje
-                        }).then((result) => {
-                            $("#tblUnidades").DataTable().ajax.reload(null, false);
-                        });
-                    } else {
-                        // Insert fallido, mostrar mensaje de error con Sweet Alert
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: response.mensaje
-                        });
-                    }
-                },
-
-                error: function(xhr, status, error) {
-                    // Manejar errores si los hay
-                    console.error(xhr.responseText);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error de validación',
+                        text: 'Verifique las validaciones! No puede ir vacío o Agregar una unidad de medida ya Existente'
+                    });
                 }
-            });
+            },
+            error: function(xhr, status, error) {
+                // Manejar errores si los hay
+                console.error(xhr.responseText);
+            }
         });
-        });
+    });
+});
 </script>
