@@ -15,4 +15,12 @@ class cat_unidades_medida extends Model
 
     protected $createdField  = 'fhAgrega'; // Campo creado automáticamente al insertar
     protected $updatedField  = 'fhEdita'; // Campo actualizado automáticamente al actualizar
+
+    public function UnidadExiste($unidadMedida, $unidadMedidaId )
+    {
+        // Realizar una consulta para verificar si el DUI ya existe en la base de datos
+        $resultado = $this->where('unidadMedida', $unidadMedida)->whereNotIn('unidadMedidaId', [$unidadMedidaId])->countAllResults();
+
+        return $resultado > 0; // Devuelve true si el DUI existe, false en caso contrario
+    }
 }
