@@ -165,7 +165,6 @@
        /* $('#btnguardarUsuario').on('click', function() {
             // Realizar una petición AJAX para obtener el contenido de la modal
             $.ajax({
-                url: '<?php// echo base_url('nuevo-usuario/guardar-usuario'); ?>',
                 type: 'POST',
                 data: $("#frmModal").serialize(),
                 success: function(response) {
