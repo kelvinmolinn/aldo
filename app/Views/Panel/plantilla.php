@@ -8,21 +8,15 @@
   <!-- Google Font: Source Sans Pro -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
 
-
   <!-- Font Awesome -->
   <link rel="stylesheet" href="<?php echo base_url();?>../assets/plugins/fontawesome-free/css/all.min.css">
   <!-- Theme style -->
   <link rel="stylesheet" href="<?php echo base_url();?>../assets/plugins/bootstrap/css/adminlte.min.css">
-
   <link rel="stylesheet" href="<?php echo base_url();?>../assets/plugins/sweetalert2/sweetalert2.min.css">
-
   <link rel="stylesheet" href="<?php echo base_url();?>../assets/plugins/select2/css/select2.min.css">
   <!-- En el head de tu vista -->
   <link rel="stylesheet" href="<?php echo base_url();?>../assets/plugins/datatables/css/dataTables.min.css">
-
   <link rel="stylesheet" href="<?php echo base_url();?>../public/css/input.css">
-
-
 
   <!-- jQuery -->
   <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>-->
@@ -35,7 +29,6 @@
   <script src="<?php echo base_url();?>../assets/plugins/sweetalert2/sweetalert2.all.min.js"></script>
   <script src="<?php echo base_url();?>../assets/plugins/select2/js/select2.min.js"></script>
   <script src="<?php echo base_url();?>../assets/plugins/datatables/js/dataTables.min.js"></script>
-
 </head>
 <body class="hold-transition sidebar-mini">
 <!-- Site wrapper -->
@@ -84,66 +77,106 @@
 
       <!-- Sidebar Menu -->
       <nav class="mt-2">
-    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-        <!-- Add icons to the links using the .nav-icon class
-            with font-awesome or any other icon font library -->
-        <li class="nav-item">
+        <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+          <!-- Add icons to the links using the .nav-icon class with font-awesome or any other icon font library -->
+          <li class="nav-item">
             <a href="#" class="nav-link">
-                <i class="nav-icon fas fa-cog"></i>
-                    <p>Configuración usuario
-                        <i class="right fas fa-angle-left"></i>
-                    </p>
+              <i class="nav-icon fas fa-cog"></i>
+              <p>Configuración usuario
+                <i class="right fas fa-angle-left"></i>
+              </p>
             </a>
             <ul class="nav nav-treeview">
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                    <i class="nav-icon fas fa-user-cog"></i>
-                        <p> Admin. usuario
-                            <i class="right fas fa-angle-left"></i>
-                        </p>
+              <li class="nav-item">
+                <a href="#" class="nav-link">
+                  <i class="nav-icon fas fa-user-cog"></i>
+                  <p> Admin. usuario
+                    <i class="right fas fa-angle-left"></i>
+                  </p>
+                </a>
+                <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                    <a href="<?= site_url('conf-general/admin-usuarios/index'); ?>" class="nav-link">
+                      <i class="fas fa-user nav-icon"></i>
+                      <p>Usuarios</p>
                     </a>
-                    <ul class="nav nav-treeview">
-                        <li class="nav-item">
-                            <a href="<?= site_url('conf-general/admin-usuarios/index'); ?>" class="nav-link">
-                                <i class="fas fa-user nav-icon"></i>
-                                <p>Usuarios</p>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                    <i class="nav-icon fas fa-wrench"></i>
-                        <p> Admin. módulos
-                            <i class="right fas fa-angle-left"></i>
-                        </p>
+                  </li>
+                </ul>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link">
+                  <i class="nav-icon fas fa-wrench"></i>
+                  <p> Admin. módulos
+                    <i class="right fas fa-angle-left"></i>
+                  </p>
+                </a>
+                <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                    <a href="<?= site_url('conf-general/admin-modulos/index'); ?>" class="nav-link">
+                      <i class="fas fa-tasks nav-icon"></i>
+                      <p>Módulos</p>
                     </a>
-                    <ul class="nav nav-treeview">
-                        <li class="nav-item">
-                            <a href="<?= site_url('conf-general/admin-modulos/index'); ?>" class="nav-link">
-                                <i class="fas fa-tasks nav-icon"></i>
-                                <p>Módulos</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="" class="nav-link">
-                                <i class="fas fa-tasks nav-icon"></i>
-                                <p>permisos</p>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
+                  </li>
+                  <li class="nav-item">
+                    <a href="" class="nav-link">
+                      <i class="fas fa-tasks nav-icon"></i>
+                      <p>permisos</p>
+                    </a>
+                  </li>
+                </ul>
+              </li>
             </ul>
-        </li>
-        
-        <li class="nav-item">
-        <a href="#" onclick="cerrarSession();" class="nav-link">
-            <i class="fas fa-sign-out-alt text-danger"></i>
-            <p>Cerrar Sesión</p>
-        </a>
-        </li>
-    </ul>
-    </nav>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="nav-icon fas fa-box-open"></i>
+              <p>Inventario
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="#" class="nav-link">
+                  <i class="nav-icon fas fa-bars"></i>
+                  <p> Catálogos inventario  
+                    <i class="right fas fa-angle-left"></i>
+                  </p>
+                </a>
+                <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                    <a href="<?= site_url('conf-general/admin-usuarios/index'); ?>" class="nav-link">
+                      <i class="fas fa-tag nav-icon"></i>
+                      <p>Unidades de medida</p>
+                    </a>
+                  </li>
+                </ul>
+                <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                    <a href="<?= site_url('conf-general/admin-usuarios/index'); ?>" class="nav-link">
+                      <i class="fas fa-box nav-icon"></i>
+                      <p>Tipos de producto</p>
+                    </a>
+                  </li>
+                </ul>
+                <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                    <a href="<?= site_url('conf-general/admin-usuarios/index'); ?>" class="nav-link">
+                      <i class="fas fa-gamepad nav-icon"></i>
+                      <p>Plataforma</p>
+                    </a>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-item">
+            <a href="#" onclick="cerrarSession();" class="nav-link">
+              <i class="fas fa-sign-out-alt text-danger"></i>
+              <p>Cerrar Sesión</p>
+            </a>
+          </li>
+        </ul>
+      </nav>
       <!-- /.sidebar-menu -->
     </div>
     <!-- /.sidebar -->
@@ -152,7 +185,7 @@
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
     <!-- Content Header (Page header) -->
-  <?php $this->renderSection('contenido'); ?>
+    <?php $this->renderSection('contenido'); ?>
     <!-- /.content -->
   </div>
   <div id="divModalContent"></div>
@@ -174,19 +207,19 @@
 <!-- ./wrapper -->
 </body>
 <script>
-    function cerrarSession(){
-        Swal.fire({
-            title: 'Desea cerrar session',
-            text: 'La session terminará!',
-            icon: 'warning',
-            showCancelButton: true,
-            cancelButton: '#d33',
-            confirmButtonText: 'Sí, salir' 
-        }).then((result) =>{
-            if(result.isConfirmed){
-                window.location.href = '<?= site_url('cerrarSession'); ?>';
-            }
-        })
-    }
+  function cerrarSession(){
+    Swal.fire({
+      title: 'Desea cerrar session',
+      text: 'La session terminará!',
+      icon: 'warning',
+      showCancelButton: true,
+      cancelButton: '#d33',
+      confirmButtonText: 'Sí, salir' 
+    }).then((result) =>{
+      if(result.isConfirmed){
+        window.location.href = '<?= site_url('cerrarSession'); ?>';
+      }
+    })
+  }
 </script>
 </html>
