@@ -1,3 +1,10 @@
+<?php
+    if($operacion == "editar") {
+        $mensajeAlerta = "Unidad de medida actualizada con exito";
+    } else {
+        $mensajeAlerta = "Unidad de medida creada con exito";
+    }
+?>
 <form id="frmModal" method="post" action="<?php echo base_url('inventario/admin-unidades/operacion/unidades'); ?>">
     <input type="hidden" id="unidadMedidaId" name="unidadMedidaId" value="<?= $unidadMedidaId; ?>">
     <input type="hidden" id="operacion" name="operacion" value="<?= $operacion; ?>">

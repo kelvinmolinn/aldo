@@ -75,6 +75,7 @@ $routes->group('inventario/admin-unidades', function($routes) {
     $routes->post('form/unidades', 'inventario\AdministracionUnidades::modalAdministracionUnidades');
     $routes->post('operacion/unidades', 'inventario\AdministracionUnidades::insertarNuevaUnidad');
     $routes->post('tabla/unidades',  'inventario\AdministracionUnidades::tablaUnidades');
+    $routes->post('operacion/eliminar/unidades', 'inventario\AdministracionUnidades::eliminarUnidades');
     //Llamada en HTML: conf-general/admin-usuarios/vista,sucursales,modal/usuario,tabla/usuarios
 });
 

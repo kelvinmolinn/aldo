@@ -91,6 +91,7 @@ class AdministracionUnidades extends Controller
         }
     }
     
+    
     public function tablaUnidades()
     {
         $mostrarUnidades = new cat_unidades_medida();
@@ -108,7 +109,7 @@ class AdministracionUnidades extends Controller
             $columna2 = "<b>Unidad de medida: </b>" . $columna['unidadMedida'];
             // Aquí puedes construir tus botones en la última columna
             $columna3 = '
-                <button class="btn btn-primary mb-1" onclick="modalModulo(`'.$columna['unidadMedidaId'].'`, `editar`);" data-toggle="tooltip" data-placement="top" title="Editar modulo">
+                <button class="btn btn-primary mb-1" onclick="modalUnidades(`'.$columna['unidadMedidaId'].'`, `editar`);" data-toggle="tooltip" data-placement="top" title="Editar UDM">
                     <span></span>
                     <i class="fas fa-pencil-alt"></i>
                 </button>
@@ -116,7 +117,7 @@ class AdministracionUnidades extends Controller
     
 
             $columna3 .= '
-                <button class="btn btn-danger mb-1" onclick="eliminarModulo(`'.$columna['unidadMedidaId'].'`);" data-toggle="tooltip" data-placement="top" title="Eliminar">
+                <button class="btn btn-danger mb-1" onclick="eliminarUnidades(`'.$columna['unidadMedidaId'].'`);" data-toggle="tooltip" data-placement="top" title="Eliminar">
                     <i class="fas fa-trash"></i>
                 </button>
             ';
@@ -136,6 +137,29 @@ class AdministracionUnidades extends Controller
             return $this->response->setJSON($output);
         } else {
             return $this->response->setJSON(array('data' => '')); // No hay datos, devuelve un array vacío
+        }
+    }
+
+    public function eliminarUnidades(){
+        //$data['sucursalUsuarioId'] = $sucursalUsuarioId;
+
+        $eliminarUnidades = new cat_unidades_medida();
+        
+        $unidadMedidaId = $this->request->getPost('unidadMedidaId');
+        $data = ['flgElimina' => 1];
+        
+        $eliminarUnidades->update($unidadMedidaId, $data);
+
+        if($eliminarUnidades) {
+            return $this->response->setJSON([
+                'success' => true,
+                'mensaje' => 'Unidad de medida eliminada correctamente'
+            ]);
+        } else {
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'No se pudo eliminar la unidad de medida'
+            ]);
         }
     }
     

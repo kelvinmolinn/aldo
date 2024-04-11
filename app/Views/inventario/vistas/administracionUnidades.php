@@ -27,7 +27,58 @@
     </table>
 </div>
 <script>
-
+        function eliminarUnidades(id) {
+        //alert("Vamos a eliminar " + id);
+            Swal.fire({
+                title: '¿Estás seguro que desea eliminar la UDM?',
+                text: "Se eiminara la unidad de medida seleccionada.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Si el usuario confirma, enviar la solicitud AJAX para eliminar el usuario de la sucursal
+                        $.ajax({
+                            url: '<?php echo base_url('inventario/admin-unidades/operacion/eliminar/unidades'); ?>',
+                            type: 'POST',
+                            data: {
+                                unidadMedidaId: id
+                            },
+                            success: function(response) {
+                                console.log(response);
+                                if (response.success) {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: '¡Unidad de medida eliminada con Éxito!',
+                                        text: response.mensaje
+                                    }).then((result) => {
+                                        $("#tblUnidades").DataTable().ajax.reload(null, false);
+                                    });
+                                } else {
+                                    // Insert fallido, mostrar mensaje de error
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Error',
+                                        text: response.mensaje
+                                    });
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                // Manejar errores si los hay
+                                console.error(xhr.responseText);
+                            }
+                        });
+                }
+            });
+        /*
+            data: {
+                sucursalUsuarioId: id
+            }
+        */
+    }
 function modalUnidades(campos) {
         // Realizar una petición AJAX para obtener los datos del módulo por su ID
         $.ajax({
@@ -47,6 +98,7 @@ function modalUnidades(campos) {
         });
     }
 $(document).ready(function() {
+    
     $('#tblUnidades').DataTable({
             "ajax": {
                 "method": "POST",
