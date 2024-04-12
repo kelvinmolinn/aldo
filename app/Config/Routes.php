@@ -99,6 +99,16 @@ $routes->group('inventario/admin-plataforma', function($routes) {
     //
 });
 
+$routes->group('inventario/admin-producto', function($routes) {
+    // Definir las rutas específicas para el grupo 'admin-existencia'
+    $routes->get('index', 'inventario\AdministracionProducto::index');
+    $routes->post('form/producto', 'inventario\AdministracionProducto::modalAdministracionProducto');
+    $routes->post('tabla/producto',  'inventario\AdministracionProducto::tablaPlataProducto');
+    $routes->post('operacion/eliminar/producto', 'inventario\AdministracionProducto::eliminarProducto');
+    $routes->post('operacion/guardar/producto', 'inventario\AdministracionProducto::modalProductoOperacion');
+    //
+});
+
 // Rutas de errores
 $routes->get('404', 'Errores::error404');
 

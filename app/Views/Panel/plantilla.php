@@ -120,7 +120,7 @@
                   </li>
                   <li class="nav-item">
                     <a href="" class="nav-link">
-                      <i class="fas fa-tasks nav-icon"></i>
+                      <i class="fas fa-user-check nav-icon"></i>
                       <p>permisos</p>
                     </a>
                   </li>
@@ -143,6 +143,14 @@
                     <i class="right fas fa-angle-left"></i>
                   </p>
                 </a>
+                <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                    <a href="<?= site_url('inventario/admin-producto/index'); ?>" class="nav-link">
+                      <i class="fas fa-box-open nav-icon"></i>
+                      <p>Existendia productos</p>
+                    </a>
+                  </li>
+                </ul>
                 <ul class="nav nav-treeview">
                   <li class="nav-item">
                     <a href="<?= site_url('inventario/admin-unidades/index'); ?>" class="nav-link">
