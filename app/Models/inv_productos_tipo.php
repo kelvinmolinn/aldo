@@ -9,7 +9,7 @@ class inv_productos_tipo extends Model
     protected $table = 'inv_productos_tipo';
     protected $primaryKey = 'productoTipoId'; // si el nombre de la clave primaria es diferente
 
-    protected $allowedFields = ['productoTipo'];
+    protected $allowedFields = ['productoTipo','flgElimina'];
 
     protected $useTimestamps = true; // Utiliza campos de timestamp para created_at y updated_at
 

@@ -70,19 +70,23 @@ $routes->group('conf-general/admin-modulos', function($routes) {
 });
 
 $routes->group('inventario/admin-unidades', function($routes) {
-    // Definir las rutas específicas para el grupo 'admin'
+    // Definir las rutas específicas para el grupo 'admin-unidades'
     $routes->get('index', 'inventario\AdministracionUnidades::index');
     $routes->post('form/unidades', 'inventario\AdministracionUnidades::modalAdministracionUnidades');
     $routes->post('tabla/unidades',  'inventario\AdministracionUnidades::tablaUnidades');
     $routes->post('operacion/eliminar/unidades', 'inventario\AdministracionUnidades::eliminarUnidades');
     $routes->post('operacion/guardar/unidades', 'inventario\AdministracionUnidades::modalUnidadesOperacion');
-    //Llamada en HTML: conf-general/admin-usuarios/vista,sucursales,modal/usuario,tabla/usuarios
+    //
 });
 
 $routes->group('inventario/admin-tipo', function($routes) {
-    // Definir las rutas específicas para el grupo 'admin'
-    $routes->get('index', 'inventario\AdministracionUnidades::index');
-    //Llamada en HTML: conf-general/admin-usuarios/vista,sucursales,modal/usuario,tabla/usuarios
+    // Definir las rutas específicas para el grupo 'admin-tipo'
+    $routes->get('index', 'inventario\AdministracionTipo::index');
+    $routes->post('form/tipo', 'inventario\AdministracionTipo::modalAdministracionTipo');
+    $routes->post('tabla/tipo',  'inventario\AdministracionTipo::tablaTipo');
+    $routes->post('operacion/eliminar/tipo', 'inventario\AdministracionTipo::eliminarTipo');
+    $routes->post('operacion/guardar/tipo', 'inventario\AdministracionTipo::modalTipoOperacion');
+    //
 });
 
 // Rutas de errores

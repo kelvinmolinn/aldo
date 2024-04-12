@@ -153,7 +153,7 @@
                 </ul>
                 <ul class="nav nav-treeview">
                   <li class="nav-item">
-                    <a href="<?= site_url('conf-general/admin-usuarios/index'); ?>" class="nav-link">
+                    <a href="<?= site_url('inventario/admin-tipo/index'); ?>" class="nav-link">
                       <i class="fas fa-box nav-icon"></i>
                       <p>Tipos de producto</p>
                     </a>
