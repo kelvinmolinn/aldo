@@ -66,8 +66,8 @@ class AdministracionUnidades extends Controller
         // Establecer reglas de validación
         $validation = service('validation');
         $validation->setRules([
-            'unidadMedida' => 'required|alpha_space|is_unique[cat_unidades_medida.unidadMedida]',
-            'abreviaturaUnidadMedida' => 'required|alpha_space|is_unique[cat_unidades_medida.abreviaturaUnidadMedida]'
+            'unidadMedida' => 'required|is_unique[cat_unidades_medida.unidadMedida]',
+            'abreviaturaUnidadMedida' => 'required|is_unique[cat_unidades_medida.abreviaturaUnidadMedida]'
         ]);
     
         // Ejecutar la validación
