@@ -40,13 +40,27 @@ class AdministracionProducto extends Controller
         if($operacion == 'editar') {
             $productoId = $this->request->getPost('productoId');
             $modulo = new inv_productos();
-            $data['campos'] = $modulo->select('productoId,productoTipoId,productoPlataformaId, unidadMedidaId','codigoProducto','producto','descripcionProducto','existenciaMinima','fechaInicioInventario','costoUnitarioFOB','CostoUnitarioRetaceo','CostoPromedio','flgProductoVenta','precioVenta','estadoProducto')->where('flgElimina', 0)->where('productoId', $productoId)->first();
+            $data['campos'] = $modulo->select('inv_productos.productoId,productoTipoId,productoPlataformaId, unidadMedidaId,inv_productos.codigoProducto,inv_productos.producto,inv_productos.descripcionProducto,inv_productos.existenciaMinima,inv_productos.fechaInicioInventario,inv_productos.costoUnitarioFOB,inv_productos.CostoUnitarioRetaceo,inv_productos.CostoPromedio,inv_productos.flgProductoVenta,inv_productos.precioVenta,inv_productos.estadoProducto')
+            ->join('inv_productos_tipo', 'inv_productos.productoTipoId = inv_productos_tipo.productoTipoId')
+            ->join('productoPlataformaId', 'conf_roles.rolId = conf_usuarios.rolId', 'left')
+            ->join('unidadMedidaId', 'conf_roles.rolId = conf_usuarios.rolId', 'left')
+            ->where('flgElimina', 0)->where('productoId', $productoId)->first();
         } else {
             $data['campos'] = [
-                'productoId'      => 0,
-                'menu'        => '',
-                'iconoMenu'   => '', 
-                'urlMenu'     => ''
+                'productoId'                => 0,
+                'productoTipoId'            => '',
+                'productoPlataformaId'      => '', 
+                'unidadMedidaId'            => '',
+                'codigoProducto'            => '',
+                'producto'                  => '',
+                'descripcionProducto'       => '',
+                'existenciaMinima'          => '',
+                'fechaInicioInventario'     => '',
+                'costoUnitarioFOB'          => '',
+                'CostoUnitarioRetaceo'      => '',
+                'CostoPromedio'             => '',
+                'flgProductoVenta'          => '',
+                'precioVenta'               => ''
             ];
         }
 

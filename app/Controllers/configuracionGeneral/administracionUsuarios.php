@@ -56,7 +56,6 @@ class AdministracionUsuarios extends Controller
 
         if($data['operacion'] == 'editar') {
             $mostrarEmpleado = new conf_empleados();
-
             // seleccionar solo los campos que estan en la modal (solo los input y select)
             $data['campos'] = $mostrarEmpleado
             ->select('conf_empleados.dui,conf_empleados.fechaNacimiento,conf_empleados.primerNombre,conf_empleados.segundoNombre,conf_empleados.primerApellido,conf_empleados.segundoApellido,conf_empleados.sexoEmpleado,conf_usuarios.correo, conf_usuarios.rolId')
