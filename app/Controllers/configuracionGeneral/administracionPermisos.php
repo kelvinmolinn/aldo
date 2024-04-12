@@ -79,6 +79,11 @@ class AdministracionPermisos extends Controller
         $data['operacion'] = $operacion;
         $data['moduloId'] = $this->request->getPost('moduloId');
         $data['menuId'] = $this->request->getPost('menuId');
+
+        $modelModulo = new conf_modulos();
+
+        $infoCarpeta =  $modelModulo->select('urlModulo')->where('flgElimina', 0)->where('moduloId', $data['moduloId'])->first();
+
         if($operacion == 'editar') {
             $menuId = $this->request->getPost('menuId');
             $modulo = new conf_menus();
@@ -91,6 +96,28 @@ class AdministracionPermisos extends Controller
                 'urlMenu'     => ''
             ];
         }
+
+        $directorio = APPPATH . 'Views/'.$infoCarpeta['urlModulo'].($infoCarpeta['urlModulo'] == "Panel" ? '' : '/vistas');
+        $archivos = [];
+    
+        // Obtener el contenido del directorio
+        $contenido = scandir($directorio);
+        
+        // Iterar sobre el contenido
+        foreach ($contenido as $item) {
+            // Ignorar los directorios especiales (., ..)
+            if ($item !== '.' && $item !== '..') {
+                // Verificar si es un archivo
+                if (is_file($directorio . '/' . $item)) {
+                    if(substr($item, 0, 4) != "page") {
+                        // Agregar a la lista de archivos
+                        $archivos[] = $item;
+                    }
+                }
+            }
+        }
+        $data['archivos'] = $archivos;
+
         return view('configuracion-general/modals/modalAdministracionMenus', $data);
     }
 
@@ -272,8 +299,7 @@ class AdministracionPermisos extends Controller
             $columna3 = "<b>Url: </b>" . $columna['urlModulo'];
             // Aquí puedes construir tus botones en la última columna
             $columna4 = '
-                <button class="btn btn-primary mb-1" onclick="modalModulo(`'.$columna['moduloId'].'`, `editar`);" data-toggle="tooltip" data-placement="top" title="Editar modulo">
-                    <span></span>
+                <button class="btn btn-primary mb-1" onclick="modalModulo(`'.$columna['moduloId'].'`, `editar`);" data-toggle="tooltip" data-placement="top" title="Editar">
                     <i class="fas fa-pencil-alt"></i>
                 </button>
             ';
@@ -309,25 +335,27 @@ class AdministracionPermisos extends Controller
         }
     }
 
-    public function tablaModulosMenus($moduloId, $modulo)
+    public function tablaModulosMenus()
     {
-        $datos["moduloId"] = $moduloId;
-        $datos["modulo"] = $modulo;
+        $datos["moduloId"] = $this->request->getPost('moduloId');
+        $datos["modulo"] = $this->request->getPost('modulo');
 
         $Menus = new conf_menus(); // Ajusta el nombre del modelo según sea necesario
-        $datos['menus'] = $Menus->where('moduloId',$moduloId)
-                               ->where('flgElimina', 0)
-                               ->findAll();
+        $datos['menus'] = $Menus
+        ->select('menuId, moduloId, menu, iconoMenu, urlMenu')
+        ->where('moduloId',$datos["moduloId"])
+        ->where('flgElimina', 0)
+        ->findAll();
     
         // Construye el array de salida
         $output['data'] = array();
         $n = 1; // Variable para contar las filas
-        foreach ($datos as $columna) {
+        foreach ($datos['menus'] as $columna) {
 
-            $menuId = $menus['menuId'];
-            $menu = $menus['menu'];
-            $iconoMenu = $menus['iconoMenu'];
-            $urlMenu = $menus['urlMenu'];
+            $menuId = $columna['menuId'];
+            $menu = $columna['menu'];
+            $iconoMenu = $columna['iconoMenu'];
+            $urlMenu = $columna['urlMenu']; 
 
             // Aquí construye tus columnas
             $columna1 = $n;
@@ -335,7 +363,15 @@ class AdministracionPermisos extends Controller
             $columna3 = "<b>Url: </b>" . $columna['urlMenu'];
             // Aquí puedes construir tus botones en la última columna
             $columna4 = '
-                HOla
+                <button class="btn btn-primary mb-1" onclick="modalMenu(`'.$columna['moduloId'].'`, `'.$columna['menuId'].'`, `editar`);" data-toggle="tooltip" data-placement="top" title="Editar">
+                    <i class="fas fa-pencil-alt"></i>
+                </button>
+            ';
+
+            $columna4 .= '
+                <button class="btn btn-danger mb-1" onclick="eliminarMenu(`'.$columna['menuId'].'`);" data-toggle="tooltip" data-placement="top" title="Eliminar">
+                    <i class="fas fa-trash"></i>
+                </button>
             ';
 
             // Agrega la fila al array de salida
@@ -358,22 +394,3 @@ class AdministracionPermisos extends Controller
     }
     
 }
-
-/*<tr>
-    <td><?php echo $n; ?></td>
-    <td><b>Menu: </b><?php echo $menu; ?><br>
-    </td>
-    <td>
-        <b>Url: </b><?php echo $menus['urlMenu']; ?>  <br>
-    </td>
-    <td>
-
-    <button class="btn btn-primary mb-1" onclick="modalMenu({moduloId: '<?= $moduloId; ?>', menuId: '<?= $menuId; ?>', operacion: 'editar'});" data-toggle="tooltip" data-placement="top" title="Editar menú">
-        <i class="fas fa-pencil-alt"></i>
-    </button>
-    <button class="btn btn-danger mb-1" onclick="eliminarMenu(`<?= $menus['menuId']; ?>`);" data-toggle="tooltip" data-placement="top" title="Eliminar">
-        <i class="fas fa-trash"></i>
-    </button>
-    </td>
-</tr>
-<?php } ?>*/

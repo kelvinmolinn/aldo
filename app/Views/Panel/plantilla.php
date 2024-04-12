@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="<?php echo base_url();?>../assets/plugins/select2/css/select2.min.css">
   <!-- En el head de tu vista -->
   <link rel="stylesheet" href="<?php echo base_url();?>../assets/plugins/datatables/css/dataTables.min.css">
-  <link rel="stylesheet" href="<?php echo base_url();?>../public/css/input.css">
+  <!--<link rel="stylesheet" href="<?php //echo base_url();?>../public/css/input.css">-->
 
   <!-- jQuery -->
   <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>-->

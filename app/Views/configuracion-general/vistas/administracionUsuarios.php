@@ -58,7 +58,7 @@
                         <?php echo $empleados['estadoEmpleado'];?>
                     </td>
                     <td>
-                        <button class="btn btn-primary mb-1" onclick="modalUsuario({usuarioId: '<?= $usuarioId; ?>',empleadoId: <?= $empleadoId; ?>, operacion: 'editar'});">
+                        <button class="btn btn-primary mb-1" data-toggle="tooltip" data-placement="top" title="Editar" onclick="modalUsuario({usuarioId: '<?= $usuarioId; ?>',empleadoId: <?= $empleadoId; ?>, operacion: 'editar'});">
                             <i class="fas fa-pencil-alt"></i>
                         </button>
                         <a href="<?= site_url('conf-general/admin-usuarios/vista/usuario/sucursal/' . $empleadoId . '/' . $nombreCompleto); ?>" class="btn btn-primary mb-1" data-toggle="tooltip" data-placement="top" title="Sucursales">

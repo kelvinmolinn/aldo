@@ -10,7 +10,7 @@
         <div class="modal-dialog  modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title"><?= ($operacion == 'editar' ? 'Editar módulo' : 'Nuevo módulo') . " " . $directorio; ?></h5>
+                    <h5 class="modal-title"><?= ($operacion == 'editar' ? 'Editar módulo' : 'Nuevo módulo');?></h5>
                 </div>
                 <div class="modal-body">
                     <input type="hidden" id="moduloId" name="moduloId" value="<?= $campos['moduloId']; ?>">
@@ -23,7 +23,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-outline">
-                                <input type="text" class="form-control " id="iconoModulo" name="iconoModulo" placeholder="Icono" value="<?= $campos['iconoModulo']; ?>" required>
+                                <input type="text" class="form-control " id="iconoModulo" name="iconoModulo" placeholder="Icono" value="<?= ($operacion == 'editar' ? $campos["iconoModulo"] : 'fas fa-'); ?>" required>
                             </div>
                         </div>
                         <div class="col-md-12 mt-4">

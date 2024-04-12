@@ -14,7 +14,7 @@
         </button>
     </div>
     <div class="col-md-6 text-right">
-        <button type= "button" id="btnAbrirModal" class="btn btn-primary estilo-btn" onclick="modalMenu({moduloId: '<?= $moduloId; ?>',menuId: 0, operacion: 'insertar'});">
+        <button type= "button" id="btnAbrirModal" class="btn btn-primary estilo-btn" onclick="modalMenu(<?= $moduloId; ?>, 0, 'insertar');">
             <i class="fas fa-save"></i>
             Nuevo menú
         </button>
@@ -87,12 +87,12 @@ function eliminarMenu(id) {
             }
         */
     }
-    function modalMenu(campos) {
+    function modalMenu(moduloId, menuId, operacion) {
         // Realizar una petición AJAX para obtener los datos del módulo por su ID
         $.ajax({
             url: '<?php echo base_url('conf-general/admin-modulos/form/modulo/nuevo/menu'); ?>',
             type: 'POST',
-            data: campos, // Pasar el ID del módulo como parámetro
+            data: {moduloId : moduloId, menuId : menuId, operacion : operacion}, // Pasar el ID del módulo como parámetro
             success: function(response) {
                 // Insertar el contenido de la modal en el cuerpo de la modal
                 $('#divModalContent').html(response);
@@ -115,7 +115,8 @@ function eliminarMenu(id) {
                 "method": "POST",
                 "url": '<?php echo base_url('conf-general/admin-modulos/tabla/modulos/menus'); ?>',
                 "data": {
-                    x: ''
+                    moduloId: '<?= $moduloId; ?>',
+                    modulo: '<?= $modulo; ?>'
                 }
             },
             "columnDefs": [
