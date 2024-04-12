@@ -114,7 +114,7 @@ class AdministracionTipo extends Controller
         // Establecer reglas de validación
         $validation = service('validation');
         $validation->setRules([
-            'productoTipo' => 'required|alpha_space|is_unique[inv_productos_tipo.productoTipo]'
+            'productoTipo' => 'required|is_unique[inv_productos_tipo.productoTipo]'
         ]);
     
         // Ejecutar la validación
