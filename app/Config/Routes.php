@@ -89,6 +89,16 @@ $routes->group('inventario/admin-tipo', function($routes) {
     //
 });
 
+$routes->group('inventario/admin-plataforma', function($routes) {
+    // Definir las rutas específicas para el grupo 'admin-plataforma'
+    $routes->get('index', 'inventario\AdministracionPlataforma::index');
+    $routes->post('form/plataforma', 'inventario\AdministracionPlataforma::modalAdministracionPlataforma');
+    $routes->post('tabla/plataforma',  'inventario\AdministracionPlataforma::tablaPlataforma');
+    $routes->post('operacion/eliminar/plataforma', 'inventario\AdministracionPlataforma::eliminarPlataforma');
+    $routes->post('operacion/guardar/plataforma', 'inventario\AdministracionPlataforma::modalPlataformaOperacion');
+    //
+});
+
 // Rutas de errores
 $routes->get('404', 'Errores::error404');
 
