@@ -56,9 +56,6 @@ class AdministracionProducto extends Controller
                 'descripcionProducto'       => '',
                 'existenciaMinima'          => '',
                 'fechaInicioInventario'     => '',
-                'costoUnitarioFOB'          => '',
-                'CostoUnitarioRetaceo'      => '',
-                'CostoPromedio'             => '',
                 'flgProductoVenta'          => '',
                 'precioVenta'               => ''
             ];
