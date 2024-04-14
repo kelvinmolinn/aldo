@@ -42,8 +42,8 @@ class AdministracionProducto extends Controller
             $modulo = new inv_productos();
             $data['campos'] = $modulo->select('inv_productos.productoId,productoTipoId,productoPlataformaId, unidadMedidaId,inv_productos.codigoProducto,inv_productos.producto,inv_productos.descripcionProducto,inv_productos.existenciaMinima,inv_productos.fechaInicioInventario,inv_productos.costoUnitarioFOB,inv_productos.CostoUnitarioRetaceo,inv_productos.CostoPromedio,inv_productos.flgProductoVenta,inv_productos.precioVenta,inv_productos.estadoProducto')
             ->join('inv_productos_tipo', 'inv_productos.productoTipoId = inv_productos_tipo.productoTipoId')
-            ->join('productoPlataformaId', 'conf_roles.rolId = conf_usuarios.rolId', 'left')
-            ->join('unidadMedidaId', 'conf_roles.rolId = conf_usuarios.rolId', 'left')
+            ->join('inv_productos_plataforma', 'inv_productos.productoTipoId = inv_productos_plataforma.productoPlataformaId')
+            ->join('cat_unidades_medida', 'inv_productos.productoTipoId = cat_unidades_medida.unidadMedidaId')
             ->where('flgElimina', 0)->where('productoId', $productoId)->first();
         } else {
             $data['campos'] = [
@@ -64,7 +64,7 @@ class AdministracionProducto extends Controller
             ];
         }
 
-        return view('configuracion-general/modals/modalAdministracionMenus', $data);
+        return view('intentario/modals/modalAdministracionProducto', $data);
     }
 
 }
