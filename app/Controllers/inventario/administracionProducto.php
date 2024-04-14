@@ -23,7 +23,7 @@ class AdministracionProducto extends Controller
         }
     }
 
-    public function modalProducto()
+    public function modalAdministracionProducto()
     {
         $operacion = $this->request->getPost('operacion');
         
