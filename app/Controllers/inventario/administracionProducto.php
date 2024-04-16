@@ -92,7 +92,7 @@ class AdministracionProducto extends Controller
                 </button>
             ';
             $columna5 .= '
-            <button class="btn btn-primary mb-1" onclick="modalPrecios(`'.$columna['productoId'].'`);" data-toggle="tooltip" data-placement="top" title="Actualizar precios de venta">
+            <button class="btn btn-success mb-1" onclick="modalPrecios(`'.$columna['productoId'].'`);" data-toggle="tooltip" data-placement="top" title="Actualizar precios de venta">
                 <span></span>
                 <i class="fas fa-dollar-sign"></i>
             </button>
