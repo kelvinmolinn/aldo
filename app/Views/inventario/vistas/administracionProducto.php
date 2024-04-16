@@ -61,11 +61,11 @@
                 }
             },
             "columnDefs": [
-                { "width": "10%", "targets": 0 }, 
-                { "width": "20%", "targets": 1 }, 
-                { "width": "20%", "targets": 2 },
-                { "width": "20%", "targets": 3 },  
-                { "width": "30%", "targets": 4 }
+                { "width": "10%"}, 
+                { "width": "25%"}, 
+                { "width": "25%"},
+                { "width": "25%"},  
+                { "width": "15%"}  
             ],
             "language": {
                 "url": "../../../assets/plugins/datatables/js/spanish.json"
