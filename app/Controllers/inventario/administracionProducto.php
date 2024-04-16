@@ -64,4 +64,71 @@ class AdministracionProducto extends Controller
         return view('intentario/modals/modalAdministracionProducto', $data);
     }
 
+    public function tablaProducto()
+    {
+        $mostrarProducto = new inv_productos();
+        $datos = $mostrarProducto
+        ->select('inv_productos.productoId,inv_productos_tipo.productoTipo,inv_productos_plataforma.productoPlataforma,inv_productos.codigoProducto, inv_productos.producto,inv_productos.descripcionProducto,inv_productos.estadoProducto,inv_productos.costoUnitarioFOB,inv_productos.CostoUnitarioRetaceo')
+        ->join('inv_productos_tipo', 'inv_productos_tipo.productoTipoId = inv_productos.productoTipoId')
+        ->join('inv_productos_plataforma', 'inv_productos_plataforma.productoPlataformaId = inv_productos.productoPlataformaId')
+        ->where('inv_productos.flgElimina', 0)
+        ->findAll();
+    
+        // Construye el array de salida
+        $output['data'] = array();
+        $n = 1; // Variable para contar las filas
+        foreach ($datos as $columna) {
+            // Aquí construye tus columnas
+            $columna1 = $n;
+            $columna2 = "<b>Codigo:</b> " . $columna['codigoProducto']."<br>"."<b>Producto:</b> " . $columna['producto']."<br>"."<b>Estado:</b> " . $columna['estadoProducto'];
+            $columna3 = "<b>Tipo Producto:</b> " . $columna['productoTipo']."<br>"."<b>Plataforma:</b> " . $columna['productoPlataforma']."<br>"."<b>Descripción:</b> " . $columna['descripcionProducto'];
+            $columna4 = "<b>Con IVA: </b>$" . $columna['CostoUnitarioRetaceo']."<br>"."<b>Sin IVA: </b>$" . $columna['costoUnitarioFOB'];
+
+            // Aquí puedes construir tus botones en la última columna
+            $columna5 = '
+                <button class="btn btn-primary mb-1" onclick="modalPlataforma(`'.$columna['productoId'].'`, `editar`);" data-toggle="tooltip" data-placement="top" title="Editar Plataforma de producto">
+                    <span></span>
+                    <i class="fas fa-pencil-alt"></i>
+                </button>
+            ';
+            $columna5 .= '
+            <button class="btn btn-primary mb-1" onclick="modalPrecios(`'.$columna['productoId'].'`);" data-toggle="tooltip" data-placement="top" title="Actualizar precios de venta">
+                <span></span>
+                <i class="fas fa-dollar-sign"></i>
+            </button>
+        ';
+        $columna5 .= '
+        <button class="btn btn-primary mb-1" onclick="modalHistorial(`'.$columna['productoId'].'`);" data-toggle="tooltip" data-placement="top" title="Historiales">
+            <span></span>
+            <i class="fas fa-clock"></i>
+        </button>
+    ';
+
+            $columna5 .= '
+                <button class="btn btn-danger mb-1" onclick="eliminarPlataforma(`'.$columna['productoId'].'`);" data-toggle="tooltip" data-placement="top" title="Eliminar">
+                    <i class="fas fa-trash"></i>
+                </button>
+            ';
+
+            // Agrega la fila al array de salida
+            $output['data'][] = array(
+                $columna1,
+                $columna2,
+                $columna3,
+                $columna4,
+                $columna5
+            );
+    
+            $n++;
+        }
+    
+        // Verifica si hay datos
+        if ($n > 1) {
+            return $this->response->setJSON($output);
+        } else {
+            return $this->response->setJSON(array('data' => '')); // No hay datos, devuelve un array vacío
+        }
+    }
+
+
 }
