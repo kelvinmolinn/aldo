@@ -8,6 +8,7 @@ use App\Models\conf_menus;
 
 class AdministracionPermisos extends Controller
 {
+    //ESTE CONTROLLERS ES DE PERMISOS 
     public function configuracionModulos()
     {
         $session = session();

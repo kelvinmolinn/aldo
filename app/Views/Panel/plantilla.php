@@ -119,7 +119,7 @@
                     </a>
                   </li>
                   <li class="nav-item">
-                    <a href="" class="nav-link">
+                    <a href="<?= site_url('conf-general/admin-permisos/index'); ?>" class="nav-link">
                       <i class="fas fa-user-check nav-icon"></i>
                       <p>permisos</p>
                     </a>

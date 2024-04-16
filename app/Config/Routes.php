@@ -69,6 +69,13 @@ $routes->group('conf-general/admin-modulos', function($routes) {
     //Llamada en HTML: conf-general/admin-usuarios/vista,sucursales,modal/usuario,tabla/usuarios
 });
 
+$routes->group('conf-general/admin-permisos', function($routes) {
+    // Definir las rutas específicas para el grupo 'admin'
+    $routes->get('index', 'configuracionGeneral\ConfiguracionPermisos::indexPermisos');
+    $routes->post('tabla/permisos',  'configuracionGeneral\ConfiguracionPermisos::tablaPermisos');
+
+});
+
 $routes->group('inventario/admin-unidades', function($routes) {
     // Definir las rutas específicas para el grupo 'admin-unidades'
     $routes->get('index', 'inventario\AdministracionUnidades::index');
