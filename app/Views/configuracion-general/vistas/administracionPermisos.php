@@ -2,7 +2,7 @@
     $this->extend('Panel/plantilla'); 
     $this->section('contenido');
 ?>
-<h2>Permisos del menu </h2>
+<h2>Permisos del menu: <?= $menu;?></h2>
 <hr>
 <div class="row mb-4">
     <div class="col-md-6">
@@ -12,7 +12,7 @@
         </button>
     </div>
     <div class="col-md-12 text-right">
-        <button type= "button" class="btn btn-primary ttip" onclick="">
+        <button type= "button" class="btn btn-primary ttip" onclick="modalPermisos();">
             <i class="fas fa-user-plus"></i>
             Nuevo permiso
         </button>
@@ -33,12 +33,12 @@
     </table>
 </div>
 <script>
-    function modalModulo() {
+    function modalPermisos() {
         // Realizar una petición AJAX para obtener los datos del módulo por su ID
         $.ajax({
-                url: '<?php echo base_url('conf-general/admin-modulos/form/nuevo/modulo'); ?>',
+                url: '<?php echo base_url('conf-general/admin-permisos/form/nuevo/permiso'); ?>',
                 type: 'POST',
-                data: { moduloId: moduloId, operacion: operacion}, // Pasar el ID del módulo como parámetro
+                data: {}, // Pasar el ID del módulo como parámetro
                 success: function(response) {
                     // Insertar el contenido de la modal en el cuerpo de la modal
                     $('#divModalContent').html(response);
@@ -57,6 +57,7 @@
             // Redireccionar a la URL correspondiente
             window.location.href = '<?php echo base_url('conf-general/admin-modulos/vista/modulos/menus'); ?>';
         });
+
         $('#tablaPermisos').DataTable({
             "ajax": {
                 "method": "POST",
@@ -72,7 +73,7 @@
                 { "width": "15%", "targets": 3 }  
             ],
             "language": {
-                "url": "../../../assets/plugins/datatables/js/spanish.json"
+                "url": "../../../../assets/plugins/datatables/js/spanish.json"
             },
                 "drawCallback": function(settings) {
                 // Inicializar tooltips de Bootstrap después de cada dibujo de la tabla

@@ -15,7 +15,7 @@ class ConfiguracionPermisos extends Controller
             return view('login');
         } else {
     
-        $data['variable'] = 0;
+        $data['menu'] = $this->request->getPost('menu');
         
         return view('configuracion-general/vistas/administracionPermisos', $data);
         }
@@ -71,6 +71,25 @@ class ConfiguracionPermisos extends Controller
         } else {
             return $this->response->setJSON(array('data' => '')); // No hay datos, devuelve un array vacío
         }
+    }
+    public function modalPermiso()
+    {
+        $operacion = $this->request->getPost('operacion');
+        if($operacion == 'editar') {
+            $permisoId = $this->request->getPost('permisoId');
+            $modulo = new conf_menu_permisos();
+            $data['campos'] = $modulo->select('moduloId,modulo,iconoModulo, urlModulo')->where('flgElimina', 0)->where('moduloId', $moduloId)->first();
+        } else {
+            $data['campos'] = [
+                'moduloId'      => 0,
+                'modulo'        => '',
+                'iconoModulo'   => '', 
+                'urlModulo'     => ''
+            ];
+        }
+        $data['operacion'] = $operacion;
+
+        return view('configuracion-general/modals/modalpermisos', $data);
     }
     
 }

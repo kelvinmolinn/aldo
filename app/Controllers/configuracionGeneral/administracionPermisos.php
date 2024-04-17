@@ -369,7 +369,7 @@ class AdministracionPermisos extends Controller
                 </button>
             ';
             $columna4 .= '
-                <a href="'.site_url('conf-general/admin-permisos/index').'" class="btn btn-secondary mb-1" data-toggle="tooltip" data-placement="top" title="Permisos">
+                <a href="'.site_url('conf-general/admin-permisos/index/' . $columna['menu']).'" class="btn btn-secondary mb-1" data-toggle="tooltip" data-placement="top" title="Permisos">
                     <i class="fas fa-bars nav-icon"></i>
                 </a>
             ';

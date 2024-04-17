@@ -71,8 +71,9 @@ $routes->group('conf-general/admin-modulos', function($routes) {
 
 $routes->group('conf-general/admin-permisos', function($routes) {
     // Definir las rutas específicas para el grupo 'admin'
-    $routes->get('index', 'configuracionGeneral\ConfiguracionPermisos::indexPermisos');
+    $routes->get('index/(:any)', 'configuracionGeneral\ConfiguracionPermisos::indexPermisos/$1');
     $routes->post('tabla/permisos',  'configuracionGeneral\ConfiguracionPermisos::tablaPermisos');
+    $routes->post('form/nuevo/permiso', 'configuracionGeneral\ConfiguracionPermisos::modalPermiso');
 
 });
 
