@@ -7,7 +7,7 @@
 
 <div class="row mb-4">
     <div class="col-md-12 text-right">
-        <button type= "button" id="btnAbrirModal" class="btn btn-primary" onclick="modalExistencia(0, 'insertar');">
+        <button type= "button" id="btnAbrirModal2" class="btn btn-primary" onclick="modalExistencia(0, 'insertar');">
             <i class="fas fa-save"></i>
             Existencia Inicial
         </button>
@@ -69,6 +69,10 @@
             ],
             "language": {
                 "url": "../../../assets/plugins/datatables/js/spanish.json"
+            },
+            "drawCallback": function(settings) {
+                // Inicializar tooltips de Bootstrap después de cada dibujo de la tabla
+                $('[data-toggle="tooltip"]').tooltip();
             },
         });
     });
