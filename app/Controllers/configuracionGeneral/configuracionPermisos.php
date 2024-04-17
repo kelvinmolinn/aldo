@@ -25,8 +25,9 @@ class ConfiguracionPermisos extends Controller
     {
         $mostrarPermisos = new conf_menu_permisos();
         $datos = $mostrarPermisos
-        ->select('menuId, menuPermiso, descripcionMenuPermiso')
-        ->where('flgElimina', 0)
+        ->select('conf_menus.menu, conf_menu_permisos.menuPermiso, conf_menu_permisos.descripcionMenuPermiso')
+        ->join('conf_menus', 'conf_menus.menuId = conf_menu_permisos.menuId')
+        ->where('conf_menu_permisos.flgElimina', 0)
         ->findAll();
     
         // Construye el array de salida
@@ -35,15 +36,25 @@ class ConfiguracionPermisos extends Controller
         foreach ($datos as $columna) {
             // Aquí construye tus columnas
             $columna1 = $n;
-            $columna2 = "<b>Módulo: </b>" . $columna['menuId'];
+            $columna2 = "<b>Módulo: </b>" . $columna['menu'];
             $columna3 = "<b>Permiso: </b>" . $columna['menuPermiso'] . "<br>" . "<b>Descripción: </b>" . $columna['descripcionMenuPermiso'];
             // Aquí puedes construir tus botones en la última columna
             $columna4 = '
+                <button class="btn btn-primary mb-1" onclick="" data-toggle="tooltip" data-placement="top" title="usuarios">
+                    <i class="fas fa-user-tie"></i>
+                </button>
+            ';
+
+            $columna4 .= '
                 <button class="btn btn-primary mb-1" onclick="" data-toggle="tooltip" data-placement="top" title="Editar">
                     <i class="fas fa-pencil-alt"></i>
                 </button>
             ';
-
+            $columna4 .= '
+                <button class="btn btn-danger mb-1" onclick="" data-toggle="tooltip" data-placement="top" title="Editar">
+                    <i class="fas fa-ban"></i>
+                </button>
+            ';    
             // Agrega la fila al array de salida
             $output['data'][] = array(
                 $columna1,
@@ -54,7 +65,6 @@ class ConfiguracionPermisos extends Controller
     
             $n++;
         }
-    
         // Verifica si hay datos
         if ($n > 1) {
             return $this->response->setJSON($output);

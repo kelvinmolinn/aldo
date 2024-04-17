@@ -368,7 +368,12 @@ class AdministracionPermisos extends Controller
                     <i class="fas fa-pencil-alt"></i>
                 </button>
             ';
-
+            $columna4 .= '
+                <a href="'.site_url('conf-general/admin-permisos/index').'" class="btn btn-secondary mb-1" data-toggle="tooltip" data-placement="top" title="Permisos">
+                    <i class="fas fa-bars nav-icon"></i>
+                </a>
+            ';
+            
             $columna4 .= '
                 <button class="btn btn-danger mb-1" onclick="eliminarMenu(`'.$columna['menuId'].'`);" data-toggle="tooltip" data-placement="top" title="Eliminar">
                     <i class="fas fa-trash"></i>
