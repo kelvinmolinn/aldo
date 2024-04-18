@@ -72,6 +72,14 @@ class AdministracionProducto extends Controller
         return view('inventario/modals/modalAdministracionProducto', $data);
     }
 
+    public function modalAdministracionPrecio()
+    { 
+    
+
+    
+            return view('inventario/modals/modalAdministracionPrecio');
+        }
+
     public function tablaProducto()
     {
         $mostrarProducto = new inv_productos();
@@ -97,7 +105,7 @@ class AdministracionProducto extends Controller
             $columna5 = '
             <button class="btn btn-info mb-1" onclick="modalExistencia(`'.$columna['productoId'].'`, `editar`);" data-toggle="tooltip" data-placement="top" title="Existencias de producto">
                 <span></span>
-                <i class="fas fa-layer-group"></i>
+                <i class="fas fa-box-open"></i>
             </button>
         ';
             $columna5 .= '
@@ -150,8 +158,15 @@ class AdministracionProducto extends Controller
         // Establecer reglas de validación
         $validation = service('validation');
         $validation->setRules([
-            'producto'          => 'required',
-            'codigoProducto'    => 'required'
+            'productoTipoId'        => 'required',
+            'productoPlataformaId'  => 'required',
+            'unidadMedidaId'        => 'required',
+            'producto'              => 'required',
+            'codigoProducto'        => 'required',
+            'descripcionProducto'   => 'required',
+            'existenciaMinima'      => 'required',
+            'fechaInicioInventario' => 'required',
+            'flgProductoVenta'      => 'required'
         ]);
     
         // Ejecutar la validación
@@ -164,9 +179,17 @@ class AdministracionProducto extends Controller
         }
     
         // Continuar con la operación de inserción o actualización en la base de datos
+        $codigoProducto = $this->request->getPost('codigoProducto');
         $operacion = $this->request->getPost('operacion');
+        $productoId = $this->request->getPost('productoId');
         $model = new inv_productos();
-    
+
+        if ($model->existeCodigo($codigoProducto, $productoId)) {
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'El Codigo de producto ya está registrado en la base de datos'
+            ]);
+        } else {
         $data = [
             'productoTipoId'        => $this->request->getPost('productoTipoId'),
             'productoPlataformaId'  => $this->request->getPost('productoPlataformaId'),
@@ -201,6 +224,7 @@ class AdministracionProducto extends Controller
                 'mensaje' => 'No se pudo insertar el producto'
             ]);
         }
+      }
     }
 
 

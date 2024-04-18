@@ -111,6 +111,7 @@ $routes->group('inventario/admin-producto', function($routes) {
     // Definir las rutas específicas para el grupo 'admin-producto'
     $routes->get('index', 'inventario\AdministracionProducto::index');
     $routes->post('form/producto', 'inventario\AdministracionProducto::modalAdministracionProducto');
+    $routes->post('form2/precio', 'inventario\AdministracionProducto::modalAdministracionPrecio');
     $routes->post('tabla/producto',  'inventario\AdministracionProducto::tablaProducto');
     $routes->post('operacion/eliminar/producto', 'inventario\AdministracionProducto::eliminarProducto');
     $routes->post('operacion/guardar/producto', 'inventario\AdministracionProducto::modalProductoOperacion');

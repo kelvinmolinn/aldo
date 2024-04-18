@@ -149,7 +149,7 @@ $(document).ready(function() {
                     Swal.fire({
                         icon: 'error',
                         title: 'Error de validación',
-                        text: 'Verifique las validaciones!'
+                        text: 'El Codigo de producto ya está registrado en la base de datos o Hay algun dato incompleto, Verifique las validaciones!'
                     });
                 }
             },
