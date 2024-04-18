@@ -1,11 +1,19 @@
+<?php
+    if($operacion == "editar") {
+        $mensajeAlerta = "Permiso actualizado con éxito";
+    } else {
+        $mensajeAlerta = "Permiso creado con éxito";
+    }
+?>
 <form id="frmModal">
     <div id="modalPermisos" class="modal" tabindex="-1">
         <div class="modal-dialog  modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title"><?php ($operacion == 'editar' ? 'Editar permiso' : 'Nuevo permiso');?></h5>
+                    <h5 class="modal-title"><?php echo ($operacion == 'editar' ? 'Editar permiso' : 'Nuevo permiso') . " del menu " . $campos['menu'];?></h5>
                 </div>
                 <div class="modal-body">
+                 <input type="hidden" id="operacion" name="operacion" value="<?= $operacion; ?>">
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-outline">
@@ -49,7 +57,7 @@
                         $('#modalPermisos').modal('hide');
                         Swal.fire({
                             icon: 'success',
-                            title: 'Se agrego',
+                            title: '<?= $mensajeAlerta; ?>',
                             text: response.mensaje
                         }).then((result) => {
                             $("#tablaPermisos").DataTable().ajax.reload(null, false);

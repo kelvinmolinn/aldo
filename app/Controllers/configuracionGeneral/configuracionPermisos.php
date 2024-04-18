@@ -4,10 +4,11 @@ namespace App\Controllers\configuracionGeneral;
 
 use CodeIgniter\Controller;
 use App\Models\conf_menu_permisos;
+use App\Models\conf_menus;
 
 class ConfiguracionPermisos extends Controller
 {
-    public function indexPermisos()
+    public function indexPermisos($menu, $menuId)
     {        
         $session = session();
         
@@ -15,8 +16,20 @@ class ConfiguracionPermisos extends Controller
             return view('login');
         } else {
     
-        $data['menu'] = $this->request->getPost('menu');
-        
+        $data['menu'] = $menu;        
+        $data['menuId'] = $menuId;
+
+        $modulos = new conf_menus();
+
+        $modulos->select('conf_modulos.modulo,conf_modulos.moduloId')
+        ->join('conf_modulos', 'conf_modulos.moduloId = conf_menus.moduloId')
+        ->where('conf_menus.flgElimina', 0)
+        ->where('conf_menus.menuId', $menuId)
+        ->findAll();
+        //$modeloModulos = consulta hacia menus con jOIN a modulos
+         $data['modulo'] = $modulos->modulo;
+         $data['moduloId'] = $modulos->moduloId;
+        // $data['moduloId']
         return view('configuracion-general/vistas/administracionPermisos', $data);
         }
     }
@@ -28,6 +41,7 @@ class ConfiguracionPermisos extends Controller
         ->select('conf_menus.menu, conf_menu_permisos.menuPermiso, conf_menu_permisos.descripcionMenuPermiso')
         ->join('conf_menus', 'conf_menus.menuId = conf_menu_permisos.menuId')
         ->where('conf_menu_permisos.flgElimina', 0)
+        ->where('conf_menu_permisos.menuId', $this->request->getPost('menuId'))
         ->findAll();
     
         // Construye el array de salida
@@ -77,14 +91,17 @@ class ConfiguracionPermisos extends Controller
         $operacion = $this->request->getPost('operacion');
         if($operacion == 'editar') {
             $permisoId = $this->request->getPost('permisoId');
-            $modulo = new conf_menu_permisos();
-            $data['campos'] = $modulo->select('moduloId,modulo,iconoModulo, urlModulo')->where('flgElimina', 0)->where('moduloId', $moduloId)->first();
+            $permisos = new conf_menu_permisos();
+            $data['campos'] = $permisos->select('menuPermisoId,menuId,menuPermiso, descripcionMenuPermiso')
+            ->where('flgElimina', 0)
+            ->where('permisoId', $permisoId)->first();
         } else {
             $data['campos'] = [
-                'moduloId'      => 0,
-                'modulo'        => '',
-                'iconoModulo'   => '', 
-                'urlModulo'     => ''
+                'menuPermisoId'             => 0,
+                'menuId'                    => $this->request->getPost('menuId'),
+                'menu'                      => $this->request->getPost('menu'),
+                'menuPermiso'               => '', 
+                'descripcionMenuPermiso'    => ''
             ];
         }
         $data['operacion'] = $operacion;
