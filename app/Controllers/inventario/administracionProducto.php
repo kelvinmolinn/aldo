@@ -48,8 +48,8 @@ class AdministracionProducto extends Controller
             ->join('inv_productos_tipo', 'inv_productos_tipo.productoTipoId = inv_productos.productoTipoId')
             ->join('inv_productos_plataforma', 'inv_productos_plataforma.productoPlataformaId = inv_productos.productoPlataformaId')
             ->join('cat_unidades_medida', 'cat_unidades_medida.unidadMedidaId = inv_productos.unidadMedidaId')
-            ->where('flgElimina', 0)
-            ->where('productoId', $productoId)->first();
+            ->where('inv_productos.flgElimina', 0)
+            ->where('inv_productos.productoId', $productoId)->first();
         } else {
 
              // formar los campos que estan en la modal (input y select) con el nombre equivalente en la BD
@@ -109,7 +109,7 @@ class AdministracionProducto extends Controller
             </button>
         ';
             $columna5 .= '
-                <button class="btn btn-primary mb-1" onclick="modalEditar(`'.$columna['productoId'].'`, `editar`);" data-toggle="tooltip" data-placement="top" title="Editar producto">
+                <button class="btn btn-primary mb-1" onclick="modalProducto(`'.$columna['productoId'].'`, `editar`);" data-toggle="tooltip" data-placement="top" title="Editar producto">
                     <span></span>
                     <i class="fas fa-pencil-alt"></i>
                 </button>
@@ -128,7 +128,7 @@ class AdministracionProducto extends Controller
     ';
 
             $columna5 .= '
-                <button class="btn btn-danger mb-1" onclick="eliminarPlataforma(`'.$columna['productoId'].'`);" data-toggle="tooltip" data-placement="top" title="Eliminar">
+                <button class="btn btn-danger mb-1" onclick="eliminarProducto(`'.$columna['productoId'].'`);" data-toggle="tooltip" data-placement="top" title="Eliminar">
                     <i class="fas fa-trash"></i>
                 </button>
             ';
@@ -150,6 +150,28 @@ class AdministracionProducto extends Controller
             return $this->response->setJSON($output);
         } else {
             return $this->response->setJSON(array('data' => '')); // No hay datos, devuelve un array vacío
+        }
+    }
+
+    public function eliminarProducto(){
+    
+        $eliminarProducto = new inv_productos();
+        
+        $productoId = $this->request->getPost('productoId');
+        $data = ['flgElimina' => 1];
+        
+        $eliminarProducto->update($productoId, $data);
+
+        if($eliminarProducto) {
+            return $this->response->setJSON([
+                'success' => true,
+                'mensaje' => 'Producto eliminado correctamente'
+            ]);
+        } else {
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'No se pudo eliminar el producto'
+            ]);
         }
     }
 

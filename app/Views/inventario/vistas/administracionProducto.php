@@ -33,6 +33,53 @@
     </table>
 </div>
 <script>
+       function eliminarProducto(id) {
+        //alert("Vamos a eliminar " + id);
+            Swal.fire({
+                title: '¿Estás seguro que desea eliminar el producto?',
+                text: "Se eiminara el producto seleccionado.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Si el usuario confirma, enviar la solicitud AJAX para eliminar el usuario de la sucursal
+                        $.ajax({
+                            url: '<?php echo base_url('inventario/admin-producto/operacion/eliminar/producto'); ?>',
+                            type: 'POST',
+                            data: {
+                                productoId: id
+                            },
+                            success: function(response) {
+                                console.log(response);
+                                if (response.success) {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: '¡Producto eliminado con Éxito!',
+                                        text: response.mensaje
+                                    }).then((result) => {
+                                        $("#tblProducto").DataTable().ajax.reload(null, false);
+                                    });
+                                } else {
+                                    // Insert fallido, mostrar mensaje de error
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Error',
+                                        text: response.mensaje
+                                    });
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                // Manejar errores si los hay
+                                console.error(xhr.responseText);
+                            }
+                        });
+                }
+            });
+    }
         function modalProducto(productoId, operacion) {
         // Realizar una petición AJAX para obtener los datos del módulo por su ID
         $.ajax({
