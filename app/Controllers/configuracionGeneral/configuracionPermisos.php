@@ -49,22 +49,21 @@ class ConfiguracionPermisos extends Controller
         foreach ($datos as $columna) {
             // Aquí construye tus columnas
             $columna1 = $n;
-            $columna2 = "<b>Módulo: </b>" . $columna['menu'];
-            $columna3 = "<b>Permiso: </b>" . $columna['menuPermiso'] . "<br>" . "<b>Descripción: </b>" . $columna['descripcionMenuPermiso'];
+            $columna2 = "<b>Permiso: </b>" . $columna['menuPermiso'] . "<br>" . "<b>Descripción: </b>" . $columna['descripcionMenuPermiso'];
             // Aquí puedes construir tus botones en la última columna
-            $columna4 = '
-                <button class="btn btn-primary mb-1" onclick="" data-toggle="tooltip" data-placement="top" title="usuarios">
+            $columna3 = '
+                <button class="btn btn-primary mb-1" onclick="modalUsuariosPermisos()" data-toggle="tooltip" data-placement="top" title="usuarios">
                     <i class="fas fa-user-tie"></i>
                 </button>
             ';
 
-            $columna4 .= '
+            $columna3 .= '
                 <button class="btn btn-primary mb-1" onclick="modalPermisos(`'.$columna['menuPermisoId'].'`, `editar`)" data-toggle="tooltip" data-placement="top" title="Editar">
                     <i class="fas fa-pencil-alt"></i>
                 </button>
             ';
-            $columna4 .= '
-                <button class="btn btn-danger mb-1" onclick="" data-toggle="tooltip" data-placement="top" title="Eliminar">
+            $columna3 .= '
+                <button class="btn btn-danger mb-1" onclick="eliminarPermiso(`'.$columna['menuPermisoId'].'`)" data-toggle="tooltip" data-placement="top" title="Eliminar">
                     <i class="fas fa-trash"></i>
                 </button>
             ';    
@@ -72,8 +71,7 @@ class ConfiguracionPermisos extends Controller
             $output['data'][] = array(
                 $columna1,
                 $columna2,
-                $columna3,
-                $columna4
+                $columna3
             );
     
             $n++;
@@ -107,6 +105,97 @@ class ConfiguracionPermisos extends Controller
         $data['operacion'] = $operacion;
 
         return view('configuracion-general/modals/modalpermisos', $data);
+    }
+
+    public function modalPermisosOperacion()
+    {
+        $operacion  = $this->request->getPost('operacion');
+        $menuId     = $this->request->getPost('menuId');
+        
+        $permisos = new conf_menu_permisos();
+
+
+        $data = [
+            'menuId'                    => $menuId,
+            'menuPermiso'               => $this->request->getPost('nombrePermiso'),
+            'descripcionMenuPermiso'    => $this->request->getPost('descripcionPermiso')
+        ];
+
+        if($operacion == 'editar') {
+            $operacionPermiso = $permisos->update($this->request->getPost('menuPermisoId'), $data);
+        } else {
+            // Insertar datos en la base de datos
+            $operacionPermiso = $permisos->insert($data);
+        }
+        if ($operacionPermiso) {
+            // Si el insert fue exitoso, devuelve el último ID insertado
+            return $this->response->setJSON([
+                'success' => true,
+                'mensaje' => 'Menu '.($operacion == 'editar' ? 'actualizado' : 'agregado').' correctamente',
+                'menuPermisoId' => ($operacion == 'editar' ? $this->request->getPost('menuPermisoId') : $permisos->insertID())
+            ]);
+        } else {
+            // Si el insert falló, devuelve un mensaje de error
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'No se pudo insertar el menu'
+            ]);
+        }
+    }
+    public function eliminarPermiso(){
+        //$data['sucursalUsuarioId'] = $sucursalUsuarioId;
+
+        $eliminarPermiso = new conf_menu_permisos();
+        
+        $menuPermisoId = $this->request->getPost('menuPermisoId');
+        $data = ['flgElimina' => 1];
+        
+        $eliminarPermiso->update($menuPermisoId, $data);
+
+        if($eliminarPermiso) {
+            return $this->response->setJSON([
+                'success' => true,
+                'mensaje' => 'Permiso eliminado correctamente'
+            ]);
+        } else {
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'No se pudo eliminar el Permiso'
+            ]);
+        }
+    }
+
+    public function tablaUsuariosPermisos()
+    {
+    
+        // Construye el array de salida
+        $output['data'] = array();
+        $n = 1; // Variable para contar las filas
+       
+            // Aquí construye tus columnas
+            $columna1 = $n;
+            $columna2 = "<b>Permiso: </b>" ."<br>";
+            $columna3 = "<b>Permiso: </b>";
+            // Aquí puedes construir tus botones en la última columna  
+            // Agrega la fila al array de salida
+            $output['data'][] = array(
+                $columna1,
+                $columna2,
+                $columna3
+            );
+    
+            $n++;
+        
+        // Verifica si hay datos
+        if ($n > 1) {
+            return $this->response->setJSON($output);
+        } else {
+            return $this->response->setJSON(array('data' => '')); // No hay datos, devuelve un array vacío
+        }
+
+        $data['variable'] = 0;
+        
+        return view('configuracion-general/modals/modalUsuariosPermisos', $data);
     }
     
 }

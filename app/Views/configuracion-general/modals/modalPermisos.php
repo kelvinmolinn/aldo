@@ -13,6 +13,8 @@
                     <h5 class="modal-title"><?php echo ($operacion == 'editar' ? 'Editar permiso' : 'Nuevo permiso') . " del menu " . $campos['menu'];?></h5>
                 </div>
                 <div class="modal-body">
+                 <input type="hidden" id="menuPermisoId" name="menuPermisoId" value="<?= $campos['menuPermisoId']; ?>">
+                 <input type="hidden" id="menuId" name="menuId" value="<?= $campos['menuId']; ?>">
                  <input type="hidden" id="operacion" name="operacion" value="<?= $operacion; ?>">
                     <div class="row">
                         <div class="col-md-6">
@@ -47,7 +49,7 @@
         $('#btnguardarUsuario').on('click', function() {
             // Realizar una petición AJAX para obtener el contenido de la modal
             $.ajax({
-                url: '<?php echo base_url('conf-general/admin-modulos/operacion/guardar/modulo'); ?>',
+                url: '<?php echo base_url('conf-general/admin-permisos/operacion/guardar/permisos'); ?>',
                 type: 'POST',
                 data: $("#frmModal").serialize(),
                 success: function(response) {
