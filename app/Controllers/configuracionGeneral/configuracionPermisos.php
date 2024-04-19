@@ -16,19 +16,18 @@ class ConfiguracionPermisos extends Controller
             return view('login');
         } else {
     
-        $data['menu'] = $menu;        
+        $data['menu'] = $menu;
         $data['menuId'] = $menuId;
 
-        $modulos = new conf_menus();
+        $menus = new conf_menus();
 
-        $modulos->select('conf_modulos.modulo,conf_modulos.moduloId')
+        $datos = $menus->select('conf_modulos.modulo,conf_modulos.moduloId')
         ->join('conf_modulos', 'conf_modulos.moduloId = conf_menus.moduloId')
         ->where('conf_menus.flgElimina', 0)
         ->where('conf_menus.menuId', $menuId)
-        ->findAll();
+        ->first();
         //$modeloModulos = consulta hacia menus con jOIN a modulos
-         $data['modulo'] = $modulos->modulo;
-         $data['moduloId'] = $modulos->moduloId;
+        $data['modulo'] = $datos;
         // $data['moduloId']
         return view('configuracion-general/vistas/administracionPermisos', $data);
         }
@@ -38,7 +37,7 @@ class ConfiguracionPermisos extends Controller
     {
         $mostrarPermisos = new conf_menu_permisos();
         $datos = $mostrarPermisos
-        ->select('conf_menus.menu, conf_menu_permisos.menuPermiso, conf_menu_permisos.descripcionMenuPermiso')
+        ->select('conf_menus.menu, conf_menu_permisos.menuPermisoId, conf_menu_permisos.menuPermiso, conf_menu_permisos.descripcionMenuPermiso')
         ->join('conf_menus', 'conf_menus.menuId = conf_menu_permisos.menuId')
         ->where('conf_menu_permisos.flgElimina', 0)
         ->where('conf_menu_permisos.menuId', $this->request->getPost('menuId'))
@@ -60,13 +59,13 @@ class ConfiguracionPermisos extends Controller
             ';
 
             $columna4 .= '
-                <button class="btn btn-primary mb-1" onclick="" data-toggle="tooltip" data-placement="top" title="Editar">
+                <button class="btn btn-primary mb-1" onclick="modalPermisos(`'.$columna['menuPermisoId'].'`, `editar`)" data-toggle="tooltip" data-placement="top" title="Editar">
                     <i class="fas fa-pencil-alt"></i>
                 </button>
             ';
             $columna4 .= '
-                <button class="btn btn-danger mb-1" onclick="" data-toggle="tooltip" data-placement="top" title="Editar">
-                    <i class="fas fa-ban"></i>
+                <button class="btn btn-danger mb-1" onclick="" data-toggle="tooltip" data-placement="top" title="Eliminar">
+                    <i class="fas fa-trash"></i>
                 </button>
             ';    
             // Agrega la fila al array de salida
@@ -90,11 +89,12 @@ class ConfiguracionPermisos extends Controller
     {
         $operacion = $this->request->getPost('operacion');
         if($operacion == 'editar') {
-            $permisoId = $this->request->getPost('permisoId');
+            $menuPermisoId = $this->request->getPost('menuPermisoId');
             $permisos = new conf_menu_permisos();
-            $data['campos'] = $permisos->select('menuPermisoId,menuId,menuPermiso, descripcionMenuPermiso')
-            ->where('flgElimina', 0)
-            ->where('permisoId', $permisoId)->first();
+            $data['campos'] = $permisos->select('conf_menus.menu,conf_menu_permisos.menuPermisoId,conf_menu_permisos.menuId,conf_menu_permisos.menuPermiso, conf_menu_permisos.descripcionMenuPermiso')
+            ->join('conf_menus', 'conf_menus.menuId = conf_menu_permisos.menuId')
+            ->where('conf_menu_permisos.flgElimina', 0)
+            ->where('conf_menu_permisos.menuPermisoId', $menuPermisoId)->first();
         } else {
             $data['campos'] = [
                 'menuPermisoId'             => 0,

@@ -17,12 +17,12 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-outline">
-                                <input type="text" Id="nombrePermiso" name="nombrePermiso" class="form-control " placeholder="Permiso" required>
+                                <input type="text" Id="nombrePermiso" name="nombrePermiso" class="form-control " placeholder="Permiso" value="<?= $campos['menuPermiso']; ?>" required>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-outline">
-                                <input type="text" class="form-control " id="descripcionPermiso" name="descripcionPermiso" placeholder="Descripción" required>
+                                <input type="text" class="form-control " id="descripcionPermiso" name="descripcionPermiso" placeholder="Descripción" value="<?= $campos['descripcionMenuPermiso']; ?>" required>
                             </div>
                         </div>
                     </div>

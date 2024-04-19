@@ -33,12 +33,12 @@
     </table>
 </div>
 <script>
-    function modalPermisos(permisoId,operacion) {
+    function modalPermisos(menuPermisoId,operacion) {
         // Realizar una petición AJAX para obtener los datos del módulo por su ID
         $.ajax({
                 url: '<?php echo base_url('conf-general/admin-permisos/form/nuevo/permiso'); ?>',
                 type: 'POST',
-                data: {permisoId: permisoId, operacion: operacion, menuId: '<?= $menuId; ?>', menu: '<?= $menu; ?>'}, // Pasar el ID del módulo como parámetro
+                data: {menuPermisoId: menuPermisoId, operacion: operacion, menuId: '<?= $menuId; ?>', menu: '<?= $menu; ?>'}, // Pasar el ID del módulo como parámetro
                 success: function(response) {
                     // Insertar el contenido de la modal en el cuerpo de la modal
                     $('#divModalContent').html(response);
@@ -55,7 +55,7 @@
      $(document).ready(function() {
         $('#btnRegresar').on('click', function() {
             // Redireccionar a la URL correspondiente
-            window.location.href = '<?php echo base_url('conf-general/admin-modulos/vista/modulos/menus/'.$moduloId .'/'.$modulo); ?>';
+            window.location.href = '<?php echo base_url('conf-general/admin-modulos/vista/modulos/menus/'.$modulo['moduloId'].'/'.$modulo['modulo']); ?>';
         });
 
         $('#tablaPermisos').DataTable({
