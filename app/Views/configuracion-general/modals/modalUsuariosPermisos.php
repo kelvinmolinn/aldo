@@ -12,7 +12,7 @@
                     <h5 class="modal-title">Usuarios con el permiso</h5>
                 </div>
                 <div class="modal-body">
-                    <input type="hidden" id="menuPermisoId" name="menuPermisoId" value="<?= $campos['menuPermisoId']; ?>">
+                    <input type="hidden" id="menuPermisoId" name="menuPermisoId" value="<?= $columna['menuPermisoId']; ?>">
                     <div class="table-responsive">
                         <table class="table table-hover" id="tablaUsuariosPermisos" style="width: 100%;">
                             <thead>
