@@ -145,7 +145,7 @@ class AdministracionPlataforma extends Controller
             // Si el insert fue exitoso, devuelve el último ID insertado
             return $this->response->setJSON([
                 'success' => true,
-                'mensaje' => 'Plataforma de producto' . ($operacion == 'editar' ? 'actualizado' : 'agregado') . ' correctamente',
+                'mensaje' => 'Plataforma de producto ' . ($operacion == 'editar' ? 'actualizado' : 'agregado') . ' correctamente',
                 'productoPlataformaId' => ($operacion == 'editar' ? $this->request->getPost('productoPlataformaId') : $model->insertID())
             ]);
         } else {

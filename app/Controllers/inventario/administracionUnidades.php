@@ -99,7 +99,7 @@ class AdministracionUnidades extends Controller
             // Si el insert fue exitoso, devuelve el último ID insertado
             return $this->response->setJSON([
                 'success' => true,
-                'mensaje' => 'UDM ' . ($operacion == 'editar' ? 'actualizado' : 'agregado') . ' correctamente',
+                'mensaje' => 'Unidad de medida  ' . ($operacion == 'editar' ? 'actualizado' : 'agregado') . ' correctamente',
                 'unidadMedidaId' => ($operacion == 'editar' ? $this->request->getPost('unidadMedidaId') : $model->insertID())
             ]);
         } else {

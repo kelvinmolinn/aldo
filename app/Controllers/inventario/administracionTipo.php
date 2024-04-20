@@ -145,7 +145,7 @@ class AdministracionTipo extends Controller
             // Si el insert fue exitoso, devuelve el último ID insertado
             return $this->response->setJSON([
                 'success' => true,
-                'mensaje' => 'Tipo de producto' . ($operacion == 'editar' ? 'actualizado' : 'agregado') . ' correctamente',
+                'mensaje' => 'Tipo de producto ' . ($operacion == 'editar' ? 'actualizado' : 'agregado') . ' correctamente',
                 'productoTipoId' => ($operacion == 'editar' ? $this->request->getPost('productoTipoId') : $model->insertID())
             ]);
         } else {

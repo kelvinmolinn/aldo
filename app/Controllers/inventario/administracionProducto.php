@@ -236,7 +236,7 @@ class AdministracionProducto extends Controller
             // Si el insert fue exitoso, devuelve el último ID insertado
             return $this->response->setJSON([
                 'success' => true,
-                'mensaje' => 'Producto' . ($operacion == 'editar' ? 'actualizado' : 'agregado') . ' correctamente',
+                'mensaje' => 'Producto ' . ($operacion == 'editar' ? 'actualizado' : 'agregado') . ' correctamente',
                 'productoId' => ($operacion == 'editar' ? $this->request->getPost('productoId') : $model->insertID())
             ]);
         } else {
