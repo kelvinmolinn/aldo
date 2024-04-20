@@ -5,6 +5,7 @@ namespace App\Controllers\configuracionGeneral;
 use CodeIgniter\Controller;
 use App\Models\conf_menu_permisos;
 use App\Models\conf_menus;
+use App\Models\conf_roles_permisos;
 
 class ConfiguracionPermisos extends Controller
 {
@@ -52,7 +53,7 @@ class ConfiguracionPermisos extends Controller
             $columna2 = "<b>Permiso: </b>" . $columna['menuPermiso'] . "<br>" . "<b>Descripción: </b>" . $columna['descripcionMenuPermiso'];
             // Aquí puedes construir tus botones en la última columna
             $columna3 = '
-                <button class="btn btn-primary mb-1" onclick="modalUsuariosPermisos()" data-toggle="tooltip" data-placement="top" title="usuarios">
+                <button class="btn btn-primary mb-1" onclick="modalUsuariosPermisos(`'.$columna['menuPermisoId'].'`)" data-toggle="tooltip" data-placement="top" title="usuarios">
                     <i class="fas fa-user-tie"></i>
                 </button>
             ';
@@ -167,15 +168,27 @@ class ConfiguracionPermisos extends Controller
 
     public function modalUsuariosPermisos()
     {
-    
+        
+        $mostrarUsuariosPermiso = new conf_roles_permisos();
+        $menuPermisoId = $this->request->getPost('menuPermisoId');
+
+        $datos['campos'] = $mostrarUsuariosPermiso
+        ->select('conf_roles.rol,conf_empleados.primerNombre,conf_empleados.segundoNombre,conf_empleados.primerApellido,conf_empleados.segundoApellido')
+        ->join('conf_roles', 'conf_roles.rolId = conf_roles_permisos.rolId')
+        ->join('conf_menu_permisos', 'conf_menu_permisos.menuPermisoId = conf_roles_permisos.menuPermisoId')
+        ->join('conf_usuarios', 'conf_usuarios.rolId = conf_roles.rolId')
+        ->join('conf_empleados', 'conf_empleados.empleadoId = conf_usuarios.empleadoId')
+        ->where('conf_roles_permisos.flgElimina', 0)
+        ->where('conf_roles_permisos.menuPermisoId', $menuPermisoId)
+        ->findAll();
         // Construye el array de salida
         $data['data'] = array();
         $n = 1; // Variable para contar las filas
        
             // Aquí construye tus columnas
             $columna1 = $n;
-            $columna2 = "<b>Usuario: </b>" ."<br>";
-            $columna3 = "<b>Rol: </b>";
+            $columna2 = "<b>Empleados: </b>".$datos['primerNombre'] ."<br>";
+            $columna3 = "<b>Rol: </b>" .$datos['rol'];
             // Aquí puedes construir tus botones en la última columna  
             // Agrega la fila al array de salida
             $data['data'][] = array(
@@ -186,7 +199,6 @@ class ConfiguracionPermisos extends Controller
     
             $n++;
 
-        $data['variable'] = 0;
         
         return view('configuracion-general/modals/modalUsuariosPermisos', $data);
     }
