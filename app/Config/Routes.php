@@ -76,7 +76,7 @@ $routes->group('conf-general/admin-permisos', function($routes) {
     $routes->post('form/nuevo/permiso', 'configuracionGeneral\ConfiguracionPermisos::modalPermiso');
     $routes->post('operacion/guardar/permisos', 'configuracionGeneral\ConfiguracionPermisos::modalPermisosOperacion');
     $routes->post('operacion/eliminar/permiso', 'configuracionGeneral\ConfiguracionPermisos::eliminarPermiso');
-    $routes->post('tabla/usuarios/permiso', 'configuracionGeneral\ConfiguracionPermisos::tablaUsuariosPermisos');
+    $routes->post('tabla/usuarios/permiso', 'configuracionGeneral\ConfiguracionPermisos::modalUsuariosPermisos');
 
 });
 

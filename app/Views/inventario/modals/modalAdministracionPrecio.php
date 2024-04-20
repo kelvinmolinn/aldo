@@ -41,8 +41,8 @@
     </div>
 </form>
 <script>
-       $(document).ready(function() {
-    $('#tblPrecio').DataTable({
+    $(document).ready(function() {
+        $('#tblPrecio').DataTable({
             "ajax": {
                 "method": "POST",
                 "url": '<?php echo base_url('inventario/admin-producto/tabla/precio'); ?>',

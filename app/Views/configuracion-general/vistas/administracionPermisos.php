@@ -106,6 +106,7 @@
 
     function modalUsuariosPermisos() {
         // Realizar una petición AJAX para obtener los datos del módulo por su ID
+        
         $.ajax({
                 url: '<?php echo base_url('conf-general/admin-permisos/tabla/usuarios/permiso'); ?>',
                 type: 'POST',
@@ -113,10 +114,11 @@
                     x: 0
                 }, // Pasar el ID del módulo como parámetro
                 success: function(response) {
+                    console.log(response);
                     // Insertar el contenido de la modal en el cuerpo de la modal
                     $('#divModalContent').html(response);
                     // Mostrar la modal
-                    $('#tablaUsuariosPermisos').modal('show');
+                    $('#modalUsuariosPermisos').modal('show');
                 },
             error: function(xhr, status, error) {
                 // Manejar errores si los hay

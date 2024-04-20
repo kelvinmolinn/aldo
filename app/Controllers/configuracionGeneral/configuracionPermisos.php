@@ -165,33 +165,26 @@ class ConfiguracionPermisos extends Controller
         }
     }
 
-    public function tablaUsuariosPermisos()
+    public function modalUsuariosPermisos()
     {
     
         // Construye el array de salida
-        $output['data'] = array();
+        $data['data'] = array();
         $n = 1; // Variable para contar las filas
        
             // Aquí construye tus columnas
             $columna1 = $n;
-            $columna2 = "<b>Permiso: </b>" ."<br>";
-            $columna3 = "<b>Permiso: </b>";
+            $columna2 = "<b>Usuario: </b>" ."<br>";
+            $columna3 = "<b>Rol: </b>";
             // Aquí puedes construir tus botones en la última columna  
             // Agrega la fila al array de salida
-            $output['data'][] = array(
+            $data['data'][] = array(
                 $columna1,
                 $columna2,
                 $columna3
             );
     
             $n++;
-        
-        // Verifica si hay datos
-        if ($n > 1) {
-            return $this->response->setJSON($output);
-        } else {
-            return $this->response->setJSON(array('data' => '')); // No hay datos, devuelve un array vacío
-        }
 
         $data['variable'] = 0;
         

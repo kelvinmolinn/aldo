@@ -77,8 +77,8 @@ class AdministracionProducto extends Controller
     
 
     
-            return view('inventario/modals/modalAdministracionPrecio');
-        }
+        return view('inventario/modals/modalAdministracionPrecio');
+    }
 
     public function tablaProducto()
     {

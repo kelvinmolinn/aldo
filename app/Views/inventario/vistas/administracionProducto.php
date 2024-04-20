@@ -118,29 +118,29 @@
         });
     }
         $(document).ready(function() {
-    $('#tblProducto').DataTable({
-            "ajax": {
-                "method": "POST",
-                "url": '<?php echo base_url('inventario/admin-producto/tabla/producto'); ?>',
-                "data": {
-                    x: ''
-                }
-            },
-            "columnDefs": [
-                { "width": "10%"}, 
-                { "width": "25%"}, 
-                { "width": "25%"},
-                { "width": "25%"},  
-                { "width": "15%"}  
-            ],
-            "language": {
-                "url": "../../../assets/plugins/datatables/js/spanish.json"
-            },
-            "drawCallback": function(settings) {
-                // Inicializar tooltips de Bootstrap después de cada dibujo de la tabla
-                $('[data-toggle="tooltip"]').tooltip();
-            },
-        });
+            $('#tblProducto').DataTable({
+                "ajax": {
+                    "method": "POST",
+                    "url": '<?php echo base_url('inventario/admin-producto/tabla/producto'); ?>',
+                    "data": {
+                        x: ''
+                    }
+                },
+                "columnDefs": [
+                    { "width": "10%"}, 
+                    { "width": "25%"}, 
+                    { "width": "25%"},
+                    { "width": "25%"},  
+                    { "width": "15%"}  
+                ],
+                "language": {
+                    "url": "../../../assets/plugins/datatables/js/spanish.json"
+                },
+                "drawCallback": function(settings) {
+                    // Inicializar tooltips de Bootstrap después de cada dibujo de la tabla
+                    $('[data-toggle="tooltip"]').tooltip();
+                },
+            });
     });
 </script>
 

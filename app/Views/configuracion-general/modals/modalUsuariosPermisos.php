@@ -4,30 +4,62 @@
 ?>
 <h2>Usuarios con el permiso: </h2>
 <hr>
-<div class="table-responsive">
-    <table class="table table-hover" id="tablaUsuariosPermisos" style="width: 100%;">
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>Usuarios</th>
-                <th>Roles</th>
-            </tr>
-        </thead>
-        <tbody>
-        </tbody>
-    </table>
-</div>
+<form id="frmModal">
+    <div id="modalUsuariosPermisos" class="modal" tabindex="-1">
+        <div class="modal-dialog  modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Usuarios con el permiso</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="tablaUsuariosPermisos" style="width: 100%;">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Usuarios</th>
+                                    <th>Roles</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php 
+                                    for ($i=0; $i < count($data); $i++) { 
+                                        echo "
+                                            <tr>
+                                                <td>".$data[$i][0]."</td>
+                                                <td>".$data[$i][1]."</td>
+                                                <td>".$data[$i][2]."</td>
+                                            </tr>
+                                        ";
+                                    } 
+                                ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                        <i class="fas fa-times-circle"></i>
+                        Cerrar
+                    </button>
+                </div>
 
+            </div>
+        </div>
+    </div>
+</form>
 <script>
      $(document).ready(function() {
-        $('#tablaPermisos').DataTable({
+        $('#tablaUsuariosPermisos').DataTable({
+            /*
             "ajax": {
                 "method": "POST",
                 "url": '<?php echo base_url('conf-general/admin-permisos/tabla/usuarios/permiso'); ?>',
                 "data": {
-                    menuId: '<?= $menuId; ?>'
+                    x : 0
                 }
             },
+            */
             "columnDefs": [
                 { "width": "10%", "targets": 0 }, 
                 { "width": "40%", "targets": 1 }, 
