@@ -40,7 +40,6 @@
         </div>
     </div>
 </form>
-
 <script>
        $(document).ready(function() {
     $('#tblPrecio').DataTable({

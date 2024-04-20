@@ -102,19 +102,19 @@ class AdministracionProducto extends Controller
             $columna4 = "<b>Sin IVA:</b> "."<br>"."<b>Con IVA:</b> ";
 
             // Aquí puedes construir tus botones en la última columna
-            $columna5 = '
+        $columna5 = '
             <button class="btn btn-info mb-1" onclick="modalExistencia(`'.$columna['productoId'].'`, `editar`);" data-toggle="tooltip" data-placement="top" title="Existencias de producto">
                 <span></span>
                 <i class="fas fa-box-open"></i>
             </button>
         ';
-            $columna5 .= '
+        $columna5 .= '
                 <button class="btn btn-primary mb-1" onclick="modalProducto(`'.$columna['productoId'].'`, `editar`);" data-toggle="tooltip" data-placement="top" title="Editar producto">
                     <span></span>
                     <i class="fas fa-pencil-alt"></i>
                 </button>
             ';
-            $columna5 .= '
+        $columna5 .= '
             <button class="btn btn-success mb-1" onclick="modalPrecios(`'.$columna['productoId'].'`);" data-toggle="tooltip" data-placement="top" title="Actualizar precios de venta">
                 <span></span>
                 <i class="fas fa-dollar-sign"></i>
@@ -127,9 +127,15 @@ class AdministracionProducto extends Controller
         </button>
     ';
 
-            $columna5 .= '
+        $columna5 .= '
                 <button class="btn btn-danger mb-1" onclick="eliminarProducto(`'.$columna['productoId'].'`);" data-toggle="tooltip" data-placement="top" title="Eliminar">
                     <i class="fas fa-trash"></i>
+                </button>
+            ';
+
+        $columna5 .= '
+                <button class="btn btn-danger mb-1" onclick="desactivarProducto(`'.$columna['productoId'].'`);" data-toggle="tooltip" data-placement="top" title="Desactivar">
+                    <i class="fas fa-ban"></i>
                 </button>
             ';
 
