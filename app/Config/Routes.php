@@ -55,7 +55,9 @@ $routes->group('conf-general/admin-usuarios', function($routes) {
 });
 
 $routes->group('conf-general/admin-roles', function($routes) {
-    $routes->get('index', 'configuracionGeneral\AdministracionUsuarios::index');
+    $routes->get('index', 'configuracionGeneral\AdministracionRoles::index');
+    $routes->post('tabla/roles',  'configuracionGeneral\AdministracionRoles::tablaRoles');
+    $routes->post('form/nuevo/rol', 'configuracionGeneral\AdministracionRoles::modalRol');
 });
 
 $routes->group('conf-general/admin-modulos', function($routes) {

@@ -127,7 +127,7 @@
         });
     }
 
-     $(document).ready(function() {
+    $(document).ready(function() {
         $('#btnRegresar').on('click', function() {
             // Redireccionar a la URL correspondiente
             window.location.href = '<?php echo base_url('conf-general/admin-modulos/vista/modulos/menus/'.$modulo['moduloId'].'/'.$modulo['modulo']); ?>';
