@@ -1,9 +1,3 @@
-<?= 
-    $this->extend('Panel/plantilla'); 
-    $this->section('contenido');
-?>
-<h2>Usuarios con el permiso: </h2>
-<hr>
 <form id="frmModal">
     <div id="modalUsuariosPermisos" class="modal" tabindex="-1">
         <div class="modal-dialog  modal-lg">
@@ -22,17 +16,6 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php 
-                                    for ($i=0; $i < count($data); $i++) { 
-                                        echo "
-                                            <tr>
-                                                <td>".$data[$i][0]."</td>
-                                                <td>".$data[$i][1]."</td>
-                                                <td>".$data[$i][2]."</td>
-                                            </tr>
-                                        ";
-                                    } 
-                                ?>
                             </tbody>
                         </table>
                     </div>
@@ -51,15 +34,13 @@
 <script>
      $(document).ready(function() {
         $('#tablaUsuariosPermisos').DataTable({
-            /*
             "ajax": {
                 "method": "POST",
-                "url": '<?php echo base_url('conf-general/admin-permisos/tabla/usuarios/permiso'); ?>',
+                "url": '<?php echo base_url('conf-general/admin-permisos/tabla/modulos/permiso/usuarios'); ?>',
                 "data": {
-                    x : 0
+                    menuPermisoId : '<?= $menuPermisoId; ?>'
                 }
             },
-            */
             "columnDefs": [
                 { "width": "10%", "targets": 0 }, 
                 { "width": "40%", "targets": 1 }, 
@@ -75,4 +56,3 @@
         });
     });
 </script>
-<?= $this->endSection(); ?>

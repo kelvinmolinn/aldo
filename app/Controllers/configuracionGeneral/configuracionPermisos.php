@@ -17,20 +17,20 @@ class ConfiguracionPermisos extends Controller
             return view('login');
         } else {
     
-        $data['menu'] = $menu;
-        $data['menuId'] = $menuId;
+            $data['menu'] = $menu;
+            $data['menuId'] = $menuId;
 
-        $menus = new conf_menus();
+            $menus = new conf_menus();
 
-        $datos = $menus->select('conf_modulos.modulo,conf_modulos.moduloId')
-        ->join('conf_modulos', 'conf_modulos.moduloId = conf_menus.moduloId')
-        ->where('conf_menus.flgElimina', 0)
-        ->where('conf_menus.menuId', $menuId)
-        ->first();
-        //$modeloModulos = consulta hacia menus con jOIN a modulos
-        $data['modulo'] = $datos;
-        // $data['moduloId']
-        return view('configuracion-general/vistas/administracionPermisos', $data);
+            $datos = $menus->select('conf_modulos.modulo,conf_modulos.moduloId')
+                           ->join('conf_modulos', 'conf_modulos.moduloId = conf_menus.moduloId')
+                           ->where('conf_menus.flgElimina', 0)
+                           ->where('conf_menus.menuId', $menuId)
+                           ->first();
+            //$modeloModulos = consulta hacia menus con jOIN a modulos
+            $data['modulo'] = $datos;
+            // $data['moduloId']
+            return view('configuracion-general/vistas/administracionPermisos', $data);
         }
     }
 
@@ -38,11 +38,11 @@ class ConfiguracionPermisos extends Controller
     {
         $mostrarPermisos = new conf_menu_permisos();
         $datos = $mostrarPermisos
-        ->select('conf_menus.menu, conf_menu_permisos.menuPermisoId, conf_menu_permisos.menuPermiso, conf_menu_permisos.descripcionMenuPermiso')
-        ->join('conf_menus', 'conf_menus.menuId = conf_menu_permisos.menuId')
-        ->where('conf_menu_permisos.flgElimina', 0)
-        ->where('conf_menu_permisos.menuId', $this->request->getPost('menuId'))
-        ->findAll();
+          ->select('conf_menus.menu, conf_menu_permisos.menuPermisoId, conf_menu_permisos.menuPermiso, conf_menu_permisos.descripcionMenuPermiso')
+          ->join('conf_menus', 'conf_menus.menuId = conf_menu_permisos.menuId')
+          ->where('conf_menu_permisos.flgElimina', 0)
+          ->where('conf_menu_permisos.menuId', $this->request->getPost('menuId'))
+          ->findAll();
     
         // Construye el array de salida
         $output['data'] = array();
@@ -84,6 +84,7 @@ class ConfiguracionPermisos extends Controller
             return $this->response->setJSON(array('data' => '')); // No hay datos, devuelve un array vacío
         }
     }
+
     public function modalPermiso()
     {
         $operacion = $this->request->getPost('operacion');
@@ -91,9 +92,9 @@ class ConfiguracionPermisos extends Controller
             $menuPermisoId = $this->request->getPost('menuPermisoId');
             $permisos = new conf_menu_permisos();
             $data['campos'] = $permisos->select('conf_menus.menu,conf_menu_permisos.menuPermisoId,conf_menu_permisos.menuId,conf_menu_permisos.menuPermiso, conf_menu_permisos.descripcionMenuPermiso')
-            ->join('conf_menus', 'conf_menus.menuId = conf_menu_permisos.menuId')
-            ->where('conf_menu_permisos.flgElimina', 0)
-            ->where('conf_menu_permisos.menuPermisoId', $menuPermisoId)->first();
+                                        ->join('conf_menus', 'conf_menus.menuId = conf_menu_permisos.menuId')
+                                        ->where('conf_menu_permisos.flgElimina', 0)
+                                        ->where('conf_menu_permisos.menuPermisoId', $menuPermisoId)->first();
         } else {
             $data['campos'] = [
                 'menuPermisoId'             => 0,
@@ -143,6 +144,7 @@ class ConfiguracionPermisos extends Controller
             ]);
         }
     }
+
     public function eliminarPermiso(){
         //$data['sucursalUsuarioId'] = $sucursalUsuarioId;
 
@@ -171,21 +173,32 @@ class ConfiguracionPermisos extends Controller
         
         $mostrarUsuariosPermiso = new conf_roles_permisos();
         $menuPermisoId = $this->request->getPost('menuPermisoId');
+        $data['menuPermisoId'] = $menuPermisoId;
+        
+        return view('configuracion-general/modals/modalUsuariosPermisos', $data);
+    }
 
+    public function tablaPermisosUsuarios()
+    {
+
+        $mostrarUsuariosPermiso = new conf_roles_permisos();
+        $menuPermisoId = $this->request->getPost('menuPermisoId');
+        
         $datos = $mostrarUsuariosPermiso
-        ->select('conf_roles.rol,conf_empleados.primerNombre,conf_empleados.segundoNombre,conf_empleados.primerApellido,conf_empleados.segundoApellido')
-        ->join('conf_roles', 'conf_roles.rolId = conf_roles_permisos.rolId')
-        ->join('conf_menu_permisos', 'conf_menu_permisos.menuPermisoId = conf_roles_permisos.menuPermisoId')
-        ->join('conf_usuarios', 'conf_usuarios.rolId = conf_roles.rolId')
-        ->join('conf_empleados', 'conf_empleados.empleadoId = conf_usuarios.empleadoId')
-        ->where('conf_roles_permisos.flgElimina', 0)
-        ->where('conf_roles_permisos.menuPermisoId', $menuPermisoId)
-        ->findAll();
+            ->select('conf_roles.rol,conf_empleados.primerNombre,conf_empleados.segundoNombre,conf_empleados.primerApellido,conf_empleados.segundoApellido')
+            ->join('conf_roles', 'conf_roles.rolId = conf_roles_permisos.rolId')
+            ->join('conf_menu_permisos', 'conf_menu_permisos.menuPermisoId = conf_roles_permisos.menuPermisoId')
+            ->join('conf_usuarios', 'conf_usuarios.rolId = conf_roles.rolId')
+            ->join('conf_empleados', 'conf_empleados.empleadoId = conf_usuarios.empleadoId')
+            ->where('conf_roles_permisos.flgElimina', 0)
+            ->where('conf_roles_permisos.menuPermisoId', $menuPermisoId)
+            ->findAll();
         // Construye el array de salida
         $data['data'] = array();
-        $n = 1; // Variable para contar las filas
-            $columna1 = $n;
-            $columna2 = "<b>Empleados: </b>";
+        $n = 0;
+        foreach($datos as $data) {
+            $columna1 = ($n + 1);
+            $columna2 = "<b>Empleados: </b>" . $data["primerNombre"];
             $columna3 = "<b>Rol: </b>";
             // Aquí puedes construir tus botones en la última columna  
             // Agrega la fila al array de salida
@@ -194,11 +207,16 @@ class ConfiguracionPermisos extends Controller
                 $columna2,
                 $columna3
             );
-    
             $n++;
-       
+        }
         
-        return view('configuracion-general/modals/modalUsuariosPermisos', $data);
+
+        // Verifica si hay datos
+        if ($n > 1) {
+            return $this->response->setJSON($data);
+        } else {
+            return $this->response->setJSON(array('data' => '')); // No hay datos, devuelve un array vacío
+        }
     }
     
 }

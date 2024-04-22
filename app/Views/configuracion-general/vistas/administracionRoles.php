@@ -26,6 +26,53 @@
     </table>
 </div>
 <script>
+    function eliminarRol(id) {
+    //alert("Vamos a eliminar " + id);
+        Swal.fire({
+            title: '¿Estás seguro que desea eliminar el ROl?',
+            text: "Se eiminara el Rol seleccionado.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Si el usuario confirma, enviar la solicitud AJAX para eliminar el usuario de la sucursal
+                    $.ajax({
+                        url: '<?php echo base_url('conf-general/admin-roles/operacion/eliminar/rol'); ?>',
+                        type: 'POST',
+                        data: {
+                            rolId: id
+                        },
+                        success: function(response) {
+                            console.log(response);
+                            if (response.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Rol eliminado con Éxito!',
+                                    text: response.mensaje
+                                }).then((result) => {
+                                    $("#tablaRoles").DataTable().ajax.reload(null, false);
+                                });
+                            } else {
+                                // Insert fallido, mostrar mensaje de error
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: response.mensaje
+                                });
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            // Manejar errores si los hay
+                            console.error(xhr.responseText);
+                        }
+                    });
+            }
+        });
+    }
     function modalRoles(rolId,operacion) {
         // Realizar una petición AJAX para obtener los datos del módulo por su ID
         $.ajax({

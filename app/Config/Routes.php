@@ -58,6 +58,11 @@ $routes->group('conf-general/admin-roles', function($routes) {
     $routes->get('index', 'configuracionGeneral\AdministracionRoles::index');
     $routes->post('tabla/roles',  'configuracionGeneral\AdministracionRoles::tablaRoles');
     $routes->post('form/nuevo/rol', 'configuracionGeneral\AdministracionRoles::modalRol');
+    $routes->post('operacion/guardar/rol', 'configuracionGeneral\AdministracionRoles::modalRolOperacion');
+    $routes->post('operacion/eliminar/rol', 'configuracionGeneral\AdministracionRoles::eliminarRol');
+    $routes->get('vista/permisos/rol/(:any)', 'configuracionGeneral\AdministracionRoles::menusModulos/$1');
+    $routes->post('tabla/permisos/rol',  'configuracionGeneral\AdministracionRoles::tablaPermisosRol');
+
 });
 
 $routes->group('conf-general/admin-modulos', function($routes) {
@@ -72,7 +77,6 @@ $routes->group('conf-general/admin-modulos', function($routes) {
     $routes->post('operacion/eliminar/menu', 'configuracionGeneral\AdministracionPermisos::eliminarMenu');
     $routes->post('tabla/modulos',  'configuracionGeneral\AdministracionPermisos::tablaModulos');
     $routes->post('tabla/modulos/menus',  'configuracionGeneral\AdministracionPermisos::tablaModulosMenus');
-    //Llamada en HTML: conf-general/admin-usuarios/vista,sucursales,modal/usuario,tabla/usuarios
 });
 
 $routes->group('conf-general/admin-permisos', function($routes) {
@@ -83,6 +87,7 @@ $routes->group('conf-general/admin-permisos', function($routes) {
     $routes->post('operacion/guardar/permisos', 'configuracionGeneral\ConfiguracionPermisos::modalPermisosOperacion');
     $routes->post('operacion/eliminar/permiso', 'configuracionGeneral\ConfiguracionPermisos::eliminarPermiso');
     $routes->post('tabla/usuarios/permiso', 'configuracionGeneral\ConfiguracionPermisos::modalUsuariosPermisos');
+    $routes->post('tabla/modulos/permiso/usuarios',  'configuracionGeneral\ConfiguracionPermisos::tablaPermisosUsuarios');
 
 });
 
