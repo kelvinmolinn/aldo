@@ -184,10 +184,9 @@ class ConfiguracionPermisos extends Controller
         // Construye el array de salida
         $data['data'] = array();
         $n = 1; // Variable para contar las filas
-       foreach($datos as $columna){
             $columna1 = $n;
-            $columna2 = "<b>Empleados: </b>".$columna['primerNombre'] ."<br>";
-            $columna3 = "<b>Rol: </b>" .$columna['rol'];
+            $columna2 = "<b>Empleados: </b>";
+            $columna3 = "<b>Rol: </b>";
             // Aquí puedes construir tus botones en la última columna  
             // Agrega la fila al array de salida
             $data['data'][] = array(
@@ -197,7 +196,7 @@ class ConfiguracionPermisos extends Controller
             );
     
             $n++;
-       }
+       
         
         return view('configuracion-general/modals/modalUsuariosPermisos', $data);
     }

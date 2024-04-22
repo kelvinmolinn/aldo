@@ -54,6 +54,10 @@ $routes->group('conf-general/admin-usuarios', function($routes) {
     //Llamada en HTML: conf-general/admin-usuarios/vista,sucursales,modal/usuario,tabla/usuarios
 });
 
+$routes->group('conf-general/admin-roles', function($routes) {
+    $routes->get('index', 'configuracionGeneral\AdministracionUsuarios::index');
+});
+
 $routes->group('conf-general/admin-modulos', function($routes) {
     // Definir las rutas específicas para el grupo 'admin'
     $routes->get('index', 'configuracionGeneral\AdministracionPermisos::configuracionModulos');
