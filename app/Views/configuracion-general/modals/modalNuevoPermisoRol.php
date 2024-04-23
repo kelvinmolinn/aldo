@@ -18,8 +18,9 @@
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="form-outline">
-                                <input type="text" class="form-control " id="descripcionPermiso" name="descripcionPermiso" placeholder="Descripción" required>
+                            <div class="form-select-control">
+                                <select name="menuPermiso[]" id="menuPermiso" style="width: 100%;" multiple>
+                                </select>
                             </div>
                         </div>
                     </div>
@@ -44,10 +45,39 @@
         $("#menu").select2({
             placeholder: 'Menus'
         });
+        $("#menuPermiso").select2({
+            placeholder: 'Permisos'
+        });
+
+        $('#menu').on('change', function() {
+            var menuId = $(this).val();
+            if (menuId) {
+                // Realizar una petición AJAX para obtener los permisos relacionados con el menú seleccionado
+                $.ajax({
+                    url: '<?php echo base_url('conf-general/admin-permisos/obtener/permisos/select'); ?>',
+                    type: "POST",
+                    dataType: "json",
+                    data: {menuId: menuId}
+                }).done(function(data){
+                    $(`#menuPermiso`).empty();
+                    $(`#menuPermiso`).append("<option></option>");
+                    for (let i = 0; i < data.length; i++){
+                        $(`#menuPermiso`).append($('<option>', {
+                            value: data[i]['valor'],
+                            text: data[i]['texto']
+                        }));
+                    }
+                });
+            } else {
+                // Limpiar el select de permisos si no se ha seleccionado ningún menú
+                $('#menuPermiso').html('<option value=""></option>');
+            }
+        });
+
         $('#btnguardar').on('click', function() {
             // Realizar una petición AJAX para obtener el contenido de la modal
             $.ajax({
-                url: '<?php echo base_url('conf-general/admin-permisos/operacion/guardar/permisos'); ?>',
+                url: '<?php echo base_url('conf-general/admin-permisos/operacion/insert/permisos/menus'); ?>',
                 type: 'POST',
                 data: $("#frmModal").serialize(),
                 success: function(response) {

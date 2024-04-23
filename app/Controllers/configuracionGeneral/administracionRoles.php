@@ -5,6 +5,7 @@ namespace App\Controllers\configuracionGeneral;
 use CodeIgniter\Controller;
 use App\Models\conf_roles;
 use App\Models\conf_menus;
+use App\Models\conf_menu_permisos;
 
 class AdministracionRoles extends Controller
 {
@@ -20,7 +21,8 @@ class AdministracionRoles extends Controller
             return view('configuracion-general/vistas/administracionRoles', $data);
         }
     }
-    public function tablaRoles(){
+    public function tablaRoles()
+    {
 
         $mostrarRoles = new conf_roles();
         $rolId = $this->request->getPost('rolId');
@@ -124,7 +126,8 @@ class AdministracionRoles extends Controller
             ]);
         }
     }
-    public function eliminarRol(){
+    public function eliminarRol()
+    {
         //$data['sucursalUsuarioId'] = $sucursalUsuarioId;
 
         $roles = new conf_roles();
@@ -157,7 +160,8 @@ class AdministracionRoles extends Controller
         return view('configuracion-general/vistas/pagePermisosRoles', $data);
     }
 
-    public function tablaPermisosRol(){
+    public function tablaPermisosRol()
+    {
         $n = 1;
 
             $columna1 = $n;
@@ -185,16 +189,4 @@ class AdministracionRoles extends Controller
         }
     }
 
-    public function modalNuevoPermiso(){
-
-        $menus = new conf_menus();
-
-        $data['menu'] = $menus
-            ->select('menuId, menu')
-            ->where('flgElimina', 0)
-            ->findAll();
-
-        return view('configuracion-general/modals/modalNuevoPermisoRol',$data);
-    }
-    
 }

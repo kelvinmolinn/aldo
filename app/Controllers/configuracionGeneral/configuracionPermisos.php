@@ -222,5 +222,84 @@ class ConfiguracionPermisos extends Controller
             return $this->response->setJSON(array('data' => '')); // No hay datos, devuelve un array vacío
         }
     }
+
+    public function modalNuevoPermiso(){
+
+        $menus = new conf_menus();
+
+        $data['menu'] = $menus
+            ->select('menuId, menu')
+            ->where('flgElimina', 0)
+            ->findAll();
+
+        return view('configuracion-general/modals/modalNuevoPermisoRol',$data);
+    }
     
+    public function obtenerPermisos() {
+        $menuId = $this->request->getPost('menuId');
+
+        $permisos = new conf_menu_permisos();
+
+        $datos = $permisos
+            ->select('menuPermisoId, menuPermiso')
+            ->where('flgElimina', 0)
+            ->where('menuId', $menuId)
+            ->findAll();
+        /*
+        // Generar las opciones HTML para los permisos
+        $options = '<option value=""></option>';
+        foreach ($datos as $permiso) {
+            $options .= '<option value="' . $permiso['menuPermisoId'] . '">' . $permiso['menuPermiso'] . '</option>';
+        }
+
+        // Devolver las opciones generadas como respuesta
+        echo $options;
+        */
+       $opcionesSelect = array();
+
+        $n = 0;
+        foreach($datos as $permiso){
+            $n += 1;
+            $opcionesSelect[] = array("valor" => $permiso['menuPermisoId'], "texto" => $permiso['menuPermiso']);
+        }
+        
+        if ($n > 0) {
+            echo json_encode($opcionesSelect);
+        }else{
+            echo json_encode(array('data'=>''));
+        }
+    }
+    
+     public function permisosMenusOperacion()
+    {
+        $menu  = $this->request->getPost('menu');
+        $menuPermiso     = $this->request->getPost('menuPermiso');
+        
+        $permisos = new conf_menu_permisos();
+
+
+        $data = [
+            'menuId'                    => $menuId,
+            'menuPermiso'               => $this->request->getPost('nombrePermiso'),
+            'descripcionMenuPermiso'    => $this->request->getPost('descripcionPermiso')
+        ];
+
+            // Insertar datos en la base de datos
+            $operacionPermiso = $permisos->insert($data);
+        
+        if ($operacionPermiso) {
+            // Si el insert fue exitoso, devuelve el último ID insertado
+            return $this->response->setJSON([
+                'success' => true,
+                'mensaje' => 'Menu '.($operacion == 'editar' ? 'actualizado' : 'agregado').' correctamente',
+                'menuPermisoId' => ($operacion == 'editar' ? $this->request->getPost('menuPermisoId') : $permisos->insertID())
+            ]);
+        } else {
+            // Si el insert falló, devuelve un mensaje de error
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'No se pudo insertar el menu'
+            ]);
+        }
+    }
 }
