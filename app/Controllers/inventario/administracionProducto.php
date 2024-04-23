@@ -7,6 +7,7 @@ use App\Models\inv_productos;
 use App\Models\cat_unidades_medida;
 use App\Models\inv_productos_tipo;
 use App\Models\inv_productos_plataforma;
+use App\Models\conf_sucursales;
 
 class AdministracionProducto extends Controller
 {
@@ -72,19 +73,11 @@ class AdministracionProducto extends Controller
         return view('inventario/modals/modalAdministracionProducto', $data);
     }
 
-    public function modalAdministracionPrecio()
-    { 
-    
-
-    
-        return view('inventario/modals/modalAdministracionPrecio');
-    }
-
     public function tablaProducto()
     {
         $mostrarProducto = new inv_productos();
         $datos = $mostrarProducto
-        ->select('inv_productos.productoId,inv_productos.codigoProducto,inv_productos.producto,inv_productos.descripcionProducto,inv_productos.existenciaMinima,inv_productos.estadoProducto,inv_productos_plataforma.productoPlataformaId,inv_productos_tipo.productoTipoId,inv_productos_tipo.productoTipo,cat_unidades_medida.unidadMedidaId')
+        ->select('inv_productos.productoId,inv_productos.codigoProducto,inv_productos.producto,inv_productos.descripcionProducto,inv_productos.existenciaMinima,inv_productos.estadoProducto,inv_productos_plataforma.productoPlataformaId,inv_productos_plataforma.productoPlataforma,inv_productos_tipo.productoTipoId,inv_productos_tipo.productoTipo,cat_unidades_medida.unidadMedidaId')
         ->join('inv_productos_tipo', 'inv_productos_tipo.productoTipoId = inv_productos.productoTipoId')
         ->join('inv_productos_plataforma', 'inv_productos_plataforma.productoPlataformaId = inv_productos.productoPlataformaId')
         ->join('cat_unidades_medida', 'cat_unidades_medida.unidadMedidaId = inv_productos.unidadMedidaId')
@@ -98,7 +91,7 @@ class AdministracionProducto extends Controller
             // Aquí construye tus columnas
             $columna1 = $n;
             $columna2 = "<b>Codigo:</b> " . $columna['codigoProducto']."<br>"."<b>Producto:</b> " . $columna['producto']."<br>"."<b>Estado:</b> " . $columna['estadoProducto'];
-            $columna3 = "<b>Tipo Producto:</b> " . $columna['productoTipo']."<br>"."<b>Plataforma:</b> " . $columna['producto']."<br>"."<b>Descripción:</b> " . $columna['descripcionProducto'];
+            $columna3 = "<b>Tipo Producto:</b> " . $columna['productoTipo']."<br>"."<b>Plataforma:</b> " . $columna['productoPlataforma']."<br>"."<b>Descripción:</b> " . $columna['descripcionProducto'];
             $columna4 = "<b>Sin IVA:</b> "."<br>"."<b>Con IVA:</b> ";
 
             // Aquí puedes construir tus botones en la última columna
@@ -126,13 +119,13 @@ class AdministracionProducto extends Controller
             <i class="fas fa-clock"></i>
         </button>
     ';
-
+/* 
         $columna5 .= '
                 <button class="btn btn-danger mb-1" onclick="eliminarProducto(`'.$columna['productoId'].'`);" data-toggle="tooltip" data-placement="top" title="Eliminar">
                     <i class="fas fa-trash"></i>
                 </button>
             ';
-
+*/
         $columna5 .= '
                 <button class="btn btn-danger mb-1" onclick="desactivarProducto(`'.$columna['productoId'].'`);" data-toggle="tooltip" data-placement="top" title="Desactivar">
                     <i class="fas fa-ban"></i>
@@ -253,6 +246,56 @@ class AdministracionProducto extends Controller
             ]);
         }
       }
+    }
+
+    public function modalAdministracionPrecio()
+    { 
+    
+
+    
+        return view('inventario/modals/modalAdministracionPrecio');
+    }
+
+
+    public function modalAdministracionExistencia()
+{ 
+
+           // Cargar el modelos
+        $productoModel = new inv_productos();
+        $sucursalesModel = new conf_sucursales();
+
+        $data['producto'] = $productoModel->where('flgElimina', 0)->findAll();
+        $data['sucursales'] = $sucursalesModel->where('flgElimina', 0)->findAll();
+        $operacion = $this->request->getPost('operacion');
+        $data['productoId'] = $this->request->getPost('productoId');
+        $data['sucursalId'] = $this->request->getPost('sucursalId');
+
+        if($operacion == 'editar') {
+            $productoExistenciaId = $this->request->getPost('productoExistenciaId');
+            $existenciaProducto = new inv_productos_existencias();
+
+             // seleccionar solo los campos que estan en la modal (solo los input y select)
+            $data['campos'] = $producto->select('inv_productos_existencias.productoExistenciaId,inv_productos_existencias.existenciaProducto,inv_productos_existencias.existenciaReservada,inv_productos.productoId,inv_productos.producto,conf_sucursales.sucursalId,conf_sucursales.sucursal')
+
+            ->join('inv_productos', 'inv_productos.productoId = inv_productos_existencias.productoId')
+            ->join('conf_sucursales', 'conf_sucursales.sucursalId = inv_productos_existencias.sucursalId')
+            ->where('inv_productos_existencias.flgElimina', 0)
+            ->where('inv_productos_existencias.productoExistenciaId', $productoExistenciaId)->first();
+        } else {
+
+             // formar los campos que estan en la modal (input y select) con el nombre equivalente en la BD
+            $data['campos'] = [
+                'productoExistenciaId'    => 0,
+                'productoId'              => '',
+                'sucursalId'              => '',
+                'existenciaProducto'      => '',
+                'existenciaReservada'     => ''
+
+            ];
+        }
+        $data['operacion'] = $operacion;
+
+        return view('inventario/modals/modalAdministracionExistencia', $data);
     }
 
 

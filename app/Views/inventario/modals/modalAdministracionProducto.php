@@ -31,14 +31,14 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div class="form-outline">
-                              <textarea name="descripcionProducto" id="descripcionProducto" class="form-control " style="width: 100%;" placeholder="Descripción del producto"></textarea>
+                              <textarea name="descripcionProducto" id="descripcionProducto" class="form-control " style="width: 100%;" placeholder="Descripción del producto" value="<?= $campos['descripcionProducto']; ?>" required></textarea>
                             </div>
                         </div>
                     </div> <br>
                     <div class="row">
                         <div class="col-md-4">
                             <div class="form-outline">
-                                <input type="date" id="fechaInicioInventario" name="fechaInicioInventario" class="form-control " required>
+                                <input type="date" id="fechaInicioInventario" name="fechaInicioInventario" class="form-control" required>
                             </div>
                         </div>
                         <div class="col-md-4">
@@ -75,7 +75,7 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-outline">
-                                <input type="number" id="existenciaMinima" name="existenciaMinima" class="form-control " placeholder="Existencia minima"  required>
+                                <input type="number" id="existenciaMinima" name="existenciaMinima" class="form-control " placeholder="Existencia minima" value="<?= $campos['existenciaMinima']; ?>"  required>
                             </div>
                         </div>
                         <div class="col-md-4">
@@ -159,5 +159,9 @@ $(document).ready(function() {
             }
         });
     });
+
+    $("#productoTipoId").val('<?= $campos["productoTipoId"]; ?>').trigger("change");
+    $("#productoPlataformaId").val('<?= $campos["productoPlataformaId"]; ?>').trigger("change");
+    $("#unidadMedidaId").val('<?= $campos["unidadMedidaId"]; ?>').trigger("change");
 });
 </script>
