@@ -51,7 +51,7 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div class="form-outline">
-                                <input type="number" id="existenciaReservada" name="existenciaReservada" class="form-control " placeholder="Existencia reservada" value="0">
+                                <input type="number" id="existenciaReservada" name="existenciaReservada" class="form-control " placeholder="Existencia reservada" value="<?= $campos['existenciaReservada']; ?>" required>
                             </div>
                         </div>
                     </div> <br>
