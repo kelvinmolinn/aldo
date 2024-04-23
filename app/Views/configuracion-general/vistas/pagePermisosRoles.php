@@ -14,9 +14,9 @@
         </button>
     </div>
     <div class="col-md-6 text-right">
-        <button type= "button" id="btnAbrirModal" class="btn btn-primary estilo-btn" onclick="">
+        <button type= "button" id="btnNuevoPermiso" class="btn btn-primary estilo-btn">
             <i class="fas fa-save"></i>
-            Nuevo menú
+            Nuevo permiso
         </button>
     </div>
 </div>
@@ -39,6 +39,29 @@
             // Redireccionar a la URL correspondiente
             window.location.href = '<?php echo base_url('conf-general/admin-roles/index'); ?>';
         });
+        $('#btnNuevoPermiso').on('click', function() {
+            // Realizar una petición AJAX para obtener el contenido de la modal
+            $.ajax({
+                url: '<?php echo base_url('conf-general/admin-roles/form/nuevo/permiso'); ?>',
+                type: 'GET',
+                success: function(response) {
+                    // Insertar el contenido de la modal en el cuerpo de la modal
+                    $('#divModalContent').html(response);
+                    // Mostrar la modal
+                    $('#modalNuevoPermisos').modal('show');
+                   
+                    // Mostrar la modal sin permitir cierre al hacer clic fuera o al presionar "Esc"
+                    $('#modalNuevoPermisos').modal({
+                        backdrop: 'static',
+                        keyboard: false
+                    });
+                },
+                error: function(xhr, status, error) {
+                    // Manejar errores si los hay
+                    console.error(xhr.responseText);
+                }
+            });
+        });
         $('#tblPermisosMenus').DataTable({
             "ajax": {
                 "method": "POST",
@@ -51,11 +74,10 @@
             "columnDefs": [
                 { "width": "10%"}, 
                 { "width": "40%"}, 
-                { "width": "35%"}, 
-                { "width": "15%"}  
+                { "width": "35%"}
             ],
             "language": {
-                "url": "../../../assets/plugins/datatables/js/spanish.json"
+                "url": "../../../../../../../assets/plugins/datatables/js/spanish.json"
             },
             "drawCallback": function(settings) {
                 // Inicializar tooltips de Bootstrap después de cada dibujo de la tabla

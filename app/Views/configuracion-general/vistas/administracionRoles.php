@@ -29,7 +29,7 @@
     function eliminarRol(id) {
     //alert("Vamos a eliminar " + id);
         Swal.fire({
-            title: '¿Estás seguro que desea eliminar el ROl?',
+            title: '¿Estás seguro que desea eliminar el Rol?',
             text: "Se eiminara el Rol seleccionado.",
             icon: 'warning',
             showCancelButton: true,

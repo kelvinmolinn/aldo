@@ -53,7 +53,7 @@ class ConfiguracionPermisos extends Controller
             $columna2 = "<b>Permiso: </b>" . $columna['menuPermiso'] . "<br>" . "<b>Descripción: </b>" . $columna['descripcionMenuPermiso'];
             // Aquí puedes construir tus botones en la última columna
             $columna3 = '
-                <button class="btn btn-primary mb-1" onclick="modalUsuariosPermisos(`'.$columna['menuPermisoId'].'`)" data-toggle="tooltip" data-placement="top" title="usuarios">
+                <button class="btn btn-primary mb-1" onclick="modalUsuariosPermisos(`'.$columna['menuPermisoId'].'`,`'.$columna['menu'].'`,`'.$columna['menuPermiso'].'`)" data-toggle="tooltip" data-placement="top" title="usuarios">
                     <i class="fas fa-user-tie"></i>
                 </button>
             ';
@@ -173,7 +173,11 @@ class ConfiguracionPermisos extends Controller
         
         $mostrarUsuariosPermiso = new conf_roles_permisos();
         $menuPermisoId = $this->request->getPost('menuPermisoId');
+        $menu = $this->request->getPost('menu');
+        $menuPermiso = $this->request->getPost('menuPermiso');
         $data['menuPermisoId'] = $menuPermisoId;
+        $data['menu'] = $menu;
+        $data['menuPermiso'] = $menuPermiso;
         
         return view('configuracion-general/modals/modalUsuariosPermisos', $data);
     }
@@ -195,11 +199,11 @@ class ConfiguracionPermisos extends Controller
             ->findAll();
         // Construye el array de salida
         $data['data'] = array();
-        $n = 0;
-        foreach($datos as $data) {
-            $columna1 = ($n + 1);
-            $columna2 = "<b>Empleados: </b>" . $data["primerNombre"];
-            $columna3 = "<b>Rol: </b>";
+        $n = 1;
+        foreach($datos as $campos) {
+            $columna1 = $n;
+            $columna2 = "<b>Empleados: </b>" . $campos["primerNombre"]." ". $campos["segundoNombre"]." ". $campos["primerApellido"]." ". $campos["segundoApellido"];
+            $columna3 = "<b>Rol: </b>". $campos["rol"];
             // Aquí puedes construir tus botones en la última columna  
             // Agrega la fila al array de salida
             $data['data'][] = array(

@@ -104,14 +104,16 @@
         });
     }
 
-    function modalUsuariosPermisos(id) {
+    function modalUsuariosPermisos(id,menu,menuPermiso) {
         // Realizar una petición AJAX para obtener los datos del módulo por su ID
         
         $.ajax({
                 url: '<?php echo base_url('conf-general/admin-permisos/tabla/usuarios/permiso'); ?>',
                 type: 'POST',
                 data: {
-                    menuPermisoId: id
+                    menuPermisoId: id,
+                    menu: menu,
+                    menuPermiso: menuPermiso
                 }, // Pasar el ID del módulo como parámetro
                 success: function(response) {
                     console.log(response);

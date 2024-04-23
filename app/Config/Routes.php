@@ -62,6 +62,7 @@ $routes->group('conf-general/admin-roles', function($routes) {
     $routes->post('operacion/eliminar/rol', 'configuracionGeneral\AdministracionRoles::eliminarRol');
     $routes->get('vista/permisos/rol/(:any)', 'configuracionGeneral\AdministracionRoles::menusModulos/$1');
     $routes->post('tabla/permisos/rol',  'configuracionGeneral\AdministracionRoles::tablaPermisosRol');
+    $routes->get('form/nuevo/permiso', 'configuracionGeneral\AdministracionRoles::modalNuevoPermiso');
 
 });
 

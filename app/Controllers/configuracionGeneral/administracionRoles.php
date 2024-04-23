@@ -4,6 +4,7 @@ namespace App\Controllers\configuracionGeneral;
 
 use CodeIgniter\Controller;
 use App\Models\conf_roles;
+use App\Models\conf_menus;
 
 class AdministracionRoles extends Controller
 {
@@ -182,6 +183,18 @@ class AdministracionRoles extends Controller
         } else {
             return $this->response->setJSON(array('data' => '')); // No hay datos, devuelve un array vacío
         }
+    }
+
+    public function modalNuevoPermiso(){
+
+        $menus = new conf_menus();
+
+        $data['menu'] = $menus
+            ->select('menuId, menu')
+            ->where('flgElimina', 0)
+            ->findAll();
+
+        return view('configuracion-general/modals/modalNuevoPermisoRol',$data);
     }
     
 }
