@@ -6,7 +6,7 @@
     }
 ?>
 
-<form id="frmModal"  method="POST">
+<form id="frmModal"  action="<?= base_url('inventario/admin-producto/operacion/guardar/existencia')?>" method="POST">
     <div id="modalExistencia" class="modal" tabindex="-1" data-backdrop="static" data-keyboard="false">
         <div class="modal-dialog  modal-lg">
             <div class="modal-content">
@@ -40,6 +40,22 @@
                             </div>
                         </div>
                     </div> <br>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-outline">
+                                <input type="number" id="existenciaProducto" name="existenciaProducto" class="form-control " placeholder="Existencia de producto" value="<?= $campos['existenciaProducto']; ?>" required>
+                            </div>
+                        </div>
+                    </div> <br>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-outline">
+                                <input type="number" id="existenciaReservada" name="existenciaReservada" class="form-control " placeholder="Existencia reservada" value="<?= $campos['existenciaReservada']; ?>" required>
+                            </div>
+                        </div>
+                    </div> <br>
+
                    
                 </div>
                 <div class="modal-footer">
@@ -72,7 +88,7 @@ $(document).ready(function() {
     $('#btnGuardarExistencia').on('click', function() {
         // Realizar una petición AJAX para obtener el contenido de la modal
         $.ajax({
-            url: '<?php echo base_url('inventario/admin-producto/operacion/guardar/producto'); ?>',
+            url: '<?php echo base_url('inventario/admin-producto/operacion/guardar/existencia'); ?>',
             type: 'POST',
             data: $("#frmModal").serialize(),
             success: function(response) {
@@ -98,7 +114,7 @@ $(document).ready(function() {
                     Swal.fire({
                         icon: 'error',
                         title: 'Error de validación',
-                        text: 'El Codigo de producto ya está registrado en la base de datos o Hay algun dato incompleto, Verifique las validaciones!'
+                        text: 'Hay algun dato incompleto o erroneo, Verifique las validaciones!'
                     });
                 }
             },

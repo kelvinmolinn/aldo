@@ -131,6 +131,7 @@ $routes->group('inventario/admin-producto', function($routes) {
     $routes->post('tabla/producto',  'inventario\AdministracionProducto::tablaProducto');
     $routes->post('operacion/eliminar/producto', 'inventario\AdministracionProducto::eliminarProducto');
     $routes->post('operacion/guardar/producto', 'inventario\AdministracionProducto::modalProductoOperacion');
+    $routes->post('operacion/guardar/existencia', 'inventario\AdministracionProducto::modalExistenciaOperacion');
     //
 });
 

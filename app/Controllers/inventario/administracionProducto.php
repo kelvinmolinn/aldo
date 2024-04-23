@@ -8,6 +8,7 @@ use App\Models\cat_unidades_medida;
 use App\Models\inv_productos_tipo;
 use App\Models\inv_productos_plataforma;
 use App\Models\conf_sucursales;
+use App\Models\inv_productos_existencias;
 
 class AdministracionProducto extends Controller
 {
@@ -296,6 +297,68 @@ class AdministracionProducto extends Controller
         $data['operacion'] = $operacion;
 
         return view('inventario/modals/modalAdministracionExistencia', $data);
+    }
+
+        public function modalExistenciaOperacion()
+    {
+        // Establecer reglas de validación
+        $validation = service('validation');
+        $validation->setRules([
+            'productoId'            => 'required',
+            'sucursalId'            => 'required',
+            'existenciaProducto'    => 'required|greater_than[0]',
+            'existenciaReservada'   => 'required|greater_than[-1]'
+        ]);
+    
+        // Ejecutar la validación
+        if (!$validation->withRequest($this->request)->run()) {
+            // Si la validación falla, devolver los errores al cliente
+            return $this->response->setJSON([
+                'success' => false,
+                'errors' => $validation->getErrors()
+            ]);
+        }
+    
+        // Continuar con la operación de inserción o actualización en la base de datos
+        $productoId = $this->request->getPost('productoId');
+        $sucursalId = $this->request->getPost('sucursalId');
+        $existenciaProducto = $this->request->getPost('existenciaProducto');
+        $existenciaReservada = $this->request->getPost('existenciaReservada');
+
+        $operacion = $this->request->getPost('operacion');
+        $productoExistenciaId = $this->request->getPost('productoExistenciaId');
+        $model = new inv_productos_existencias();
+
+
+        $data = [
+            'productoId'                 => $this->request->getPost('productoId'),
+            'sucursalId'                 => $this->request->getPost('sucursalId'),
+            'existenciaProducto'         => $this->request->getPost('existenciaProducto'),
+            'existenciaReservada'        => $this->request->getPost('existenciaReservada')
+        ];
+    
+        if ($operacion == 'editar') {
+            $operacionExistencia = $model->update($this->request->getPost('productoExistenciaId'), $data);
+        } else {
+            // Insertar datos en la base de datos
+            $operacionExistencia = $model->insert($data);
+        }
+    
+        if ($operacionExistencia) {
+            // Si el insert fue exitoso, devuelve el último ID insertado
+            return $this->response->setJSON([
+                'success' => true,
+                'mensaje' => 'Existencia ' . ($operacion == 'editar' ? 'actualizada' : 'agregada') . ' correctamente',
+                'productoExistenciaId' => ($operacion == 'editar' ? $this->request->getPost('productoExistenciaId') : $model->insertID())
+            ]);
+        } else {
+            // Si el insert falló, devuelve un mensaje de error
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'No se pudo insertar la Existencia'
+            ]);
+        }
+      
     }
 
 
