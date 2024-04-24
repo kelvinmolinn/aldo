@@ -169,7 +169,7 @@ class AdministracionRoles extends Controller
         $rolesPermiso = new conf_roles_permisos();
 
         $datos = $rolesPermiso
-            ->select('conf_menus.menu')
+            ->select('conf_menus.menu, conf_menus.menuId, conf_roles_permisos.rolId')
             ->join('conf_menu_permisos', 'conf_menu_permisos.menuPermisoId = conf_roles_permisos.menuPermisoId')
             ->join('conf_menus', 'conf_menus.menuId = conf_menu_permisos.menuId')
             ->where('conf_roles_permisos.flgElimina', 0)
@@ -184,7 +184,7 @@ class AdministracionRoles extends Controller
             $columna2 = "<b>Menú: </b>".$campos['menu'];
             // Aquí puedes construir tus botones en la última columna
             $columna3 = '
-                <button class="btn btn-primary mb-1" onclick="" data-toggle="tooltip" data-placement="top" title="Menús">
+                <button class="btn btn-primary mb-1" onclick="modalPermisosRolMenu(`'.$campos['menuId'].'`,`'.$campos['menu'].'`,`'.$campos['rolId'].'`)" data-toggle="tooltip" data-placement="top" title="Menús">
                     <i class="fas fa-bars nav-icon"></i>
                 </button>
             ';
@@ -204,6 +204,111 @@ class AdministracionRoles extends Controller
         } else {
             return $this->response->setJSON(array('data' => '')); // No hay datos, devuelve un array vacío
         }
+    }
+
+    public function modalNuevoPermiso(){
+
+        $menus = new conf_menus();
+        $data['rol'] = $this->request->getPost('rol');
+        $data['rolId'] = $this->request->getPost('rolId');
+
+        $data['menu'] = $menus
+            ->select('menuId, menu')
+            ->where('flgElimina', 0)
+            ->findAll();
+
+        return view('configuracion-general/modals/modalNuevoPermisoRol',$data);
+    }
+    
+    public function obtenerPermisos() {
+        $menuId = $this->request->getPost('menuId');
+        //$rolId = $this->request->getPost('rolId');
+        $existePermisos = $this->request->getPost('existePermisos');
+
+
+        if($existePermisos == 'Si') {
+            $permisosMenu = new conf_menu_permisos();
+            $datos = $permisosMenu
+                ->select('conf_menu_permisos.menuPermisoId, conf_menu_permisos.menuPermiso')
+                ->where('conf_menu_permisos.flgElimina', 0)
+                ->where('conf_menu_permisos.menuId', $menuId)
+                ->whereNotIn('conf_menu_permisos.menuPermisoId', function($builder) {
+                    $builder->select('conf_roles_permisos.menuPermisoId')
+                            ->from('conf_roles_permisos')
+                            ->where('conf_roles_permisos.rolId', 1)
+                            ->where('conf_roles_permisos.flgElimina', 0)
+                            ->where('conf_roles_permisos.menuPermisoId','conf_menu_permisos.menuPermisoId');
+                })
+                ->findAll();
+            
+        } else {
+            $permisos = new conf_menu_permisos();
+            $datos = $permisos
+                ->select('menuPermisoId, menuPermiso')
+                ->where('flgElimina', 0)
+                ->where('menuId', $menuId)
+                ->findAll();
+        }
+
+       $opcionesSelect = array();
+
+        $n = 0;
+        foreach($datos as $permiso){
+            $n += 1;
+            $opcionesSelect[] = array("valor" => $permiso['menuPermisoId'], "texto" => $permiso['menuPermiso']);
+        }
+        
+        if ($n > 0) {
+            echo json_encode($opcionesSelect);
+        }else{
+            echo json_encode(array('data'=>''));
+        }
+    }
+    
+     public function permisosMenusOperacion()
+    {
+        $menuPermiso    = $this->request->getPost('menuPermiso');
+        $rol            = $this->request->getPost('rol');
+        $rolId          = $this->request->getPost('rolId');
+        
+        $rolesPermiso = new conf_roles_permisos();
+
+
+        $data = [
+            'rolId'                    => $rolId,
+            'menuPermisoId'            => $this->request->getPost('menuPermiso')
+        ];
+
+            // Insertar datos en la base de datos
+            $OperacionRolesPermiso = $rolesPermiso->insert($data);
+        
+        if ($OperacionRolesPermiso) {
+            // Si el insert fue exitoso, devuelve el último ID insertado
+            return $this->response->setJSON([
+                'success' => true,
+                'mensaje' => 'Permiso se agrego correctamente',
+                'rolMenuId' => $rolesPermiso->insertID()
+            ]);
+        } else {
+            // Si el insert falló, devuelve un mensaje de error
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'No se pudo insertar el permiso'
+            ]);
+        }
+    }
+    public function modalPermisosRolMenu(){
+        /*$menus = new conf_menus();
+        $data['rol'] = $this->request->getPost('rol');
+        $data['rolId'] = $this->request->getPost('rolId');
+
+        $data['menu'] = $menus
+            ->select('menuId, menu')
+            ->where('flgElimina', 0)
+            ->findAll();*/
+        $data['menuId'] = $this->request->getPost('menuId');
+
+        return view('configuracion-general/modals/modalPermisosRolMenu',$data);
     }
 
 }

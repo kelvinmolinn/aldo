@@ -11,7 +11,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-select-control">
-                                <select name="menu" id="menu" style="width: 100%;">
+                                <select name="menu" id="menu" style="width: 100%;" required>
                                         <option value=""></option>
                                     <?php foreach ($menu as $menu) { ?>
                                         <option value="<?= $menu['menuId'];?>"><?= $menu['menu'];?></option>
@@ -21,7 +21,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-select-control">
-                                <select name="menuPermiso[]" id="menuPermiso" style="width: 100%;" multiple>
+                                <select name="menuPermiso[]" id="menuPermiso" style="width: 100%;" multiple required>
                                 </select>
                             </div>
                         </div>
@@ -56,10 +56,10 @@
             if (menuId) {
                 // Realizar una petición AJAX para obtener los permisos relacionados con el menú seleccionado
                 $.ajax({
-                    url: '<?php echo base_url('conf-general/admin-permisos/obtener/permisos/select'); ?>',
+                    url: '<?php echo base_url('conf-general/admin-roles/obtener/permisos/select'); ?>',
                     type: "POST",
                     dataType: "json",
-                    data: {menuId: menuId}
+                    data: {menuId: menuId, existePermisos: 'No'}
                 }).done(function(data){
                     $(`#menuPermiso`).empty();
                     $(`#menuPermiso`).append("<option></option>");
@@ -79,7 +79,7 @@
         $('#btnguardar').on('click', function() {
             // Realizar una petición AJAX para obtener el contenido de la modal
             $.ajax({
-                url: '<?php echo base_url('conf-general/admin-permisos/operacion/insert/permisos/menus'); ?>',
+                url: '<?php echo base_url('conf-general/admin-roles/operacion/insert/permisos/menus'); ?>',
                 type: 'POST',
                 data: $("#frmModal").serialize(),
                 success: function(response) {
@@ -92,7 +92,7 @@
                             title: 'Agregado con éxito',
                             text: response.mensaje
                         }).then((result) => {
-                            $("#tablaPermisos").DataTable().ajax.reload(null, false);
+                            $("#tblPermisosMenus").DataTable().ajax.reload(null, false);
                         });
                     } else {
                         // Insert fallido, mostrar mensaje de error con Sweet Alert

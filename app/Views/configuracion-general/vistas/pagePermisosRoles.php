@@ -34,6 +34,23 @@
     </table>
 </div>
 <script>
+    function modalPermisosRolMenu(menuId) {
+        $.ajax({
+            url: '<?php echo base_url('conf-general/admin-roles/form/permisos/rol/menu'); ?>',
+            type: 'POST',
+            data: {menuId: menuId},
+            success: function(response) {
+                
+                $('#divModalContent').html(response);
+                
+                $('#modalPermisosRolMenu').modal('show');
+            },
+            error: function(xhr, status, error) {
+                // Manejar errores si los hay
+                console.error(xhr.responseText);
+            }
+        });
+    }
     $(document).ready(function() {
         $('#btnRegresarRol').on('click', function() {
             // Redireccionar a la URL correspondiente
@@ -42,7 +59,7 @@
         $('#btnNuevoPermiso').on('click', function() {
             // Realizar una petición AJAX para obtener el contenido de la modal
             $.ajax({
-                url: '<?php echo base_url('conf-general/admin-permisos/form/nuevo/permiso/rol'); ?>',
+                url: '<?php echo base_url('conf-general/admin-roles/form/nuevo/permiso/rol'); ?>',
                 type: 'POST',
                 data: {
                     rolId: '<?= $rolId; ?>',
