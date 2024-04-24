@@ -280,9 +280,10 @@ class AdministracionProducto extends Controller
         $productoId = $this->request->getPost('productoId');
         $mostrarProductoExistencia = new inv_productos_existencias();
         $datos = $mostrarProductoExistencia
-        ->select('inv_productos_existencias.productoExistenciaId,inv_productos_existencias.existenciaProducto,inv_productos_existencias.existenciaReservada,conf_sucursales.sucursalId,conf_sucursales.sucursal,inv_productos.productoId,inv_productos.producto')
+        ->select('inv_productos_existencias.productoExistenciaId,inv_productos_existencias.existenciaProducto,inv_productos_existencias.existenciaReservada,conf_sucursales.sucursalId,conf_sucursales.sucursal,inv_productos.productoId,inv_productos.producto,cat_unidades_medida.abreviaturaUnidadMedida')
         ->join('conf_sucursales', 'conf_sucursales.sucursalId = inv_productos_existencias.sucursalId')
         ->join('inv_productos', 'inv_productos.productoId = inv_productos_existencias.productoId')
+        ->join('cat_unidades_medida', 'cat_unidades_medida.unidadMedidaId = inv_productos.unidadMedidaId')
         ->where('inv_productos_existencias.flgElimina', 0)
         ->where('inv_productos_existencias.productoId', $productoId)
         ->findAll();
@@ -295,7 +296,7 @@ class AdministracionProducto extends Controller
             // Aquí construye tus columnas
             $columna1 = $n;
             $columna2 = "<b>Sucursal:</b> " . $columna['sucursal'];
-            $columna3 = "<b>Existencia:</b> " . $columna['existenciaProducto'];
+            $columna3 = "<b>Existencia:</b> " . $columna['existenciaProducto'].' '.'('.$columna['abreviaturaUnidadMedida'].')';
             $columna4 = "<b>Existencia Reservada:</b> " . $columna['existenciaReservada'];
 
             // Agrega la fila al array de salida
