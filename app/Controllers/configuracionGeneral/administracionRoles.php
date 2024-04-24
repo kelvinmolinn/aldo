@@ -6,6 +6,7 @@ use CodeIgniter\Controller;
 use App\Models\conf_roles;
 use App\Models\conf_menus;
 use App\Models\conf_menu_permisos;
+use App\Models\conf_roles_permisos;
 
 class AdministracionRoles extends Controller
 {
@@ -162,15 +163,30 @@ class AdministracionRoles extends Controller
 
     public function tablaPermisosRol()
     {
-        $n = 1;
+        $rol = $this->request->getPost('rol');
+        $rolId = $this->request->getPost('rolId');
 
+        $rolesPermiso = new conf_roles_permisos();
+
+        $datos = $rolesPermiso
+            ->select('conf_menus.menu')
+            ->join('conf_menu_permisos', 'conf_menu_permisos.menuPermisoId = conf_roles_permisos.menuPermisoId')
+            ->join('conf_menus', 'conf_menus.menuId = conf_menu_permisos.menuId')
+            ->where('conf_roles_permisos.flgElimina', 0)
+            ->where('conf_roles_permisos.rolId', $rolId)
+            ->groupBy('conf_menu_permisos.menuId')
+            ->findAll();
+            
+        $output['data'] = array();
+        $n = 1;
+        foreach($datos as $campos){
             $columna1 = $n;
-            $columna2 = "<b>Menú: </b>";
+            $columna2 = "<b>Menú: </b>".$campos['menu'];
             // Aquí puedes construir tus botones en la última columna
             $columna3 = '
-                <a href="" data-toggle="tooltip" data-placement="top" title="Menús">
+                <button class="btn btn-primary mb-1" onclick="" data-toggle="tooltip" data-placement="top" title="Menús">
                     <i class="fas fa-bars nav-icon"></i>
-                </a>
+                </button>
             ';
             
             // Agrega la fila al array de salida
@@ -181,6 +197,7 @@ class AdministracionRoles extends Controller
             );
     
             $n++;
+        }
         // Verifica si hay datos
         if ($n > 1) {
             return $this->response->setJSON($output);

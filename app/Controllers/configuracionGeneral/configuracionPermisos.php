@@ -226,6 +226,8 @@ class ConfiguracionPermisos extends Controller
     public function modalNuevoPermiso(){
 
         $menus = new conf_menus();
+        $data['rol'] = $this->request->getPost('rol');
+        $data['rolId'] = $this->request->getPost('rolId');
 
         $data['menu'] = $menus
             ->select('menuId, menu')
@@ -272,33 +274,33 @@ class ConfiguracionPermisos extends Controller
     
      public function permisosMenusOperacion()
     {
-        $menu  = $this->request->getPost('menu');
-        $menuPermiso     = $this->request->getPost('menuPermiso');
+        $menuPermiso    = $this->request->getPost('menuPermiso');
+        $rol            = $this->request->getPost('rol');
+        $rolId          = $this->request->getPost('rolId');
         
-        $permisos = new conf_menu_permisos();
+        $rolesPermiso = new conf_roles_permisos();
 
 
         $data = [
-            'menuId'                    => $menuId,
-            'menuPermiso'               => $this->request->getPost('nombrePermiso'),
-            'descripcionMenuPermiso'    => $this->request->getPost('descripcionPermiso')
+            'rolId'                    => $rolId,
+            'menuPermisoId'            => $this->request->getPost('menuPermiso')
         ];
 
             // Insertar datos en la base de datos
-            $operacionPermiso = $permisos->insert($data);
+            $OperacionRolesPermiso = $rolesPermiso->insert($data);
         
-        if ($operacionPermiso) {
+        if ($OperacionRolesPermiso) {
             // Si el insert fue exitoso, devuelve el último ID insertado
             return $this->response->setJSON([
                 'success' => true,
-                'mensaje' => 'Menu '.($operacion == 'editar' ? 'actualizado' : 'agregado').' correctamente',
-                'menuPermisoId' => ($operacion == 'editar' ? $this->request->getPost('menuPermisoId') : $permisos->insertID())
+                'mensaje' => 'Permiso se agrego correctamente',
+                'rolMenuId' => $rolesPermiso->insertID()
             ]);
         } else {
             // Si el insert falló, devuelve un mensaje de error
             return $this->response->setJSON([
                 'success' => false,
-                'mensaje' => 'No se pudo insertar el menu'
+                'mensaje' => 'No se pudo insertar el permiso'
             ]);
         }
     }

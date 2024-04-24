@@ -99,11 +99,11 @@ function eliminarMenu(id) {
                 // Mostrar la modal
                 $('#modalMenus').modal('show');
             },
-        error: function(xhr, status, error) {
-            // Manejar errores si los hay
-            console.error(xhr.responseText);
-        }
-    });
+            error: function(xhr, status, error) {
+                // Manejar errores si los hay
+                console.error(xhr.responseText);
+            }
+        });
     }
     $(document).ready(function() {
         $('#btnRegresarModulo').on('click', function() {

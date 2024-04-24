@@ -42,8 +42,12 @@
         $('#btnNuevoPermiso').on('click', function() {
             // Realizar una petición AJAX para obtener el contenido de la modal
             $.ajax({
-                url: '<?php echo base_url('conf-general/admin-permisos/form/nuevo/permiso'); ?>',
-                type: 'GET',
+                url: '<?php echo base_url('conf-general/admin-permisos/form/nuevo/permiso/rol'); ?>',
+                type: 'POST',
+                data: {
+                    rolId: '<?= $rolId; ?>',
+                    rol: '<?= $rol; ?>'
+                },
                 success: function(response) {
                     // Insertar el contenido de la modal en el cuerpo de la modal
                     $('#divModalContent').html(response);

@@ -3,9 +3,11 @@
         <div class="modal-dialog  modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Nuevo Permiso</h5>
+                    <h5 class="modal-title">Nuevo permiso del rol: <?= $rol;?></h5>
                 </div>
                 <div class="modal-body">
+                    <input type="hidden" name="rol" id="rol" value="<?= $rol;?>">
+                    <input type="hidden" name="rolId" id="rolId" value="<?= $rolId;?>">
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-select-control">
