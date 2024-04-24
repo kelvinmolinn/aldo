@@ -97,7 +97,7 @@ class AdministracionProducto extends Controller
 
             // Aquí puedes construir tus botones en la última columna
         $columna5 = '
-            <button class="btn btn-info mb-1" onclick="modalExistencia(`'.$columna['productoId'].'`, `editar`);" data-toggle="tooltip" data-placement="top" title="Existencias de producto">
+            <button class="btn btn-info mb-1" onclick="modalExistenciaProducto(`'.$columna['productoId'].'`);" data-toggle="tooltip" data-placement="top" title="Existencias de producto">
                 <span></span>
                 <i class="fas fa-box-open"></i>
             </button>
@@ -119,19 +119,30 @@ class AdministracionProducto extends Controller
             <span></span>
             <i class="fas fa-clock"></i>
         </button>
-    ';
-/* 
+        ';
+        /*  
         $columna5 .= '
                 <button class="btn btn-danger mb-1" onclick="eliminarProducto(`'.$columna['productoId'].'`);" data-toggle="tooltip" data-placement="top" title="Eliminar">
                     <i class="fas fa-trash"></i>
                 </button>
             ';
-*/
-        $columna5 .= '
-                <button class="btn btn-danger mb-1" onclick="desactivarProducto(`'.$columna['productoId'].'`);" data-toggle="tooltip" data-placement="top" title="Desactivar">
+        */
+
+            if($columna['estadoProducto'] == 'Activo'){
+                $mensaje = "¿Estás seguro que desea Desactivar el producto?";
+                $mensaje2 = "pasará a Desactivado";
+                $columna5 .= '
+                <button class="btn btn-danger" data-toggle="tooltip" data-placement="top" title="Desactivar" onclick="cambiarEstadoProducto({productoId: \''.$columna['productoId'].'\', estadoProducto: \''.$columna['estadoProducto'].'\', mensaje: \''.$mensaje.'\', mensaje2: \''.$mensaje2.'\'});">
                     <i class="fas fa-ban"></i>
-                </button>
-            ';
+                </button>';
+            } else {
+                $mensaje = "¿Estás seguro que desea Activar el producto?";
+                $mensaje2 = "pasará a Activo";
+                $columna5 .= '
+                <button class="btn btn-success mb-1" data-toggle="tooltip" data-placement="top" title="Activar" onclick="cambiarEstadoProducto({productoId: \''.$columna['productoId'].'\', estadoProducto: \''.$columna['estadoProducto'].'\', mensaje: \''.$mensaje.'\', mensaje2: \''.$mensaje2.'\'})">
+                    <i class="fas fa-check"></i>
+                </button>';
+            }        
 
             // Agrega la fila al array de salida
             $output['data'][] = array(
@@ -257,6 +268,56 @@ class AdministracionProducto extends Controller
         return view('inventario/modals/modalAdministracionPrecio');
     }
 
+    public function modalAdministracionExistenciaProducto()
+    { 
+    
+
+    
+        return view('inventario/modals/modalAdministracionExistenciaProducto');
+    }
+
+    public function tablaExistenciaProducto()
+    {
+        $productoId = $this->request->getPost('productoId');
+        $mostrarProductoExistencia = new inv_productos_existencias();
+        $datos = $mostrarProductoExistencia
+        ->select('inv_productos_existencias.productoExistenciaId,inv_productos_existencias.existenciaProducto,inv_productos_existencias.existenciaReservada,conf_sucursales.sucursalId,conf_sucursales.sucursal,inv_productos.productoId,inv_productos.producto')
+        ->join('conf_sucursales', 'conf_sucursales.sucursalId = inv_productos_existencias.sucursalId')
+        ->join('inv_productos', 'inv_productos.productoId = inv_productos_existencias.productoId')
+        ->where('inv_productos.productoId', $productoId)
+        ->where('inv_productos_existencias.flgElimina', 0)
+        ->findAll();
+    
+        // Construye el array de salida 
+        $output['data'] = array();
+        $n = 1; // Variable para contar las filas
+        foreach ($datos as $columna) {
+            // Aquí construye tus columnas
+            $columna1 = $n;
+            $columna2 = "<b>Sucursal:</b> " . $columna['sucursal'];
+            $columna3 = "<b>Existencia:</b> " . $columna['existenciaProducto'];
+            $columna4 = "<b>Existencia Reservada:</b> " . $columna['existenciaReservada'];
+
+            // Agrega la fila al array de salida
+            $output['data'][] = array(
+                $columna1,
+                $columna2,
+                $columna3,
+                $columna4
+            );
+    
+            $n++;
+        }
+    
+        // Verifica si hay datos
+        if ($n > 1) {
+            return $this->response->setJSON($output);
+        } else {
+            return $this->response->setJSON(array('data' => '')); // No hay datos, devuelve un array vacío
+        }
+    }
+    
+
 
     public function modalAdministracionExistencia()
 { 
@@ -359,6 +420,35 @@ class AdministracionProducto extends Controller
             ]);
         }
       
+    }
+
+    public function ActivarDesactivar(){
+        $desactivarActivarProducto = new inv_productos();
+    
+
+        $productoId = $this->request->getPost('productoId');
+        $estadoProducto = $this->request->getPost('estadoProducto');
+
+        if($estadoProducto == 'Activo'){
+            $data = ['estadoProducto' => 'Inactivo'];
+        }else{
+            $data = ['estadoProducto' => 'Activo'];
+           
+        }
+
+        $desactivarActivarProducto->update($productoId, $data);
+
+        if($desactivarActivarProducto) {
+            return $this->response->setJSON([
+                'success' => true,
+                'mensaje' => 'Se cambió el estado con éxito'
+            ]);
+        } else {
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'No se pudo cambiar el estado del producto'
+            ]);
+        }
     }
 
 

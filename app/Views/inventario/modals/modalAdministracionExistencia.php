@@ -17,7 +17,7 @@
                     <input type="hidden" id="productoExistenciaId" name="productoExistenciaId" value="<?= $campos['productoExistenciaId'] ?>">
                     <input type="hidden" id="operacion" name="operacion" value="<?= $operacion; ?>">
                     <div class="row">
-                        <div class="col-md-12">
+                        <div class="col-md-6">
                             <div class="form-select-control">
                                 <select name="sucursalId" id="sucursalId" class="form-control " style="width: 100%;">
                                 <option></option>
@@ -27,9 +27,8 @@
                                 </select>
                             </div>
                         </div>
-                    </div> <br>
-                    <div class="row">
-                        <div class="col-md-12">
+                 
+                        <div class="col-md-6">
                             <div class="form-select-control">
                                 <select name="productoId" id="productoId" class="form-control " style="width: 100%;">
                                 <option></option>
@@ -41,15 +40,12 @@
                         </div>
                     </div> <br>
                     <div class="row">
-                        <div class="col-md-12">
+                        <div class="col-md-6">
                             <div class="form-outline">
                                 <input type="number" id="existenciaProducto" name="existenciaProducto" class="form-control " placeholder="Existencia de producto" value="<?= $campos['existenciaProducto']; ?>" required>
                             </div>
                         </div>
-                    </div> <br>
-
-                    <div class="row">
-                        <div class="col-md-12">
+                        <div class="col-md-6">
                             <div class="form-outline">
                                 <input type="number" id="existenciaReservada" name="existenciaReservada" class="form-control " placeholder="Existencia reservada" value="<?= $campos['existenciaReservada']; ?>" required>
                             </div>

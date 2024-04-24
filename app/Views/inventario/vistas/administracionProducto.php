@@ -33,6 +33,7 @@
     </table>
 </div>
 <script>
+
        function eliminarProducto(id) {
         //alert("Vamos a eliminar " + id);
             Swal.fire({
@@ -59,6 +60,54 @@
                                     Swal.fire({
                                         icon: 'success',
                                         title: '¡Producto eliminado con Éxito!',
+                                        text: response.mensaje
+                                    }).then((result) => {
+                                        $("#tblProducto").DataTable().ajax.reload(null, false);
+                                    });
+                                } else {
+                                    // Insert fallido, mostrar mensaje de error
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Error',
+                                        text: response.mensaje
+                                    });
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                // Manejar errores si los hay
+                                console.error(xhr.responseText);
+                            }
+                        });
+                }
+            });
+    }
+
+    function cambiarEstadoProducto(datos) {
+            Swal.fire({
+                title: datos.mensaje,
+                text: datos.mensaje2,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, cambiar estado',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Si el usuario confirma, enviar la solicitud AJAX para eliminar el usuario de la sucursal
+                        $.ajax({
+                            url: '<?php echo base_url('inventario/admin-producto/operacion/estado/usuario'); ?>',
+                            type: 'POST',
+                            data: {
+                                productoId: datos.productoId,
+                                estadoProducto : datos.estadoProducto
+                            },
+                            success: function(response) {
+                                console.log(response);
+                                if (response.success) {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: '¡Producto desactivado con Éxito!',
                                         text: response.mensaje
                                     }).then((result) => {
                                         $("#tblProducto").DataTable().ajax.reload(null, false);
@@ -110,6 +159,25 @@
                     $('#divModalContent').html(response);
                     // Mostrar la modal
                     $('#modalExistencia').modal('show');
+                },
+            error: function(xhr, status, error) {
+                // Manejar errores si los hay
+                console.error(xhr.responseText);
+            }
+        });
+    }
+
+    function modalExistenciaProducto(productoId) {
+        // Realizar una petición AJAX para obtener los datos del módulo por su ID
+        $.ajax({
+                url: '<?php echo base_url('inventario/admin-producto/form4/existenciaProducto'); ?>',
+                type: 'POST',
+                data: { productoId: productoId}, // Pasar el ID del módulo como parámetro
+                success: function(response) {
+                    // Insertar el contenido de la modal en el cuerpo de la modal
+                    $('#divModalContent').html(response);
+                    // Mostrar la modal
+                    $('#modalExistenciaProducto').modal('show');
                 },
             error: function(xhr, status, error) {
                 // Manejar errores si los hay

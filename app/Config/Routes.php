@@ -130,10 +130,13 @@ $routes->group('inventario/admin-producto', function($routes) {
     $routes->post('form/producto', 'inventario\AdministracionProducto::modalAdministracionProducto');
     $routes->post('form2/precio', 'inventario\AdministracionProducto::modalAdministracionPrecio');
     $routes->post('form3/existencia', 'inventario\AdministracionProducto::modalAdministracionExistencia');
+    $routes->post('form4/existenciaProducto', 'inventario\AdministracionProducto::modalAdministracionExistenciaProducto');
     $routes->post('tabla/producto',  'inventario\AdministracionProducto::tablaProducto');
+    $routes->post('tabla/existenciaProducto',  'inventario\AdministracionProducto::tablaExistenciaProducto');
     $routes->post('operacion/eliminar/producto', 'inventario\AdministracionProducto::eliminarProducto');
     $routes->post('operacion/guardar/producto', 'inventario\AdministracionProducto::modalProductoOperacion');
     $routes->post('operacion/guardar/existencia', 'inventario\AdministracionProducto::modalExistenciaOperacion');
+    $routes->post('operacion/estado/usuario', 'inventario\AdministracionProducto::ActivarDesactivar');
     //
 });
 
