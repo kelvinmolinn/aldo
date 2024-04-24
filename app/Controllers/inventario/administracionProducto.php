@@ -270,10 +270,9 @@ class AdministracionProducto extends Controller
 
     public function modalAdministracionExistenciaProducto()
     { 
+        $data["productoId"] = $this->request->getPost('productoId');
     
-
-    
-        return view('inventario/modals/modalAdministracionExistenciaProducto');
+        return view('inventario/modals/modalAdministracionExistenciaProducto', $data);
     }
 
     public function tablaExistenciaProducto()
@@ -284,11 +283,12 @@ class AdministracionProducto extends Controller
         ->select('inv_productos_existencias.productoExistenciaId,inv_productos_existencias.existenciaProducto,inv_productos_existencias.existenciaReservada,conf_sucursales.sucursalId,conf_sucursales.sucursal,inv_productos.productoId,inv_productos.producto')
         ->join('conf_sucursales', 'conf_sucursales.sucursalId = inv_productos_existencias.sucursalId')
         ->join('inv_productos', 'inv_productos.productoId = inv_productos_existencias.productoId')
-        ->where('inv_productos.productoId', $productoId)
         ->where('inv_productos_existencias.flgElimina', 0)
+        ->where('inv_productos_existencias.productoId', $productoId)
         ->findAll();
     
-        // Construye el array de salida 
+        //validar si el producto en la sucursal ya existe sumar la nueva existencia al post
+        // Construye el array de salida  para solo mostrar una 
         $output['data'] = array();
         $n = 1; // Variable para contar las filas
         foreach ($datos as $columna) {
@@ -380,6 +380,7 @@ class AdministracionProducto extends Controller
             ]);
         }
     
+        //validar si el producto en la sucursal ya existe sumar la nueva existencia al post
         // Continuar con la operación de inserción o actualización en la base de datos
         $productoId = $this->request->getPost('productoId');
         $sucursalId = $this->request->getPost('sucursalId');

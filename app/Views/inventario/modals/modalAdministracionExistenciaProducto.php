@@ -39,7 +39,7 @@
                 "method": "POST",
                 "url": '<?php echo base_url('inventario/admin-producto/tabla/existenciaProducto'); ?>',
                 "data": {
-                    x: ''
+                    productoId: '<?= $productoId; ?>'
                 }
             },
             "columnDefs": [
