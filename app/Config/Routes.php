@@ -140,6 +140,10 @@ $routes->group('inventario/admin-producto', function($routes) {
     //
 });
 
+$routes->group('compras/admin-proveedores', function($routes) {
+    $routes->get('index', 'compras\administracionProveedores::index');
+});
+
 // Rutas de errores
 $routes->get('404', 'Errores::error404');
 
