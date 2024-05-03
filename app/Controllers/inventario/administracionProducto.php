@@ -9,6 +9,7 @@ use App\Models\inv_productos_tipo;
 use App\Models\inv_productos_plataforma;
 use App\Models\conf_sucursales;
 use App\Models\inv_productos_existencias;
+use App\Models\inv_kardex;
 
 class AdministracionProducto extends Controller
 {
@@ -391,6 +392,7 @@ class AdministracionProducto extends Controller
 
     // Crear instancia del modelo
     $model = new inv_productos_existencias();
+    $modelKardex = new inv_kardex();
 
     // Buscar la entrada existente del producto en la sucursal
     $existingEntry = $model->where('productoId', $productoId)
@@ -409,12 +411,24 @@ class AdministracionProducto extends Controller
     if ($existingEntry) {
         $data['existenciaProducto'] += $existingEntry['existenciaProducto'];
         $operacionExistencia = $model->update($existingEntry['productoExistenciaId'], $data);
+        $productoExistenciaId = $existingEntry['productoExistenciaId'];
     } else {
-        $operacionExistencia = $model->insert($data);
+        $productoExistenciaId = $model->insert($data);
     }
 
     // Preparar la respuesta JSON
     if ($operacionExistencia) {
+        // insert a inv_kardex
+        // recordar if de operacionKardex y en if colocar el JSON de abajo
+
+        $dataKardex = [
+            'tipoMovimiento'                    => $this->request->getPost('existenciaProducto'),
+            'descripcionMovimiento'             => "Existencia Inicial",
+            'productoExistenciaId'              => $productoExistenciaId,
+            'existenciaAntesMovimiento'         => 0,
+            'cantidadMovimiento'                => $this->request->getPost('existenciaProducto'),
+            'existenciaDespuesMovimiento'       => $this->request->getPost('existenciaProducto')
+        ];
         $response = [
             'success' => true,
             'mensaje' => 'Existencia ' . ($operacion == 'editar' ? 'actualizada' : 'agregada') . ' correctamente',

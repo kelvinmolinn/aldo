@@ -18,9 +18,9 @@ class cat_unidades_medida extends Model
 
     public function UnidadExiste($unidadMedida, $unidadMedidaId )
     {
-        // Realizar una consulta para verificar si el DUI ya existe en la base de datos
+        // Realizar una consulta para verificar si la unidad de medida ya existe en la base de datos
         $resultado = $this->where('unidadMedida', $unidadMedida)->whereNotIn('unidadMedidaId', [$unidadMedidaId])->countAllResults();
 
-        return $resultado > 0; // Devuelve true si el DUI existe, false en caso contrario
+        return $resultado > 0; // Devuelve true si la unidad de medida existe, false en caso contrario
     }
 }
