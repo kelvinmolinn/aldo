@@ -7,7 +7,7 @@
 ?>
 
 <form id="frmModal" action="<?= base_url('inventario/admin-producto/operacion/guardar/producto')?>" method="POST">
-    <div id="modalProducto" class="modal" tabindex="-1">
+    <div id="modalProducto" class="modal" tabindex="-1" data-backdrop="static" data-keyboard="false">
         <div class="modal-dialog  modal-lg">
             <div class="modal-content">
                 <div class="modal-header">

@@ -1,5 +1,5 @@
 <form id="frmModal">
-    <div id="modalExistenciaProducto" class="modal" tabindex="-1">
+    <div id="modalExistenciaProducto" class="modal" tabindex="-1" data-backdrop="static" data-keyboard="false">
         <div class="modal-dialog  modal-xl">
             <div class="modal-content">
                 <div class="modal-header">

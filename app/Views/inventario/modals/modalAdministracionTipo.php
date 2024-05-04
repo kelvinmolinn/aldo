@@ -7,7 +7,7 @@
 ?>
 
 <form id="frmModal" action="<?= base_url('inventario/admin-tipo/operacion/guardar/tipo')?>" method="POST">
-    <div id="modalTipo" class="modal" tabindex="-1">
+    <div id="modalTipo" class="modal" tabindex="-1" data-backdrop="static" data-keyboard="false">
         <div class="modal-dialog  modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
