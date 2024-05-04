@@ -339,7 +339,7 @@ class AdministracionProducto extends Controller
             $existenciaProducto = new inv_productos_existencias();
 
              // seleccionar solo los campos que estan en la modal (solo los input y select)
-            $data['campos'] = $producto->select('inv_productos_existencias.productoExistenciaId,inv_productos_existencias.existenciaProducto,inv_productos_existencias.existenciaReservada,inv_productos.productoId,inv_productos.producto,conf_sucursales.sucursalId,conf_sucursales.sucursal')
+            $data['campos'] = $producto->select('inv_productos_existencias.productoExistenciaId,inv_productos_existencias.existenciaProducto,inv_productos_existencias.existenciaReservada,inv_productos.productoId,inv_productos.producto,inv_productos.CostoPromedio,conf_sucursales.sucursalId,conf_sucursales.sucursal')
 
             ->join('inv_productos', 'inv_productos.productoId = inv_productos_existencias.productoId')
             ->join('conf_sucursales', 'conf_sucursales.sucursalId = inv_productos_existencias.sucursalId')
@@ -353,7 +353,8 @@ class AdministracionProducto extends Controller
                 'productoId'              => '',
                 'sucursalId'              => '',
                 'existenciaProducto'      => '',
-                'existenciaReservada'     => ''
+                'existenciaReservada'     => 0,
+                'CostoPromedio'           => ''
 
             ];
         }
@@ -370,7 +371,7 @@ class AdministracionProducto extends Controller
         'productoId'            => 'required',
         'sucursalId'            => 'required',
         'existenciaProducto'    => 'required|greater_than[0]',
-        'existenciaReservada'   => 'required|greater_than[-1]'
+        'CostoPromedio'         => 'required|greater_than[-1]',
     ]);
 
     // Ejecutar la validación
@@ -386,12 +387,13 @@ class AdministracionProducto extends Controller
     $productoId = $this->request->getPost('productoId');
     $sucursalId = $this->request->getPost('sucursalId');
     $existenciaProducto = $this->request->getPost('existenciaProducto');
-    $existenciaReservada = $this->request->getPost('existenciaReservada');
+    $CostoPromedio = $this->request->getPost('CostoPromedio');
     $operacion = $this->request->getPost('operacion');
     $productoExistenciaId = $this->request->getPost('productoExistenciaId');
 
     // Crear instancia del modelo
     $model = new inv_productos_existencias();
+    $modelProducto = new inv_productos();
     $modelKardex = new inv_kardex();
 
     // Buscar la entrada existente del producto en la sucursal
@@ -404,16 +406,19 @@ class AdministracionProducto extends Controller
         'productoId'             => $productoId,
         'sucursalId'             => $sucursalId,
         'existenciaProducto'     => $existenciaProducto,
-        'existenciaReservada'    => $existenciaReservada
+        'existenciaReservada'    => 0,
+        'CostoPromedio'          => $CostoPromedio
     ];
 
     // Si existe la entrada, actualizar; de lo contrario, insertar
     if ($existingEntry) {
         $data['existenciaProducto'] += $existingEntry['existenciaProducto'];
         $operacionExistencia = $model->update($existingEntry['productoExistenciaId'], $data);
+        $operacionExistencia = $modelProducto->update($existingEntry['productoId'], $data);
         $productoExistenciaId = $existingEntry['productoExistenciaId'];
     } else {
-        $productoExistenciaId = $model->insert($data);
+        $productoExistencia = $model->insert($data);
+        $productoExistencia = $modelProducto->insert($data);
     }
 
     // Preparar la respuesta JSON
@@ -421,14 +426,7 @@ class AdministracionProducto extends Controller
         // insert a inv_kardex
         // recordar if de operacionKardex y en if colocar el JSON de abajo
 
-        $dataKardex = [
-            'tipoMovimiento'                    => $this->request->getPost('existenciaProducto'),
-            'descripcionMovimiento'             => "Existencia Inicial",
-            'productoExistenciaId'              => $productoExistenciaId,
-            'existenciaAntesMovimiento'         => 0,
-            'cantidadMovimiento'                => $this->request->getPost('existenciaProducto'),
-            'existenciaDespuesMovimiento'       => $this->request->getPost('existenciaProducto')
-        ];
+
         $response = [
             'success' => true,
             'mensaje' => 'Existencia ' . ($operacion == 'editar' ? 'actualizada' : 'agregada') . ' correctamente',

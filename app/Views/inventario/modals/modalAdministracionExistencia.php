@@ -47,7 +47,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-outline">
-                                <input type="number" id="existenciaReservada" name="existenciaReservada" class="form-control " placeholder="Existencia reservada" value="<?= $campos['existenciaReservada']; ?>" required>
+                                <input type="number" id="CostoPromedio" name="CostoPromedio" class="form-control " placeholder="Costo promedio" value="<?= $campos['CostoPromedio']; ?>" required>
                             </div>
                         </div>
                     </div> <br>
