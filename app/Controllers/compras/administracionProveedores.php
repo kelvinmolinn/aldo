@@ -4,6 +4,10 @@ namespace App\Controllers\compras;
 use CodeIgniter\Controller;
 
 
+use App\Models\comp_proveedores;
+use App\Models\comp_proveedores_contacto;
+use App\Models\cat_tipo_contacto;
+
 class administracionProveedores extends Controller
 {
     //ESTE CONTROLLERS ES DE PERMISOS 

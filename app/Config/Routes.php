@@ -142,6 +142,7 @@ $routes->group('inventario/admin-producto', function($routes) {
 
 $routes->group('compras/admin-proveedores', function($routes) {
     $routes->get('index', 'compras\administracionProveedores::index');
+    $routes->post('tabla/proveedores',  'compras\administracionProveedores::index');
 });
 
 // Rutas de errores

@@ -14,7 +14,7 @@
     </div>
 </div>
 <div class="table-responsive">
-    <table class="table table-hover" id="" style="width: 100%;">
+    <table class="table table-hover" id="tablaProveedores" style="width: 100%;">
         <thead>
             <tr>
                 <th>#</th>
@@ -28,6 +28,29 @@
     </table>
 </div>
 <script>
-
+    $(document).ready(function() {
+        $('#tablaProveedores').DataTable({
+            "ajax": {
+                "method": "POST",
+                "url": '<?php echo base_url('conf-general/admin-permisos/tabla/permisos'); ?>',
+                "data": {
+                    x:''
+                }
+            },
+            "columnDefs": [
+                { "width": "10%", "targets": 0 }, 
+                { "width": "40%", "targets": 1 }, 
+                { "width": "35%", "targets": 2 }, 
+                { "width": "20%", "targets": 3 } 
+            ],
+            "language": {
+                "url": "../../../../../assets/plugins/datatables/js/spanish.json"
+            },
+                "drawCallback": function(settings) {
+                // Inicializar tooltips de Bootstrap después de cada dibujo de la tabla
+                $('[data-toggle="tooltip"]').tooltip();
+            },
+        });
+    });
 </script>
 <?= $this->endSection(); ?>

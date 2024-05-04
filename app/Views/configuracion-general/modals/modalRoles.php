@@ -6,7 +6,7 @@
     }
 ?>
 <form id="frmModal">
-    <div id="modalRol" class="modal" tabindex="-1">
+    <div id="modalRol" class="modal" tabindex="-1" data-backdrop="static" data-keyboard="false">
         <div class="modal-dialog  modal-sm">
             <div class="modal-content">
                 <div class="modal-header">

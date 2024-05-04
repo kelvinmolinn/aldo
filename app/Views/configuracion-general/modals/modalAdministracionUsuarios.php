@@ -2,7 +2,7 @@
     <input type="hidden" id="usuarioId" name="usuarioId" value="<?= $usuarioId; ?>">
     <input type="hidden" id="empleadoId" name="empleadoId" value="<?= $empleadoId; ?>">
     <input type="hidden" id="operacion" name="operacion" value="<?= $operacion; ?>">
-    <div id="modalUsuario" class="modal" tabindex="-1">
+    <div id="modalUsuario" class="modal" tabindex="-1" data-backdrop="static" data-keyboard="false">
         <div class="modal-dialog  modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
