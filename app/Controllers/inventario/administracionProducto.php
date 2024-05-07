@@ -406,7 +406,10 @@ class AdministracionProducto extends Controller
         'productoId'             => $productoId,
         'sucursalId'             => $sucursalId,
         'existenciaProducto'     => $existenciaProducto,
-        'existenciaReservada'    => 0,
+        'existenciaReservada'    => 0
+    ];
+
+    $dataProducto = [
         'CostoPromedio'          => $CostoPromedio
     ];
 
@@ -414,11 +417,11 @@ class AdministracionProducto extends Controller
     if ($existingEntry) {
         $data['existenciaProducto'] += $existingEntry['existenciaProducto'];
         $operacionExistencia = $model->update($existingEntry['productoExistenciaId'], $data);
-        $operacionExistencia = $modelProducto->update($existingEntry['productoId'], $data);
+        $productoExistencia = $modelProducto->update($existingEntry['productoId'], $dataProducto);
         $productoExistenciaId = $existingEntry['productoExistenciaId'];
     } else {
-        $productoExistencia = $model->insert($data);
-        $productoExistencia = $modelProducto->insert($data);
+        $operacionExistencia = $model->insert($data);
+        $productoExistencia = $modelProducto->update($productoId, $dataProducto);
     }
 
     // Preparar la respuesta JSON
