@@ -7,7 +7,7 @@
 <hr>
 <div class="row mb-4">
     <div class="col-md-12 text-right">
-        <button type= "button" id="btnNuevoProveedor" class="btn btn-primary estilo-btn">
+        <button type= "button" id="btnNuevoProveedor" class="btn btn-primary estilo-btn" onclick="modalProveedor(0,'insertar');">
             <i class="fas fa-save"></i>
             Nuevo permiso
         </button>
@@ -28,11 +28,29 @@
     </table>
 </div>
 <script>
+    function modalProveedor(proveedorId,operacion) {
+        // Realizar una petición AJAX para obtener los datos del módulo por su ID
+        $.ajax({
+                url: '<?php echo base_url('compras/admin-proveedores/form/nuevo/proveedor'); ?>',
+                type: 'POST',
+                data: {proveedorId: proveedorId, operacion: operacion}, // Pasar el ID del módulo como parámetro
+                success: function(response) {
+                    // Insertar el contenido de la modal en el cuerpo de la modal
+                    $('#divModalContent').html(response);
+                    // Mostrar la modal
+                    $('#modalProveedores').modal('show');
+                },
+            error: function(xhr, status, error) {
+                // Manejar errores si los hay
+                console.error(xhr.responseText);
+            }
+        });
+    }
     $(document).ready(function() {
         $('#tablaProveedores').DataTable({
             "ajax": {
                 "method": "POST",
-                "url": '<?php echo base_url('conf-general/admin-permisos/tabla/permisos'); ?>',
+                "url": '<?php echo base_url('compras/admin-proveedores/tabla/proveedores'); ?>',
                 "data": {
                     x:''
                 }
@@ -40,11 +58,11 @@
             "columnDefs": [
                 { "width": "10%", "targets": 0 }, 
                 { "width": "40%", "targets": 1 }, 
-                { "width": "35%", "targets": 2 }, 
+                { "width": "30%", "targets": 2 }, 
                 { "width": "20%", "targets": 3 } 
             ],
             "language": {
-                "url": "../../../../../assets/plugins/datatables/js/spanish.json"
+                "url": "../../../assets/plugins/datatables/js/spanish.json"
             },
                 "drawCallback": function(settings) {
                 // Inicializar tooltips de Bootstrap después de cada dibujo de la tabla
