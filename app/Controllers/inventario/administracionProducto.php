@@ -390,6 +390,8 @@ class AdministracionProducto extends Controller
     $CostoPromedio = $this->request->getPost('CostoPromedio');
     $operacion = $this->request->getPost('operacion');
     $productoExistenciaId = $this->request->getPost('productoExistenciaId');
+    $kardexId = $this->request->getPost('kardexId');
+
 
     // Crear instancia del modelo
     $model = new inv_productos_existencias();
@@ -413,21 +415,41 @@ class AdministracionProducto extends Controller
         'CostoPromedio'          => $CostoPromedio
     ];
 
+    $dataKardex = [
+        'tipoMovimiento'                => "Inicial",
+        'descripcionMovimiento'         => "Entrada a inventario registrada como existencia inicial",
+        'productoExistenciaId'          => $kardexId,
+        'existenciaAntesMovimiento'     => 0,
+        'cantidadMovimiento'            => $existenciaProducto,
+        'existenciaDespuesMovimiento'   => $existenciaProducto,
+        'costoUnitarioFOB'              => $CostoPromedio,
+        'costoUnitarioRetaceo'          => $CostoPromedio,
+        'costoPromedio'                 => $CostoPromedio,
+        'precioVentaUnitario'           => 0,
+        'fechaDocumento'                 => date('Y-m-d'),
+        'fechaMovimiento'               => date('Y-m-d'),
+        'tablaMovimiento'               => "inv_kardex"
+    ];
+
+
     // Si existe la entrada, actualizar; de lo contrario, insertar
     if ($existingEntry) {
         $data['existenciaProducto'] += $existingEntry['existenciaProducto'];
         $operacionExistencia = $model->update($existingEntry['productoExistenciaId'], $data);
         $productoExistencia = $modelProducto->update($existingEntry['productoId'], $dataProducto);
         $productoExistenciaId = $existingEntry['productoExistenciaId'];
+       
     } else {
         $operacionExistencia = $model->insert($data);
         $productoExistencia = $modelProducto->update($productoId, $dataProducto);
+         $OperacionkardexId = $modelKardex->update($kardexId, $dataKardex);
     }
 
     // Preparar la respuesta JSON
     if ($operacionExistencia) {
         // insert a inv_kardex
         // recordar if de operacionKardex y en if colocar el JSON de abajo
+        $kardexId = $modelKardex->insert($dataKardex);
 
 
         $response = [

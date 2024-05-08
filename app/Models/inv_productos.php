@@ -18,10 +18,10 @@ class inv_productos extends Model
 
     public function existeCodigo($codigoProducto, $productoId)
     {
-        // Realizar una consulta para verificar si el DUI ya existe en la base de datos
+        // Realizar una consulta para verificar si el producto ya existe en la base de datos
         $resultado = $this->where('codigoProducto', $codigoProducto)->whereNotIn('productoId', [$productoId])->countAllResults();
 
-        return $resultado > 0; // Devuelve true si el DUI existe, false en caso contrario
+        return $resultado > 0; // Devuelve true si el producto existe, false en caso contrario
     }
 
 }
