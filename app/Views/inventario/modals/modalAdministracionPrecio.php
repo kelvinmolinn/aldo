@@ -6,14 +6,17 @@
                     <h5 class="modal-title"><?= ('Actualizar precio de venta'); ?></h5>
                 </div>
                 <div class="modal-body">
-                <div class="row">
-                    <div class="col-md-12 text-right">
-                        <button type= "button" id="btnAbrirModal" class="btn btn-primary" onclick="modalNuevoPrecio(0, 'insertar');">
-                            <i class="fas fa-save"></i>
-                            Nuevo precio 
-                        </button>
-                    </div>
+
+                    <!-- Botón para mostrar el input -->
+                <button id="mostrarInputBtn" class="btn btn-primary" type="button">Nuevo Precio</button>
+
+                <!-- Div para contener el input (inicialmente oculto) -->
+                <div id="inputContainer" style="display: none;">
+                  <label for="nuevoPrecio">Ingrese el nuevo precio:</label>
+                  <input type="number" id="nuevoPrecio" name="nuevoPrecio" disabled>
+                  <button class="btn btn-primary" id="guardarPrecioBtn">Guardar</button>
                 </div>
+
                 <hr>
                 <div class= "table-responsive">
                     <table id="tblPrecio" name = "tblPrecio" class="table table-hover" style="width: 100%;">
@@ -31,10 +34,6 @@
                 </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" id="btnguardarProducto" class="btn btn-primary">
-                        <i class="fas fa-save"></i>
-                        Guardar
-                    </button>
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">
                         <i class="fas fa-times-circle"></i>
                         Cerrar
@@ -46,6 +45,29 @@
 </form>
 <script>
     $(document).ready(function() {
+
+         // Event listener para mostrar el input
+  $("#mostrarInputBtn").click(function() {
+    // Muestra el div contenedor del input
+    $("#inputContainer").show();
+    // Desbloquea el input
+    $("#nuevoPrecio").prop("disabled", false);
+  });
+
+  // Event listener para guardar el precio
+  $("#guardarPrecioBtn").click(function() {
+    // Obtiene el valor ingresado en el input
+    var nuevoPrecio = $("#nuevoPrecio").val();
+    
+    // Aquí podrías realizar cualquier acción con el nuevo precio, como enviarlo a un servidor, etc.
+    console.log("Nuevo precio ingresado: " + nuevoPrecio);
+    
+    // Oculta el div contenedor del input
+    $("#inputContainer").hide();
+    // Bloquea nuevamente el input
+    $("#nuevoPrecio").prop("disabled", true);
+  });
+
         $('#tblPrecio').DataTable({
             "ajax": {
                 "method": "POST",
