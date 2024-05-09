@@ -450,7 +450,6 @@ class AdministracionProducto extends Controller
         $operacionExistencia = $model->insert($data);
         $productoExistenciaId = $operacionExistencia;
         $productoExistencia = $modelProducto->update($productoId, $dataProducto);
-         $OperacionkardexId = $modelKardex->update($kardexId, $dataKardex);
     }
 
     // Preparar la respuesta JSON

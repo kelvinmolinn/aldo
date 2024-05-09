@@ -31,6 +31,10 @@
                 </div>
                 </div>
                 <div class="modal-footer">
+                    <button type="button" id="btnguardarProducto" class="btn btn-primary">
+                        <i class="fas fa-save"></i>
+                        Guardar
+                    </button>
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">
                         <i class="fas fa-times-circle"></i>
                         Cerrar
