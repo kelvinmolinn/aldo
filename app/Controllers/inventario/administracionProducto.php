@@ -512,5 +512,12 @@ class AdministracionProducto extends Controller
         }
     }
 
+    public function tablaPrecio()
+    { 
+        $data["productoId"] = $this->request->getPost('productoId');
+    
+        return view('inventario/modals/modalAdministracionPrecio', $data);
+    }
+
 
 }

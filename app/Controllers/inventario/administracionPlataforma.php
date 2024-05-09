@@ -14,8 +14,16 @@ class AdministracionPlataforma extends Controller
             return view('login');
         } else {
             $data['variable'] = 0;
-            // Cargar la vista 'administracionModulos.php' desde la carpeta 'Views/configuracion-general/vistas'
-            return view('inventario/vistas/administracionPlataforma', $data);
+
+            $camposSession = [
+                'renderVista' => 'No'
+            ];
+            $session->set([
+                'route'             => 'inventario/admin-plataforma/index',
+                'camposSession'     => json_encode($camposSession)
+            ]);
+
+         return view('inventario/vistas/administracionPlataforma', $data);
         }
     }
 

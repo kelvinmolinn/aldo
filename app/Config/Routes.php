@@ -119,7 +119,7 @@ $routes->group('inventario/admin-tipo', function($routes) {
 
 $routes->group('inventario/admin-plataforma', function($routes) {
     // Definir las rutas específicas para el grupo 'admin-plataforma'
-    $routes->get('index', 'inventario\AdministracionPlataforma::index');
+    $routes->post('index', 'inventario\AdministracionPlataforma::index');
     $routes->post('form/plataforma', 'inventario\AdministracionPlataforma::modalAdministracionPlataforma');
     $routes->post('tabla/plataforma',  'inventario\AdministracionPlataforma::tablaPlataforma');
     $routes->post('operacion/eliminar/plataforma', 'inventario\AdministracionPlataforma::eliminarPlataforma');
@@ -136,6 +136,7 @@ $routes->group('inventario/admin-producto', function($routes) {
     $routes->post('form4/existenciaProducto', 'inventario\AdministracionProducto::modalAdministracionExistenciaProducto');
     $routes->post('tabla/producto',  'inventario\AdministracionProducto::tablaProducto');
     $routes->post('tabla/existenciaProducto',  'inventario\AdministracionProducto::tablaExistenciaProducto');
+    $routes->post('tabla/precio',  'inventario\AdministracionProducto::tablaPrecio');
     $routes->post('operacion/eliminar/producto', 'inventario\AdministracionProducto::eliminarProducto');
     $routes->post('operacion/guardar/producto', 'inventario\AdministracionProducto::modalProductoOperacion');
     $routes->post('operacion/guardar/existencia', 'inventario\AdministracionProducto::modalExistenciaOperacion');

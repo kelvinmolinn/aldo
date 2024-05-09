@@ -1,7 +1,3 @@
-<?= 
-    $this->extend('Panel/plantilla'); 
-    $this->section('contenido');
-?>
 
 <h2>Plataformas</h2>
 <hr>
@@ -94,7 +90,7 @@
         });
     }
     $(document).ready(function() {
-    
+    tituloVentana("Plataforma de producto");
     $('#tblPlataforma').DataTable({
             "ajax": {
                 "method": "POST",
@@ -109,11 +105,8 @@
                 { "width": "35%", "targets": 2 }
             ],
             "language": {
-                "url": "../../../assets/plugins/datatables/js/spanish.json"
+                "url": "../assets/plugins/datatables/js/spanish.json"
             },
         });
     });
 </script>
-
-
-<?= $this->endSection(); ?>

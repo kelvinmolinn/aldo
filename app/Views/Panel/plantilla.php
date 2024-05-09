@@ -171,7 +171,7 @@
                 </ul>
                 <ul class="nav nav-treeview">
                   <li class="nav-item">
-                    <a href="<?= site_url('inventario/admin-plataforma/index'); ?>" class="nav-link">
+                    <a role= "button" class="nav-link" onclick="cambiarInterfaz('inventario/admin-plataforma/index', {renderVista: 'No'});">
                       <i class="fas fa-gamepad nav-icon"></i>
                       <p>Plataforma</p>
                     </a>
