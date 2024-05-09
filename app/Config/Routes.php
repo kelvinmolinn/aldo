@@ -99,7 +99,7 @@ $routes->group('conf-general/admin-permisos', function($routes) {
 });
 $routes->group('inventario/admin-unidades', function($routes) {
     // Definir las rutas específicas para el grupo 'admin-unidades'
-    $routes->get('index', 'inventario\AdministracionUnidades::index');
+    $routes->post('index', 'inventario\AdministracionUnidades::index');
     $routes->post('form/unidades', 'inventario\AdministracionUnidades::modalAdministracionUnidades');
     $routes->post('tabla/unidades',  'inventario\AdministracionUnidades::tablaUnidades');
     $routes->post('operacion/eliminar/unidades', 'inventario\AdministracionUnidades::eliminarUnidades');
@@ -109,7 +109,7 @@ $routes->group('inventario/admin-unidades', function($routes) {
 
 $routes->group('inventario/admin-tipo', function($routes) {
     // Definir las rutas específicas para el grupo 'admin-tipo'
-    $routes->get('index', 'inventario\AdministracionTipo::index');
+    $routes->post('index', 'inventario\AdministracionTipo::index');
     $routes->post('form/tipo', 'inventario\AdministracionTipo::modalAdministracionTipo');
     $routes->post('tabla/tipo',  'inventario\AdministracionTipo::tablaTipo');
     $routes->post('operacion/eliminar/tipo', 'inventario\AdministracionTipo::eliminarTipo');
@@ -129,7 +129,7 @@ $routes->group('inventario/admin-plataforma', function($routes) {
 
 $routes->group('inventario/admin-producto', function($routes) {
     // Definir las rutas específicas para el grupo 'admin-producto'
-    $routes->get('index', 'inventario\AdministracionProducto::index');
+    $routes->post('index', 'inventario\AdministracionProducto::index');
     $routes->post('form/producto', 'inventario\AdministracionProducto::modalAdministracionProducto');
     $routes->post('form2/precio', 'inventario\AdministracionProducto::modalAdministracionPrecio');
     $routes->post('form3/existencia', 'inventario\AdministracionProducto::modalAdministracionExistencia');

@@ -21,7 +21,15 @@ class AdministracionProducto extends Controller
             return view('login');
         } else {
             $data['variable'] = 0;
-            // Cargar la vista 'administracionModulos.php' desde la carpeta 'Views/configuracion-general/vistas'
+
+            $camposSession = [
+                'renderVista' => 'No'
+            ];
+            $session->set([
+                'route'             => 'inventario/admin-producto/index',
+                'camposSession'     => json_encode($camposSession)
+            ]);
+
             return view('inventario/vistas/administracionProducto', $data);
         }
     }
@@ -418,7 +426,6 @@ class AdministracionProducto extends Controller
     $dataKardex = [
         'tipoMovimiento'                => "Inicial",
         'descripcionMovimiento'         => "Entrada a inventario registrada como existencia inicial",
-        'productoExistenciaId'          => $kardexId,
         'existenciaAntesMovimiento'     => 0,
         'cantidadMovimiento'            => $existenciaProducto,
         'existenciaDespuesMovimiento'   => $existenciaProducto,
@@ -441,6 +448,7 @@ class AdministracionProducto extends Controller
        
     } else {
         $operacionExistencia = $model->insert($data);
+        $productoExistenciaId = $operacionExistencia;
         $productoExistencia = $modelProducto->update($productoId, $dataProducto);
          $OperacionkardexId = $modelKardex->update($kardexId, $dataKardex);
     }
@@ -449,8 +457,15 @@ class AdministracionProducto extends Controller
     if ($operacionExistencia) {
         // insert a inv_kardex
         // recordar if de operacionKardex y en if colocar el JSON de abajo
+        $dataKardex += [
+            'productoExistenciaId'          => $productoExistenciaId
+        ];
         $kardexId = $modelKardex->insert($dataKardex);
 
+        $dataKardexMovimiento = [
+            'tablaMovimientoId'         => $kardexId
+        ];
+        $operacionKardex = $modelKardex->update($kardexId, $dataKardexMovimiento);
 
         $response = [
             'success' => true,

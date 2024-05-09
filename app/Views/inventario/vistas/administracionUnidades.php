@@ -1,8 +1,3 @@
-<?= 
-    $this->extend('Panel/plantilla'); 
-    $this->section('contenido');
-?>
-
 <h2>Unidades de medida</h2>
 
 <hr>
@@ -94,7 +89,7 @@ function modalUnidades(unidadMedidaId, operacion) {
         });
     }
 $(document).ready(function() {
-    
+    tituloVentana('Unidades de medida');
     $('#tblUnidades').DataTable({
             "ajax": {
                 "method": "POST",
@@ -109,10 +104,8 @@ $(document).ready(function() {
                 { "width": "35%", "targets": 2 }
             ],
             "language": {
-                "url": "../../../assets/plugins/datatables/js/spanish.json"
+                "url": "../assets/plugins/datatables/js/spanish.json"
             },
         });
     });
 </script>
-
-<?= $this->endSection(); ?>

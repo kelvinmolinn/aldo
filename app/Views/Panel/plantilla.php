@@ -147,7 +147,7 @@
                 </a>
                 <ul class="nav nav-treeview">
                   <li class="nav-item">
-                    <a href="<?= site_url('inventario/admin-producto/index'); ?>" class="nav-link">
+                    <a role="button" class="nav-link" onclick="cambiarInterfaz('inventario/admin-producto/index', {renderVista: 'No'});">
                       <i class="fas fa-box-open nav-icon"></i>
                       <p>Existendia productos</p>
                     </a>
@@ -155,7 +155,7 @@
                 </ul>
                 <ul class="nav nav-treeview">
                   <li class="nav-item">
-                    <a href="<?= site_url('inventario/admin-unidades/index'); ?>" class="nav-link">
+                    <a role="button" class="nav-link" onclick="cambiarInterfaz('inventario/admin-unidades/index', {renderVista: 'No'});">
                       <i class="fas fa-tag nav-icon"></i>
                       <p>Unidades de medida</p>
                     </a>
@@ -163,7 +163,7 @@
                 </ul>
                 <ul class="nav nav-treeview">
                   <li class="nav-item">
-                    <a href="<?= site_url('inventario/admin-tipo/index'); ?>" class="nav-link">
+                    <a role="button" class="nav-link" onclick="cambiarInterfaz('inventario/admin-tipo/index', {renderVista: 'No'});">
                       <i class="fas fa-box nav-icon"></i>
                       <p>Tipos de producto</p>
                     </a>

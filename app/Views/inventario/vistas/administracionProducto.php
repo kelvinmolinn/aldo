@@ -1,7 +1,3 @@
-<?= 
-    $this->extend('Panel/plantilla'); 
-    $this->section('contenido');
-?>
 <h2>Inventario de productos</h2>
 <hr>
 
@@ -205,6 +201,7 @@
         });
     }
         $(document).ready(function() {
+            tituloVentana("Existencias Productos");
             $('#tblProducto').DataTable({
                 "ajax": {
                     "method": "POST",
@@ -221,7 +218,7 @@
                     { "width": "15%"}  
                 ],
                 "language": {
-                    "url": "../../../assets/plugins/datatables/js/spanish.json"
+                    "url": "../assets/plugins/datatables/js/spanish.json"
                 },
                 "drawCallback": function(settings) {
                     // Inicializar tooltips de Bootstrap después de cada dibujo de la tabla
@@ -230,5 +227,3 @@
             });
     });
 </script>
-
-<?= $this->endSection(); ?>

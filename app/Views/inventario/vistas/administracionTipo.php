@@ -1,8 +1,3 @@
-<?= 
-    $this->extend('Panel/plantilla'); 
-    $this->section('contenido');
-?>
-
 <h2>Tipos de producto</h2>
 <hr>
 <div class="row mb-4">
@@ -94,7 +89,7 @@
         });
     }
     $(document).ready(function() {
-    
+    tituloVentana('Tipos de producto');
     $('#tblTipo').DataTable({
             "ajax": {
                 "method": "POST",
@@ -109,11 +104,8 @@
                 { "width": "35%", "targets": 2 }
             ],
             "language": {
-                "url": "../../../assets/plugins/datatables/js/spanish.json"
+                "url": "../assets/plugins/datatables/js/spanish.json"
             },
         });
     });
 </script>
-
-
-<?= $this->endSection(); ?>
