@@ -5,7 +5,7 @@
         $mensajeAlerta = "Proveedor creado con éxito";
     }
 ?>
-<form id="frmModal">
+<form id="frmModal" method="post" action="<?php echo base_url('conf-general/admin-usuarios/operacion/usuarios'); ?>">
     <div id="modalProveedores" class="modal" tabindex="-1" data-backdrop="static" data-keyboard="false">
         <div class="modal-dialog  modal-lg">
             <div class="modal-content">
@@ -27,8 +27,8 @@
                             <div class="form-select-control">
                                 <select name="selectTipoPersona" id="selectTipoPersona" style="width: 100%;" required>
                                     <option value=""></option>
-                                    <option value="Local">Proveedor local</option>
-                                    <option value="Internacional">Proveedor Internacional</option>
+                                    <option value="Natural">Persona natural</option>
+                                    <option value="Juridica">Persona juridica</option>
                                 </select>
                             </div>
                         </div>
@@ -36,8 +36,9 @@
                             <div class="form-select-control">
                                 <select name="selectTipoContribuyente" id="selectTipoContribuyente" style="width: 100%;" required>
                                     <option value=""></option>
-                                    <option value="Local">Proveedor local</option>
-                                    <option value="Internacional">Proveedor Internacional</option>
+                                    <option value="Grandes">Grandes contribuyentes</option>
+                                    <option value="Medianos">Medianos contribuyentes</option>
+                                    <option value="Otros">Otros contribuyentes</option>
                                 </select>
                             </div>
                         </div>
@@ -68,6 +69,27 @@
                                     <option value="Nit">NIT</option>
                                     <option value="Otro">Otro</option>
                                 </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-outline">
+                                <input type="number" id="numeroDocumento" name="numeroDocumento" class="form-control " placeholder="Numero del documento" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <div class="form-select-control">
+                                <select name="selectActividadEconomica" id="selectActividadEconomica" style="width: 100%;" required>
+                                    <option value=""></option>
+                                    <option value="Ventas">Ventas de juegos</option>
+                                    <option value="Otro">Otro</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-outline">
+                                <input type="text" id="direccionProveedor" name="direccionProveedor" class="form-control " placeholder="Dirección del proveedor" required>
                             </div>
                         </div>
                     </div>                
@@ -103,5 +125,45 @@
         $("#selectTipoDocumento").select2({
             placeholder: 'Tipo de documento'
         });
+        $("#selectActividadEconomica").select2({
+            placeholder: 'Actividad economica'
+        });
+
+        $("#frmModal").submit(function(event) {
+            event.preventDefault();
+            $.ajax({
+                url: $(this).attr('action'), 
+                type: $(this).attr('method'),
+                data: $(this).serialize(),
+                success: function(response) {
+                    console.log(response);
+                    if (response.success) {
+                        // Insert exitoso, ocultar modal y mostrar mensaje
+                        $('#modalUsuario').modal('hide');
+                        Swal.fire({
+                            icon: 'success',
+                            title: '¡Usuario agregado con Éxito!',
+                            text: response.mensaje
+                        }).then((result) => {
+                            // Recargar la DataTable después del insert
+                            
+                        });
+                        console.log("Último ID insertado:", response.empleadoId);
+                    } else {
+                        // Insert fallido, mostrar mensaje de error
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.mensaje
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    // Manejar errores si los hay
+                    console.error(xhr.responseText);
+                }
+            });
+        });
+
     });
 </script>
