@@ -5,7 +5,7 @@
         $mensajeAlerta = "Proveedor creado con éxito";
     }
 ?>
-<form id="frmModal" method="post" action="<?php echo base_url('conf-general/admin-usuarios/operacion/usuarios'); ?>">
+<form id="frmModal" method="post" action="<?php echo base_url('compras/admin-proveedores/operacion/guardar/proveedores'); ?>">
     <div id="modalProveedores" class="modal" tabindex="-1" data-backdrop="static" data-keyboard="false">
         <div class="modal-dialog  modal-lg">
             <div class="modal-content">
@@ -13,6 +13,8 @@
                     <h5 class="modal-title"><?php echo ($operacion == 'editar' ? 'Editar Proveedor' : 'Nuevo Proveedor');?></h5>
                 </div>
                 <div class="modal-body">
+                    <input type="hidden" id="proveedorId" name="proveedorId" value="<?= $campos['proveedorId'] ?>">
+                    <input type="hidden" id="operacion" name="operacion" value="<?= $operacion; ?>">
                     <div class="row">
                         <div class="col-md-4">
                             <div class="form-select-control">
@@ -27,8 +29,9 @@
                             <div class="form-select-control">
                                 <select name="selectTipoPersona" id="selectTipoPersona" style="width: 100%;" required>
                                     <option value=""></option>
-                                    <option value="Natural">Persona natural</option>
-                                    <option value="Juridica">Persona juridica</option>
+                                    <?php foreach ($tipoPersona as $tipoPersona){ ?>
+                                        <option value="<?php echo $tipoPersona['tipoPersonaId']; ?>"><?php echo $tipoPersona['tipoPersona']; ?></option>
+                                    <?php } ?>
                                 </select>
                             </div>
                         </div>
@@ -36,9 +39,9 @@
                             <div class="form-select-control">
                                 <select name="selectTipoContribuyente" id="selectTipoContribuyente" style="width: 100%;" required>
                                     <option value=""></option>
-                                    <option value="Grandes">Grandes contribuyentes</option>
-                                    <option value="Medianos">Medianos contribuyentes</option>
-                                    <option value="Otros">Otros contribuyentes</option>
+                                    <?php foreach ($tipoContribuyente as $tipoContribuyente){ ?>
+                                        <option value="<?php echo $tipoContribuyente['tipoContribuyenteId']; ?>"><?php echo $tipoContribuyente['tipoContribuyente']; ?></option>
+                                    <?php } ?>
                                 </select>
                             </div>
                         </div>
@@ -65,9 +68,9 @@
                             <div class="form-select-control">
                                 <select name="selectTipoDocumento" id="selectTipoDocumento" style="width: 100%;" required>
                                     <option value=""></option>
-                                    <option value="Dui">DUI</option>
-                                    <option value="Nit">NIT</option>
-                                    <option value="Otro">Otro</option>
+                                    <?php foreach ($documentoIdentificacion as $documentoIdentificacion){ ?>
+                                        <option value="<?php echo $documentoIdentificacion['documentoIdentificacionId']; ?>"><?php echo $documentoIdentificacion['documentoIdentificacion']; ?></option>
+                                    <?php } ?>
                                 </select>
                             </div>
                         </div>
@@ -82,8 +85,9 @@
                             <div class="form-select-control">
                                 <select name="selectActividadEconomica" id="selectActividadEconomica" style="width: 100%;" required>
                                     <option value=""></option>
-                                    <option value="Ventas">Ventas de juegos</option>
-                                    <option value="Otro">Otro</option>
+                                    <?php foreach ($actividadEconomica as $actividadEconomica){ ?>
+                                        <option value="<?php echo $actividadEconomica['actividadEconomicaId']; ?>"><?php echo $actividadEconomica['actividadEconomica']; ?></option>
+                                    <?php } ?>
                                 </select>
                             </div>
                         </div>
@@ -111,6 +115,12 @@
 
 <script>
     $(document).ready(function() {
+
+        $('#nrc').inputmask({
+            mask: '999-999',
+            placeholder: ''
+        });
+
         $("#selectTipoProveedor").select2({
             placeholder: 'Tipo proveedor'
         });
@@ -139,16 +149,16 @@
                     console.log(response);
                     if (response.success) {
                         // Insert exitoso, ocultar modal y mostrar mensaje
-                        $('#modalUsuario').modal('hide');
+                        $('#modalProveedores').modal('hide');
                         Swal.fire({
                             icon: 'success',
-                            title: '¡Usuario agregado con Éxito!',
+                            title: '<?php echo $mensajeAlerta; ?>',
                             text: response.mensaje
                         }).then((result) => {
-                            // Recargar la DataTable después del insert
+                            $("#tablaProveedores").DataTable().ajax.reload(null, false);
                             
                         });
-                        console.log("Último ID insertado:", response.empleadoId);
+                        console.log("Último ID insertado:", response.proveedorId);
                     } else {
                         // Insert fallido, mostrar mensaje de error
                         Swal.fire({

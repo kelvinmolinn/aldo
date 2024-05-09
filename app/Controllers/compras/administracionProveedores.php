@@ -7,6 +7,10 @@ use CodeIgniter\Controller;
 use App\Models\comp_proveedores;
 use App\Models\comp_proveedores_contacto;
 use App\Models\cat_tipo_contacto;
+use App\Models\cat_tipo_persona;
+use App\Models\cat_documentos_identificacion;
+use App\Models\cat_actividad_economica;
+use App\Models\cat_tipo_contribuyente;
 
 class administracionProveedores extends Controller
 {
@@ -84,14 +88,38 @@ class administracionProveedores extends Controller
     }
     public function modalProveedores(){
         $operacion = $this->request->getPost('operacion');
+
+        $catTipoPersona = new cat_tipo_persona;
+        $data['tipoPersona'] = $catTipoPersona
+            ->select('tipoPersonaId,tipoPersona')
+            ->where('flgElimina', 0)
+            ->findAll();
+
+        $catDocumentoIdentificacion = new cat_documentos_identificacion;
+        $data['documentoIdentificacion'] = $catDocumentoIdentificacion
+            ->select('documentoIdentificacionId,documentoIdentificacion')
+            ->where('flgElimina', 0)
+            ->findAll();
+
+        $catActividadEconomica = new cat_actividad_economica;
+        $data['actividadEconomica'] = $catActividadEconomica
+            ->select('actividadEconomicaId,actividadEconomica')
+            ->where('flgElimina', 0)
+            ->findAll();
+
+        $catTipoContribuyente = new cat_tipo_contribuyente;
+        $data['tipoContribuyente'] = $catTipoContribuyente
+            ->select('tipoContribuyenteId,tipoContribuyente')
+            ->where('flgElimina', 0)
+            ->findAll();
+
         if($operacion == 'editar') {
             $proveedorId = $this->request->getPost('proveedorId');
 
             $proveedor = new comp_proveedores();
             $data['campos'] = $proveedor
-            ->select('')
-            ->where('', 0)
-            ->where('',)
+            ->select('proveedorId,tipoProveedorOrigen,tipoPersonaId,documentoIdentificacionId,ncrProveedor,numDocumentoIdentificacion,proveedor,proveedorComercial,actividadEconomicaId,tipoContribuyenteId,direccionProveedor')
+            ->where('flgElimina', 0)
             ->first();
         } else {
             $data['campos'] = [
@@ -105,12 +133,53 @@ class administracionProveedores extends Controller
                 'proveedorComercial'        => '',
                 'actividadEconomicaId'      => '',
                 'tipoContribuyenteId'       => '',
-                'direccionProveedor'        => '',
-                'estadoProveedor'           => 'Activo'
+                'direccionProveedor'        => ''
             ];
         }
         $data['operacion'] = $operacion;
 
         return view('compras/modals/modalProveedores', $data);
+    }
+    public function modalProveedorOperacion(){
+        $operacion      = $this->request->getPost('operacion');
+        $proveedorId    = $this->request->getPost('proveedorId');
+        
+        $proveedor = new comp_proveedores();
+
+
+        $data = [
+            'tipoProveedorOrigen'           => $this->request->getPost('selectTipoProveedor'),
+            'tipoPersonaId'                 => $this->request->getPost('selectTipoPersona'),
+            'documentoIdentificacionId'     => $this->request->getPost('selectTipoDocumento'),
+            'ncrProveedor'                  => $this->request->getPost('nrc'),
+            'numDocumentoIdentificacion'    => $this->request->getPost('numeroDocumento'),
+            'proveedor'                     => $this->request->getPost('nombreProveedor'),
+            'proveedorComercial'            => $this->request->getPost('nombreComercial'),
+            'actividadEconomicaId'          => $this->request->getPost('selectActividadEconomica'),
+            'tipoContribuyenteId'           => $this->request->getPost('selectTipoContribuyente'),
+            'direccionProveedor'            => $this->request->getPost('direccionProveedor'),
+            'estadoProveedor'               => "Activo"
+        ];
+
+        if($operacion == 'editar') {
+            $operacionProveedor = $proveedor->update($this->request->getPost('proveedorId'), $data);
+        } else {
+            // Insertar datos en la base de datos
+            $operacionProveedor = $proveedor->insert($data);
+        }
+        if ($operacionProveedor) {
+            // Si el insert fue exitoso, devuelve el último ID insertado
+            return $this->response->setJSON([
+                'success' => true,
+                'mensaje' => 'Proveedor '.($operacion == 'editar' ? 'actualizado' : 'agregado').' correctamente',
+                'proveedorId' => ($operacion == 'editar' ? $this->request->getPost('proveedorId') : $proveedor->insertID())
+            ]);
+        } else {
+            // Si el insert falló, devuelve un mensaje de error
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'No se pudo insertar el Proveedor'
+            ]);
+        }
     } 
 }
