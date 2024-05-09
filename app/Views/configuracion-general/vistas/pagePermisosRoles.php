@@ -1,16 +1,10 @@
-<?= 
-    $this->extend('Panel/plantilla'); 
-    $this->section('contenido');
-
-    //$param1 = $request->getGet('modulo');
-?>
 <h2>Permisos del rol: <?php echo  $rol;?></h2>
 <hr>
 <div class="row mb-4">
     <div class="col-md-6">
         <button type= "button" id="btnRegresarRol" class="btn btn-secondary estilo-btn">
             <i class="fas fa-angle-double-left"> </i>
-            Volver a Módulo
+            Volver a Roles
         </button>
     </div>
     <div class="col-md-6 text-right">
@@ -53,8 +47,7 @@
     }
     $(document).ready(function() {
         $('#btnRegresarRol').on('click', function() {
-            // Redireccionar a la URL correspondiente
-            window.location.href = '<?php echo base_url('conf-general/admin-roles/index'); ?>';
+            cambiarInterfaz('conf-general/admin-roles/index', {renderVista: 'No'});
         });
         $('#btnNuevoPermiso').on('click', function() {
             // Realizar una petición AJAX para obtener el contenido de la modal
@@ -98,7 +91,7 @@
                 { "width": "35%"}
             ],
             "language": {
-                "url": "../../../../../../../assets/plugins/datatables/js/spanish.json"
+                "url": "../assets/plugins/datatables/js/spanish.json"
             },
             "drawCallback": function(settings) {
                 // Inicializar tooltips de Bootstrap después de cada dibujo de la tabla
@@ -107,4 +100,3 @@
         });
     });
 </script>
-<?= $this->endSection(); ?>

@@ -6,7 +6,15 @@
     class UsuarioLogin extends Model
     {
         protected $table = 'conf_usuarios';
-    
+        protected $primaryKey = 'usuarioId'; // si el nombre de la clave primaria es diferente
+
+        protected $allowedFields = ['empleadoId','rolId','correo','clave', 'flgEnLinea', 'numIngresos', 'fhUltimoIngreso', 'intentosIngreso','estadoUsuario','flgElimina'];
+
+        protected $useTimestamps = true; // Utiliza campos de timestamp para created_at y updated_at
+
+        protected $createdField  = 'fhAgrega'; // Campo creado automáticamente al insertar
+        protected $updatedField  = 'fhEdita'; // Campo actualizado automáticamente al actualizar
+
         public function obtenerUsuario($data)
         {
             // Agregar JOIN a conf_empleados (cambiar cof a conf) 

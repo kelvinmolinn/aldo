@@ -34,9 +34,16 @@ class AdministracionUsuarios extends Controller
                                         ->countAllResults();
                 $empleado['conteo_sucursales'] = $conteo;
             }
-    
-    
-        return view('configuracion-general/vistas/administracionUsuarios', $data);
+
+            $camposSession = [
+                'renderVista' => 'No'
+            ];
+            $session->set([
+                'route'             => 'conf-general/admin-usuarios/index',
+                'camposSession'     => json_encode($camposSession)
+            ]);
+
+            return view('configuracion-general/vistas/administracionUsuarios', $data);
         }
     }
 
@@ -159,9 +166,12 @@ class AdministracionUsuarios extends Controller
         }
     }
 
-    public function usuarioSucursal($empleadoId, $nombreCompleto){
-        $data['empleadoId'] = $empleadoId;
-        $data['nombreCompleto'] = $nombreCompleto;
+    public function usuarioSucursal(){
+        // $empleadoId, $nombreCompleto
+        $session = session();
+        
+        $data['empleadoId'] = $this->request->getPost('empleadoId');
+        $data['nombreCompleto'] = $this->request->getPost('nombreCompleto');
 
         $mostrarSucursalUsuario = new conf_sucursales_empleados();
 
@@ -169,8 +179,18 @@ class AdministracionUsuarios extends Controller
             ->select('conf_sucursales.sucursal, conf_sucursales_empleados.sucursalUsuarioId')
             ->join('conf_sucursales', 'conf_sucursales.sucursalId = conf_sucursales_empleados.sucursalId')
             ->where('conf_sucursales_empleados.flgElimina', 0)
-            ->where('conf_sucursales_empleados.empleadoId',$empleadoId)
+            ->where('conf_sucursales_empleados.empleadoId',$data['empleadoId'])
             ->findAll(); 
+
+        $camposSession = [
+            'renderVista'       => 'No',
+            'empleadoId'        => $data['empleadoId'],
+            'nombreCompleto'    => $data['nombreCompleto']
+        ];
+        $session->set([
+            'route'             => 'conf-general/admin-usuarios/vista/usuario/sucursal',
+            'camposSession'     => json_encode($camposSession)
+        ]);
 
         return view('configuracion-general/vistas/pageUsuariosSucursales', $data);
     }

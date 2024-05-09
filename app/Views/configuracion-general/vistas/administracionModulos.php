@@ -1,7 +1,3 @@
-<?= 
-    $this->extend('Panel/plantilla'); 
-    $this->section('contenido');
-?>
 <h2>Gestión de Módulos</h2>
 <hr>
 <div class="row mb-4">
@@ -114,7 +110,7 @@
                 { "width": "15%", "targets": 3 }  
             ],
             "language": {
-                "url": "../../../assets/plugins/datatables/js/spanish.json"
+                "url": "../assets/plugins/datatables/js/spanish.json"
             },
             "drawCallback": function(settings) {
                 // Inicializar tooltips de Bootstrap después de cada dibujo de la tabla
@@ -123,4 +119,3 @@
         });
     });
 </script>
-<?= $this->endSection(); ?>

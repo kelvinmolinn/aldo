@@ -1,14 +1,10 @@
-<?= 
-    $this->extend('Panel/plantilla'); 
-    $this->section('contenido');
-?>
 <h2>Permisos del menu: <?= $menu;?></h2>
 <hr>
 <div class="row mb-4">
     <div class="col-md-6">
         <button type= "button" id="btnRegresar" class="btn btn-secondary estilo-btn">
             <i class="fas fa-angle-double-left"> </i>
-            Volver a menus
+            Volver a menús
         </button>
     </div>
     <div class="col-md-12 text-right">
@@ -131,8 +127,7 @@
 
     $(document).ready(function() {
         $('#btnRegresar').on('click', function() {
-            // Redireccionar a la URL correspondiente
-            window.location.href = '<?php echo base_url('conf-general/admin-modulos/vista/modulos/menus/'.$modulo['moduloId'].'/'.$modulo['modulo']); ?>';
+            cambiarInterfaz('conf-general/admin-modulos/vista/modulos/menus', {renderVista: 'No', moduloId: '<?= $modulo["moduloId"]; ?>', modulo: '<?= $modulo["modulo"]; ?>'});
         });
 
         $('#tablaPermisos').DataTable({
@@ -149,7 +144,7 @@
                 { "width": "35%", "targets": 2 } 
             ],
             "language": {
-                "url": "../../../../../assets/plugins/datatables/js/spanish.json"
+                "url": "../assets/plugins/datatables/js/spanish.json"
             },
                 "drawCallback": function(settings) {
                 // Inicializar tooltips de Bootstrap después de cada dibujo de la tabla
@@ -158,4 +153,3 @@
         });
     });
 </script>
-<?= $this->endSection(); ?>

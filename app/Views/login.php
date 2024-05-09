@@ -34,7 +34,14 @@
 
       <form action="<?php echo base_url('login/validarIngreso'); ?>" method="post">
         <div class="input-group mb-3">
-          <input type="email" name="correoUsuario" id="correoUsuario" class="form-control" placeholder="Correo electrónico" required>
+          <!-- Mensaje de error si lo hay -->
+          <?php 
+            $correoUsuario = "";
+            if (session()->has('correo')): 
+              $correoUsuario = session('correo');
+            endif; 
+          ?>
+          <input type="email" name="correoUsuario" id="correoUsuario" class="form-control" placeholder="Correo electrónico" value="<?php echo $correoUsuario; ?>" required>
           <div class="input-group-append">
             <div class="input-group-text">
               <span class="fas fa-envelope"></span>
@@ -64,27 +71,13 @@
         </div>
         <!-- Mensaje de error si lo hay -->
         <?php if (session()->has('mensaje')): ?>
-            <p style="color: red;"><?php echo session('mensaje'); ?></p>
+            <p id="divMensaje" style="color: red;"><?php echo session('mensaje'); ?></p>
         <?php endif; ?>
         <div class="row">
             <button type="submit" class="btn btn-primary btn-block">Iniciar Sesion</button>
         </div>          
       </form>
       <br>
-      <div class="row">
-          <div class="col-12" style="text-aling: center;" >
-              <?php 
-                if(isset($mensaje)){ ?>
-                <div class="alert alert-<?php $tipo; ?>" >
-                    <?php echo $mensaje; ?>
-                </div>
-              <?php
-
-                }
-                ?>
-                
-          </div>
-      </div>
       <p class="mt-4">
         <a href="forgot-password.html">¿Olvidó su contraseña?</a>
       </p>
@@ -100,5 +93,12 @@
 <script src="<?php echo base_url();?>../assets/plugins/bootstrap/js/popper.min.js"></script>
 <!-- AdminLTE App -->
 <script src="<?php echo base_url();?>../assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+<script>
+  $(document).ready(function() {
+    $("#claveUsuario").keyup(function(e) {
+      $("#divMensaje").html('');
+    });
+  });
+</script>
 </body>
 </html>

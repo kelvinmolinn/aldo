@@ -1,10 +1,3 @@
-<?= 
-    $this->extend('Panel/plantilla'); 
-    $this->section('contenido');
-
-    //$usuarioId = $request->getGet('usuarioId');
-    //$nombreCompleto = $request->getGet('nombreCompleto');
-?>
 <h2>Asignación de sucursales a usuario: <?php echo  $nombreCompleto;?></h2>
 <hr>
 <div class="row mb-4">
@@ -107,6 +100,8 @@
     }
 
     $(document).ready(function() {
+        tituloVentana('Usuarios - Sucursales');
+
         $('#btnAsignarSucursal').on('click', function() {
             // Realizar una petición AJAX para obtener el contenido de la modal
             $.ajax({
@@ -131,12 +126,12 @@
 
         $('#btnRegresarUsuarios').on('click', function() {
             // Redireccionar a la URL correspondiente
-            window.location.href = '<?php echo base_url('conf-general/admin-usuarios/index'); ?>';
+            cambiarInterfaz('conf-general/admin-usuarios/index', {renderVista: 'No'});
         });
 
         $('#tblSucursales').DataTable({
             "language": {
-                "url": "../../../../../../../assets/plugins/datatables/js/spanish.json"
+                "url": "../assets/plugins/datatables/js/spanish.json"
             },
             "columnDefs": [
                 { "width": "10%"}, 
@@ -146,4 +141,3 @@
         });
     });
 </script>
-<?= $this->endSection(); ?>

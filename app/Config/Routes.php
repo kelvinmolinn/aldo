@@ -39,14 +39,18 @@ $routes->post('login/validarIngreso', 'Login::validarIngreso');
 $routes->get('cerrarSession', 'Login::cerrarSession'); // 'cerrarSesion' corregido a 'cerrarSession'
 
 // Rutas para Panel
-$routes->get('escritorio/dashboard', 'Panel::index');
+$routes->post('escritorio/dashboard', 'Panel::escritorio');
+
+// Rutas para no usar parametros por URL
+$routes->get('app', 'Panel::index');
 
 $routes->group('conf-general/admin-usuarios', function($routes) {
     // Definir las rutas específicas para el grupo 'admin'
-    $routes->get('index', 'configuracionGeneral\AdministracionUsuarios::index');
+    $routes->post('index', 'configuracionGeneral\AdministracionUsuarios::index');
     $routes->post('form/empleados/usuarios', 'configuracionGeneral\AdministracionUsuarios::modalAdministracionUsuarios');
     $routes->post('operacion/usuarios', 'configuracionGeneral\AdministracionUsuarios::insertarNuevoUsuario');
-    $routes->get('vista/usuario/sucursal/(:any)', 'configuracionGeneral\AdministracionUsuarios::usuarioSucursal/$1'); 
+    //$routes->get('vista/usuario/sucursal/(:any)', 'configuracionGeneral\AdministracionUsuarios::usuarioSucursal/$1'); 
+    $routes->post('vista/usuario/sucursal', 'configuracionGeneral\AdministracionUsuarios::usuarioSucursal'); 
     $routes->post('form/Usuario/sucursal', 'configuracionGeneral\AdministracionUsuarios::modalUsuariosSucursales');
     $routes->post('operacion/agregar/usuario/sucursal', 'configuracionGeneral\AdministracionUsuarios::insertUsuariosSucursal');
     $routes->post('operacion/eliminar/usuario/sucursal', 'configuracionGeneral\AdministracionUsuarios::eliminarUsuarioSucursal');
@@ -55,12 +59,12 @@ $routes->group('conf-general/admin-usuarios', function($routes) {
 });
 
 $routes->group('conf-general/admin-roles', function($routes) {
-    $routes->get('index', 'configuracionGeneral\AdministracionRoles::index');
+    $routes->post('index', 'configuracionGeneral\AdministracionRoles::index');
     $routes->post('tabla/roles',  'configuracionGeneral\AdministracionRoles::tablaRoles');
     $routes->post('form/nuevo/rol', 'configuracionGeneral\AdministracionRoles::modalRol');
     $routes->post('operacion/guardar/rol', 'configuracionGeneral\AdministracionRoles::modalRolOperacion');
     $routes->post('operacion/eliminar/rol', 'configuracionGeneral\AdministracionRoles::eliminarRol');
-    $routes->get('vista/permisos/rol/(:any)', 'configuracionGeneral\AdministracionRoles::menusModulos/$1');
+    $routes->post('vista/permisos/rol', 'configuracionGeneral\AdministracionRoles::menusModulos');
     $routes->post('tabla/permisos/rol',  'configuracionGeneral\AdministracionRoles::tablaPermisosRol');
     $routes->post('obtener/permisos/select',  'configuracionGeneral\AdministracionRoles::obtenerPermisos');
     $routes->post('form/nuevo/permiso/rol', 'configuracionGeneral\AdministracionRoles::modalNuevoPermiso');
@@ -71,11 +75,11 @@ $routes->group('conf-general/admin-roles', function($routes) {
 
 $routes->group('conf-general/admin-modulos', function($routes) {
     // Definir las rutas específicas para el grupo 'admin'
-    $routes->get('index', 'configuracionGeneral\AdministracionPermisos::configuracionModulos');
+    $routes->post('index', 'configuracionGeneral\AdministracionPermisos::configuracionModulos');
     $routes->post('operacion/eliminar/modulo', 'configuracionGeneral\AdministracionPermisos::eliminarModulo');
     $routes->post('form/nuevo/modulo', 'configuracionGeneral\AdministracionPermisos::modalModulo');
     $routes->post('operacion/guardar/modulo', 'configuracionGeneral\AdministracionPermisos::modalModuloOperacion');
-    $routes->get('vista/modulos/menus/(:any)', 'configuracionGeneral\AdministracionPermisos::menusModulos/$1');
+    $routes->post('vista/modulos/menus', 'configuracionGeneral\AdministracionPermisos::menusModulos');
     $routes->post('form/modulo/nuevo/menu', 'configuracionGeneral\AdministracionPermisos::modalMenu');
     $routes->post('operacion/guardar/menu', 'configuracionGeneral\AdministracionPermisos::modalMenuOperacion');
     $routes->post('operacion/eliminar/menu', 'configuracionGeneral\AdministracionPermisos::eliminarMenu');
@@ -85,7 +89,7 @@ $routes->group('conf-general/admin-modulos', function($routes) {
 
 $routes->group('conf-general/admin-permisos', function($routes) {
     // Definir las rutas específicas para el grupo 'admin'
-    $routes->get('index/(:any)', 'configuracionGeneral\ConfiguracionPermisos::indexPermisos/$1');
+    $routes->post('index', 'configuracionGeneral\ConfiguracionPermisos::indexPermisos');
     $routes->post('tabla/permisos',  'configuracionGeneral\ConfiguracionPermisos::tablaPermisos');
     $routes->post('form/nuevo/permiso', 'configuracionGeneral\ConfiguracionPermisos::modalPermiso');
     $routes->post('operacion/guardar/permisos', 'configuracionGeneral\ConfiguracionPermisos::modalPermisosOperacion');
@@ -93,7 +97,6 @@ $routes->group('conf-general/admin-permisos', function($routes) {
     $routes->post('tabla/usuarios/permiso', 'configuracionGeneral\ConfiguracionPermisos::modalUsuariosPermisos');
     $routes->post('tabla/modulos/permiso/usuarios',  'configuracionGeneral\ConfiguracionPermisos::tablaPermisosUsuarios');
 });
-
 $routes->group('inventario/admin-unidades', function($routes) {
     // Definir las rutas específicas para el grupo 'admin-unidades'
     $routes->get('index', 'inventario\AdministracionUnidades::index');

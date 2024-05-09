@@ -1,10 +1,4 @@
-<?= 
-    $this->extend('Panel/plantilla'); 
-    $this->section('contenido');
-?>
-
 <h2>Administración de usuarios</h2>
-
 <hr>
 <div class="row mb-4">
     <div class="col-md-12 text-right">
@@ -61,8 +55,8 @@
                         <button class="btn btn-primary mb-1" data-toggle="tooltip" data-placement="top" title="Editar" onclick="modalUsuario({usuarioId: '<?= $usuarioId; ?>',empleadoId: <?= $empleadoId; ?>, operacion: 'editar'});">
                             <i class="fas fa-pencil-alt"></i>
                         </button>
-                        <a href="<?= site_url('conf-general/admin-usuarios/vista/usuario/sucursal/' . $empleadoId . '/' . $nombreCompleto); ?>" class="btn btn-primary mb-1" data-toggle="tooltip" data-placement="top" title="Sucursales">
-                            <span><?= $empleados['conteo_sucursales'];?></span>
+                        <a role="button" class="btn btn-primary mb-1" data-toggle="tooltip" data-placement="top" title="Sucursales" onclick="cambiarInterfaz('conf-general/admin-usuarios/vista/usuario/sucursal', {empleadoId: '<?= $empleadoId; ?>', nombreCompleto: '<?= $nombreCompleto; ?>'});">
+                            <span>0</span>
                             <i class="fas fa-store"></i>
                         </a>
                         <?php
@@ -154,9 +148,11 @@
     }
     
     $(document).ready(function() {
+        tituloVentana('Usuarios');
+
         $('#tblEmpleados').DataTable({
             "language": {
-                "url": "../../../assets/plugins/datatables/js/spanish.json"
+                "url": "../assets/plugins/datatables/js/spanish.json"
             },
             "columnDefs": [
                 { "width": "10%"}, 
@@ -167,4 +163,3 @@
         });
     });
 </script>
-<?= $this->endSection(); ?>

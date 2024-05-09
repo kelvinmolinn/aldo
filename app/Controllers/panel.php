@@ -13,7 +13,39 @@ class Panel extends BaseController{
         
         //$data['usuarios'] = $usuario->obtenerDatos();
 
-        return view("Panel/escritorio");
+        $data['renderVista'] = $this->request->getPost("renderVista");
+
+        if($data['renderVista'] == "") {
+            $data['renderVista'] = "Sí";
+        } else {
+            $data['renderVista'] = "No";
+        }
+
+        $data['route'] = $session->get('route');
+        $data['tituloVentana'] = $session->get('tituloVentana');
+        $data['campos'] = $session->get('camposSession');
+
+        return view('Panel/app', $data);
+    }
+
+    public function escritorio(){        
+        $session = session();
+        
+        if(!$session->get('nombreUsuario')) {
+            return view('login');
+        }
+        $usuario = new UsuarioLogin();
+
+        $camposSession = [
+            'renderVista' => 'No'
+        ];
+
+        $session->set([
+            'route'             => 'escritorio/dashboard',
+            'camposSession'     => json_encode($camposSession)
+        ]);
+
+        return view('Panel/escritorio');
     }
 }
 

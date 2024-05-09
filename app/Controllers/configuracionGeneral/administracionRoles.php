@@ -19,6 +19,14 @@ class AdministracionRoles extends Controller
         } else {
             $data['variable'] = 0;
 
+            $camposSession = [
+                'renderVista' => 'No'
+            ];
+            $session->set([
+                'route'             => 'conf-general/admin-roles/index',
+                'camposSession'     => json_encode($camposSession)
+            ]);
+
             return view('configuracion-general/vistas/administracionRoles', $data);
         }
     }
@@ -40,20 +48,25 @@ class AdministracionRoles extends Controller
             $columna1 = $n;
             $columna2 = "<b>Rol: </b>". $campos['rol'];
             // Aquí puedes construir tus botones en la última columna
+            $jsonPermisos = [
+                "rolId"         => $campos['rolId'],
+                "rol"           => $campos['rol']
+            ];
+
             $columna3 = '
-                <a href="'.site_url('conf-general/admin-roles/vista/permisos/rol/' . $campos['rolId'] . '/' . $campos['rol']).'" class="btn btn-secondary mb-1" data-toggle="tooltip" data-placement="top" title="Menús">
+                <button type="button" onclick="cambiarInterfaz(`conf-general/admin-roles/vista/permisos/rol`, '.htmlspecialchars(json_encode($jsonPermisos)).');" class="btn btn-secondary mb-1" data-toggle="tooltip" data-placement="top" title="Menús">
                     <i class="fas fa-bars nav-icon"></i>
-                </a>
+                </button>
             ';
             
             $columna3 .= '
-                <button class="btn btn-primary mb-1" onclick="modalRoles(`'.$campos['rolId'].'`, `editar`);" data-toggle="tooltip" data-placement="top" title="Editar">
+                <button type="button" class="btn btn-primary mb-1" onclick="modalRoles(`'.$campos['rolId'].'`, `editar`);" data-toggle="tooltip" data-placement="top" title="Editar">
                     <i class="fas fa-pencil-alt"></i>
                 </button>
             '; 
 
             $columna3 .= '
-                <button class="btn btn-danger mb-1" onclick="eliminarRol(`'.$campos['rolId'].'`);" data-toggle="tooltip" data-placement="top" title="Eliminar">
+                <button  type="button" class="btn btn-danger mb-1" onclick="eliminarRol(`'.$campos['rolId'].'`);" data-toggle="tooltip" data-placement="top" title="Eliminar">
                     <i class="fas fa-trash"></i>
                 </button>
             '; 
@@ -151,13 +164,22 @@ class AdministracionRoles extends Controller
         }
     }
 
-    public function menusModulos($rolId, $rol)
+    public function menusModulos()
     {
-        $data["rolId"] = $rolId;
-        $data["rol"] = $rol;
+        $session = session();
+        $data["rolId"] = $this->request->getPost('rolId');
+        $data["rol"] = $this->request->getPost('rol');
 
-         // Esto es un ejemplo, ajusta según tu situación
-        // Cargar la vista 'administracionUsuarios.php' desde la carpeta 'Views/configuracion-general/vistas'
+        $camposSession = [
+            'renderVista'       => 'No',
+            'rolId'             => $data['rolId'],
+            'rol'               => $data['rol']
+        ];
+        $session->set([
+            'route'             => 'conf-general/admin-roles/vista/permisos/rol',
+            'camposSession'     => json_encode($camposSession)
+        ]);
+
         return view('configuracion-general/vistas/pagePermisosRoles', $data);
     }
 
@@ -184,7 +206,7 @@ class AdministracionRoles extends Controller
             $columna2 = "<b>Menú: </b>".$campos['menu'];
             // Aquí puedes construir tus botones en la última columna
             $columna3 = '
-                <button class="btn btn-primary mb-1" onclick="modalPermisosRolMenu(`'.$campos['menuId'].'`,`'.$campos['menu'].'`,`'.$campos['rolId'].'`)" data-toggle="tooltip" data-placement="top" title="Menús">
+                <button class="btn btn-primary mb-1" onclick="modalPermisosRolMenu(`'.$campos['menuId'].'`,`'.$campos['menu'].'`,`'.$campos['rolId'].'`)" data-toggle="tooltip" data-placement="top" title="Permisos del menú">
                     <i class="fas fa-bars nav-icon"></i>
                 </button>
             ';

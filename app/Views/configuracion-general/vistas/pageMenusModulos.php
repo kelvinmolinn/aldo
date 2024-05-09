@@ -1,16 +1,10 @@
-<?= 
-    $this->extend('Panel/plantilla'); 
-    $this->section('contenido');
-
-    //$param1 = $request->getGet('modulo');
-?>
 <h2>Asignación de menús a módulo: <?php echo  $modulo;?></h2>
 <hr>
 <div class="row mb-4">
     <div class="col-md-6">
         <button type= "button" id="btnRegresarModulo" class="btn btn-secondary estilo-btn">
             <i class="fas fa-angle-double-left"> </i>
-            Volver a Módulo
+            Volver a Módulos
         </button>
     </div>
     <div class="col-md-6 text-right">
@@ -64,7 +58,8 @@ function eliminarMenu(id) {
                                         text: response.mensaje
                                     }).then((result) => {
                                         // Recargar la DataTable después del insert
-                                        $("#tblMenus").DataTable().ajax.reload(null, false);                                    });
+                                        $("#tblMenus").DataTable().ajax.reload(null, false); 
+                                    });
                                 } else {
                                     // Insert fallido, mostrar mensaje de error
                                     Swal.fire({
@@ -107,8 +102,7 @@ function eliminarMenu(id) {
     }
     $(document).ready(function() {
         $('#btnRegresarModulo').on('click', function() {
-            // Redireccionar a la URL correspondiente
-            window.location.href = '<?php echo base_url('conf-general/admin-modulos/index'); ?>';
+            cambiarInterfaz('conf-general/admin-modulos/index', {renderVista: 'No'});
         });
         $('#tblMenus').DataTable({
             "ajax": {
@@ -126,7 +120,7 @@ function eliminarMenu(id) {
                 { "width": "15%"}  
             ],
             "language": {
-                "url": "../../../../../../../assets/plugins/datatables/js/spanish.json"
+                "url": "../assets/plugins/datatables/js/spanish.json"
             },
             "drawCallback": function(settings) {
                 // Inicializar tooltips de Bootstrap después de cada dibujo de la tabla
@@ -135,4 +129,3 @@ function eliminarMenu(id) {
         });
     });
 </script>
-<?= $this->endSection(); ?>

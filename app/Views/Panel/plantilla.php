@@ -57,7 +57,7 @@
   <!-- Main Sidebar Container -->
   <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
-    <a href="<?= site_url('escritorio/dashboard'); ?>" class="brand-link">
+    <a role="button" class="brand-link" onclick="cambiarInterfaz('escritorio/dashboard', {renderVista: 'No'});">
       <img class="brand-image img-circle elevation-3" style="opacity: .8" src="<?php echo base_url();?>../assets/plugins/img/algo_game_store.jpg">
       <span class="brand-text font-weight-light">Aldo Games</span>
     </a>
@@ -97,7 +97,7 @@
                 </a>
                 <ul class="nav nav-treeview">
                   <li class="nav-item">
-                    <a href="<?= site_url('conf-general/admin-usuarios/index'); ?>" class="nav-link">
+                    <a role="button" class="nav-link" onclick="cambiarInterfaz('conf-general/admin-usuarios/index', {renderVista: 'No'});">
                       <i class="fas fa-user nav-icon"></i>
                       <p>Usuarios</p>
                     </a>
@@ -105,7 +105,7 @@
                 </ul>
                 <ul class="nav nav-treeview">
                   <li class="nav-item">
-                    <a href="<?= site_url('conf-general/admin-roles/index'); ?>" class="nav-link">
+                    <a role="button" class="nav-link" onclick="cambiarInterfaz('conf-general/admin-roles/index', {renderVista: 'No'});">
                       <i class="fas fa-user nav-icon"></i>
                       <p>Roles</p>
                     </a>
@@ -121,7 +121,7 @@
                 </a>
                 <ul class="nav nav-treeview">
                   <li class="nav-item">
-                    <a href="<?= site_url('conf-general/admin-modulos/index'); ?>" class="nav-link">
+                    <a role="button" class="nav-link" onclick="cambiarInterfaz('conf-general/admin-modulos/index', {renderVista: 'No'});">
                       <i class="fas fa-tasks nav-icon"></i>
                       <p>Módulos</p>
                     </a>
@@ -211,7 +211,7 @@
   </aside>
 
   <!-- Content Wrapper. Contains page content -->
-  <div class="content-wrapper" style="padding-left: 15px; padding-right: 15px;">
+  <div id="divContenido" class="content-wrapper" style="padding-left: 15px; padding-right: 15px;">
     <!-- Content Header (Page header) -->
     <?php $this->renderSection('contenido'); ?>
     <!-- /.content -->
@@ -248,6 +248,22 @@
         window.location.href = '<?= site_url('cerrarSession'); ?>';
       }
     })
+  }
+  function tituloVentana(titulo) {
+      document.title = 'Aldo Games | ' + titulo;
+  }
+  function cambiarInterfaz(ruta, campos) {
+    $.ajax({
+      url: '<?= site_url(); ?>' + ruta,
+      type: 'POST',
+      data: campos,
+      success: function(response) {
+          $('#divContenido').html(response);
+      },
+      error: function(xhr, status, error) {
+        console.error(xhr.responseText);
+      }
+    });
   }
 </script>
 </html>

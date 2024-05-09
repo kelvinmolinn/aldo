@@ -9,7 +9,7 @@ use App\Models\conf_roles_permisos;
 
 class ConfiguracionPermisos extends Controller
 {
-    public function indexPermisos($menu, $menuId)
+    public function indexPermisos()
     {        
         $session = session();
         
@@ -17,19 +17,29 @@ class ConfiguracionPermisos extends Controller
             return view('login');
         } else {
     
-            $data['menu'] = $menu;
-            $data['menuId'] = $menuId;
+            $data['menu'] = $this->request->getPost('menu');
+            $data['menuId'] = $this->request->getPost('menuId');
 
             $menus = new conf_menus();
 
             $datos = $menus->select('conf_modulos.modulo,conf_modulos.moduloId')
                            ->join('conf_modulos', 'conf_modulos.moduloId = conf_menus.moduloId')
                            ->where('conf_menus.flgElimina', 0)
-                           ->where('conf_menus.menuId', $menuId)
+                           ->where('conf_menus.menuId', $data['menuId'])
                            ->first();
             //$modeloModulos = consulta hacia menus con jOIN a modulos
             $data['modulo'] = $datos;
-            // $data['moduloId']
+
+            $camposSession = [
+                'renderVista'           => 'No',
+                'menuId'                => $data['menuId'],
+                'menu'                  => $data['menu']
+            ];
+            $session->set([
+                'route'             => 'conf-general/admin-permisos/index',
+                'camposSession'     => json_encode($camposSession)
+            ]);
+
             return view('configuracion-general/vistas/administracionPermisos', $data);
         }
     }

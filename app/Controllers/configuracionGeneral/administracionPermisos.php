@@ -16,7 +16,15 @@ class AdministracionPermisos extends Controller
             return view('login');
         } else {
             $data['variable'] = 0;
-            // Cargar la vista 'administracionModulos.php' desde la carpeta 'Views/configuracion-general/vistas'
+
+            $camposSession = [
+                'renderVista' => 'No'
+            ];
+            $session->set([
+                'route'             => 'conf-general/admin-modulos/index',
+                'camposSession'     => json_encode($camposSession)
+            ]);
+
             return view('configuracion-general/vistas/administracionModulos', $data);
         }
     }
@@ -223,17 +231,27 @@ class AdministracionPermisos extends Controller
 
     }
     
-    public function menusModulos($moduloId, $modulo)
+    public function menusModulos()
     {
-        $data["moduloId"] = $moduloId;
-        $data["modulo"] = $modulo;
+        $session = session();
+        $data["moduloId"] = $this->request->getPost('moduloId');
+        $data["modulo"] = $this->request->getPost('modulo');
 
         $Menus = new conf_menus(); // Ajusta el nombre del modelo según sea necesario
-        $data['menus'] = $Menus->where('moduloId',$moduloId)
+        $data['menus'] = $Menus->where('moduloId',$data['moduloId'])
                                ->where('flgElimina', 0)
                                ->findAll();
-         // Esto es un ejemplo, ajusta según tu situación
-        // Cargar la vista 'administracionUsuarios.php' desde la carpeta 'Views/configuracion-general/vistas'
+
+        $camposSession = [
+            'renderVista'           => 'No',
+            'moduloId'              => $data['moduloId'],
+            'modulo'                => $data['modulo']
+        ];
+        $session->set([
+            'route'             => 'conf-general/admin-modulos/vista/modulos/menus',
+            'camposSession'     => json_encode($camposSession)
+        ]);
+
         return view('configuracion-general/vistas/pageMenusModulos', $data);
     }
 
@@ -304,11 +322,16 @@ class AdministracionPermisos extends Controller
                     <i class="fas fa-pencil-alt"></i>
                 </button>
             ';
-            
+
+            $jsonMenusModulo = [
+                "moduloId"          => $columna['moduloId'],
+                "modulo"            => $columna['modulo']
+            ];
+
             $columna4 .= '
-                <a href="'.site_url('conf-general/admin-modulos/vista/modulos/menus/' . $columna['moduloId'] . '/' . $columna['modulo']).'" class="btn btn-secondary mb-1" data-toggle="tooltip" data-placement="top" title="Menús">
+                <button type="button" class="btn btn-secondary mb-1" onclick="cambiarInterfaz(`conf-general/admin-modulos/vista/modulos/menus`, '.htmlspecialchars(json_encode($jsonMenusModulo)).');" data-toggle="tooltip" data-placement="top" title="Menús">
                     <i class="fas fa-bars nav-icon"></i>
-                </a>
+                </button>
             ';
 
             $columna4 .= '
@@ -368,12 +391,24 @@ class AdministracionPermisos extends Controller
                     <i class="fas fa-pencil-alt"></i>
                 </button>
             ';
+            /*
             $columna4 .= '
-                <a href="'.site_url('conf-general/admin-permisos/index/' . $columna['menu'] . '/' . $columna['menuId']).'" class="btn btn-secondary mb-1" data-toggle="tooltip" data-placement="top" title="Permisos">
+                <a href="'.site_url('conf-general/admin-permisos/index/' . $columna['menu'] . '/' . $columna['menuId']).'" class="btn btn-secondary mb-1" data-toggle="tooltip" data-placement="top" title="Permisos del menú">
                     <i class="fas fa-bars nav-icon"></i>
                 </a>
             ';
-            
+            */
+            $jsonPermisosMenu = [
+                "menuId"        => $columna["menuId"],
+                "menu"          => $columna["menu"]
+            ];
+
+            $columna4 .= '
+                <button type="button" class="btn btn-secondary mb-1" onclick="cambiarInterfaz(`conf-general/admin-permisos/index`, '.htmlspecialchars(json_encode($jsonPermisosMenu)).');" data-toggle="tooltip" data-placement="top" title="Permisos del menú">
+                    <i class="fas fa-bars nav-icon"></i>
+                </button>
+            ';
+
             $columna4 .= '
                 <button class="btn btn-danger mb-1" onclick="eliminarMenu(`'.$columna['menuId'].'`);" data-toggle="tooltip" data-placement="top" title="Eliminar">
                     <i class="fas fa-trash"></i>
@@ -398,5 +433,4 @@ class AdministracionPermisos extends Controller
             return $this->response->setJSON(array('data' => '')); // No hay datos, devuelve un array vacío
         }
     }
-    
 }
