@@ -1,8 +1,3 @@
-<?= 
-    $this->extend('Panel/plantilla'); 
-    $this->section('contenido');
-
-?>
 <h2>Proveedores</h2>
 <hr>
 <div class="row mb-4">
@@ -47,6 +42,7 @@
         });
     }
     $(document).ready(function() {
+        tituloVentana("Proveedores");
         $('#tablaProveedores').DataTable({
             "ajax": {
                 "method": "POST",
@@ -62,7 +58,7 @@
                 { "width": "20%", "targets": 3 } 
             ],
             "language": {
-                "url": "../../../assets/plugins/datatables/js/spanish.json"
+                "url": "../assets/plugins/datatables/js/spanish.json"
             },
                 "drawCallback": function(settings) {
                 // Inicializar tooltips de Bootstrap después de cada dibujo de la tabla
@@ -71,4 +67,3 @@
         });
     });
 </script>
-<?= $this->endSection(); ?>

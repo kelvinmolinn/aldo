@@ -42,6 +42,35 @@
                             </div>
                         </div>
                     </div>
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <div class="form-outline">
+                                <input type="text" id="nombreProveedor" name="nombreProveedor" class="form-control " placeholder="Nombre del proveedor" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-outline">
+                                <input type="text" id="nombreComercial" name="nombreComercial" class="form-control " placeholder="Nombre comercial" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col-md-4">
+                            <div class="form-outline">
+                                <input type="number" id="nrc" name="nrc" class="form-control " placeholder="NRC" required>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-select-control">
+                                <select name="selectTipoDocumento" id="selectTipoDocumento" style="width: 100%;" required>
+                                    <option value=""></option>
+                                    <option value="Dui">DUI</option>
+                                    <option value="Nit">NIT</option>
+                                    <option value="Otro">Otro</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>                
                 </div>
                 <div class="modal-footer">
                     <button type="submit" id="btnguardarProveedor" class="btn btn-primary">
@@ -70,6 +99,9 @@
 
         $("#selectTipoContribuyente").select2({
             placeholder: 'Tipo contribuyente'
+        });
+        $("#selectTipoDocumento").select2({
+            placeholder: 'Tipo de documento'
         });
     });
 </script>

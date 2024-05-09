@@ -144,7 +144,7 @@ $routes->group('inventario/admin-producto', function($routes) {
 });
 
 $routes->group('compras/admin-proveedores', function($routes) {
-    $routes->get('index', 'compras\administracionProveedores::index');
+    $routes->post('index', 'compras\administracionProveedores::index');
     $routes->post('tabla/proveedores',  'compras\administracionProveedores::tablaProveedores');
     $routes->post('form/nuevo/proveedor', 'compras\administracionProveedores::modalProveedores');
 });

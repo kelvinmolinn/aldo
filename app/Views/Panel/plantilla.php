@@ -189,7 +189,7 @@
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="<?= site_url('compras/admin-proveedores/index'); ?>" class="nav-link">
+                <a role="button" class="nav-link" onclick="cambiarInterfaz('compras/admin-proveedores/index', {renderVista: 'No'});">
                   <i class="fas fa-users"></i>
                   <p> Proveedores  
                   </p>

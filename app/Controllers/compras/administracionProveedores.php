@@ -18,7 +18,14 @@ class administracionProveedores extends Controller
             return view('login');
         } else {
             $data['variable'] = 0;
-            // Cargar la vista 'administracionModulos.php' desde la carpeta 'Views/configuracion-general/vistas'
+
+            $camposSession = [
+                'renderVista' => 'No'
+            ];
+            $session->set([
+                'route'             => 'compras/admin-proveedores/index',
+                'camposSession'     => json_encode($camposSession)
+            ]);
             return view('compras/vistas/proveedores', $data);
         }
     }
