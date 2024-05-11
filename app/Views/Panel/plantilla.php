@@ -30,6 +30,7 @@
   <script src="<?php echo base_url();?>../assets/plugins/select2/js/select2.min.js"></script>
   <script src="<?php echo base_url();?>../assets/plugins/datatables/js/dataTables.min.js"></script>
   <script src="<?php echo base_url();?>../assets/plugins/bootstrap/js/jquery.inputmask.min.js"></script>
+  <!--<script src="<?php echo base_url();?>../assets/plugins/bootstrap/js/jquery.inputmask.bundle.js"></script>-->
 </head>
 <body class="hold-transition sidebar-mini">
 <!-- Site wrapper -->

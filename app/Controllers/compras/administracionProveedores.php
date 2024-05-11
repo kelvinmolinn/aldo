@@ -38,7 +38,7 @@ class administracionProveedores extends Controller
         $mostrarProveedor = new comp_proveedores();
 
         $datos = $mostrarProveedor
-          ->select('comp_proveedores.tipoProveedorOrigen, comp_proveedores.tipoPersonaId,comp_proveedores.documentoIdentificacionId, comp_proveedores.ncrProveedor, comp_proveedores.numDocumentoIdentificacion, comp_proveedores.proveedor, comp_proveedores.proveedorComercial, cat_actividad_economica.actividadEconomica, comp_proveedores.tipoContribuyenteId, comp_proveedores.direccionProveedor')
+          ->select('comp_proveedores.tipoProveedorOrigen,comp_proveedores.proveedorId, comp_proveedores.tipoPersonaId,comp_proveedores.documentoIdentificacionId, comp_proveedores.ncrProveedor, comp_proveedores.numDocumentoIdentificacion, comp_proveedores.proveedor, comp_proveedores.proveedorComercial, cat_actividad_economica.actividadEconomica, comp_proveedores.tipoContribuyenteId, comp_proveedores.direccionProveedor')
           ->join('cat_actividad_economica' , 'cat_actividad_economica.actividadEconomicaId = comp_proveedores.actividadEconomicaId')
           ->where('comp_proveedores.flgElimina', 0)
           ->findAll();
@@ -55,7 +55,7 @@ class administracionProveedores extends Controller
 
 
             $columna4 = '
-                <button class="btn btn-primary mb-1" onclick="" data-toggle="tooltip" data-placement="top" title="Editar">
+                <button class="btn btn-primary mb-1" onclick="modalProveedor(`'.$columna['proveedorId'].'`, `editar`);" data-toggle="tooltip" data-placement="top" title="Editar">
                     <i class="fas fa-pencil-alt"></i>
                 </button>
             ';
@@ -120,6 +120,7 @@ class administracionProveedores extends Controller
             $data['campos'] = $proveedor
             ->select('proveedorId,tipoProveedorOrigen,tipoPersonaId,documentoIdentificacionId,ncrProveedor,numDocumentoIdentificacion,proveedor,proveedorComercial,actividadEconomicaId,tipoContribuyenteId,direccionProveedor')
             ->where('flgElimina', 0)
+            ->where('proveedorId', $proveedorId)
             ->first();
         } else {
             $data['campos'] = [

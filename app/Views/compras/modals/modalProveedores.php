@@ -49,19 +49,19 @@
                     <div class="row mt-4">
                         <div class="col-md-6">
                             <div class="form-outline">
-                                <input type="text" id="nombreProveedor" name="nombreProveedor" class="form-control " placeholder="Nombre del proveedor" required>
+                                <input type="text" id="nombreProveedor" name="nombreProveedor" class="form-control " placeholder="Nombre del proveedor" value="<?= $campos['proveedor']; ?>" required>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-outline">
-                                <input type="text" id="nombreComercial" name="nombreComercial" class="form-control " placeholder="Nombre comercial" required>
+                                <input type="text" id="nombreComercial" name="nombreComercial" class="form-control " placeholder="Nombre comercial" value="<?= $campos['proveedorComercial']; ?>" required>
                             </div>
                         </div>
                     </div>
                     <div class="row mt-4">
                         <div class="col-md-4">
                             <div class="form-outline">
-                                <input type="number" id="nrc" name="nrc" class="form-control " placeholder="NRC" required>
+                                <input type="number" id="nrc" name="nrc" class="form-control" placeholder="NRC" value="<?= $campos['ncrProveedor']; ?>" required>
                             </div>
                         </div>
                         <div class="col-md-4">
@@ -76,7 +76,7 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-outline">
-                                <input type="number" id="numeroDocumento" name="numeroDocumento" class="form-control " placeholder="Numero del documento" required>
+                                <input type="number" id="numeroDocumento" name="numeroDocumento" class="form-control" placeholder="Numero del documento" value="<?= $campos['numDocumentoIdentificacion']; ?>" required>
                             </div>
                         </div>
                     </div>
@@ -93,7 +93,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-outline">
-                                <input type="text" id="direccionProveedor" name="direccionProveedor" class="form-control " placeholder="Dirección del proveedor" required>
+                                <input type="text" id="direccionProveedor" name="direccionProveedor" class="form-control " placeholder="Dirección del proveedor" value="<?= $campos['direccionProveedor']; ?>" required>
                             </div>
                         </div>
                     </div>                
@@ -114,12 +114,8 @@
 </form>
 
 <script>
-    $(document).ready(function() {
 
-        $('#nrc').inputmask({
-            mask: '999-999',
-            placeholder: ''
-        });
+    $(document).ready(function() {
 
         $("#selectTipoProveedor").select2({
             placeholder: 'Tipo proveedor'
@@ -139,6 +135,8 @@
             placeholder: 'Actividad economica'
         });
 
+        $('#nrc').inputmask('999-999');
+        
         $("#frmModal").submit(function(event) {
             event.preventDefault();
             $.ajax({
@@ -174,6 +172,11 @@
                 }
             });
         });
+            $("#selectTipoProveedor").val('<?= $campos["tipoProveedorOrigen"]; ?>').trigger("change");
+            $("#selectTipoPersona").val('<?= $campos["tipoPersonaId"]; ?>').trigger("change");
+            $("#selectTipoContribuyente").val('<?= $campos["tipoContribuyenteId"]; ?>').trigger("change");
+            $("#selectTipoDocumento").val('<?= $campos["documentoIdentificacionId"]; ?>').trigger("change");
+            $("#selectActividadEconomica").val('<?= $campos["actividadEconomicaId"]; ?>').trigger("change");
 
     });
 </script>
