@@ -41,6 +41,7 @@ class administracionProveedores extends Controller
           ->select('comp_proveedores.tipoProveedorOrigen,comp_proveedores.proveedorId, comp_proveedores.tipoPersonaId,comp_proveedores.documentoIdentificacionId, comp_proveedores.ncrProveedor, comp_proveedores.numDocumentoIdentificacion, comp_proveedores.proveedor, comp_proveedores.proveedorComercial, cat_actividad_economica.actividadEconomica, comp_proveedores.tipoContribuyenteId, comp_proveedores.direccionProveedor')
           ->join('cat_actividad_economica' , 'cat_actividad_economica.actividadEconomicaId = comp_proveedores.actividadEconomicaId')
           ->where('comp_proveedores.flgElimina', 0)
+          ->orderBy('comp_proveedores.proveedorId', 'ASC')
           ->findAll();
     
         // Construye el array de salida

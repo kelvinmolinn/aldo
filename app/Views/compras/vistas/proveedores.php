@@ -4,7 +4,7 @@
     <div class="col-md-12 text-right">
         <button type= "button" id="btnNuevoProveedor" class="btn btn-primary estilo-btn" onclick="modalProveedor(0,'insertar');">
             <i class="fas fa-save"></i>
-            Nuevo permiso
+            Nuevo proveedor
         </button>
     </div>
 </div>
