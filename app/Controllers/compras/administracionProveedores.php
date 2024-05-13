@@ -66,7 +66,7 @@ class administracionProveedores extends Controller
                 </button>
             ';
             $columna4 .= '
-                <button class="btn btn-primary mb-1" onclick="" data-toggle="tooltip" data-placement="top" title="Contactos">
+                <button class="btn btn-primary mb-1" onclick="modalContactoProveedor(`'.$columna['proveedorId'].'`);" data-toggle="tooltip" data-placement="top" title="Contactos">
                     <i class="fas fa-address-book"></i>
                 </button>
             ';
@@ -182,6 +182,44 @@ class administracionProveedores extends Controller
                 'success' => false,
                 'mensaje' => 'No se pudo insertar el Proveedor'
             ]);
+        }
+    }
+    public function modalContactoProveedores(){
+        $data['proveedorId'] = $this->request->getPost('proveedorId');
+
+        $data['proveedor'] = $this->request->getPost('proveedor');
+
+        return view('compras/modals/modalContactoProveedor', $data);
+    }
+    public function tablaContactoProveedores(){
+        $contactoProveedor = new comp_proveedores_contacto();
+
+        $output['data'] = array();
+        $n = 1; // Variable para contar las filas
+        //foreach ($datos as $columna) {
+            // Aquí construye tus columnas
+            $columna1 = $n;
+            $columna2 = "<b>Telefono: </b>HOLA";
+
+            $columna3 = '
+                <button class="btn btn-primary mb-1" onclick="" data-toggle="tooltip" data-placement="top" title="Editar">
+                    <i class="fas fa-pencil-alt"></i>
+                </button>
+            ';
+            // Agrega la fila al array de salida
+            $output['data'][] = array(
+                $columna1,
+                $columna2,
+                $columna3
+            );
+    
+            $n++;
+        //}
+        // Verifica si hay datos
+        if ($n > 1) {
+            return $this->response->setJSON($output);
+        } else {
+            return $this->response->setJSON(array('data' => '')); // No hay datos, devuelve un array vacío
         }
     } 
 }

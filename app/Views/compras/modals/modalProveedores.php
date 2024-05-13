@@ -61,7 +61,7 @@
                     <div class="row mt-4">
                         <div class="col-md-4">
                             <div class="form-outline">
-                                <input type="number" id="nrc" name="nrc" class="form-control" placeholder="NRC" value="<?= $campos['ncrProveedor']; ?>" required>
+                                <input type="number" id="nrc" name="nrc" class="form-control" placeholder="NRC" min ="0" value="<?= $campos['ncrProveedor']; ?>" required>
                             </div>
                         </div>
                         <div class="col-md-4">
@@ -76,7 +76,7 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-outline">
-                                <input type="number" id="numeroDocumento" name="numeroDocumento" class="form-control" placeholder="Numero del documento" value="<?= $campos['numDocumentoIdentificacion']; ?>" required>
+                                <input type="number" id="numeroDocumento" name="numeroDocumento" class="form-control" placeholder="Numero del documento" value="<?= $campos['numDocumentoIdentificacion']; ?>" min ="0" required>
                             </div>
                         </div>
                     </div>

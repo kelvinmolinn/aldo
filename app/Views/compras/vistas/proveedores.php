@@ -41,6 +41,25 @@
             }
         });
     }
+
+    function modalContactoProveedor(proveedorId,proveedor) {
+        // Realizar una petición AJAX para obtener los datos del módulo por su ID
+        $.ajax({
+                url: '<?php echo base_url('compras/admin-proveedores/form/nuevo/contacto/proveedor'); ?>',
+                type: 'POST',
+                data: {proveedorId: proveedorId, proveedor: proveedor}, // Pasar el ID del módulo como parámetro
+                success: function(response) {
+                    // Insertar el contenido de la modal en el cuerpo de la modal
+                    $('#divModalContent').html(response);
+                    // Mostrar la modal
+                    $('#modalContactoProveedor').modal('show');
+                },
+            error: function(xhr, status, error) {
+                // Manejar errores si los hay
+                console.error(xhr.responseText);
+            }
+        });
+    }
     $(document).ready(function() {
         tituloVentana("Proveedores");
         $('#tablaProveedores').DataTable({
