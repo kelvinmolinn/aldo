@@ -3,10 +3,10 @@
         <div class="modal-dialog  modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Contacto del proveedor: </h5><?php //echo $campos['proveedorId']; ?>
+                    <h5 class="modal-title">Contacto del proveedor: <?php echo $proveedor; ?></h5>
                 </div>
                 <div class="modal-body">
-                    <input type="hidden" id="proveedorId" name="proveedorId" value="<?= $campos['proveedorId'] ?>">
+                    <input type="hidden" id="proveedorId" name="proveedorId" value="<?= $proveedorId; ?>">
                     <div class="row mb-4">
                         <div class="col-md-4">
                             <div class="form-select-control">
@@ -75,6 +75,8 @@
                             text: response.mensaje
                         }).then((result) => {
                             $("#tablaProveedores").DataTable().ajax.reload(null, false);
+                            // Actualizar tabla de contactos
+                            // Limpiar inputs con .val(null) o .val('')
                             
                         });
                         console.log("Último ID insertado:", response.proveedorId);

@@ -16,22 +16,18 @@ class administracionProveedores extends Controller
 {
     //ESTE CONTROLLERS ES DE PERMISOS 
     public function index(){
-
         $session = session();
-        if(!$session->get('nombreUsuario')) {
-            return view('login');
-        } else {
-            $data['variable'] = 0;
 
-            $camposSession = [
-                'renderVista' => 'No'
-            ];
-            $session->set([
-                'route'             => 'compras/admin-proveedores/index',
-                'camposSession'     => json_encode($camposSession)
-            ]);
-            return view('compras/vistas/proveedores', $data);
-        }
+        $data['variable'] = 0;
+
+        $camposSession = [
+            'renderVista' => 'No'
+        ];
+        $session->set([
+            'route'             => 'compras/admin-proveedores/index',
+            'camposSession'     => json_encode($camposSession)
+        ]);
+        return view('compras/vistas/proveedores', $data);
     }
 
     public function tablaProveedores(){
@@ -66,7 +62,7 @@ class administracionProveedores extends Controller
                 </button>
             ';
             $columna4 .= '
-                <button class="btn btn-primary mb-1" onclick="modalContactoProveedor(`'.$columna['proveedorId'].'`);" data-toggle="tooltip" data-placement="top" title="Contactos">
+                <button class="btn btn-primary mb-1" onclick="modalContactoProveedor(`'.$columna['proveedorId'].'`,`'.$columna['proveedor'].'`);" data-toggle="tooltip" data-placement="top" title="Contactos">
                     <i class="fas fa-address-book"></i>
                 </button>
             ';

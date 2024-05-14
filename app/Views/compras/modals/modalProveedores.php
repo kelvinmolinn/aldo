@@ -61,7 +61,7 @@
                     <div class="row mt-4">
                         <div class="col-md-4">
                             <div class="form-outline">
-                                <input type="number" id="nrc" name="nrc" class="form-control" placeholder="NRC" min ="0" value="<?= $campos['ncrProveedor']; ?>" required>
+                                <input type="text" id="nrc" name="nrc" class="form-control" placeholder="NRC" min ="0" value="<?= $campos['ncrProveedor']; ?>" required>
                             </div>
                         </div>
                         <div class="col-md-4">
@@ -76,7 +76,7 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-outline">
-                                <input type="number" id="numeroDocumento" name="numeroDocumento" class="form-control" placeholder="Numero del documento" value="<?= $campos['numDocumentoIdentificacion']; ?>" min ="0" required>
+                                <input type="text" id="numeroDocumento" name="numeroDocumento" class="form-control" placeholder="Numero del documento" value="<?= $campos['numDocumentoIdentificacion']; ?>" min ="0" required>
                             </div>
                         </div>
                     </div>
@@ -135,8 +135,17 @@
             placeholder: 'Actividad economica'
         });
 
-        $('#nrc').inputmask('999-999');
-        
+        //$('#nrc').inputmask('999-999');
+        $("#selectTipoDocumento").change(function(e) {
+            if($(this).val() == "1") {
+                $('#numeroDocumento').inputmask('99999999-9');
+            } else if($(this).val() == "2") {
+                $('#numeroDocumento').inputmask('9999-999999-999-9');
+            } else {
+                $('#numeroDocumento').inputmask('remove');
+            }
+        });
+
         $("#frmModal").submit(function(event) {
             event.preventDefault();
             $.ajax({
