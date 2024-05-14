@@ -1,3 +1,4 @@
+
 <form id="frmModal">
     <div id="modalPrecios" class="modal" tabindex="-1" data-backdrop="static" data-keyboard="false">
         <div class="modal-dialog  modal-xl">
@@ -7,15 +8,18 @@
                 </div>
                 <div class="modal-body">
 
-                    <!-- Botón para mostrar el input -->
-                <button id="mostrarInputBtn" class="btn btn-primary" type="button">Nuevo Precio</button>
-
-                <!-- Div para contener el input (inicialmente oculto) -->
-                <div id="inputContainer" style="display: none;">
-                  <label for="nuevoPrecio">Ingrese el nuevo precio:</label>
-                  <input type="number" id="nuevoPrecio" name="nuevoPrecio" disabled>
-                  <button class="btn btn-primary" id="guardarPrecioBtn">Guardar</button>
+                <div class="container modal-body">
+                    <div class="form-outline position-relative">
+                        <div class="col-md-4">
+                            <input type="number" id="precioVentaNuevo" class="form-control" name="precioVentaNuevo" placeholder="Nuevo precio de venta" readonly required>
+                        </div>
+                        <div class="col-md-4 mt-2">
+                            <button type="button" class="btn btn-sm btn-primary edit-button" onclick="enableEdit()">Editar</button>
+                        </div>
+                        <label class="trailing"></label>
+                    </div>
                 </div>
+
 
                 <hr>
                 <div class= "table-responsive">
@@ -46,27 +50,12 @@
 <script>
     $(document).ready(function() {
 
-         // Event listener para mostrar el input
-  $("#mostrarInputBtn").click(function() {
-    // Muestra el div contenedor del input
-    $("#inputContainer").show();
-    // Desbloquea el input
-    $("#nuevoPrecio").prop("disabled", false);
-  });
-
-  // Event listener para guardar el precio
-  $("#guardarPrecioBtn").click(function() {
-    // Obtiene el valor ingresado en el input
-    var nuevoPrecio = $("#nuevoPrecio").val();
-    
-    // Aquí podrías realizar cualquier acción con el nuevo precio, como enviarlo a un servidor, etc.
-    console.log("Nuevo precio ingresado: " + nuevoPrecio);
-    
-    // Oculta el div contenedor del input
-    $("#inputContainer").hide();
-    // Bloquea nuevamente el input
-    $("#nuevoPrecio").prop("disabled", true);
-  });
+            // Función para habilitar la edición del campo precioVentaNuevo
+            window.enableEdit = function() {
+                var precioVentaNuevo = document.getElementById('precioVentaNuevo');
+                precioVentaNuevo.readOnly = false; // Habilita la edición del campo
+                precioVentaNuevo.focus(); // Opcional: pone el foco en el campo para que el usuario pueda editar inmediatamente
+            };
 
         $('#tblPrecio').DataTable({
             "ajax": {

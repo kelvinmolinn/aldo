@@ -544,6 +544,107 @@ class AdministracionProducto extends Controller
         return view('inventario/modals/modalAdministracionPrecio');
     }
 
+       public function modalPrecioOperacion()
+{
+    // Establecer reglas de validación
+    $validation = service('validation');
+    $validation->setRules([
+        'precioVentaNuevo'    => 'required|greater_than[0]'
+    ]);
+
+    // Ejecutar la validación
+    if (!$validation->withRequest($this->request)->run()) {
+        // Si la validación falla, devolver los errores al cliente
+        return $this->response->setJSON([
+            'success' => false,
+            'errors' => $validation->getErrors()
+        ]);
+    }
+
+    // Obtener datos del formulario
+    $productoId = $this->request->getPost('productoId');
+    $precioVentaNuevo = $this->request->getPost('precioVentaNuevo');
+    $operacion = $this->request->getPost('operacion');
+
+
+    // Crear instancia del modelo
+    $modelProducto = new inv_productos();
+    $model = new log_productos_precios();
+    $modelKardex = new inv_kardex();
+
+    // Buscar la entrada existente del precio en el producto
+    $existingEntry = $model->where('productoId', $productoId)
+                           ->where('logProductoPrecioId', $logProductoPrecioId)
+                           ->first();
+
+    // Construir datos para la inserción o actualización
+    $data = [
+        'productoId'             => $productoId,
+        'logProductoPrecioId'    => $logProductoPrecioId,
+        'precioVentaNuevo'       => $precioVentaNuevo
+    ];
+
+    $dataProducto = [
+        'CostoPromedio'          => $CostoPromedio
+    ];
+
+    $dataKardex = [
+        'tipoMovimiento'                => "Inicial",
+        'descripcionMovimiento'         => "Entrada a inventario registrada como existencia inicial",
+        'existenciaAntesMovimiento'     => 0,
+        'cantidadMovimiento'            => $existenciaProducto,
+        'existenciaDespuesMovimiento'   => $existenciaProducto,
+        'costoUnitarioFOB'              => $CostoPromedio,
+        'costoUnitarioRetaceo'          => $CostoPromedio,
+        'costoPromedio'                 => $CostoPromedio,
+        'precioVentaUnitario'           => 0,
+        'fechaDocumento'                 => date('Y-m-d'),
+        'fechaMovimiento'               => date('Y-m-d'),
+        'tablaMovimiento'               => "inv_kardex"
+    ];
+
+
+    // Si existe la entrada, actualizar; de lo contrario, insertar
+    if ($existingEntry) {
+        $data['existenciaProducto'] += $existingEntry['existenciaProducto'];
+        $operacionExistencia = $model->update($existingEntry['productoExistenciaId'], $data);
+        $productoExistencia = $modelProducto->update($existingEntry['productoId'], $dataProducto);
+        $productoExistenciaId = $existingEntry['productoExistenciaId'];
+       
+    } else {
+        $operacionExistencia = $model->insert($data);
+        $productoExistenciaId = $operacionExistencia;
+        $productoExistencia = $modelProducto->update($productoId, $dataProducto);
+    }
+
+    // Preparar la respuesta JSON
+    if ($operacionExistencia) {
+        // insert a inv_kardex
+        // recordar if de operacionKardex y en if colocar el JSON de abajo
+        $dataKardex += [
+            'productoExistenciaId'          => $productoExistenciaId
+        ];
+        $kardexId = $modelKardex->insert($dataKardex);
+
+        $dataKardexMovimiento = [
+            'tablaMovimientoId'         => $kardexId
+        ];
+        $operacionKardex = $modelKardex->update($kardexId, $dataKardexMovimiento);
+
+        $response = [
+            'success' => true,
+            'mensaje' => 'Existencia ' . ($operacion == 'editar' ? 'actualizada' : 'agregada') . ' correctamente',
+            'productoExistenciaId' => ($operacion == 'editar' ? $productoExistenciaId : $model->insertID())
+        ];
+    } else {
+        $response = [
+            'success' => false,
+            'mensaje' => 'No se pudo ' . ($operacion == 'editar' ? 'actualizar' : 'insertar') . ' la Existencia'
+        ];
+    }
+
+    return $this->response->setJSON($response);
+}
     public function tablaPrecio()
     { 
         $data["productoId"] = $this->request->getPost('productoId');
