@@ -10,6 +10,7 @@ use App\Models\inv_productos_plataforma;
 use App\Models\conf_sucursales;
 use App\Models\inv_productos_existencias;
 use App\Models\inv_kardex;
+use App\Models\log_productos_precios;
 
 class AdministracionProducto extends Controller
 {
@@ -269,13 +270,6 @@ class AdministracionProducto extends Controller
       }
     }
 
-    public function modalAdministracionPrecio()
-    { 
-    
-
-    
-        return view('inventario/modals/modalAdministracionPrecio');
-    }
 
     public function modalAdministracionExistenciaProducto()
     { 
@@ -509,6 +503,45 @@ class AdministracionProducto extends Controller
                 'mensaje' => 'No se pudo cambiar el estado del producto'
             ]);
         }
+    }
+
+    public function modalAdministracionPrecio()
+    { 
+         // Cargar el modelos
+         $logProductosPreciosModel = new log_productos_precios();
+         $invProductosModel = new inv_productos();
+    
+         $data['precios'] = $logProductosPreciosModel->where('flgElimina', 0)->findAll();
+         $data['productos'] = $invProductosModel->where('flgElimina', 0)->findAll();
+         $operacion = $this->request->getPost('operacion');
+         $precioVentaNuevo = $this->request->getPost('precioVentaNuevo');
+         $data['logProductoPrecioId'] = $this->request->getPost('logProductoPrecioId');
+         $data['productoId'] = $this->request->getPost('productoId');
+
+         
+        if($operacion == 'editar') {
+            $logProductoPrecioId = $this->request->getPost('logProductoPrecioId');
+            $logPrecio = new log_productos_precios();
+
+             // seleccionar solo los campos que estan en la modal (solo los input y select)
+            $data['campos'] = $logPrecio->select('log_productos_precios.logProductoPrecioId,log_productos_precios.precioVentaNuevo, inv_productos.productoId')
+            ->join('inv_productos', 'inv_productos.productoId = log_productos_precios.productoId')
+            ->where('log_productos_precios.flgElimina', 0)
+            ->where('log_productos_precios.logProductoPrecioId', $logProductoPrecioId)->first();
+        } else {
+
+             // formar los campos que estan en la modal (input y select) con el nombre equivalente en la BD
+            $data['campos'] = [
+                'logProductoPrecioId'   => 0,
+                'productoId'            => '',
+                'precioVentaNuevo'      => ''
+
+            ];
+        }
+        $data['operacion'] = $operacion;
+
+    
+        return view('inventario/modals/modalAdministracionPrecio');
     }
 
     public function tablaPrecio()

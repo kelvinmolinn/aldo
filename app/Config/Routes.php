@@ -140,6 +140,7 @@ $routes->group('inventario/admin-producto', function($routes) {
     $routes->post('operacion/eliminar/producto', 'inventario\AdministracionProducto::eliminarProducto');
     $routes->post('operacion/guardar/producto', 'inventario\AdministracionProducto::modalProductoOperacion');
     $routes->post('operacion/guardar/existencia', 'inventario\AdministracionProducto::modalExistenciaOperacion');
+    $routes->post('operacion/guardar/precio', 'inventario\AdministracionProducto::modalPrecioOperacion');
     $routes->post('operacion/estado/usuario', 'inventario\AdministracionProducto::ActivarDesactivar');
     //
 });
