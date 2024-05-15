@@ -11,9 +11,6 @@
                         <div class="col-md-4">
                             <div class="form-select-control">
                                 <select name="selectTipoContacto" id="selectTipoContacto" style="width: 100%;" required>
-                                    <option value=""></option>
-                                    <option value="Correo">Correo electronico</option>
-                                    <option value="Telefono">Teléfono</option>
                                 </select>
                             </div>
                         </div>
@@ -55,10 +52,88 @@
 </form>
 
 <script>
+    function eliminarContactoProveedor(id) {
+    //alert("Vamos a eliminar " + id);
+        Swal.fire({
+            title: '¿Estás seguro que desea eliminar el Contacto?',
+            text: "Se eiminara el contacto seleccionado.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Si el usuario confirma, enviar la solicitud AJAX para eliminar el usuario de la sucursal
+                    $.ajax({
+                        url: '<?php echo base_url('compras/admin-proveedores/eliminar/contacto/proveedor'); ?>',
+                        type: 'POST',
+                        data: {
+                            proveedorContactoId: id
+                        },
+                        success: function(response) {
+                            console.log(response);
+                            if (response.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Contacto eliminado con Éxito!',
+                                    text: response.mensaje
+                                }).then((result) => {
+                                    $("#tablaContactoProveedor").DataTable().ajax.reload(null, false);
+                                });
+                            } else {
+                                // Insert fallido, mostrar mensaje de error
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: response.mensaje
+                                });
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            // Manejar errores si los hay
+                            console.error(xhr.responseText);
+                        }
+                    });
+            }
+        });
+    }
+    function cargarContactoProveedor() {
+        // Realizar una petición AJAX para obtener los permisos relacionados con el menú seleccionado
+        $.ajax({
+            url: '<?php echo base_url('compras/admin-proveedores/obtener/contacto/proveedor'); ?>',
+            type: "POST",
+            dataType: "json",
+            data: {}
+        }).done(function(data){
+            $(`#selectTipoContacto`).empty();
+            $(`#selectTipoContacto`).append("<option></option>");
+            for (let i = 0; i < data.length; i++){
+                $(`#selectTipoContacto`).append($('<option>', {
+                    value: data[i]['valor'],
+                    text: data[i]['texto']
+                }));
+            }
+        });
+    }
     $(document).ready(function() {
         $("#selectTipoContacto").select2({
             placeholder: "Tipo contacto"
         });
+
+        cargarContactoProveedor();
+
+        $("#selectTipoContacto").change(function(e) {
+            if($(this).val() == "1") {
+                $('#tipoContacto').inputmask('9999-9999');
+            } else if($(this).val() == "2") {
+                $('#tipoContacto').inputmask('email');
+            } else {
+                $('#numeroDocumento').inputmask('remove');
+            }
+        });
+
         $("#frmModal").submit(function(event) {
             event.preventDefault();
             $.ajax({
@@ -74,8 +149,9 @@
                             title: 'Contato agregado con éxito',
                             text: response.mensaje
                         }).then((result) => {
-                            $("#tablaProveedores").DataTable().ajax.reload(null, false);
+                            $("#tablaContactoProveedor").DataTable().ajax.reload(null, false);
                             $("#tipoContacto").val('');
+                            $("#selectTipoContacto").val(null).trigger("change");
                             // Actualizar tabla de contactos
                             // Limpiar inputs con .val(null) o .val('')
                             
@@ -102,7 +178,7 @@
                 "method": "POST",
                 "url": '<?php echo base_url('compras/admin-proveedores/tabla/contacto/proveedor'); ?>',
                 "data": {
-                    x:''
+                    proveedorId:<?php echo $proveedorId;?>
                 }
             },
             "columnDefs": [

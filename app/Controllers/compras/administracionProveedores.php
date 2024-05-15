@@ -39,7 +39,7 @@ class administracionProveedores extends Controller
           ->where('comp_proveedores.flgElimina', 0)
           ->orderBy('comp_proveedores.proveedorId', 'ASC')
           ->findAll();
-    
+
         // Construye el array de salida
         $output['data'] = array();
         $n = 1; // Variable para contar las filas
@@ -61,6 +61,7 @@ class administracionProveedores extends Controller
                     <i class="fas fa-history"></i>
                 </button>
             ';
+
             $columna4 .= '
                 <button class="btn btn-primary mb-1" onclick="modalContactoProveedor(`'.$columna['proveedorId'].'`,`'.$columna['proveedor'].'`);" data-toggle="tooltip" data-placement="top" title="Contactos">
                     <i class="fas fa-address-book"></i>
@@ -81,6 +82,27 @@ class administracionProveedores extends Controller
             return $this->response->setJSON($output);
         } else {
             return $this->response->setJSON(array('data' => '')); // No hay datos, devuelve un array vacío
+        }
+    }
+    public function obtenerContactoProveedor(){
+        $contacto = new cat_tipo_contacto();
+
+        $tipoContacto = $contacto
+            ->select('tipoContactoId, tipoContacto')
+            ->where('flgElimina', 0)
+            ->findAll();
+        $opcionesSelect = array();
+
+        $n = 0;
+        foreach($tipoContacto as $tipoContacto){
+            $n += 1;
+            $opcionesSelect[] = array("valor" => $tipoContacto['tipoContactoId'], "texto" => $tipoContacto['tipoContacto']);
+        }
+        
+        if ($n > 0) {
+            echo json_encode($opcionesSelect);
+        }else{
+            echo json_encode(array('data'=>''));
         }
     }
     public function modalProveedores(){
@@ -189,21 +211,55 @@ class administracionProveedores extends Controller
     }
 
     public function agregarContacto(){
+        $proveedorId    = $this->request->getPost('proveedorId');
         
+        $proveedorContacto = new comp_proveedores_contacto();
+
+
+        $data = [
+            'proveedorId'           => $proveedorId,
+            'tipoContactoId'        => $this->request->getPost('selectTipoContacto'),
+            'contactoProveedor'     => $this->request->getPost('tipoContacto')
+        ];
+
+        // Insertar datos en la base de datos
+        $operacionProveedor = $proveedorContacto->insert($data);
+        
+        if ($operacionProveedor) {
+            // Si el insert fue exitoso, devuelve el último ID insertado
+            return $this->response->setJSON([
+                'success'               => true,
+                'mensaje'               => 'Contacto agregado correctamente',
+                'proveedorContactoId'   =>  $proveedorContacto->insertID()
+            ]);
+        } else {
+            // Si el insert falló, devuelve un mensaje de error
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'No se pudo insertar el contacto'
+            ]);
+        }
     }
     public function tablaContactoProveedores(){
+        $proveedorId    = $this->request->getPost('proveedorId');
         $contactoProveedor = new comp_proveedores_contacto();
 
+        $datos = $contactoProveedor
+          ->select('comp_proveedores_contacto.proveedorContactoId,cat_tipo_contacto.tipoContacto, comp_proveedores_contacto.contactoProveedor')
+          ->join('cat_tipo_contacto' , 'cat_tipo_contacto.tipoContactoId = comp_proveedores_contacto.tipoContactoId')
+          ->where('comp_proveedores_contacto.flgElimina', 0)
+          ->where('comp_proveedores_contacto.proveedorId',$proveedorId)
+          ->findAll();
         $output['data'] = array();
         $n = 1; // Variable para contar las filas
-        //foreach ($datos as $columna) {
+        foreach ($datos as $columna) {
             // Aquí construye tus columnas
             $columna1 = $n;
-            $columna2 = "<b>Teléfono: </b>HOLA";
+            $columna2 = "<b>".$columna["tipoContacto"].":</b> ".$columna["contactoProveedor"];
 
             $columna3 = '
-                <button class="btn btn-primary mb-1" onclick="" data-toggle="tooltip" data-placement="top" title="Editar">
-                    <i class="fas fa-pencil-alt"></i>
+                <button type="button" class="btn btn-danger mb-1" onclick="eliminarContactoProveedor(`'.$columna["proveedorContactoId"].'`)" data-toggle="tooltip" data-placement="top" title="Eliminar">
+                    <i class="fas fa-trash-alt"></i>
                 </button>
             ';
             // Agrega la fila al array de salida
@@ -214,12 +270,33 @@ class administracionProveedores extends Controller
             );
     
             $n++;
-        //}
+        }
         // Verifica si hay datos
         if ($n > 1) {
             return $this->response->setJSON($output);
         } else {
             return $this->response->setJSON(array('data' => '')); // No hay datos, devuelve un array vacío
         }
-    } 
+    }
+
+    public function eliminarContacto(){
+            $eliminarContacto = new comp_proveedores_contacto();
+        
+            $proveedorContactoId = $this->request->getPost('proveedorContactoId');
+            $data = ['flgElimina' => 1];
+            
+            $eliminarContacto->update($proveedorContactoId, $data);
+
+            if($eliminarContacto) {
+                return $this->response->setJSON([
+                    'success' => true,
+                    'mensaje' => 'Contacto eliminado correctamente'
+                ]);
+            } else {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'mensaje' => 'No se pudo eliminar el contacto'
+                ]);
+            }
+        }
 }

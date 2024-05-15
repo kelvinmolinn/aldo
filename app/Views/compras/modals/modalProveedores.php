@@ -115,14 +115,6 @@
 
 <script>
     $(document).ready(function() {
-        // Evitar la entrada de 'e', 'E', '+', y '-' en los campos de número
-        document.querySelectorAll('#nrc').forEach(function(input) {
-            input.addEventListener('keydown', function(event) {
-                if (event.key === 'e' || event.key === 'E' || event.key === '-' || event.key === '+') {
-                    event.preventDefault();
-                }
-            });
-        });
 
         $("#selectTipoProveedor").select2({
             placeholder: 'Tipo proveedor'
@@ -142,7 +134,6 @@
             placeholder: 'Actividad economica'
         });
 
-        //$('#nrc').inputmask('999-999');
         $("#selectTipoDocumento").change(function(e) {
             if($(this).val() == "1") {
                 $('#numeroDocumento').inputmask('99999999-9');
@@ -151,7 +142,7 @@
             } else if($(this).val() == "3") {
                 document.querySelectorAll('#numeroDocumento').forEach(function(input) {
                     input.addEventListener('keydown', function(event) {
-                        if (event.key === 'e' || event.key === 'E' || event.key === '-' || event.key === '+' | event.key === '.') {
+                        if (event.key === 'e' || event.key === 'E' || event.key === '+' || event.key === '.') {
                             event.preventDefault();
                         }
                     });

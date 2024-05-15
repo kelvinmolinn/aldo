@@ -47,7 +47,9 @@
         $.ajax({
                 url: '<?php echo base_url('compras/admin-proveedores/form/nuevo/contacto/proveedor'); ?>',
                 type: 'POST',
-                data: {proveedorId: proveedorId, proveedor: proveedor}, // Pasar el ID del módulo como parámetro
+                data: { proveedorId: proveedorId, 
+                        proveedor: proveedor
+                      }, // Pasar el ID del módulo como parámetro
                 success: function(response) {
                     // Insertar el contenido de la modal en el cuerpo de la modal
                     $('#divModalContent').html(response);

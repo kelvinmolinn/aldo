@@ -76,8 +76,8 @@
                         });
                 }
             });
-    }
-
+        }
+        
     function cambiarEstadoProducto(datos) {
             Swal.fire({
                 title: datos.mensaje,
