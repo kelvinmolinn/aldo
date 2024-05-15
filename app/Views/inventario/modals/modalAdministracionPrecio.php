@@ -11,7 +11,7 @@
                 <div class="container modal-body">
                     <div class="form-outline position-relative">
                         <div class="col-md-4">
-                            <input type="number" id="precioVentaNuevo" class="form-control" name="precioVentaNuevo" placeholder="Nuevo precio de venta" readonly required>
+                            <input type="number" id="precioVentaNuevo" inputmode="numeric"  class="form-control" name="precioVentaNuevo" placeholder="Nuevo precio de venta" readonly required>
                         </div>
                         <div class="col-md-4 mt-2">
                             <button type="button" class="btn btn-sm btn-primary edit-button" onclick="enableEdit()">Editar</button>
@@ -56,6 +56,14 @@
                 precioVentaNuevo.readOnly = false; // Habilita la edición del campo
                 precioVentaNuevo.focus(); // Opcional: pone el foco en el campo para que el usuario pueda editar inmediatamente
             };
+
+            const input = document.getElementById('precioVentaNuevo');
+
+                input.addEventListener('keydown', function(event) {
+                    if (event.key === 'e' || event.key === 'E' || event.key === '-' || event.key === '+') {
+                        event.preventDefault();
+                    }
+                });
 
         $('#tblPrecio').DataTable({
             "ajax": {
