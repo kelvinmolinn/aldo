@@ -54,14 +54,14 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-outline">
-                                <input type="text" id="nombreComercial" name="nombreComercial" class="form-control " placeholder="Nombre comercial" value="<?= $campos['proveedorComercial']; ?>" required>
+                                <input type="text" id="nombreComercial" name="nombreComercial" class="form-control numero" placeholder="Nombre comercial" value="<?= $campos['proveedorComercial']; ?>" required>
                             </div>
                         </div>
                     </div>
                     <div class="row mt-4">
                         <div class="col-md-4">
                             <div class="form-outline">
-                                <input type="text" id="nrc" name="nrc" class="form-control" placeholder="NRC" min ="0" value="<?= $campos['ncrProveedor']; ?>" required>
+                                <input type="number" id="nrc" name="nrc" class="form-control" placeholder="NRC" min ="0" value="<?= $campos['ncrProveedor']; ?>" required>
                             </div>
                         </div>
                         <div class="col-md-4">
@@ -114,8 +114,15 @@
 </form>
 
 <script>
-
     $(document).ready(function() {
+        // Evitar la entrada de 'e', 'E', '+', y '-' en los campos de número
+        document.querySelectorAll('#nrc').forEach(function(input) {
+            input.addEventListener('keydown', function(event) {
+                if (event.key === 'e' || event.key === 'E' || event.key === '-' || event.key === '+') {
+                    event.preventDefault();
+                }
+            });
+        });
 
         $("#selectTipoProveedor").select2({
             placeholder: 'Tipo proveedor'
@@ -141,6 +148,14 @@
                 $('#numeroDocumento').inputmask('99999999-9');
             } else if($(this).val() == "2") {
                 $('#numeroDocumento').inputmask('9999-999999-999-9');
+            } else if($(this).val() == "3") {
+                document.querySelectorAll('#numeroDocumento').forEach(function(input) {
+                    input.addEventListener('keydown', function(event) {
+                        if (event.key === 'e' || event.key === 'E' || event.key === '-' || event.key === '+' | event.key === '.') {
+                            event.preventDefault();
+                        }
+                    });
+                });
             } else {
                 $('#numeroDocumento').inputmask('remove');
             }

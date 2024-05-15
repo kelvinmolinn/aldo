@@ -1,4 +1,4 @@
-<form id="frmModal">
+<form id="frmModal" method="post" action="<?php echo base_url('compras/admin-proveedores/operacion/guardar/contacto'); ?>">
     <div id="modalContactoProveedor" class="modal" tabindex="-1" data-backdrop="static" data-keyboard="false">
         <div class="modal-dialog  modal-lg">
             <div class="modal-content">
@@ -12,8 +12,8 @@
                             <div class="form-select-control">
                                 <select name="selectTipoContacto" id="selectTipoContacto" style="width: 100%;" required>
                                     <option value=""></option>
-                                    <option value="Local">Proveedor local</option>
-                                    <option value="Internacional">Proveedor Internacional</option>
+                                    <option value="Correo">Correo electronico</option>
+                                    <option value="Telefono">Teléfono</option>
                                 </select>
                             </div>
                         </div>
@@ -23,7 +23,7 @@
                             </div>
                         </div>
                         <div class="col-md-4 text-right">
-                            <button type= "button" id="btnNuevoContactoProveedor" class="btn btn-primary estilo-btn" onclick="">
+                            <button type= "submit" id="btnNuevoContactoProveedor" class="btn btn-primary estilo-btn" onclick="">
                                 <i class="fas fa-save"></i>
                                 Nuevo Contacto
                             </button>
@@ -34,7 +34,7 @@
                             <thead>
                                 <tr>
                                     <th>#</th>
-                                    <th>Contato</th>
+                                    <th>Contacto</th>
                                     <th>Acciones</th>
                                 </tr>
                             </thead>
@@ -75,6 +75,7 @@
                             text: response.mensaje
                         }).then((result) => {
                             $("#tablaProveedores").DataTable().ajax.reload(null, false);
+                            $("#tipoContacto").val('');
                             // Actualizar tabla de contactos
                             // Limpiar inputs con .val(null) o .val('')
                             

@@ -152,6 +152,7 @@ $routes->group('compras/admin-proveedores', function($routes) {
     $routes->post('operacion/guardar/proveedores', 'compras\administracionProveedores::modalProveedorOperacion');
     $routes->post('form/nuevo/contacto/proveedor', 'compras\administracionProveedores::modalContactoProveedores');
     $routes->post('tabla/contacto/proveedor',  'compras\administracionProveedores::tablaContactoProveedores');
+    $routes->post('operacion/guardar/contacto', 'compras\administracionProveedores::agregarContacto');
 });
 
 // Rutas de errores

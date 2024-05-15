@@ -187,6 +187,10 @@ class administracionProveedores extends Controller
 
         return view('compras/modals/modalContactoProveedor', $data);
     }
+
+    public function agregarContacto(){
+        
+    }
     public function tablaContactoProveedores(){
         $contactoProveedor = new comp_proveedores_contacto();
 
@@ -195,7 +199,7 @@ class administracionProveedores extends Controller
         //foreach ($datos as $columna) {
             // Aquí construye tus columnas
             $columna1 = $n;
-            $columna2 = "<b>Telefono: </b>HOLA";
+            $columna2 = "<b>Teléfono: </b>HOLA";
 
             $columna3 = '
                 <button class="btn btn-primary mb-1" onclick="" data-toggle="tooltip" data-placement="top" title="Editar">
