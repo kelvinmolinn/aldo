@@ -507,147 +507,112 @@ class AdministracionProducto extends Controller
 
     public function modalAdministracionPrecio()
     { 
-         // Cargar el modelos
-         $logProductosPreciosModel = new log_productos_precios();
-         $invProductosModel = new inv_productos();
-    
-         $data['precios'] = $logProductosPreciosModel->where('flgElimina', 0)->findAll();
-         $data['productos'] = $invProductosModel->where('flgElimina', 0)->findAll();
-         $operacion = $this->request->getPost('operacion');
-         $precioVentaNuevo = $this->request->getPost('precioVentaNuevo');
-         $data['logProductoPrecioId'] = $this->request->getPost('logProductoPrecioId');
-         $data['productoId'] = $this->request->getPost('productoId');
 
-         
+
+        $operacion = $this->request->getPost('operacion');
         if($operacion == 'editar') {
             $logProductoPrecioId = $this->request->getPost('logProductoPrecioId');
-            $logPrecio = new log_productos_precios();
-
-             // seleccionar solo los campos que estan en la modal (solo los input y select)
-            $data['campos'] = $logPrecio->select('log_productos_precios.logProductoPrecioId,log_productos_precios.precioVentaNuevo, inv_productos.productoId')
-            ->join('inv_productos', 'inv_productos.productoId = log_productos_precios.productoId')
-            ->where('log_productos_precios.flgElimina', 0)
-            ->where('log_productos_precios.logProductoPrecioId', $logProductoPrecioId)->first();
+            $precioVenta = new log_productos_precios();
+            $data['campos'] = $precioVenta->select('logProductoPrecioId,precioVentaNuevo')
+            ->where('flgElimina', 0)->where('logProductoPrecioId', $logProductoPrecioId)->first();
         } else {
-
-             // formar los campos que estan en la modal (input y select) con el nombre equivalente en la BD
             $data['campos'] = [
-                'logProductoPrecioId'   => 0,
-                'productoId'            => '',
-                'precioVentaNuevo'      => ''
-
+                'logProductoPrecioId'      => 0,
+                'precioVentaNuevo'        => ''
             ];
         }
         $data['operacion'] = $operacion;
 
     
-        return view('inventario/modals/modalAdministracionPrecio');
+        return view('inventario/modals/modalAdministracionPrecio', $data);
     }
 
        public function modalPrecioOperacion()
 {
-    // Establecer reglas de validación
-    $validation = service('validation');
-    $validation->setRules([
-        'precioVentaNuevo'    => 'required|greater_than[0]'
-    ]);
-
-    // Ejecutar la validación
-    if (!$validation->withRequest($this->request)->run()) {
-        // Si la validación falla, devolver los errores al cliente
-        return $this->response->setJSON([
-            'success' => false,
-            'errors' => $validation->getErrors()
+        // Establecer reglas de validación
+        $validation = service('validation');
+        $validation->setRules([
+            'precioVentaNuevo' => 'greater_than[0]'
         ]);
-    }
-
-    // Obtener datos del formulario
-    $productoId = $this->request->getPost('productoId');
-    $precioVentaNuevo = $this->request->getPost('precioVentaNuevo');
-    $operacion = $this->request->getPost('operacion');
-
-
-    // Crear instancia del modelo
-    $modelProducto = new inv_productos();
-    $model = new log_productos_precios();
-    $modelKardex = new inv_kardex();
-
-    // Buscar la entrada existente del precio en el producto
-    $existingEntry = $model->where('productoId', $productoId)
-                           ->where('logProductoPrecioId', $logProductoPrecioId)
-                           ->first();
-
-    // Construir datos para la inserción o actualización
-    $data = [
-        'productoId'             => $productoId,
-        'logProductoPrecioId'    => $logProductoPrecioId,
-        'precioVentaNuevo'       => $precioVentaNuevo
-    ];
-
-    $dataProducto = [
-        'CostoPromedio'          => $CostoPromedio
-    ];
-
-    $dataKardex = [
-        'tipoMovimiento'                => "Inicial",
-        'descripcionMovimiento'         => "Entrada a inventario registrada como existencia inicial",
-        'existenciaAntesMovimiento'     => 0,
-        'cantidadMovimiento'            => $existenciaProducto,
-        'existenciaDespuesMovimiento'   => $existenciaProducto,
-        'costoUnitarioFOB'              => $CostoPromedio,
-        'costoUnitarioRetaceo'          => $CostoPromedio,
-        'costoPromedio'                 => $CostoPromedio,
-        'precioVentaUnitario'           => 0,
-        'fechaDocumento'                 => date('Y-m-d'),
-        'fechaMovimiento'               => date('Y-m-d'),
-        'tablaMovimiento'               => "inv_kardex"
-    ];
-
-
-    // Si existe la entrada, actualizar; de lo contrario, insertar
-    if ($existingEntry) {
-        $data['existenciaProducto'] += $existingEntry['existenciaProducto'];
-        $operacionExistencia = $model->update($existingEntry['productoExistenciaId'], $data);
-        $productoExistencia = $modelProducto->update($existingEntry['productoId'], $dataProducto);
-        $productoExistenciaId = $existingEntry['productoExistenciaId'];
-       
-    } else {
-        $operacionExistencia = $model->insert($data);
-        $productoExistenciaId = $operacionExistencia;
-        $productoExistencia = $modelProducto->update($productoId, $dataProducto);
-    }
-
-    // Preparar la respuesta JSON
-    if ($operacionExistencia) {
-        // insert a inv_kardex
-        // recordar if de operacionKardex y en if colocar el JSON de abajo
-        $dataKardex += [
-            'productoExistenciaId'          => $productoExistenciaId
+    
+        // Ejecutar la validación
+        if (!$validation->withRequest($this->request)->run()) {
+            // Si la validación falla, devolver los errores al cliente
+            return $this->response->setJSON([
+                'success' => false,
+                'errors' => $validation->getErrors()
+            ]);
+        }
+    
+        // Continuar con la operación de inserción o actualización en la base de datos
+        $operacion = $this->request->getPost('operacion');
+        $model = new log_productos_precios();
+    
+        $data = [
+            'precioVentaNuevo' => $this->request->getPost('precioVentaNuevo')
         ];
-        $kardexId = $modelKardex->insert($dataKardex);
-
-        $dataKardexMovimiento = [
-            'tablaMovimientoId'         => $kardexId
-        ];
-        $operacionKardex = $modelKardex->update($kardexId, $dataKardexMovimiento);
-
-        $response = [
-            'success' => true,
-            'mensaje' => 'Existencia ' . ($operacion == 'editar' ? 'actualizada' : 'agregada') . ' correctamente',
-            'productoExistenciaId' => ($operacion == 'editar' ? $productoExistenciaId : $model->insertID())
-        ];
-    } else {
-        $response = [
-            'success' => false,
-            'mensaje' => 'No se pudo ' . ($operacion == 'editar' ? 'actualizar' : 'insertar') . ' la Existencia'
-        ];
-    }
-
-    return $this->response->setJSON($response);
+    
+        if ($operacion == 'editar') {
+            $operacionPrecio = $model->update($this->request->getPost('logProductoPrecioId'), $data);
+        } else {
+            // Insertar datos en la base de datos
+            $operacionPrecio = $model->insert($data);
+        }
+    
+        if ($operacionPrecio) {
+            // Si el insert fue exitoso, devuelve el último ID insertado
+            return $this->response->setJSON([
+                'success' => true,
+                'mensaje' => 'Nuevo precio de venta  ' . ($operacion == 'editar' ? 'actualizado' : 'agregado') . ' correctamente',
+                'logProductoPrecioId' => ($operacion == 'editar' ? $this->request->getPost('logProductoPrecioId') : $model->insertID())
+            ]);
+        } else {
+            // Si el insert falló, devuelve un mensaje de error
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'No se pudo insertar el precio de venta'
+            ]);
+        }
 }
     public function tablaPrecio()
     { 
-        $data["productoId"] = $this->request->getPost('productoId');
+        $mostrarPrecios = new log_productos_precios();
+        $datos = $mostrarPrecios
+        ->select('logProductoPrecioId, precioVentaNuevo')
+        ->where('flgElimina', 0)
+        ->findAll();
+    
+        // Construye el array de salida
+        $output['data'] = array();
+        $n = 1; // Variable para contar las filas
+        foreach ($datos as $columna) {
+            // Aquí construye tus columnas
+            $columna1 = $n;
+            $columna2 = "<b>Costo FOB:</b> " . "<br>" . "<b>Costo Promedio:</b> ";
+
+
+            // Aquí puedes construir tus botones en la última columna
+           $columna3 = "<b>Precio nuevo: </b> " . $columna['precioVentaNuevo'];
+            $columna4 ="<b>Usuario: </b> " . "<br>" . "<b>Fecha y Hora: </b> ";
+
+
+            // Agrega la fila al array de salida
+            $output['data'][] = array(
+                $columna1,
+                $columna2,
+                $columna3,
+                $columna4
+            );
+    
+            $n++;
+        }
+    
+        // Verifica si hay datos
+        if ($n > 1) {
+            return $this->response->setJSON($output);
+        } else {
+            return $this->response->setJSON(array('data' => '')); // No hay datos, devuelve un array vacío
+        }
     
         return view('inventario/modals/modalAdministracionPrecio', $data);
     }

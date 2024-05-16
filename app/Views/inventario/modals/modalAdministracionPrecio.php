@@ -1,13 +1,21 @@
+<?php
+    if ($operacion == "editar") {
+        $mensajeAlerta = "Precio actualizado con éxito";
+    } else {
+        $mensajeAlerta = "Precio agregado con éxito";
+    }
+?>
 
-<form id="frmModal">
-    <div id="modalPrecios" class="modal" tabindex="-1" data-backdrop="static" data-keyboard="false">
+<form id="frmModal" action="<?= base_url('inventario/admin-producto/operacion/guardar/precio') ?>" method="POST">
+    <div id="modalPrecios"  class="modal" tabindex="-1" data-backdrop="static" data-keyboard="false">
         <div class="modal-dialog  modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title"><?= ('Actualizar precio de venta'); ?></h5>
+                    <h5 class="modal-title"><?= ($operacion == 'editar' ? 'Editar Precio' : 'Nuevo precio inicial'); ?></h5>
                 </div>
                 <div class="modal-body">
-
+                    <input type="hidden" id="logProductoPrecioId" name="logProductoPrecioId" value="<?= $campos['logProductoPrecioId'] ?>">
+                    <input type="hidden" id="operacion" name="operacion" value="<?= $operacion; ?>">
                 <div class="container modal-body">
                     <div class="form-outline position-relative">
                         <div class="col-md-4">
@@ -19,8 +27,14 @@
                         <label class="trailing"></label>
                     </div>
                 </div>
-
-
+                <div class="row">
+                    <div class="col-md-6">
+                        <button type="submit" id="btnGuardarPrecio" class="btn btn-primary">
+                            <i class="fas fa-save"></i>
+                            Guardar
+                        </button>
+                    </div>
+                </div>
                 <hr>
                 <div class= "table-responsive">
                     <table id="tblPrecio" name = "tblPrecio" class="table table-hover" style="width: 100%;">
@@ -64,6 +78,49 @@
                         event.preventDefault();
                     }
                 });
+
+            $("#frmModal").submit(function(event) {
+            event.preventDefault();
+            $.ajax({
+                url: $(this).attr('action'), 
+                type: $(this).attr('method'),
+                data: $(this).serialize(),
+                success: function(response) {
+                    console.log(response);
+                    if (response.success) {
+                        // Insert exitoso, ocultar modal y mostrar mensaje
+                        $('#modalPrecios').modal('hide');
+                        Swal.fire({
+                            icon: 'success',
+                            title: '<?php echo $mensajeAlerta; ?>',
+                            text: response.mensaje
+                        }).then((result) => {
+                            $("#tblPrecio").DataTable().ajax.reload(null, false);
+                            
+                        });
+                        console.log("Último ID insertado:", response.logProductoPrecioId);
+
+                } else {
+                    // Insert fallido, mostrar mensaje de error con Sweet Alert
+                    let errorMessage = '<ul>';
+                    $.each(response.errors, function(key, value) {
+                        errorMessage += '<li>' + value + '</li>';
+                    });
+                    errorMessage += '</ul>';
+
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error de validación',
+                        text: 'Hay algun dato incompleto o erroneo, Verifique las validaciones!'
+                    });
+                }
+            },
+            error: function(xhr, status, error) {
+                // Manejar errores si los hay
+                console.error(xhr.responseText);
+            }
+        });
+    });
 
         $('#tblPrecio').DataTable({
             "ajax": {
