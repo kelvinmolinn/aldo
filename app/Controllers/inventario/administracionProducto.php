@@ -509,7 +509,7 @@ class AdministracionProducto extends Controller
     { 
 
 
-        $operacion = $this->request->getPost('operacion');
+     /*   $operacion = $this->request->getPost('operacion');
         if($operacion == 'editar') {
             $logProductoPrecioId = $this->request->getPost('logProductoPrecioId');
             // Cargar el modelos
@@ -525,6 +525,35 @@ class AdministracionProducto extends Controller
                 'logProductoPrecioId'      => 0,
                 'productoId'              => '',
                 'precioVentaNuevo'        => ''
+            ];
+        }
+        $data['operacion'] = $operacion;*/
+
+            // Cargar el modelos
+        $productoModel = new inv_productos();
+        $data['producto'] = $productoModel->where('flgElimina', 0)->findAll();
+        $operacion = $this->request->getPost('operacion');
+        $data['productoId'] = $this->request->getPost('productoId');
+
+
+        if($operacion == 'editar') {
+            $logProductoPrecioId = $this->request->getPost('logProductoPrecioId');
+            $precioVenta = new log_productos_precios();
+
+             // seleccionar solo los campos que estan en la modal (solo los input y select)
+            $data['campos'] = $precioVenta->select('inv_productos.productoId,log_productos_precios.precioVentaNuevo,log_productos_precios.costoPromedio')
+            ->join('inv_productos', 'inv_productos.productoId = log_productos_precios.productoId')
+            ->where('log_productos_precios.flgElimina', 0)
+            ->where('log_productos_precios.logProductoPrecioId', $logProductoPrecioId)->first();
+        } else {
+
+             // formar los campos que estan en la modal (input y select) con el nombre equivalente en la BD
+            $data['campos'] = [
+                'logProductoPrecioId'   => 0,
+                'precioVentaNuevo'      => '',
+                'costoPromedio'         => ''
+
+
             ];
         }
         $data['operacion'] = $operacion;
