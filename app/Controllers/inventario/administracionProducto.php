@@ -512,12 +512,18 @@ class AdministracionProducto extends Controller
         $operacion = $this->request->getPost('operacion');
         if($operacion == 'editar') {
             $logProductoPrecioId = $this->request->getPost('logProductoPrecioId');
+            // Cargar el modelos
+            $productoModel = new inv_productos();
             $precioVenta = new log_productos_precios();
-            $data['campos'] = $precioVenta->select('logProductoPrecioId,precioVentaNuevo')
-            ->where('flgElimina', 0)->where('logProductoPrecioId', $logProductoPrecioId)->first();
+            $data['campos'] = $precioVenta->select('logProductoPrecioId,precioVentaNuevo')->where('flgElimina', 0)->where('logProductoPrecioId', $logProductoPrecioId)->first();
+            $data['producto'] = $productoModel->where('flgElimina', 0)->findAll();
+
+
+
         } else {
             $data['campos'] = [
                 'logProductoPrecioId'      => 0,
+                'productoId'              => '',
                 'precioVentaNuevo'        => ''
             ];
         }
@@ -547,8 +553,10 @@ class AdministracionProducto extends Controller
         // Continuar con la operación de inserción o actualización en la base de datos
         $operacion = $this->request->getPost('operacion');
         $model = new log_productos_precios();
-    
+        
+
         $data = [
+
             'precioVentaNuevo' => $this->request->getPost('precioVentaNuevo')
         ];
     
@@ -613,8 +621,6 @@ class AdministracionProducto extends Controller
         } else {
             return $this->response->setJSON(array('data' => '')); // No hay datos, devuelve un array vacío
         }
-    
-        return view('inventario/modals/modalAdministracionPrecio', $data);
     }
 
 

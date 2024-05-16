@@ -15,26 +15,29 @@
                 </div>
                 <div class="modal-body">
                     <input type="hidden" id="logProductoPrecioId" name="logProductoPrecioId" value="<?= $campos['logProductoPrecioId'] ?>">
+                    <input type="hidden" id="productoId" name="productoId" value="<?= $campos['productoId'] ?>">
                     <input type="hidden" id="operacion" name="operacion" value="<?= $operacion; ?>">
                 <div class="container modal-body">
                     <div class="form-outline position-relative">
+                           <div class="row mt-2">
                         <div class="col-md-4">
-                            <input type="number" id="precioVentaNuevo" inputmode="numeric"  class="form-control" name="precioVentaNuevo" placeholder="Nuevo precio de venta" readonly required>
+                            <input type="number" id="precioVentaNuevo" inputmode="numeric" class="form-control" name="precioVentaNuevo" placeholder="Nuevo precio de venta" readonly required>
                         </div>
-                        <div class="col-md-4 mt-2">
+                        <div class="col-md-8 text-end">
+                            <button type="submit" id="btnGuardarPrecio" class="btn btn-primary">
+                                <i class="fas fa-save"></i>
+                                Guardar
+                            </button>
+                        </div>
+                        </div>
+                        <div class="col-md-12 mt-2">
                             <button type="button" class="btn btn-sm btn-primary edit-button" onclick="enableEdit()">Editar</button>
                         </div>
                         <label class="trailing"></label>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6">
-                        <button type="submit" id="btnGuardarPrecio" class="btn btn-primary">
-                            <i class="fas fa-save"></i>
-                            Guardar
-                        </button>
-                    </div>
-                </div>
+                 
+
+
                 <hr>
                 <div class= "table-responsive">
                     <table id="tblPrecio" name = "tblPrecio" class="table table-hover" style="width: 100%;">
