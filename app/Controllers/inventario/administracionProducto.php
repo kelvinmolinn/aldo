@@ -508,27 +508,6 @@ class AdministracionProducto extends Controller
     public function modalAdministracionPrecio()
     { 
 
-
-     /*   $operacion = $this->request->getPost('operacion');
-        if($operacion == 'editar') {
-            $logProductoPrecioId = $this->request->getPost('logProductoPrecioId');
-            // Cargar el modelos
-            $productoModel = new inv_productos();
-            $precioVenta = new log_productos_precios();
-            $data['campos'] = $precioVenta->select('logProductoPrecioId,precioVentaNuevo')->where('flgElimina', 0)->where('logProductoPrecioId', $logProductoPrecioId)->first();
-            $data['producto'] = $productoModel->where('flgElimina', 0)->findAll();
-
-
-
-        } else {
-            $data['campos'] = [
-                'logProductoPrecioId'      => 0,
-                'productoId'              => '',
-                'precioVentaNuevo'        => ''
-            ];
-        }
-        $data['operacion'] = $operacion;*/
-
             // Cargar el modelos
         $productoModel = new inv_productos();
         $data['producto'] = $productoModel->where('flgElimina', 0)->findAll();
@@ -562,12 +541,13 @@ class AdministracionProducto extends Controller
         return view('inventario/modals/modalAdministracionPrecio', $data);
     }
 
-       public function modalPrecioOperacion()
-{
+    public function modalPrecioOperacion()
+    {
         // Establecer reglas de validación
         $validation = service('validation');
         $validation->setRules([
-            'precioVentaNuevo' => 'greater_than[0]'
+            'precioVentaNuevo' => 'greater_than[0]',
+            'productoId' => 'required|integer'
         ]);
     
         // Ejecutar la validación
@@ -582,41 +562,59 @@ class AdministracionProducto extends Controller
         // Continuar con la operación de inserción o actualización en la base de datos
         $operacion = $this->request->getPost('operacion');
         $model = new log_productos_precios();
+        $productoModel = new inv_productos();
         
-
-        $data = [
-            'productoId' => $this->request->getPost('productoId'),
-            'precioVentaNuevo' => $this->request->getPost('precioVentaNuevo')
+        $productoId = $this->request->getPost('productoId');
+        $precioVentaNuevo = $this->request->getPost('precioVentaNuevo');
+    
+        // Obtener el precioVenta actual de inv_productos
+        $producto = $productoModel->select('precioVenta')->where('productoId', $productoId)->first();
+        if (!$producto) {
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'Producto no encontrado'
+            ]);
+        }
+    
+        $precioVentaActual = $producto['precioVenta'];
+    
+        // Datos para log_productos_precios
+        $dataLog = [
+            'productoId' => $productoId,
+            'precioVentaNuevo' => $precioVentaNuevo,
+            'precioVentaAntes' => $precioVentaActual // Asegúrate de tener este campo en la tabla log_productos_precios
         ];
     
+        // Realizar la operación de inserción en log_productos_precios
         if ($operacion == 'editar') {
-            $operacionPrecio = $model->update($this->request->getPost('logProductoPrecioId'), $data);
+            $operacionPrecio = $model->update($this->request->getPost('logProductoPrecioId'), $dataLog);
         } else {
-            // Insertar datos en la base de datos
-            $operacionPrecio = $model->insert($data);
+            $operacionPrecio = $model->insert($dataLog);
         }
     
         if ($operacionPrecio) {
-            // Si el insert fue exitoso, devuelve el último ID insertado
+            // Si el insert fue exitoso, actualizar el precioVenta en inv_productos
+            $productoModel->update($productoId, ['precioVenta' => $precioVentaNuevo]);
+    
             return $this->response->setJSON([
                 'success' => true,
-                'mensaje' => 'Nuevo precio de venta  ' . ($operacion == 'editar' ? 'actualizado' : 'agregado') . ' correctamente',
+                'mensaje' => 'Nuevo precio de venta ' . ($operacion == 'editar' ? 'actualizado' : 'agregado') . ' correctamente',
                 'logProductoPrecioId' => ($operacion == 'editar' ? $this->request->getPost('logProductoPrecioId') : $model->insertID())
             ]);
         } else {
-            // Si el insert falló, devuelve un mensaje de error
             return $this->response->setJSON([
                 'success' => false,
                 'mensaje' => 'No se pudo insertar el precio de venta'
             ]);
         }
-}
+    }
+    
     public function tablaPrecio()
     { 
         $productoId = $this->request->getPost('productoId');
         $mostrarPrecios = new log_productos_precios();
         $datos = $mostrarPrecios
-        ->select('logProductoPrecioId, precioVentaNuevo')
+        ->select('logProductoPrecioId, precioVentaNuevo, precioVentaAntes')
         ->where('flgElimina', 0)
         ->where('productoId', $productoId)
         ->findAll();
@@ -631,7 +629,7 @@ class AdministracionProducto extends Controller
 
 
             // Aquí puedes construir tus botones en la última columna
-           $columna3 = "<b>Precio nuevo: </b> " . $columna['precioVentaNuevo'];
+           $columna3 = "<b>Precio nuevo: </b> " . $columna['precioVentaNuevo']. "<br>" ."<b>Precio Anterior: </b> " . $columna['precioVentaAntes'] ;
             $columna4 ="<b>Usuario: </b> " . "<br>" . "<b>Fecha y Hora: </b> ";
 
 
