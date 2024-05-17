@@ -182,12 +182,12 @@
         });
     }
 
-    function modalPrecios() {
+    function modalPrecios(productoId) {
         // Realizar una petición AJAX para obtener los datos del módulo por su ID
         $.ajax({
                 url: '<?php echo base_url('inventario/admin-producto/form2/precio'); ?>',
                 type: 'POST',
-                data: { }, // Pasar el ID del módulo como parámetro
+                data: { productoId: productoId}, // Pasar el ID del módulo como parámetro
                 success: function(response) {
                     // Insertar el contenido de la modal en el cuerpo de la modal
                     $('#divModalContent').html(response);

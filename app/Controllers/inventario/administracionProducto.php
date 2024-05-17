@@ -551,8 +551,8 @@ class AdministracionProducto extends Controller
             $data['campos'] = [
                 'logProductoPrecioId'   => 0,
                 'precioVentaNuevo'      => '',
-                'costoPromedio'         => ''
-
+                'costoPromedio'         => '',
+                'productoId'            => $this->request->getPost('productoId')
 
             ];
         }
@@ -585,7 +585,7 @@ class AdministracionProducto extends Controller
         
 
         $data = [
-
+            'productoId' => $this->request->getPost('productoId'),
             'precioVentaNuevo' => $this->request->getPost('precioVentaNuevo')
         ];
     
@@ -613,10 +613,12 @@ class AdministracionProducto extends Controller
 }
     public function tablaPrecio()
     { 
+        $productoId = $this->request->getPost('productoId');
         $mostrarPrecios = new log_productos_precios();
         $datos = $mostrarPrecios
         ->select('logProductoPrecioId, precioVentaNuevo')
         ->where('flgElimina', 0)
+        ->where('productoId', $productoId)
         ->findAll();
     
         // Construye el array de salida

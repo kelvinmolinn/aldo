@@ -15,6 +15,7 @@
                 </div>
                 <div class="modal-body">
                     <input type="hidden" id="logProductoPrecioId" name="logProductoPrecioId" value="<?= $campos['logProductoPrecioId'] ?>">
+                    <input type="hidden" id="productoId" name="productoId" value="<?= $campos['productoId'] ?>">
                     <input type="hidden" id="operacion" name="operacion" value="<?= $operacion; ?>">
                 <div class="container modal-body">
                     <div class="form-outline position-relative">
@@ -129,7 +130,7 @@
                 "method": "POST",
                 "url": '<?php echo base_url('inventario/admin-producto/tabla/precio'); ?>',
                 "data": {
-                    x: ''
+                    productoId:<?php echo $productoId;?>
                 }
             },
             "columnDefs": [
