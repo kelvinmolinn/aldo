@@ -157,6 +157,10 @@ $routes->group('compras/admin-proveedores', function($routes) {
     $routes->post('eliminar/contacto/proveedor', 'compras\administracionProveedores::eliminarContacto');
 });
 
+$routes->group('compras/admin-compras', function($routes) {
+    $routes->post('index', 'compras\administracionCompras::index');
+    $routes->post('tabla/compras', 'compras\administracionCompras::tablaCompras');
+});
 // Rutas de errores
 $routes->get('404', 'Errores::error404');
 

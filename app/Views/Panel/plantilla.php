@@ -139,14 +139,6 @@
                 <i class="right fas fa-angle-left"></i>
               </p>
             </a>
-            <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <a href="#" class="nav-link">
-                  <i class="nav-icon fas fa-bars"></i>
-                  <p> Catálogos inventario  
-                    <i class="right fas fa-angle-left"></i>
-                  </p>
-                </a>
                 <ul class="nav nav-treeview">
                   <li class="nav-item">
                     <a role="button" class="nav-link" onclick="cambiarInterfaz('inventario/admin-producto/index', {renderVista: 'No'});">
@@ -179,8 +171,6 @@
                     </a>
                   </li>
                 </ul>
-              </li>
-            </ul>
           </li>
           <li class="nav-item">
             <a href="#" class="nav-link">
@@ -194,6 +184,13 @@
                 <a role="button" class="nav-link" onclick="cambiarInterfaz('compras/admin-proveedores/index', {renderVista: 'No'});">
                   <i class="fas fa-users"></i>
                   <p> Proveedores  
+                  </p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a role="button" class="nav-link" onclick="cambiarInterfaz('compras/admin-compras/index', {renderVista: 'No'});">
+                  <i class="fas fa-store"></i>
+                  <p> compras  
                   </p>
                 </a>
               </li>
