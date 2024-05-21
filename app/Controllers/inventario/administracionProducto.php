@@ -613,7 +613,7 @@ class AdministracionProducto extends Controller
     { 
         $productoId = $this->request->getPost('productoId');
         $mostrarPrecios = new log_productos_precios();
-        $usuarioAgrega = $session->get("nombreUsuario");
+        $usuarioAgrega = $session->get("nombreUsuario"); //agregue esta linea
         $datos = $mostrarPrecios
         ->select('logProductoPrecioId, precioVentaNuevo, precioVentaAntes,fhAgrega')
         ->where('flgElimina', 0)
@@ -631,7 +631,7 @@ class AdministracionProducto extends Controller
 
             // Aquí puedes construir tus botones en la última columna
            $columna3 = "<b>Precio nuevo: </b> " . $columna['precioVentaNuevo']. "<br>" ."<b>Precio Anterior: </b> " . $columna['precioVentaAntes'] ;
-            $columna4 ="<b>Usuario: </b> ".$columna[$usuarioAgrega] . "<br>" . "<b>Fecha y Hora: </b> ". $columna['fhAgrega'];
+            $columna4 ="<b>Usuario: </b> ".$columna[$usuarioAgrega] . "<br>" . "<b>Fecha y Hora: </b> ". $columna['fhAgrega']; //y aqui $usuarioAgrega
 
 
             // Agrega la fila al array de salida
