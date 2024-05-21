@@ -11,6 +11,7 @@ use App\Models\conf_sucursales;
 use App\Models\inv_productos_existencias;
 use App\Models\inv_kardex;
 use App\Models\log_productos_precios;
+use App\Models\conf_parametrizaciones;
 
 class AdministracionProducto extends Controller
 {
@@ -86,24 +87,43 @@ class AdministracionProducto extends Controller
 
     public function tablaProducto()
     {
-        $mostrarProducto = new inv_productos();
-        $datos = $mostrarProducto
-        ->select('inv_productos.productoId,inv_productos.codigoProducto,inv_productos.producto,inv_productos.descripcionProducto,inv_productos.existenciaMinima,inv_productos.estadoProducto,inv_productos_plataforma.productoPlataformaId,inv_productos_plataforma.productoPlataforma,inv_productos_tipo.productoTipoId,inv_productos_tipo.productoTipo,cat_unidades_medida.unidadMedidaId')
+
+    // Obtener el valor de la parametrización
+    $parametrizacionModel = new conf_parametrizaciones();
+    $parametrizacion = $parametrizacionModel->select('valorParametrizacion')->where('parametrizacionId', 1)->first();
+
+    if (!$parametrizacion) {
+        // Manejar el caso en que la parametrización no se encuentra
+        return $this->response->setJSON([
+            'success' => false,
+            'mensaje' => 'Parametrización no encontrada'
+        ]);
+    }
+
+    $valorParametrizacion = $parametrizacion['valorParametrizacion'];
+
+    $mostrarProducto = new inv_productos();
+    $datos = $mostrarProducto
+        ->select('inv_productos.productoId, inv_productos.codigoProducto, inv_productos.producto, inv_productos.descripcionProducto, inv_productos.existenciaMinima, inv_productos.estadoProducto, inv_productos.precioVenta, inv_productos_plataforma.productoPlataformaId, inv_productos_plataforma.productoPlataforma, inv_productos_tipo.productoTipoId, inv_productos_tipo.productoTipo, cat_unidades_medida.unidadMedidaId')
         ->join('inv_productos_tipo', 'inv_productos_tipo.productoTipoId = inv_productos.productoTipoId')
         ->join('inv_productos_plataforma', 'inv_productos_plataforma.productoPlataformaId = inv_productos.productoPlataformaId')
         ->join('cat_unidades_medida', 'cat_unidades_medida.unidadMedidaId = inv_productos.unidadMedidaId')
         ->where('inv_productos.flgElimina', 0)
         ->findAll();
-    
+
         // Construye el array de salida
         $output['data'] = array();
         $n = 1; // Variable para contar las filas
         foreach ($datos as $columna) {
-            // Aquí construye tus columnas
-            $columna1 = $n;
-            $columna2 = "<b>Codigo:</b> " . $columna['codigoProducto']."<br>"."<b>Producto:</b> " . $columna['producto']."<br>"."<b>Estado:</b> " . $columna['estadoProducto'];
-            $columna3 = "<b>Tipo Producto:</b> " . $columna['productoTipo']."<br>"."<b>Plataforma:</b> " . $columna['productoPlataforma']."<br>"."<b>Descripción:</b> " . $columna['descripcionProducto'];
-            $columna4 = "<b>Sin IVA:</b> "."<br>"."<b>Con IVA:</b> ";
+            $precioVenta = $columna['precioVenta'];
+            $precioVentaConIVA = $precioVenta * ($valorParametrizacion/100+1);
+
+        // Construye tus columnas
+        $columna1 = $n;
+        $columna2 = "<b>Codigo:</b> " . $columna['codigoProducto'] . "<br>" . "<b>Producto:</b> " . $columna['producto'] . "<br>" . "<b>Estado:</b> " . $columna['estadoProducto'];
+        $columna3 = "<b>Tipo Producto:</b> " . $columna['productoTipo'] . "<br>" . "<b>Plataforma:</b> " . $columna['productoPlataforma'] . "<br>" . "<b>Descripción:</b> " . $columna['descripcionProducto'];
+         $columna4 = "<b>Sin IVA: $</b> " . $precioVenta . "<br>" . "<b>(+) IVA: $</b> " . $precioVentaConIVA;
+
 
             // Aquí puedes construir tus botones en la última columna
         $columna5 = '
@@ -541,81 +561,86 @@ class AdministracionProducto extends Controller
         return view('inventario/modals/modalAdministracionPrecio', $data);
     }
 
-    public function modalPrecioOperacion()
-    {
-        // Establecer reglas de validación
-        $validation = service('validation');
-        $validation->setRules([
-            'precioVentaNuevo' => 'greater_than[0]',
-            'productoId' => 'required|integer'
+   public function modalPrecioOperacion()
+{
+    // Establecer reglas de validación
+    $validation = service('validation');
+    $validation->setRules([
+        'precioVentaNuevo' => 'greater_than[0]',
+        'productoId' => 'required|integer'
+    ]);
+
+    // Ejecutar la validación
+    if (!$validation->withRequest($this->request)->run()) {
+        // Si la validación falla, devolver los errores al cliente
+        return $this->response->setJSON([
+            'success' => false,
+            'errors' => $validation->getErrors()
         ]);
-    
-        // Ejecutar la validación
-        if (!$validation->withRequest($this->request)->run()) {
-            // Si la validación falla, devolver los errores al cliente
-            return $this->response->setJSON([
-                'success' => false,
-                'errors' => $validation->getErrors()
-            ]);
-        }
-    
-        // Continuar con la operación de inserción o actualización en la base de datos
-        $operacion = $this->request->getPost('operacion');
-        $model = new log_productos_precios();
-        $productoModel = new inv_productos();
-        
-        $productoId = $this->request->getPost('productoId');
-        $precioVentaNuevo = $this->request->getPost('precioVentaNuevo');
-    
-        // Obtener el precioVenta actual de inv_productos
-        $producto = $productoModel->select('precioVenta')->where('productoId', $productoId)->first();
-        if (!$producto) {
-            return $this->response->setJSON([
-                'success' => false,
-                'mensaje' => 'Producto no encontrado'
-            ]);
-        }
-    
-        $precioVentaActual = $producto['precioVenta'];
-    
-        // Datos para log_productos_precios
-        $dataLog = [
-            'productoId' => $productoId,
-            'precioVentaNuevo' => $precioVentaNuevo,
-            'precioVentaAntes' => $precioVentaActual // Asegúrate de tener este campo en la tabla log_productos_precios
-        ];
-    
-        // Realizar la operación de inserción en log_productos_precios
-        if ($operacion == 'editar') {
-            $operacionPrecio = $model->update($this->request->getPost('logProductoPrecioId'), $dataLog);
-        } else {
-            $operacionPrecio = $model->insert($dataLog);
-        }
-    
-        if ($operacionPrecio) {
-            // Si el insert fue exitoso, actualizar el precioVenta en inv_productos
-            $productoModel->update($productoId, ['precioVenta' => $precioVentaNuevo]);
-    
-            return $this->response->setJSON([
-                'success' => true,
-                'mensaje' => 'Nuevo precio de venta ' . ($operacion == 'editar' ? 'actualizado' : 'agregado') . ' correctamente',
-                'logProductoPrecioId' => ($operacion == 'editar' ? $this->request->getPost('logProductoPrecioId') : $model->insertID())
-            ]);
-        } else {
-            return $this->response->setJSON([
-                'success' => false,
-                'mensaje' => 'No se pudo insertar el precio de venta'
-            ]);
-        }
     }
+
+    // Continuar con la operación de inserción o actualización en la base de datos
+    $operacion = $this->request->getPost('operacion');
+    $model = new log_productos_precios();
+    $productoModel = new inv_productos();
+    
+    $productoId = $this->request->getPost('productoId');
+    $precioVentaNuevo = $this->request->getPost('precioVentaNuevo');
+
+    // Obtener el precioVenta y costoPromedio actual de inv_productos
+    $producto = $productoModel->select('precioVenta, costoPromedio, costoUnitarioFOB')->where('productoId', $productoId)->first();
+    if (!$producto) {
+        return $this->response->setJSON([
+            'success' => false,
+            'mensaje' => 'Producto no encontrado'
+        ]);
+    }
+
+    $precioVentaActual = $producto['precioVenta'];
+    $costoPromedio = $producto['costoPromedio'];
+    $costoUnitarioFOB = $producto['costoUnitarioFOB'];
+
+    // Datos para log_productos_precios
+    $dataLog = [
+        'productoId'        => $productoId,
+        'precioVentaNuevo'  => $precioVentaNuevo,
+        'precioVentaAntes'  => $precioVentaActual, // Asegúrate de tener este campo en la tabla log_productos_precios
+        'costoPromedio'     => $costoPromedio, // Asegúrate de tener este campo en la tabla log_productos_precios
+        'costoUnitarioFOB'  => $costoUnitarioFOB
+    ];
+
+    // Realizar la operación de inserción en log_productos_precios
+    if ($operacion == 'editar') {
+        $operacionPrecio = $model->update($this->request->getPost('logProductoPrecioId'), $dataLog);
+    } else {
+        $operacionPrecio = $model->insert($dataLog);
+    }
+
+    if ($operacionPrecio) {
+        // Si el insert fue exitoso, actualizar el precioVenta en inv_productos
+        $productoModel->update($productoId, ['precioVenta' => $precioVentaNuevo]);
+
+        return $this->response->setJSON([
+            'success' => true,
+            'mensaje' => 'Nuevo precio de venta ' . ($operacion == 'editar' ? 'actualizado' : 'agregado') . ' correctamente',
+            'logProductoPrecioId' => ($operacion == 'editar' ? $this->request->getPost('logProductoPrecioId') : $model->insertID())
+        ]);
+    } else {
+        return $this->response->setJSON([
+            'success' => false,
+            'mensaje' => 'No se pudo insertar el precio de venta'
+        ]);
+    }
+}
+
     
     public function tablaPrecio()
     { 
         $productoId = $this->request->getPost('productoId');
         $mostrarPrecios = new log_productos_precios();
-        $usuarioAgrega = $session->get("nombreUsuario"); //agregue esta linea
+        //$usuarioAgrega = $session->get("primerNombre"); //agregue esta linea
         $datos = $mostrarPrecios
-        ->select('logProductoPrecioId, precioVentaNuevo, precioVentaAntes,fhAgrega')
+        ->select('logProductoPrecioId, costoPromedio,costoUnitarioFOB,precioVentaNuevo, precioVentaAntes,fhAgrega')
         ->where('flgElimina', 0)
         ->where('productoId', $productoId)
         ->findAll();
@@ -626,12 +651,12 @@ class AdministracionProducto extends Controller
         foreach ($datos as $columna) {
             // Aquí construye tus columnas
             $columna1 = $n;
-            $columna2 = "<b>Costo FOB:</b> " . "<br>" . "<b>Costo Promedio:</b> ";
+            $columna2 = "<b>Costo FOB:</b> ". $columna['costoUnitarioFOB'] . "<br>" . "<b>Costo Promedio:</b> ". $columna['costoPromedio'];
 
 
             // Aquí puedes construir tus botones en la última columna
            $columna3 = "<b>Precio nuevo: </b> " . $columna['precioVentaNuevo']. "<br>" ."<b>Precio Anterior: </b> " . $columna['precioVentaAntes'] ;
-            $columna4 ="<b>Usuario: </b> ".$columna[$usuarioAgrega] . "<br>" . "<b>Fecha y Hora: </b> ". $columna['fhAgrega']; //y aqui $usuarioAgrega
+            $columna4 ="<b>Usuario: </b> " . "<br>" . "<b>Fecha y Hora: </b> ". $columna['fhAgrega']; //y aqui $usuarioAgrega
 
 
             // Agrega la fila al array de salida
