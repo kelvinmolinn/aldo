@@ -99,6 +99,7 @@
                             text: response.mensaje
                         }).then((result) => {
                             $("#tblPrecio").DataTable().ajax.reload(null, false);
+                             $("#tblProducto").DataTable().ajax.reload(null, false);
                             
                         });
                         console.log("Último ID insertado:", response.logProductoPrecioId);
