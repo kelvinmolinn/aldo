@@ -115,12 +115,20 @@ class AdministracionProducto extends Controller
         $output['data'] = array();
         $n = 1; // Variable para contar las filas
         foreach ($datos as $columna) {
-            $precioVenta = $columna['precioVenta'];
-            $precioVentaConIVA = $precioVenta * ($valorParametrizacion/100+1);
+            //  $precioVenta = $columna['precioVenta'];
+            //   $precioVentaConIVA = $precioVenta * ($valorParametrizacion/100+1);
+
+                    // Formatear el campo precioVenta y calcular el precioVentaConIVA
+        $precioVenta = number_format($columna['precioVenta'], 2);
+        $precioVentaConIVA = number_format($columna['precioVenta'] * ($valorParametrizacion / 100 + 1), 2);
 
         // Construye tus columnas
         $columna1 = $n;
-        $columna2 = "<b>Codigo:</b> " . $columna['codigoProducto'] . "<br>" . "<b>Producto:</b> " . $columna['producto'] . "<br>" . "<b>Estado:</b> " . $columna['estadoProducto'];
+        $estadoColor = $columna['estadoProducto'] == 'Activo' ? 'text-success' : 'text-danger';
+        $columna2 = "<b>Código:</b> " . $columna['codigoProducto'] . "<br>" . 
+                    "<b>Producto:</b> " . $columna['producto'] . "<br>" . 
+                    "<b>Estado:</b> <span class='$estadoColor'>" . $columna['estadoProducto'] . "</span>";
+        
         $columna3 = "<b>Tipo Producto:</b> " . $columna['productoTipo'] . "<br>" . "<b>Plataforma:</b> " . $columna['productoPlataforma'] . "<br>" . "<b>Descripción:</b> " . $columna['descripcionProducto'];
          $columna4 = "<b>Sin IVA: $</b> " . $precioVenta . "<br>" . "<b>(+) IVA: $</b> " . $precioVentaConIVA;
 
@@ -133,19 +141,19 @@ class AdministracionProducto extends Controller
             </button>
         ';
         $columna5 .= '
-                <button class="btn btn-primary mb-1" onclick="modalProducto(`'.$columna['productoId'].'`, `editar`);" data-toggle="tooltip" data-placement="top" title="Editar producto">
+                <button class="btn btn-primary mb-1 " onclick="modalProducto(`'.$columna['productoId'].'`, `editar`);" data-toggle="tooltip" data-placement="top" title="Editar producto">
                     <span></span>
                     <i class="fas fa-pencil-alt"></i>
                 </button>
             ';
         $columna5 .= '
-            <button class="btn btn-success mb-1" onclick="modalPrecios(`'.$columna['productoId'].'`);" data-toggle="tooltip" data-placement="top" title="Actualizar precios de venta">
+            <button class="btn btn-success mb-1 " onclick="modalPrecios(`'.$columna['productoId'].'`);" data-toggle="tooltip" data-placement="top" title="Actualizar precios de venta">
                 <span></span>
                 <i class="fas fa-dollar-sign"></i>
             </button>
         ';
         $columna5 .= '
-        <button class="btn btn-info mb-1" onclick="modalHistorial(`'.$columna['productoId'].'`);" data-toggle="tooltip" data-placement="top" title="Historiales">
+        <button class="btn btn-info mb-1 " onclick="modalHistorial(`'.$columna['productoId'].'`);" data-toggle="tooltip" data-placement="top" title="Historiales">
             <span></span>
             <i class="fas fa-clock"></i>
         </button>
@@ -162,14 +170,14 @@ class AdministracionProducto extends Controller
                 $mensaje = "¿Estás seguro que desea Desactivar el producto?";
                 $mensaje2 = "pasará a Desactivado";
                 $columna5 .= '
-                <button class="btn btn-danger" data-toggle="tooltip" data-placement="top" title="Desactivar" onclick="cambiarEstadoProducto({productoId: \''.$columna['productoId'].'\', estadoProducto: \''.$columna['estadoProducto'].'\', mensaje: \''.$mensaje.'\', mensaje2: \''.$mensaje2.'\'});">
+                <button class="btn btn-danger mb-1 " data-toggle="tooltip" data-placement="top" title="Desactivar" onclick="cambiarEstadoProducto({productoId: \''.$columna['productoId'].'\', estadoProducto: \''.$columna['estadoProducto'].'\', mensaje: \''.$mensaje.'\', mensaje2: \''.$mensaje2.'\'});">
                     <i class="fas fa-ban"></i>
                 </button>';
             } else {
                 $mensaje = "¿Estás seguro que desea Activar el producto?";
                 $mensaje2 = "pasará a Activo";
                 $columna5 .= '
-                <button class="btn btn-success mb-1" data-toggle="tooltip" data-placement="top" title="Activar" onclick="cambiarEstadoProducto({productoId: \''.$columna['productoId'].'\', estadoProducto: \''.$columna['estadoProducto'].'\', mensaje: \''.$mensaje.'\', mensaje2: \''.$mensaje2.'\'})">
+                <button class="btn btn-success mb-1 " data-toggle="tooltip" data-placement="top" title="Activar" onclick="cambiarEstadoProducto({productoId: \''.$columna['productoId'].'\', estadoProducto: \''.$columna['estadoProducto'].'\', mensaje: \''.$mensaje.'\', mensaje2: \''.$mensaje2.'\'})">
                     <i class="fas fa-check"></i>
                 </button>';
             }        
@@ -649,14 +657,17 @@ class AdministracionProducto extends Controller
         $output['data'] = array();
         $n = 1; // Variable para contar las filas
         foreach ($datos as $columna) {
-            // Aquí construye tus columnas
-            $columna1 = $n;
-            $columna2 = "<b>Costo FOB:</b> ". $columna['costoUnitarioFOB'] . "<br>" . "<b>Costo Promedio:</b> ". $columna['costoPromedio'];
+        // Formatear los campos numéricos a dos decimales
+        $costoPromedio = number_format($columna['costoPromedio'], 2);
+        $costoUnitarioFOB = number_format($columna['costoUnitarioFOB'], 2);
+        $precioVentaNuevo = number_format($columna['precioVentaNuevo'], 2);
+        $precioVentaAntes = number_format($columna['precioVentaAntes'], 2);
 
-
-            // Aquí puedes construir tus botones en la última columna
-           $columna3 = "<b>Precio nuevo: </b> " . $columna['precioVentaNuevo']. "<br>" ."<b>Precio Anterior: </b> " . $columna['precioVentaAntes'] ;
-            $columna4 ="<b>Usuario: </b> " . "<br>" . "<b>Fecha y Hora: </b> ". $columna['fhAgrega']; //y aqui $usuarioAgrega
+        // Aquí construye tus columnas
+        $columna1 = $n;
+        $columna2 = "<b>Costo FOB:</b> " . $costoUnitarioFOB . "<br>" . "<b>Costo Promedio:</b> " . $costoPromedio;
+        $columna3 = "<b>Precio nuevo: </b> " . $precioVentaNuevo . "<br>" . "<b>Precio Anterior: </b> " . $precioVentaAntes;
+        $columna4 = "<b>Usuario: </b> ". "<br>" . "<b>Fecha y Hora: </b> " . $columna['fhAgrega'];
 
 
             // Agrega la fila al array de salida

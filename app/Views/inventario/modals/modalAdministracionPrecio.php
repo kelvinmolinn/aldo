@@ -21,7 +21,7 @@
                     <div class="form-outline position-relative">
                            <div class="row mt-2">
                         <div class="col-md-4">
-                            <input type="number" id="precioVentaNuevo" class="form-control" name="precioVentaNuevo" placeholder="Nuevo precio de venta" readonly required>
+                            <input type="number" id="precioVentaNuevo" class="form-control  number-input" name="precioVentaNuevo" placeholder="Nuevo precio de venta" readonly required>
                         </div>
                         <div class="col-md-8 text-end">
                             <button type="submit" id="btnGuardarPrecio" class="btn btn-primary">
@@ -74,13 +74,14 @@
                 precioVentaNuevo.focus(); // Opcional: pone el foco en el campo para que el usuario pueda editar inmediatamente
             };
 
-            const input = document.getElementById('precioVentaNuevo');
-
+            // Evitar la entrada de 'e', 'E', '+', y '-' en los campos de número
+            document.querySelectorAll('.number-input').forEach(function(input) {
                 input.addEventListener('keydown', function(event) {
                     if (event.key === 'e' || event.key === 'E' || event.key === '-' || event.key === '+') {
                         event.preventDefault();
                     }
                 });
+            });
 
             $("#frmModal").submit(function(event) {
             event.preventDefault();

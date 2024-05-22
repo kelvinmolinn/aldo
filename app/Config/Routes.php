@@ -145,6 +145,14 @@ $routes->group('inventario/admin-producto', function($routes) {
     //
 });
 
+$routes->group('inventario/admin-salida', function($routes) {
+    // Definir las rutas específicas para el grupo 'admin-salidas'
+    $routes->post('index', 'inventario\AdministracionSalida::index');
+    $routes->post('form/salida', 'inventario\AdministracionProducto::modalAdministracionSalida');
+    $routes->post('tabla/salida',  'inventario\AdministracionSalida::tablaSalida');
+    //
+});
+
 $routes->group('compras/admin-proveedores', function($routes) {
     $routes->post('index', 'compras\administracionProveedores::index');
     $routes->post('tabla/proveedores',  'compras\administracionProveedores::tablaProveedores');

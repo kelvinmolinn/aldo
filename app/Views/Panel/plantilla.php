@@ -143,15 +143,23 @@
                   <li class="nav-item">
                     <a role="button" class="nav-link" onclick="cambiarInterfaz('inventario/admin-producto/index', {renderVista: 'No'});">
                       <i class="fas fa-box-open nav-icon"></i>
-                      <p>Existendia productos</p>
+                      <p>Existencia productos</p>
                     </a>
                   </li>
                 </ul>
                 <ul class="nav nav-treeview">
                   <li class="nav-item">
-                    <a role="button" class="nav-link" onclick="cambiarInterfaz('inventario/admin-unidades/index', {renderVista: 'No'});">
-                      <i class="fas fa-tag nav-icon"></i>
-                      <p>Unidades de medida</p>
+                    <a role="button" class="nav-link" onclick="cambiarInterfaz('inventario/admin-salida/index', {renderVista: 'No'});">
+                      <i class="fas fa-door-open nav-icon"></i>
+                      <p>Descargos/Salidas</p>
+                    </a>
+                  </li>
+                </ul>
+                <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                    <a role="button" class="nav-link" onclick="cambiarInterfaz('inventario/admin-salida/index', {renderVista: 'No'});">
+                      <i class="fas fa-truck nav-icon"></i>
+                      <p>Traslados de productos</p>
                     </a>
                   </li>
                 </ul>
@@ -168,6 +176,14 @@
                     <a role= "button" class="nav-link" onclick="cambiarInterfaz('inventario/admin-plataforma/index', {renderVista: 'No'});">
                       <i class="fas fa-gamepad nav-icon"></i>
                       <p>Plataforma</p>
+                    </a>
+                  </li>
+                </ul>
+                <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                    <a role="button" class="nav-link" onclick="cambiarInterfaz('inventario/admin-unidades/index', {renderVista: 'No'});">
+                      <i class="fas fa-tag nav-icon"></i>
+                      <p>Unidades de medida</p>
                     </a>
                   </li>
                 </ul>
