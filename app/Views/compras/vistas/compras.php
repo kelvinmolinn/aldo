@@ -8,24 +8,24 @@
         </button>
     </div>
 </div>
-<div class="row">
-    <div class="col-md-4 mb-4">
+<div class="row mb-2">
+    <div class="col-md-4">
         <div class="form-outline">
             <input type="text" id="filtroNumDocumento" name="filtroNumDocumento" class="form-control " placeholder="Numero de documento">
         </div>
     </div>
-    <div class="col-md-4 mb-4">
+    <div class="col-md-4">
         <div class="form-outline">
             <input type="date" id="filtroFechaDocumento" name="filtroFechaDocumento" class="form-control " placeholder="Fecha del documento">
         </div>
     </div>
-    <div class="col-md-4 mb-4">
+    <div class="col-md-4">
         <div class="form-outline">
             <input type="text" id="filtroProveedor" name="filtroProveedor" class="form-control " placeholder="Proveedor">
         </div>
     </div>
 </div>
-<div class="text-right">
+<div class="text-right mb-4">
     <button type= "button" id="btnBuscarCompra" class="btn btn-primary estilo-btn" onclick="$('#tablaProveedores').DataTable().ajax.reload(null, false);">
         <i class="fas fa-search"></i>
         Buscar
