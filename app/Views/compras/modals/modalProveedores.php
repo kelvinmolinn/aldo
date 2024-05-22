@@ -133,6 +133,13 @@
         $("#selectActividadEconomica").select2({
             placeholder: 'Actividad economica'
         });
+        document.querySelectorAll('#nrc').forEach(function(input) {
+            input.addEventListener('keydown', function(event) {
+                if (event.key === 'e' || event.key === 'E' || event.key === '+' || event.key === '.') {
+                    event.preventDefault();
+                }
+            });
+        });
 
         $("#selectTipoDocumento").change(function(e) {
             if($(this).val() == "1") {
@@ -140,6 +147,16 @@
             } else if($(this).val() == "2") {
                 $('#numeroDocumento').inputmask('9999-999999-999-9');
             } else if($(this).val() == "3") {
+                $('#numeroDocumento').inputmask('remove');
+                document.querySelectorAll('#numeroDocumento').forEach(function(input) {
+                    input.addEventListener('keydown', function(event) {
+                        if (event.key === 'e' || event.key === 'E' || event.key === '+' || event.key === '.') {
+                            event.preventDefault();
+                        }
+                    });
+                });
+            } else if($(this).val() == "4") {
+                $('#numeroDocumento').inputmask('remove');
                 document.querySelectorAll('#numeroDocumento').forEach(function(input) {
                     input.addEventListener('keydown', function(event) {
                         if (event.key === 'e' || event.key === 'E' || event.key === '+' || event.key === '.') {

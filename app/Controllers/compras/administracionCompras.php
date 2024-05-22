@@ -7,9 +7,9 @@ use CodeIgniter\Controller;
 use App\Models\comp_proveedores;
 use App\Models\comp_proveedores_contacto;
 use App\Models\cat_tipo_contacto;
-use App\Models\cat_tipo_persona;
-use App\Models\cat_documentos_identificacion;
-use App\Models\cat_actividad_economica;
+use App\Models\cat_29_tipo_persona;
+use App\Models\cat_22_documentos_identificacion;
+use App\Models\cat_19_actividad_economica;
 use App\Models\cat_tipo_contribuyente;
 
 class administracionCompras extends Controller
