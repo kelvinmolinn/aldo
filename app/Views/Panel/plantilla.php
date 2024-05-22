@@ -150,7 +150,7 @@
                 <ul class="nav nav-treeview">
                   <li class="nav-item">
                     <a role="button" class="nav-link" onclick="cambiarInterfaz('inventario/admin-salida/index', {renderVista: 'No'});">
-                      <i class="fas fa-door-open nav-icon"></i>
+                      <i class="fas fa-arrow-circle-right nav-icon"></i>
                       <p>Descargos/Salidas</p>
                     </a>
                   </li>
