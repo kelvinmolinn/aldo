@@ -31,53 +31,63 @@ class administracionCompras extends Controller
         return view('compras/vistas/compras', $data);
     }
     public function tablaCompras(){
+        $com_compras = new comp_compras;
+
         $contadorFiltros = 0;
-        $numDocumento = $this->request->getPost('numDocumento');
-        $fechaDocumento = $this->request->getPost('filtroFechaDocumento');
-        $filtroProveedor = $this->request->getPost('filtroProveedor');
+        $numFactura = $this->request->getPost('numFactura');
+        $fechaDocumento = $this->request->getPost('fechaFactura');
+        $filtroProveedor = $this->request->getPost('nombreProveedor');
         
+        $consultaCompras = $com_compras
+                ->select('comp_proveedores.tipoProveedorOrigen, cat_02_tipo_dte.tipoDocumentoDTE, 
+                          comp_compras.fechaDocumento, comp_compras.numFactura,
+                          cat_20_paises.pais,comp_proveedores.proveedor,comp_proveedores.proveedorComercial')
+                ->join('comp_proveedores','comp_proveedores.proveedorId = comp_compras.proveedorId')
+                ->join('cat_02_tipo_dte','cat_02_tipo_dte.tipoDTEId = comp_compras.tipoDTEId')
+                ->join('cat_20_paises','cat_20_paises.paisId = comp_compras.paisId')
+                ->where('comp_compras.flgElimina', 0);
 
-        if($numDocumento == "") {
-            $whereDocumento = "";
-        } else {
-            $whereDocumento = $numDocumento;
+        if($numFactura != "") {
+            $consultaCompras->like('numFactura', $numFactura);
             $contadorFiltros++;
         }
 
-        if($fechaDocumento == "") {
-            $whereFecha = "";
-        } else {
-            $whereFecha = $fechaDocumento;
+        if($fechaDocumento != "") {
+            $consultaCompras->where('fechaDocumento', $fechaDocumento);
             $contadorFiltros++;
         }
 
-        if($filtroProveedor == "") {
-            $whereProveedor = "";
-        } else {
-            $whereProveedor = $filtroProveedor;
+        if($filtroProveedor != "") {
+            $consultaCompras->like('proveedorId', $filtroProveedor);
             $contadorFiltros++;
         }
+
         // Construye el array de salida
         $output['data'] = array();
-        $n = 1; // Variable para contar las filas
+        $n = 0; // Variable para contar las filas
         if($contadorFiltros > 0) {
-            $com_compras = new comp_compras;
-
-            $datos = $com_compras
-                ->select('proveedorId,ObsCompra')
-                ->where('flgElimina', 0)
-                ->where('numDocumento', $whereDocumento)
-                ->where('fechaDocumento', $fechaDocumento)
-                ->where('proveedorId', $filtroProveedor)
-                ->findAll();
+            $datos = $consultaCompras->findAll();
 
             foreach ($datos as $columna) {
+                $n++;
                 // Aquí construye tus columnas
                 $columna1 = $n;
-                $columna2 = "<b>Nombre0</b>". $columna['ObsCompra'];
-                $columna3 = "";
-                $columna4 = "";
-                $columna5 = "";
+                $columna2 = "<b>Numero de factura: </b>" . $columna['numFactura'] ."<br>" . "<b>País: </b>" . $columna['pais'] ."<br>" . "<b>Fecha de la compra: </b>" . $columna['fechaDocumento'];
+
+                $columna3 = "<b>proveedor: </b>". $columna['proveedor'] ."<br>" . "<b>Nombre comercial: </b>". $columna['proveedorComercial'] ."<br>" ."<b>Tipo proveedor: </b>" . $columna['tipoProveedorOrigen'] ."<br>" . "<b>Tipo factura: </b>" . $columna['tipoDocumentoDTE'];
+                $columna4 = "<b>Monto: </b>";
+                
+                $columna5 = '
+                    <button class="btn btn-primary mb-1" onclick="" data-toggle="tooltip" data-placement="top" title="Continuar compra">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                ';
+
+                $columna5 .= '
+                    <button class="btn btn-danger mb-1" onclick="" data-toggle="tooltip" data-placement="top" title="Anular compra">
+                        <i class="fas fa-ban"></i>
+                    </button>
+                ';
                 // Agrega la fila al array de salida
                 $output['data'][] = array(
                     $columna1,
@@ -86,14 +96,12 @@ class administracionCompras extends Controller
                     $columna4,
                     $columna5
                 );
-        
-                $n++;
             }
         } else {
             $n = 0;
         }
         // Verifica si hay datos
-        if ($n > 1) {
+        if ($n > 0) {
             return $this->response->setJSON($output);
         } else {
             return $this->response->setJSON(array('data' => '')); // No hay datos, devuelve un array vacío

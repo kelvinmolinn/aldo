@@ -1,0 +1,41 @@
+.form-outline .form-control {
+    min-height: auto;
+    padding-top: .32rem;
+    padding-bottom: .32rem;
+    padding-left: .75rem;
+    padding-right: .75rem;
+    background: rgba(0, 0, 0, 0);
+    transition: all .2s linear
+}
+
+.form-outline .form-control~.form-label {
+    position: absolute;
+    top: 0;
+    max-width: 90%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    left: .75rem;
+    padding-top: .37rem;
+    pointer-events: none;
+    transform-origin: 0 0;
+    transition: all .2s ease-out;
+    color: var(--mdb-form-control-label-color);
+    margin-bottom: 0
+}
+
+.form-outline .form-control:not(.placeholder-active)::placeholder {
+    opacity: 0
+}
+.form-outline .form-control:focus::placeholder,
+.form-outline .form-control.active::placeholder {
+    opacity: 1
+}
+
+.form-outline .form-control:focus~.form-label,
+.form-outline .form-control.active~.form-label {
+    transform: translateY(-1rem) translateY(0.1rem) scale(0.8)
+}
+.form-outline .form-control:focus~.form-label {
+    color: #3b71ca
+}

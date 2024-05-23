@@ -2,7 +2,7 @@
 <hr>
 <div class="row mb-4">
     <div class="col-md-12 text-right">
-        <button type= "button" id="btnNuevoProveedor" class="btn btn-primary estilo-btn" onclick="">
+        <button type= "button" id="btnNuevoProveedor" class="btn btn-primary estilo-btn" onclick="cambiarInterfaz('compras/admin-compras/vista/nueva/compra', {renderVista: 'No'});">
             <i class="fas fa-save"></i>
             Nueva compra
         </button>
@@ -11,17 +11,21 @@
 <div class="row mb-2">
     <div class="col-md-4">
         <div class="form-outline">
-            <input type="text" id="filtroNumDocumento" name="filtroNumDocumento" class="form-control " placeholder="Numero de documento">
+            <input type="text" id="filtroNumFactura" name="filtroNumFactura" class="form-control ">
+            <label class="form-label" for="filtroNumFactura">Numero de factura</label>
         </div>
     </div>
     <div class="col-md-4">
         <div class="form-outline">
-            <input type="date" id="filtroFechaDocumento" name="filtroFechaDocumento" class="form-control " placeholder="Fecha del documento">
+            <input type="date" id="filtroFechaDocumento" name="filtroFechaDocumento" class="form-control ">
+            <label class="form-label" for="filtroFechaDocumento">Fecha del documento</label>
+
         </div>
     </div>
     <div class="col-md-4">
         <div class="form-outline">
-            <input type="text" id="filtroProveedor" name="filtroProveedor" class="form-control " placeholder="Proveedor">
+            <input type="text" id="filtroProveedor" name="filtroProveedor" class="form-control ">
+            <label class="form-label" for="Proveedor">Proveedor</label>
         </div>
     </div>
 </div>
@@ -55,7 +59,9 @@
                 "url": '<?php echo base_url('compras/admin-compras/tabla/compras'); ?>',
                 "data": function() { 
                     return {
-                        "numDocumento": $("#filtroNumDocumento").val()
+                        "numFactura": $("#filtroNumFactura").val(),
+                        "fechaFactura": $("#filtroFechaDocumento").val(),
+                        "nombreProveedor": $("#filtroProveedor").val()
                     }
                 }
             },
