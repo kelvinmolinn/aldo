@@ -61,7 +61,7 @@
                     <div class="row mt-4">
                         <div class="col-md-4">
                             <div class="form-outline">
-                                <input type="number" id="nrc" name="nrc" class="form-control" placeholder="NRC" min ="0" value="<?= $campos['ncrProveedor']; ?>" required>
+                                <input type="text" id="nrc" name="nrc" class="form-control" placeholder="NRC" min ="0" value="<?= $campos['ncrProveedor']; ?>" required>
                             </div>
                         </div>
                         <div class="col-md-4">

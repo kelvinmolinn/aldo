@@ -11,6 +11,7 @@ use App\Models\cat_29_tipo_persona;
 use App\Models\cat_22_documentos_identificacion;
 use App\Models\cat_19_actividad_economica;
 use App\Models\cat_tipo_contribuyente;
+use App\Models\comp_compras;
 
 class administracionCompras extends Controller
 {
@@ -32,24 +33,48 @@ class administracionCompras extends Controller
     public function tablaCompras(){
         $contadorFiltros = 0;
         $numDocumento = $this->request->getPost('numDocumento');
+        $fechaDocumento = $this->request->getPost('filtroFechaDocumento');
+        $filtroProveedor = $this->request->getPost('filtroProveedor');
         
 
         if($numDocumento == "") {
             $whereDocumento = "";
         } else {
-            $whereDocumento = "AND c.numDocumento = '" . $numDocumento . "'";
+            $whereDocumento = $numDocumento;
             $contadorFiltros++;
         }
 
+        if($fechaDocumento == "") {
+            $whereFecha = "";
+        } else {
+            $whereFecha = $fechaDocumento;
+            $contadorFiltros++;
+        }
+
+        if($filtroProveedor == "") {
+            $whereProveedor = "";
+        } else {
+            $whereProveedor = $filtroProveedor;
+            $contadorFiltros++;
+        }
         // Construye el array de salida
         $output['data'] = array();
         $n = 1; // Variable para contar las filas
         if($contadorFiltros > 0) {
-            // Aqui va la consulta
-            //foreach ($datos as $columna) {
+            $com_compras = new comp_compras;
+
+            $datos = $com_compras
+                ->select('proveedorId,ObsCompra')
+                ->where('flgElimina', 0)
+                ->where('numDocumento', $whereDocumento)
+                ->where('fechaDocumento', $fechaDocumento)
+                ->where('proveedorId', $filtroProveedor)
+                ->findAll();
+
+            foreach ($datos as $columna) {
                 // Aquí construye tus columnas
                 $columna1 = $n;
-                $columna2 = "";
+                $columna2 = "<b>Nombre0</b>". $columna['ObsCompra'];
                 $columna3 = "";
                 $columna4 = "";
                 $columna5 = "";
@@ -63,7 +88,7 @@ class administracionCompras extends Controller
                 );
         
                 $n++;
-        //}
+            }
         } else {
             $n = 0;
         }
@@ -73,5 +98,20 @@ class administracionCompras extends Controller
         } else {
             return $this->response->setJSON(array('data' => '')); // No hay datos, devuelve un array vacío
         }
+    }
+
+    public function vistaNuevaCompra(){
+        $session = session();
+
+        $data['variable'] = 0;
+
+        $camposSession = [
+            'renderVista' => 'No'
+        ];
+        $session->set([
+            'route'             => 'compras\administracionCompras::vistaNuevaCompra',
+            'camposSession'     => json_encode($camposSession)
+        ]);
+        return view('compras/vistas/pageNuevaCompra', $data);
     }
 }
