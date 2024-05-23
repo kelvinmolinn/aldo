@@ -3,7 +3,7 @@
 namespace App\Controllers\inventario;
 
 use CodeIgniter\Controller;
-use App\Models\cat_unidades_medida;
+use App\Models\cat_14_unidades_medida;
 class AdministracionUnidades extends Controller
 {
     public function index()
@@ -32,7 +32,7 @@ class AdministracionUnidades extends Controller
         $operacion = $this->request->getPost('operacion');
         if($operacion == 'editar') {
             $unidadMedidaId = $this->request->getPost('unidadMedidaId');
-            $unidadMedida = new cat_unidades_medida();
+            $unidadMedida = new cat_14_unidades_medida();
             $data['campos'] = $unidadMedida->select('unidadMedidaId,unidadMedida,abreviaturaUnidadMedida')->where('flgElimina', 0)->where('unidadMedidaId', $unidadMedidaId)->first();
         } else {
             $data['campos'] = [
@@ -49,7 +49,7 @@ class AdministracionUnidades extends Controller
     public function eliminarUnidades(){
         //$data['sucursalUsuarioId'] = $sucursalUsuarioId;
 
-        $eliminarUnidades = new cat_unidades_medida();
+        $eliminarUnidades = new cat_14_unidades_medida();
         
         $unidadMedidaId = $this->request->getPost('unidadMedidaId');
         $data = ['flgElimina' => 1];
@@ -74,8 +74,8 @@ class AdministracionUnidades extends Controller
         // Establecer reglas de validación
         $validation = service('validation');
         $validation->setRules([
-            'unidadMedida' => 'required|is_unique[cat_unidades_medida.unidadMedida]',
-            'abreviaturaUnidadMedida' => 'required|is_unique[cat_unidades_medida.abreviaturaUnidadMedida]'
+            'unidadMedida' => 'required|is_unique[cat_14_unidades_medida.unidadMedida]',
+            'abreviaturaUnidadMedida' => 'required|is_unique[cat_14_unidades_medida.abreviaturaUnidadMedida]'
         ]);
     
         // Ejecutar la validación
@@ -89,7 +89,7 @@ class AdministracionUnidades extends Controller
     
         // Continuar con la operación de inserción o actualización en la base de datos
         $operacion = $this->request->getPost('operacion');
-        $model = new cat_unidades_medida();
+        $model = new cat_14_unidades_medida();
     
         $data = [
             'unidadMedida' => $this->request->getPost('unidadMedida'),
@@ -122,7 +122,7 @@ class AdministracionUnidades extends Controller
 
     public function tablaUnidades()
     {
-        $mostrarUnidades = new cat_unidades_medida();
+        $mostrarUnidades = new cat_14_unidades_medida();
         $datos = $mostrarUnidades
         ->select('unidadMedidaId, unidadMedida, abreviaturaUnidadMedida')
         ->where('flgElimina', 0)

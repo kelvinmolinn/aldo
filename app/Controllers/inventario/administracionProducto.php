@@ -4,7 +4,7 @@ namespace App\Controllers\inventario;
 
 use CodeIgniter\Controller;
 use App\Models\inv_productos;
-use App\Models\cat_unidades_medida;
+use App\Models\cat_14_unidades_medida;
 use App\Models\inv_productos_tipo;
 use App\Models\inv_productos_plataforma;
 use App\Models\conf_sucursales;
@@ -42,7 +42,7 @@ class AdministracionProducto extends Controller
            // Cargar el modelos
         $tipoModel = new inv_productos_tipo();
         $plataformaModel = new inv_productos_plataforma();
-        $unidadModel = new cat_unidades_medida();
+        $unidadModel = new cat_14_unidades_medida();
 
         $data['tipo'] = $tipoModel->where('flgElimina', 0)->findAll();
         $data['plataforma'] = $plataformaModel->where('flgElimina', 0)->findAll();
@@ -57,10 +57,10 @@ class AdministracionProducto extends Controller
             $producto = new inv_productos();
 
              // seleccionar solo los campos que estan en la modal (solo los input y select)
-            $data['campos'] = $producto->select('inv_productos.productoId,inv_productos.codigoProducto,inv_productos.producto,inv_productos.descripcionProducto,inv_productos.existenciaMinima,inv_productos_plataforma.productoPlataformaId,inv_productos_tipo.productoTipoId,cat_unidades_medida.unidadMedidaId')
+            $data['campos'] = $producto->select('inv_productos.productoId,inv_productos.codigoProducto,inv_productos.producto,inv_productos.descripcionProducto,inv_productos.existenciaMinima,inv_productos_plataforma.productoPlataformaId,inv_productos_tipo.productoTipoId,cat_14_unidades_medida.unidadMedidaId')
             ->join('inv_productos_tipo', 'inv_productos_tipo.productoTipoId = inv_productos.productoTipoId')
             ->join('inv_productos_plataforma', 'inv_productos_plataforma.productoPlataformaId = inv_productos.productoPlataformaId')
-            ->join('cat_unidades_medida', 'cat_unidades_medida.unidadMedidaId = inv_productos.unidadMedidaId')
+            ->join('cat_14_unidades_medida', 'cat_14_unidades_medida.unidadMedidaId = inv_productos.unidadMedidaId')
             ->where('inv_productos.flgElimina', 0)
             ->where('inv_productos.productoId', $productoId)->first();
         } else {
@@ -104,10 +104,10 @@ class AdministracionProducto extends Controller
 
     $mostrarProducto = new inv_productos();
     $datos = $mostrarProducto
-        ->select('inv_productos.productoId, inv_productos.codigoProducto, inv_productos.producto, inv_productos.descripcionProducto, inv_productos.existenciaMinima, inv_productos.estadoProducto, inv_productos.precioVenta, inv_productos_plataforma.productoPlataformaId, inv_productos_plataforma.productoPlataforma, inv_productos_tipo.productoTipoId, inv_productos_tipo.productoTipo, cat_unidades_medida.unidadMedidaId')
+        ->select('inv_productos.productoId, inv_productos.codigoProducto, inv_productos.producto, inv_productos.descripcionProducto, inv_productos.existenciaMinima, inv_productos.estadoProducto, inv_productos.precioVenta, inv_productos_plataforma.productoPlataformaId, inv_productos_plataforma.productoPlataforma, inv_productos_tipo.productoTipoId, inv_productos_tipo.productoTipo, cat_14_unidades_medida.unidadMedidaId')
         ->join('inv_productos_tipo', 'inv_productos_tipo.productoTipoId = inv_productos.productoTipoId')
         ->join('inv_productos_plataforma', 'inv_productos_plataforma.productoPlataformaId = inv_productos.productoPlataformaId')
-        ->join('cat_unidades_medida', 'cat_unidades_medida.unidadMedidaId = inv_productos.unidadMedidaId')
+        ->join('cat_14_unidades_medida', 'cat_14_unidades_medida.unidadMedidaId = inv_productos.unidadMedidaId')
         ->where('inv_productos.flgElimina', 0)
         ->findAll();
 
@@ -311,10 +311,10 @@ class AdministracionProducto extends Controller
         $productoId = $this->request->getPost('productoId');
         $mostrarProductoExistencia = new inv_productos_existencias();
         $datos = $mostrarProductoExistencia
-        ->select('inv_productos_existencias.productoExistenciaId,inv_productos_existencias.existenciaProducto,inv_productos_existencias.existenciaReservada,conf_sucursales.sucursalId,conf_sucursales.sucursal,inv_productos.productoId,inv_productos.producto,cat_unidades_medida.abreviaturaUnidadMedida')
+        ->select('inv_productos_existencias.productoExistenciaId,inv_productos_existencias.existenciaProducto,inv_productos_existencias.existenciaReservada,conf_sucursales.sucursalId,conf_sucursales.sucursal,inv_productos.productoId,inv_productos.producto,cat_14_unidades_medida.abreviaturaUnidadMedida')
         ->join('conf_sucursales', 'conf_sucursales.sucursalId = inv_productos_existencias.sucursalId')
         ->join('inv_productos', 'inv_productos.productoId = inv_productos_existencias.productoId')
-        ->join('cat_unidades_medida', 'cat_unidades_medida.unidadMedidaId = inv_productos.unidadMedidaId')
+        ->join('cat_14_unidades_medida', 'cat_14_unidades_medida.unidadMedidaId = inv_productos.unidadMedidaId')
         ->where('inv_productos_existencias.flgElimina', 0)
         ->where('inv_productos_existencias.productoId', $productoId)
         ->findAll();

@@ -4,7 +4,7 @@ namespace App\Controllers\inventario;
 
 use CodeIgniter\Controller;
 use App\Models\inv_productos;
-use App\Models\cat_unidades_medida;
+use App\Models\cat_14_unidades_medida;
 use App\Models\inv_productos_tipo;
 use App\Models\inv_productos_plataforma;
 use App\Models\conf_sucursales;

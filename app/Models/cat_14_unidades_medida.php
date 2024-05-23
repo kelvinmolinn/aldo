@@ -4,12 +4,12 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class cat_unidades_medida extends Model
+class cat_14_unidades_medida extends Model
 {
-    protected $table = 'cat_unidades_medida';
+    protected $table = 'cat_14_unidades_medida';
     protected $primaryKey = 'unidadMedidaId'; // si el nombre de la clave primaria es diferente
 
-    protected $allowedFields = ['unidadMedida','abreviaturaUnidadMedida','flgElimina'];
+    protected $allowedFields = ['unidadMedida','abreviaturaUnidadMedida','codigoMH','flgElimina'];
 
     protected $useTimestamps = true; // Utiliza campos de timestamp para created_at y updated_at
 
