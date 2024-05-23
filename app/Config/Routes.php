@@ -148,8 +148,9 @@ $routes->group('inventario/admin-producto', function($routes) {
 $routes->group('inventario/admin-salida', function($routes) {
     // Definir las rutas específicas para el grupo 'admin-salidas'
     $routes->post('index', 'inventario\AdministracionSalida::index');
-    $routes->post('form/salida', 'inventario\AdministracionProducto::modalAdministracionSalida');
+    $routes->post('form/salida', 'inventario\AdministracionSalida::modalAdministracionSalida');
     $routes->post('tabla/salida',  'inventario\AdministracionSalida::tablaSalida');
+    $routes->post('operacion/guardar/salida', 'inventario\AdministracionSalida::modalSalidaOperacion');
     //
 });
 
