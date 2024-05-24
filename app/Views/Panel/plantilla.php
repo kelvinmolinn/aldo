@@ -22,6 +22,7 @@
   <!-- jQuery -->
   <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>-->
   <script src="<?php echo base_url();?>../assets/plugins/bootstrap/js/jquery.min.js"></script>
+  <script src="<?php echo base_url();?>../assets/plugins/bootstrap/js/inputs.js"></script>
   <!-- Bootstrap 4 -->
   <script src="<?php echo base_url();?>../assets/plugins/bootstrap/js/popper.min.js"></script>
   <!-- AdminLTE App -->

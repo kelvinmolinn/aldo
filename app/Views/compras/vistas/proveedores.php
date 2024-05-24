@@ -34,6 +34,7 @@
                     $('#divModalContent').html(response);
                     // Mostrar la modal
                     $('#modalProveedores').modal('show');
+                    
                 },
             error: function(xhr, status, error) {
                 // Manejar errores si los hay

@@ -12,6 +12,8 @@ use App\Models\cat_22_documentos_identificacion;
 use App\Models\cat_19_actividad_economica;
 use App\Models\cat_tipo_contribuyente;
 use App\Models\comp_compras;
+use App\Models\cat_02_tipo_dte;
+use App\Models\cat_20_paises;
 
 class administracionCompras extends Controller
 {
@@ -111,8 +113,6 @@ class administracionCompras extends Controller
     public function vistaNuevaCompra(){
         $session = session();
 
-        $data['variable'] = 0;
-
         $camposSession = [
             'renderVista' => 'No'
         ];
@@ -120,6 +120,24 @@ class administracionCompras extends Controller
             'route'             => 'compras\administracionCompras::vistaNuevaCompra',
             'camposSession'     => json_encode($camposSession)
         ]);
+
+        $tipoDte = new cat_02_tipo_dte;
+        $proveedor = new comp_proveedores;
+        $pais = new cat_20_paises;
+
+        $data['tipoDTE'] = $tipoDte
+                        ->select("tipoDTEId,tipoDocumentoDTE")
+                        ->where("flgElimina", 0)
+                        ->findAll();
+        $data['selectProveedor'] = $proveedor
+                        ->select("proveedorId,proveedor")
+                        ->where("flgElimina", 0)
+                        ->findAll();
+        $data['selectPais'] = $pais
+                        ->select("paisId,pais")
+                        ->where("flgElimina", 0)
+                        ->findAll();                               
+
         return view('compras/vistas/pageNuevaCompra', $data);
     }
 }

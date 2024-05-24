@@ -106,6 +106,7 @@ class administracionProveedores extends Controller
         }
     }
     public function modalProveedores(){
+        
         $operacion = $this->request->getPost('operacion');
 
         $catTipoPersona = new cat_29_tipo_persona;

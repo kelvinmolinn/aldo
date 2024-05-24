@@ -52,6 +52,16 @@
 </div>
 <script>
     $(document).ready(function() {
+    $('input, textarea').on('focus', function() {
+        $(this).addClass('active');
+    });
+
+    // Remover clase 'active' si el input está vacío al perder el foco
+    $('input, textarea').on('blur', function() {
+        if ($(this).val().trim() === '') {
+            $(this).removeClass('active');
+        }
+    });
         tituloVentana("Proveedores");
         $('#tablaProveedores').DataTable({
             "ajax": {

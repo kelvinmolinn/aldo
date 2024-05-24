@@ -49,19 +49,22 @@
                     <div class="row mt-4">
                         <div class="col-md-6">
                             <div class="form-outline">
-                                <input type="text" id="nombreProveedor" name="nombreProveedor" class="form-control " placeholder="Nombre del proveedor" value="<?= $campos['proveedor']; ?>" required>
+                                <input type="text" id="nombreProveedor" name="nombreProveedor" class="form-control" value="<?= $campos['proveedor']; ?>" required>
+                                <label class="form-label" for="nombreProveedor">Nombre del proveedor</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-outline">
-                                <input type="text" id="nombreComercial" name="nombreComercial" class="form-control numero" placeholder="Nombre comercial" value="<?= $campos['proveedorComercial']; ?>" required>
+                                <input type="text" id="nombreComercial" name="nombreComercial" class="form-control numero" value="<?= $campos['proveedorComercial']; ?>" required>
+                                <label class="form-label" for="nombreComercial">Nombre comercial</label>
                             </div>
                         </div>
                     </div>
                     <div class="row mt-4">
                         <div class="col-md-4">
                             <div class="form-outline">
-                                <input type="text" id="nrc" name="nrc" class="form-control" placeholder="NRC" min ="0" value="<?= $campos['ncrProveedor']; ?>">
+                                <input type="text" id="nrc" name="nrc" class="form-control" min ="0" value="<?= $campos['ncrProveedor']; ?>">
+                                <label class="form-label" for="nrc">NRC</label>
                             </div>
                         </div>
                         <div class="col-md-4">
@@ -76,7 +79,8 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-outline">
-                                <input type="text" id="numeroDocumento" name="numeroDocumento" class="form-control" placeholder="Numero del documento" value="<?= $campos['numDocumentoIdentificacion']; ?>" min ="0" required>
+                                <input type="text" id="numeroDocumento" name="numeroDocumento" class="form-control" value="<?= $campos['numDocumentoIdentificacion']; ?>" min ="0" required>
+                                <label class="form-label" for="numeroDocumento">Numero del documento</label>
                             </div>
                         </div>
                     </div>
@@ -93,7 +97,8 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-outline">
-                                <input type="text" id="direccionProveedor" name="direccionProveedor" class="form-control " placeholder="Dirección del proveedor" value="<?= $campos['direccionProveedor']; ?>" required>
+                                <input type="text" id="direccionProveedor" name="direccionProveedor" class="form-control " value="<?= $campos['direccionProveedor']; ?>" required>
+                                <label class="form-label" for="direccionProveedor">Dirección del proveedor</label>
                             </div>
                         </div>
                     </div>                
