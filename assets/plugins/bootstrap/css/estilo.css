@@ -4,8 +4,11 @@
     padding-bottom: .32rem;
     padding-left: .75rem;
     padding-right: .75rem;
-    background: rgba(121, 120, 120, 0.049);
+    background: rgba(18, 17, 17, 0.049);
     transition: all .2s linear;
+    font-family: inherit, sans-serif; /* Cambia la fuente a Arial */
+    font-weight: 280;
+     /* Hace que el texto sea más ligero */
 }
 
 .form-outline .form-control~.form-label {
@@ -20,8 +23,10 @@
     pointer-events: none;
     transform-origin: 0 0;
     transition: all .2s ease-out;
-    color:  rgba(0, 0, 0, 0.573);
+    color: rgb(0, 0, 0);
     margin-bottom: 0;
+    font-family: inherit, sans-serif; /* Cambia la fuente a Arial */
+    font-weight: 280; /* Hace que el texto sea más ligero */
 }
 
 .form-outline .form-control:not(.placeholder-active)::placeholder {
@@ -37,7 +42,7 @@
     transform: translateY(-1rem) translateY(0.1rem) scale(0.8)
 }
 .form-outline .form-control:focus~.form-label {
-    color: rgba(0, 0, 0, 0.527);
+    color: rgb(0, 0, 0);
 }
 
 .form-outline .form-control[type="date"] {
