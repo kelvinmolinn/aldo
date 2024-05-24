@@ -19,7 +19,7 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    left: 5%;
+    left: 8%;
     padding-top: .37rem;
     pointer-events: none;
     transform-origin: 0 0;
@@ -28,6 +28,8 @@
     margin-bottom: 0;
     font-family: inherit, sans-serif; /* Cambia la fuente a Arial */
     font-weight: 280; /* Hace que el texto sea más ligero */
+
+
 }
 
 .form-outline .form-control:not(.placeholder-active)::placeholder {
