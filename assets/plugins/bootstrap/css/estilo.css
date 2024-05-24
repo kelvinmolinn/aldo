@@ -8,6 +8,7 @@
     transition: all .2s linear;
     font-family: inherit, sans-serif; /* Cambia la fuente a Arial */
     font-weight: 280;
+    border: 1px solid rgba(0, 0, 0, 0.315);
      /* Hace que el texto sea más ligero */
 }
 
@@ -18,7 +19,7 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    left: .75rem;
+    left: 5%;
     padding-top: .37rem;
     pointer-events: none;
     transform-origin: 0 0;
