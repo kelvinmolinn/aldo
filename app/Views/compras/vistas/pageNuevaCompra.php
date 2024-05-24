@@ -8,6 +8,7 @@
                 <option value="factura">Factura</option>
                 <option value="otro">otro</option>
             </select>
+            
         </div>
     </div>
     <div class="col-md-4">
@@ -19,7 +20,7 @@
     </div>
     <div class="col-md-4">
         <div class="form-outline">
-            <input type="date" id="fechaFactura" name="fechaFactura" class="form-control " placeholder="Fecha factura">
+            <input type="date" id="fechaFactura" name="fechaFactura" class="form-control ">
             <label class="form-label" for="fechaFactura">Fecha Factura</label>
         </div>
     </div>

@@ -1,0 +1,71 @@
+.form-outline .form-control {
+    min-height: auto;
+    padding-top: .32rem;
+    padding-bottom: .32rem;
+    padding-left: .75rem;
+    padding-right: .75rem;
+    background: rgba(121, 120, 120, 0.049);
+    transition: all .2s linear;
+}
+
+.form-outline .form-control~.form-label {
+    position: absolute;
+    top: 0;
+    max-width: 90%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    left: .75rem;
+    padding-top: .37rem;
+    pointer-events: none;
+    transform-origin: 0 0;
+    transition: all .2s ease-out;
+    color:  rgba(0, 0, 0, 0.573);
+    margin-bottom: 0;
+}
+
+.form-outline .form-control:not(.placeholder-active)::placeholder {
+    opacity: 0;
+}
+.form-outline .form-control:focus::placeholder,
+.form-outline .form-control.active::placeholder {
+    opacity: 1;
+}
+
+.form-outline .form-control:focus~.form-label,
+.form-outline .form-control.active~.form-label {
+    transform: translateY(-1rem) translateY(0.1rem) scale(0.8)
+}
+.form-outline .form-control:focus~.form-label {
+    color: rgba(0, 0, 0, 0.527);
+}
+
+.form-outline .form-control[type="date"] {
+    color: rgba(0, 0, 0, 0); /* Oculta el texto de la fecha */
+}
+
+.form-outline .form-control[type="date"]::-webkit-datetime-edit {
+    color: transparent; /* Oculta el texto de la fecha en navegadores basados en WebKit */
+}
+
+.form-outline .form-control[type="date"]:focus::-webkit-datetime-edit,
+.form-outline .form-control[type="date"]:active::-webkit-datetime-edit {
+    color: black; /* Muestra el texto de la fecha cuando está enfocado o activo */
+}
+
+.form-outline .form-control[type="date"]::before {
+    content: attr(placeholder); /* Usa el texto del placeholder como contenido antes del input */
+    color: gray;
+    display: block;
+    position: absolute;
+    left: .75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+.form-outline .form-control[type="date"]:focus::before {
+    display: none; /* Esconde el placeholder cuando el input está enfocado */
+}
+
+

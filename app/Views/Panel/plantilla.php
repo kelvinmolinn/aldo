@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="<?php echo base_url();?>../assets/plugins/fontawesome-free/css/all.min.css">
   <!-- Theme style -->
   <link rel="stylesheet" href="<?php echo base_url();?>../assets/plugins/bootstrap/css/adminlte.min.css">
-  <link rel="stylesheet" href="<?php echo base_url();?>../assets/plugins/bootstrap/css/stilo.css">
+  <link rel="stylesheet" href="<?php echo base_url();?>../assets/plugins/bootstrap/css/estilo.css">
   <link rel="stylesheet" href="<?php echo base_url();?>../assets/plugins/sweetalert2/sweetalert2.min.css">
   <link rel="stylesheet" href="<?php echo base_url();?>../assets/plugins/select2/css/select2.min.css">
   <!-- En el head de tu vista -->
