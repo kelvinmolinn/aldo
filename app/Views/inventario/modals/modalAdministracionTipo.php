@@ -19,7 +19,8 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div class="form-outline">
-                                <input type="text" id="productoTipo" name="productoTipo" class="form-control " placeholder="Tipo de producto" value="<?= $campos['productoTipo']; ?>" required>
+                                <input type="text" id="productoTipo" name="productoTipo" class="form-control "  value="<?= $campos['productoTipo']; ?>" required>
+                                <label class="form-label" for="productoTipo">Tipo de producto</label>
                             </div>
                         </div>
                     </div>

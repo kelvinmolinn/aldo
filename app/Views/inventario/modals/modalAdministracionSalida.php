@@ -29,7 +29,8 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-outline">
-                                <input type="text" id="obsDescargo" name="obsDescargo" class="form-control" placeholder="Observación de la salida/descargo" value="<?= $campos['obsDescargo']; ?>" required>
+                                <input type="text" id="obsDescargo" name="obsDescargo" class="form-control"  value="<?= $campos['obsDescargo']; ?>" required>
+                                <label class="form-label" for="obsDescargo">Observación de la salida/descargo</label>
                             </div>
                         </div>
                     </div>

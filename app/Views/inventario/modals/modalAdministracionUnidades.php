@@ -20,11 +20,13 @@
                         <div class="col-md-6">
                             <div class="form-outline">
                                 <input type="text" id="unidadMedida" name="unidadMedida" class="form-control " placeholder="Unidad de medida" value="<?= $campos['unidadMedida']; ?>" required>
+                                <label class="form-label" for="unidadMedida">Unidad de medida</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-outline">
-                                <input type="text" class="form-control " id="abreviaturaUnidadMedida" name="abreviaturaUnidadMedida" placeholder="Abreviatura" value="<?= $campos['abreviaturaUnidadMedida']; ?>" required>
+                                <input type="text" class="form-control " id="abreviaturaUnidadMedida" name="abreviaturaUnidadMedida" value="<?= $campos['abreviaturaUnidadMedida']; ?>" required>
+                                <label class="form-label" for="abreviaturaUnidadMedida">Abreviatura</label>
                             </div>
                         </div>
                     </div>

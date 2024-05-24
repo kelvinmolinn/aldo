@@ -19,19 +19,23 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-outline">
-                                <input type="text" id="codigoProducto" name="codigoProducto" class="form-control " placeholder="Código de producto" value="<?= $campos['codigoProducto']; ?>" required>
+                                <input type="text" id="codigoProducto" name="codigoProducto" class="form-control "  value="<?= $campos['codigoProducto']; ?>" required>
+                                <label class="form-label" for="codigoProducto">Código de producto</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-outline">
-                                <input type="text" id="producto" name="producto" class="form-control " placeholder="Producto" value="<?= $campos['producto']; ?>" required>
+                                <input type="text" id="producto" name="producto" class="form-control "  value="<?= $campos['producto']; ?>" required>
+                                <label class="form-label" for="producto">Producto</label>
                             </div>
                         </div>
                     </div> <br>
                     <div class="row">
                         <div class="col-md-12">
                             <div class="form-outline">
-                              <textarea name="descripcionProducto" id="descripcionProducto" class="form-control " style="width: 100%;" placeholder="Descripción del producto" value="<?= $campos['descripcionProducto']; ?>" required></textarea>
+                              <textarea name="descripcionProducto" id="descripcionProducto" class="form-control " style="width: 100%;" value="<?= $campos['descripcionProducto']; ?>" required></textarea>
+                              <label class="form-label" for="descripcionProducto">Descripción del producto</label>
+                              
                             </div>
                         </div>
                     </div> <br>
@@ -39,6 +43,7 @@
                         <div class="col-md-4">
                             <div class="form-outline">
                                 <input type="date" id="fechaInicioInventario" name="fechaInicioInventario" class="form-control" required>
+                                <label class="form-label" for="fechaInicioInventario">Fecha inicio</label>
                             </div>
                         </div>
                         <div class="col-md-4">
@@ -75,7 +80,8 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-outline">
-                                <input type="number" id="existenciaMinima" name="existenciaMinima" class="form-control " placeholder="Existencia minima" value="<?= $campos['existenciaMinima']; ?>"  required>
+                                <input type="number" id="existenciaMinima" name="existenciaMinima" class="form-control "  value="<?= $campos['existenciaMinima']; ?>"  required>
+                                <label class="form-label" for="existenciaMinima">Existencia minima</label>
                             </div>
                         </div>
                         <div class="col-md-4">

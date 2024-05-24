@@ -42,12 +42,14 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-outline">
-                                <input type="number" id="existenciaProducto" name="existenciaProducto" class="form-control" placeholder="Existencia de producto" value="<?= $campos['existenciaProducto']; ?>" required>
+                                <input type="number" id="existenciaProducto" name="existenciaProducto" class="form-control" value="<?= $campos['existenciaProducto']; ?>" required>
+                                <label class="form-label" for="existenciaProducto">Existencia de producto</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-outline">
-                                <input type="number" id="CostoPromedio" name="CostoPromedio" class="form-control number-input" placeholder="Costo promedio" value="<?= $campos['CostoPromedio']; ?>" required>
+                                <input type="number" id="CostoPromedio" name="CostoPromedio" class="form-control number-input" placeholder="placeholder" value="<?= $campos['CostoPromedio']; ?>" required>
+                                <label class="form-label" for="CostoPromedio">Costo promedio</label>
                             </div>
                         </div>
                     </div>
