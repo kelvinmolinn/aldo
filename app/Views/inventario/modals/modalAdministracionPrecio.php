@@ -21,7 +21,7 @@
                     <div class="form-outline position-relative">
                            <div class="row mt-2">
                         <div class="col-md-4">
-                            <input type="number" id="precioVentaNuevo" class="form-control  number-input" name="precioVentaNuevo"  placeholder="Nuevo precio de venta" readonly required>
+                            <input type="number" id="precioVentaNuevo" class="form-control  number-input" name="precioVentaNuevo"  placeholder="Nuevo precio de venta"  readonly required>
                             
                         </div>
                         <div class="col-md-8 text-end">
@@ -36,9 +36,6 @@
                         </div>
                         <label class="trailing"></label>
                     </div>
-                 
-
-
                 <hr>
                 <div class= "table-responsive">
                     <table id="tblPrecio" name = "tblPrecio" class="table table-hover" style="width: 100%;">

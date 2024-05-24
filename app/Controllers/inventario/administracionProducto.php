@@ -574,8 +574,7 @@ class AdministracionProducto extends Controller
     // Establecer reglas de validación
     $validation = service('validation');
     $validation->setRules([
-        'precioVentaNuevo' => 'greater_than[0]',
-        'productoId' => 'required|integer'
+        'precioVentaNuevo' => 'greater_than[0]'
     ]);
 
     // Ejecutar la validación
