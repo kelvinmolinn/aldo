@@ -138,6 +138,6 @@ class administracionCompras extends Controller
                         ->where("flgElimina", 0)
                         ->findAll();                               
 
-        return view('compras/vistas/pageNuevaCompra', $data);
+        return view('compras/vistas/pageActualizarCompra', $data);
     }
 }

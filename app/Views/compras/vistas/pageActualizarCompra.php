@@ -30,7 +30,7 @@
     <div class="row mb-2">
         <div class="col-md-4">
             <div class="form-select-control">
-                <select name="selectTipoDTE" id="selectTipoDTE" style="width: 100%;" required>
+                <select name="selectProveedor" id="selectProveedor" style="width: 100%;" required>
                     <option value=""></option>
                     <?php foreach ($selectProveedor as $selectProveedor){ ?>
                         <option value="<?php echo $selectProveedor['proveedorId']; ?>"><?php echo $selectProveedor['proveedor']; ?></option>
@@ -71,8 +71,8 @@
     	$("#tipoDocumento").select2({
             placeholder: 'Tipo documento'
         });
-        $("#selectTipoDTE").select2({
-            placeholder: 'Tipo de factura'
+        $("#selectProveedor").select2({
+            placeholder: 'Proveedor'
         });
         $("#selectPais").select2({
             placeholder: 'Pais'

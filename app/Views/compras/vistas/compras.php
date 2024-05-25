@@ -2,7 +2,7 @@
 <hr>
 <div class="row mb-4">
     <div class="col-md-12 text-right">
-        <button type= "button" id="btnNuevoProveedor" class="btn btn-primary estilo-btn" onclick="cambiarInterfaz('compras/admin-compras/vista/nueva/compra', {renderVista: 'No'});">
+        <button type= "button" id="btnNuevoProveedor" class="btn btn-primary estilo-btn" onclick="">
             <i class="fas fa-save"></i>
             Nueva compra
         </button>
