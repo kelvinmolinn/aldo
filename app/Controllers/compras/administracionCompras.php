@@ -117,7 +117,7 @@ class administracionCompras extends Controller
             'renderVista' => 'No'
         ];
         $session->set([
-            'route'             => 'compras\administracionCompras::vistaNuevaCompra',
+            'route'             => 'compras/admin-compras/vista/nueva/compra',
             'camposSession'     => json_encode($camposSession)
         ]);
 

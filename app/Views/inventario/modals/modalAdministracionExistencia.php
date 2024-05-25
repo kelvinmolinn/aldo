@@ -48,7 +48,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-outline">
-                                <input type="number" id="CostoPromedio" name="CostoPromedio" class="form-control number-input" placeholder="placeholder" value="<?= $campos['CostoPromedio']; ?>" required>
+                                <input type="number" id="CostoPromedio" name="CostoPromedio" class="form-control number-input" placeholder="placeholder" value="<?= $campos['CostoPromedio']; ?>" step="0.01" required>
                                 <label class="form-label" for="CostoPromedio">Costo promedio</label>
                             </div>
                         </div>
