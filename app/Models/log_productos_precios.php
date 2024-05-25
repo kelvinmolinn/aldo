@@ -9,7 +9,7 @@ class log_productos_precios extends Model
     protected $table = 'log_productos_precios';
     protected $primaryKey = 'logProductoPrecioId'; // si el nombre de la clave primaria es diferente
 
-    protected $allowedFields = ['productoId','costoUnitarioFOB','CostoUnitarioRetaceo','costoPromedio','precioVentaAntes','precioVentaNuevo','fhAgrega','flgElimina'];
+    protected $allowedFields = ['productoId','costoUnitarioFOB','CostoUnitarioRetaceo','costoPromedio','precioVentaAntes','precioVentaNuevo','fhAgrega','flgElimina','usuarioIdAgrega'];
 
     protected $useTimestamps = true; // Utiliza campos de timestamp para created_at y updated_at
 

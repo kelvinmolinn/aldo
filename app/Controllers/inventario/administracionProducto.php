@@ -12,6 +12,7 @@ use App\Models\inv_productos_existencias;
 use App\Models\inv_kardex;
 use App\Models\log_productos_precios;
 use App\Models\conf_parametrizaciones;
+use App\Models\vista_usuarios_empleados;
 
 class AdministracionProducto extends Controller
 {
@@ -590,6 +591,8 @@ class AdministracionProducto extends Controller
     $operacion = $this->request->getPost('operacion');
     $model = new log_productos_precios();
     $productoModel = new inv_productos();
+    $session = session();
+    $usuarioIdAgrega = $session->get("usuarioId");
     
     $productoId = $this->request->getPost('productoId');
     $precioVentaNuevo = $this->request->getPost('precioVentaNuevo');
@@ -613,7 +616,8 @@ class AdministracionProducto extends Controller
         'precioVentaNuevo'  => $precioVentaNuevo,
         'precioVentaAntes'  => $precioVentaActual, // Asegúrate de tener este campo en la tabla log_productos_precios
         'costoPromedio'     => $costoPromedio, // Asegúrate de tener este campo en la tabla log_productos_precios
-        'costoUnitarioFOB'  => $costoUnitarioFOB
+        'costoUnitarioFOB'  => $costoUnitarioFOB,
+        'usuarioIdAgrega'   => $usuarioIdAgrega
     ];
 
     // Realizar la operación de inserción en log_productos_precios
@@ -645,9 +649,11 @@ class AdministracionProducto extends Controller
     { 
         $productoId = $this->request->getPost('productoId');
         $mostrarPrecios = new log_productos_precios();
-        //$usuarioAgrega = $session->get("primerNombre"); //agregue esta linea
+        $vistaUsuariosEmpleados = new vista_usuarios_empleados();
+        $usuarioIdAgrega =  $this->request->getPost("usuarioId"); //agregue esta linea
         $datos = $mostrarPrecios
-        ->select('logProductoPrecioId, costoPromedio,costoUnitarioFOB,precioVentaNuevo, precioVentaAntes,fhAgrega')
+        ->select('log_productos_precios.logProductoPrecioId, log_productos_precios.costoPromedio,log_productos_precios.costoUnitarioFOB,log_productos_precios.precioVentaNuevo, log_productos_precios.precioVentaAntes,log_productos_precios.fhAgrega, log_productos_precios.usuarioIdAgrega,vista_usuarios_empleados.primerNombre, vista_usuarios_empleados.primerApellido')
+        ->join('vista_usuarios_empleados', 'log_productos_precios.usuarioIdAgrega = vista_usuarios_empleados.usuarioId')
         ->where('flgElimina', 0)
         ->where('productoId', $productoId)
         ->findAll();
@@ -666,7 +672,7 @@ class AdministracionProducto extends Controller
         $columna1 = $n;
         $columna2 = "<b>Costo FOB:</b> " . $costoUnitarioFOB . "<br>" . "<b>Costo Promedio:</b> " . $costoPromedio;
         $columna3 = "<b>Precio nuevo: </b> " . $precioVentaNuevo . "<br>" . "<b>Precio Anterior: </b> " . $precioVentaAntes;
-        $columna4 = "<b>Usuario: </b> ". "<br>" . "<b>Fecha y Hora: </b> " . $columna['fhAgrega'];
+        $columna4 = "<b>Usuario: </b> ". $columna['primerNombre'] . " " . $columna['primerApellido'] . "<br>" . "<b>Fecha y Hora: </b> " . $columna['fhAgrega'];
 
 
             // Agrega la fila al array de salida
