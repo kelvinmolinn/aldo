@@ -2,7 +2,7 @@
 <hr>
 <div class="row mb-4">
     <div class="col-md-12 text-right">
-        <button type= "button" id="btnNuevoProveedor" class="btn btn-primary estilo-btn" onclick="">
+        <button type= "button" id="btnNuevoProveedor" class="btn btn-primary estilo-btn" onclick="modalProveedor()">
             <i class="fas fa-save"></i>
             Nueva compra
         </button>
@@ -30,13 +30,13 @@
     </div>
 </div>
 <div class="text-right mb-4">
-    <button type= "button" id="btnBuscarCompra" class="btn btn-primary estilo-btn" onclick="$('#tablaProveedores').DataTable().ajax.reload(null, false);">
+    <button type= "button" id="btnBuscarCompra" class="btn btn-primary estilo-btn" onclick="$('#tablaCompras').DataTable().ajax.reload(null, false);">
         <i class="fas fa-search"></i>
         Buscar
     </button>
 </div>
 <div class="table-responsive">
-    <table class="table table-hover" id="tablaProveedores" style="width: 100%;">
+    <table class="table table-hover" id="tablaCompras" style="width: 100%;">
         <thead>
             <tr>
                 <th>#</th>
@@ -51,6 +51,25 @@
     </table>
 </div>
 <script>
+    function modalProveedor() {
+        // Realizar una petición AJAX para obtener los datos del módulo por su ID
+        $.ajax({
+                url: '<?php echo base_url('compras/admin-compras/form/nueva/compra'); ?>',
+                type: 'POST',
+                data: {}, // Pasar el ID del módulo como parámetro
+                success: function(response) {
+                    // Insertar el contenido de la modal en el cuerpo de la modal
+                    $('#divModalContent').html(response);
+                    // Mostrar la modal
+                    $('#modalNuevaCompra').modal('show');
+                    
+                },
+            error: function(xhr, status, error) {
+                // Manejar errores si los hay
+                console.error(xhr.responseText);
+            }
+        });
+    }
     $(document).ready(function() {
     $('input, textarea').on('focus', function() {
         $(this).addClass('active');
@@ -62,8 +81,8 @@
             $(this).removeClass('active');
         }
     });
-        tituloVentana("Proveedores");
-        $('#tablaProveedores').DataTable({
+        tituloVentana("Nueva Compra");
+        $('#tablaCompras').DataTable({
             "ajax": {
                 "method": "POST",
                 "url": '<?php echo base_url('compras/admin-compras/tabla/compras'); ?>',

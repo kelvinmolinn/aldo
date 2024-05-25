@@ -1,6 +1,5 @@
 <h2>Nueva compra</h2>
 <hr>
-<form id="frmModal" method="post" action="<?php echo base_url(''); ?>">
     <div class="row mb-2">
         <div class="col-md-4">
             <div class="form-select-control">
@@ -14,14 +13,14 @@
         </div>
         <div class="col-md-4">
             <div class="form-outline">
-                <input type="number" id="numeroFactura" name="numeroFactura" class="form-control" required>
+                <input type="number" id="numeroFactura" name="numeroFactura" class="form-control active" required>
                 <label class="form-label" for="numeroFactura">Numero de factura</label>
 
             </div>
         </div>
         <div class="col-md-4">
             <div class="form-outline">
-                <input type="date" id="fechaFactura" name="fechaFactura" class="form-control" required>
+                <input type="date" id="fechaFactura" name="fechaFactura" class="form-control active" required>
                 <label class="form-label" for="fechaFactura">Fecha Factura</label>
             </div>
         </div>
@@ -32,9 +31,13 @@
             <div class="form-select-control">
                 <select name="selectProveedor" id="selectProveedor" style="width: 100%;" required>
                     <option value=""></option>
-                    <?php foreach ($selectProveedor as $selectProveedor){ ?>
+                    <?php 
+                        foreach ($selectProveedor as $selectProveedor){ 
+                    ?>
                         <option value="<?php echo $selectProveedor['proveedorId']; ?>"><?php echo $selectProveedor['proveedor']; ?></option>
-                    <?php } ?>
+                    <?php 
+                        } 
+                    ?>
                 </select>
             </div>
         </div>
@@ -61,10 +64,9 @@
     <div class="modal-footer">
         <button type="submit" id="btnguardarProveedor" class="btn btn-primary">
             <i class="fas fa-save"></i>
-            Generar compra
+            Actualizar compra
         </button>
     </div>
-</form>
 <script>
     $(document).ready(function(){
 
@@ -79,6 +81,13 @@
         });
         $("#selectRetaceo").select2({
             placeholder: 'Aplica retaceo'
-        });        
+        });    
+        $("#fechaFactura").val('<?= $camposEncabezado["fechaDocumento"]; ?>');
+        $("#numeroFactura").val(<?= $camposEncabezado["numFactura"]; ?>);
+
+        $("#selectProveedor").val(<?= $camposEncabezado["proveedorId"]; ?>).trigger('change');    
+        $("#tipoDocumento").val(<?= $camposEncabezado["tipoDTEId"]; ?>).trigger('change');    
+        $("#selectPais").val(<?= $camposEncabezado["paisId"]; ?>).trigger('change');    
+        $("#selectRetaceo").val('<?= $camposEncabezado["flgRetaceo"]; ?>').trigger('change');    
     })
 </script>

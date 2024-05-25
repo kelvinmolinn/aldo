@@ -169,7 +169,9 @@ $routes->group('compras/admin-proveedores', function($routes) {
 $routes->group('compras/admin-compras', function($routes) {
     $routes->post('index', 'compras\administracionCompras::index');
     $routes->post('tabla/compras', 'compras\administracionCompras::tablaCompras');
-    $routes->post('vista/nueva/compra', 'compras\administracionCompras::vistaNuevaCompra');
+    $routes->post('form/nueva/compra', 'compras\administracionCompras::modalNuevaCompra');
+    $routes->post('operacion/guardar/compra', 'compras\administracionCompras::modalCompraOperacion');
+    $routes->post('vista/actualizar/compra', 'compras\administracionCompras::vistaActualizarCompra');
 });
 // Rutas de errores
 $routes->get('404', 'Errores::error404');

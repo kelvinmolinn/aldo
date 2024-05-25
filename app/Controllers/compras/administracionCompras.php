@@ -41,7 +41,7 @@ class administracionCompras extends Controller
         $filtroProveedor = $this->request->getPost('nombreProveedor');
         
         $consultaCompras = $com_compras
-                ->select('comp_proveedores.tipoProveedorOrigen, cat_02_tipo_dte.tipoDocumentoDTE, 
+                ->select('comp_compras.compraId,comp_proveedores.tipoProveedorOrigen, cat_02_tipo_dte.tipoDocumentoDTE, 
                           comp_compras.fechaDocumento, comp_compras.numFactura,
                           cat_20_paises.pais,comp_proveedores.proveedor,comp_proveedores.proveedorComercial')
                 ->join('comp_proveedores','comp_proveedores.proveedorId = comp_compras.proveedorId')
@@ -79,8 +79,12 @@ class administracionCompras extends Controller
                 $columna3 = "<b>proveedor: </b>". $columna['proveedor'] ."<br>" . "<b>Nombre comercial: </b>". $columna['proveedorComercial'] ."<br>" ."<b>Tipo proveedor: </b>" . $columna['tipoProveedorOrigen'] ."<br>" . "<b>Tipo factura: </b>" . $columna['tipoDocumentoDTE'];
                 $columna4 = "<b>Monto: </b>";
                 
+                $jsonActualiarCompra = [
+                    "compraId"          => $columna['compraId']
+                ];
+
                 $columna5 = '
-                    <button class="btn btn-primary mb-1" onclick="" data-toggle="tooltip" data-placement="top" title="Continuar compra">
+                    <button class="btn btn-primary mb-1" onclick="cambiarInterfaz(`compras/admin-compras/vista/actualizar/compra`, '.htmlspecialchars(json_encode($jsonActualiarCompra)).');" data-toggle="tooltip" data-placement="top" title="Continuar compra">
                         <i class="fas fa-sync-alt"></i>
                     </button>
                 ';
@@ -110,17 +114,7 @@ class administracionCompras extends Controller
         }
     }
 
-    public function vistaNuevaCompra(){
-        $session = session();
-
-        $camposSession = [
-            'renderVista' => 'No'
-        ];
-        $session->set([
-            'route'             => 'compras/admin-compras/vista/nueva/compra',
-            'camposSession'     => json_encode($camposSession)
-        ]);
-
+    public function modalNuevaCompra(){
         $tipoDte = new cat_02_tipo_dte;
         $proveedor = new comp_proveedores;
         $pais = new cat_20_paises;
@@ -137,6 +131,92 @@ class administracionCompras extends Controller
                         ->select("paisId,pais")
                         ->where("flgElimina", 0)
                         ->findAll();                               
+
+        return view('compras/modals/modalNuevaCompra', $data);
+    }
+
+    public function modalCompraOperacion(){
+        $compras = new comp_compras;
+
+        $data = [
+            'proveedorId'       => $this->request->getPost('selectProveedor'),
+            'tipoDTEId'         => $this->request->getPost('tipoDocumento'),
+            'fechaDocumento'    => $this->request->getPost('fechaFactura'),
+            'numFactura'        => $this->request->getPost('numeroFactura'),
+            'paisId'            => $this->request->getPost('selectPais'),
+            'flgRetaceo'        => $this->request->getPost('selectRetaceo'),
+            'estadoCompra'      => 'Pendiente'
+
+        ];
+
+            // Insertar datos en la base de datos
+            $operacionCompra = $compras->insert($data);
+
+        if ($operacionCompra) {
+            // Si el insert fue exitoso, devuelve el último ID insertado
+            return $this->response->setJSON([
+                'success' => true,
+                'mensaje' => 'Compra agregada correctamente',
+                'compraId' =>  $compras->insertID()
+            ]);
+        } else {
+            // Si el insert falló, devuelve un mensaje de error
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'No se pudo insertar la compra'
+            ]);
+        }
+    }
+
+    public function vistaActualizarCompra(){
+        $session = session();
+
+        $camposSession = [
+            'renderVista' => 'No'
+        ];
+        $session->set([
+            'route'             => 'compras/admin-compras/vista/actualizar/compra',
+            'camposSession'     => json_encode($camposSession)
+        ]);
+
+        $compraId = $this->request->getPost('compraId');
+
+        $tipoDte = new cat_02_tipo_dte;
+        $proveedor = new comp_proveedores;
+        $pais = new cat_20_paises;
+        $compras = new comp_compras;
+
+        $data['tipoDTE'] = $tipoDte
+                        ->select("tipoDTEId,tipoDocumentoDTE")
+                        ->where("flgElimina", 0)
+                        ->findAll();
+        $data['selectProveedor'] = $proveedor
+                        ->select("proveedorId,proveedor")
+                        ->where("flgElimina", 0)
+                        ->findAll();
+        $data['selectPais'] = $pais
+                        ->select("paisId,pais")
+                        ->where("flgElimina", 0)
+                        ->findAll();     
+
+        $data['compraId'] = $compraId;
+
+        // Consulta para traer los valores de los input que se pueden actualizar
+        $consultaCompra = $compras
+                ->select("proveedorId,tipoDTEId,numFactura,fechaDocumento,paisId,flgRetaceo")
+                ->where("flgElimina", 0)
+                ->where("compraId", $compraId)
+                ->first();   
+
+        $data['camposEncabezado'] = [
+            'proveedorId'       => $consultaCompra['proveedorId'],
+            'tipoDTEId'         => $consultaCompra['tipoDTEId'],
+            'fechaDocumento'    => $consultaCompra['fechaDocumento'],
+            'numFactura'        => $consultaCompra['numFactura'],
+            'paisId'            => $consultaCompra['paisId'],
+            'flgRetaceo'        => $consultaCompra['flgRetaceo']
+            // Sacar estos valores de la consulta
+        ];                      
 
         return view('compras/vistas/pageActualizarCompra', $data);
     }
