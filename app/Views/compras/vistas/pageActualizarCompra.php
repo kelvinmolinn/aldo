@@ -69,6 +69,7 @@
     </div>
 <script>
     $(document).ready(function(){
+        tituloVentana("Continuar compra");
 
     	$("#tipoDocumento").select2({
             placeholder: 'Tipo documento'

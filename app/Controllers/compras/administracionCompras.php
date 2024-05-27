@@ -50,17 +50,17 @@ class administracionCompras extends Controller
                 ->where('comp_compras.flgElimina', 0);
 
         if($numFactura != "") {
-            $consultaCompras->like('numFactura', $numFactura);
+            $consultaCompras->like('comp_compras.numFactura', $numFactura);
             $contadorFiltros++;
         }
 
         if($fechaDocumento != "") {
-            $consultaCompras->where('fechaDocumento', $fechaDocumento);
+            $consultaCompras->where('comp_compras.fechaDocumento', $fechaDocumento);
             $contadorFiltros++;
         }
 
         if($filtroProveedor != "") {
-            $consultaCompras->like('proveedorId', $filtroProveedor);
+            $consultaCompras->like('comp_proveedores.proveedor', $filtroProveedor);
             $contadorFiltros++;
         }
 
@@ -79,12 +79,12 @@ class administracionCompras extends Controller
                 $columna3 = "<b>proveedor: </b>". $columna['proveedor'] ."<br>" . "<b>Nombre comercial: </b>". $columna['proveedorComercial'] ."<br>" ."<b>Tipo proveedor: </b>" . $columna['tipoProveedorOrigen'] ."<br>" . "<b>Tipo factura: </b>" . $columna['tipoDocumentoDTE'];
                 $columna4 = "<b>Monto: </b>";
                 
-                $jsonActualiarCompra = [
+                $jsonActualizarCompra = [
                     "compraId"          => $columna['compraId']
                 ];
 
                 $columna5 = '
-                    <button class="btn btn-primary mb-1" onclick="cambiarInterfaz(`compras/admin-compras/vista/actualizar/compra`, '.htmlspecialchars(json_encode($jsonActualiarCompra)).');" data-toggle="tooltip" data-placement="top" title="Continuar compra">
+                    <button class="btn btn-primary mb-1" onclick="cambiarInterfaz(`compras/admin-compras/vista/actualizar/compra`, '.htmlspecialchars(json_encode($jsonActualizarCompra)).');" data-toggle="tooltip" data-placement="top" title="Continuar compra">
                         <i class="fas fa-sync-alt"></i>
                     </button>
                 ';
@@ -171,16 +171,18 @@ class administracionCompras extends Controller
     public function vistaActualizarCompra(){
         $session = session();
 
+        $compraId = $this->request->getPost('compraId');
+
         $camposSession = [
-            'renderVista' => 'No'
+            'renderVista' => 'No',
+            'compraId'    => $compraId
         ];
         $session->set([
             'route'             => 'compras/admin-compras/vista/actualizar/compra',
             'camposSession'     => json_encode($camposSession)
         ]);
 
-        $compraId = $this->request->getPost('compraId');
-
+        
         $tipoDte = new cat_02_tipo_dte;
         $proveedor = new comp_proveedores;
         $pais = new cat_20_paises;

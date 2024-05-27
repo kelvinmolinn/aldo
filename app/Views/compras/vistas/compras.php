@@ -17,7 +17,7 @@
     </div>
     <div class="col-md-4">
         <div class="form-outline">
-            <input type="date" id="filtroFechaDocumento" name="filtroFechaDocumento" class="form-control ">
+            <input type="date" id="filtroFechaDocumento" name="filtroFechaDocumento" class="form-control">
             <label class="form-label" for="filtroFechaDocumento">Fecha del documento</label>
 
         </div>
@@ -30,7 +30,7 @@
     </div>
 </div>
 <div class="text-right mb-4">
-    <button type= "button" id="btnBuscarCompra" class="btn btn-primary estilo-btn" onclick="$('#tablaCompras').DataTable().ajax.reload(null, false);">
+    <button type= "button" id="btnBuscarCompra" name="btnBuscarCompra" class="btn btn-primary estilo-btn" onclick="$('#tablaCompras').DataTable().ajax.reload(null, false);">
         <i class="fas fa-search"></i>
         Buscar
     </button>
@@ -71,6 +71,20 @@
         });
     }
     $(document).ready(function() {
+
+    function añadirEventoEnter(inputId) {
+        $('#' + inputId).on('keypress', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault(); // Evita el comportamiento por defecto
+                $('#btnBuscarCompra').click(); // Simula el clic en el botón
+            }
+        });
+    }
+    añadirEventoEnter('filtroNumFactura');
+    añadirEventoEnter('filtroFechaDocumento');
+    añadirEventoEnter('filtroProveedor');
+    
+
     $('input, textarea').on('focus', function() {
         $(this).addClass('active');
     });

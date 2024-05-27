@@ -4,12 +4,10 @@
     padding-bottom: .32rem;
     padding-left: .75rem;
     padding-right: .75rem;
-    background: rgba(18, 17, 17, 0.049);
     transition: all .2s linear;
-    font-family: inherit, sans-serif; /* Cambia la fuente a Arial */
+    font-family: inherit, sans-serif; 
     font-weight: 280;
     border: 1px solid rgba(0, 0, 0, 0.315);
-     /* Hace que el texto sea más ligero */
 }
 
 .form-outline .form-control~.form-label {
@@ -24,10 +22,11 @@
     pointer-events: none;
     transform-origin: 0 0;
     transition: all .2s ease-out;
-    color: rgb(0, 0, 0);
+    color: #1a1a1a;
+    opacity: 1;
     margin-bottom: 0;
     font-family: inherit, sans-serif; /* Cambia la fuente a Arial */
-    font-weight: 280; /* Hace que el texto sea más ligero */
+    font-weight: 400; /* Hace que el texto sea más ligero */
 
 
 }
@@ -57,7 +56,7 @@
 }
 
 .form-outline .form-control[type="date"]:focus::-webkit-datetime-edit,
-.form-outline .form-control[type="date"]:active::-webkit-datetime-edit {
+.form-outline .form-control[type="date"].active::-webkit-datetime-edit {
     color: black; /* Muestra el texto de la fecha cuando está enfocado o activo */
 }
 
@@ -76,5 +75,3 @@
     display: none; /* Esconde el placeholder cuando el input está enfocado */
     color: black;
 }
-
-
