@@ -145,10 +145,10 @@ public function tablaSalida()
         if ($columna['estadoDescargo'] === 'Pendiente') {
             $columna5 = '
                 <button class="btn btn-primary mb-1" onclick="modalHistorial(`'.$columna['descargosId'].'`);" data-toggle="tooltip" data-placement="top" title="Continuar">
-                    <i class="fas fa-sync-alt"></i> <span>Continuar</span>
+                    <i class="fas fa-sync-alt"></i> <span></span>
                 </button>
                 <button class="btn btn-danger mb-1" onclick="modalHistorial(`'.$columna['descargosId'].'`);" data-toggle="tooltip" data-placement="top" title="Anular">
-                    <i class="fas fa-ban"></i> <span>Anular</span>
+                    <i class="fas fa-ban"></i> <span></span>
                 </button>
             ';
         } elseif ($columna['estadoDescargo'] === 'Finalizado') {
