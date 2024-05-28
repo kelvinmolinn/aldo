@@ -125,7 +125,7 @@ class AdministracionProducto extends Controller
 
         // Construye tus columnas
         $columna1 = $n;
-        $estadoColor = $columna['estadoProducto'] == 'Activo' ? 'text-success' : 'text-danger';
+        $estadoColor = $columna['estadoProducto'] == 'Activo' ? 'badge badge-success' : 'badge badge-danger';
         $columna2 = "<b>Código:</b> " . $columna['codigoProducto'] . "<br>" . 
                     "<b>Producto:</b> " . $columna['producto'] . "<br>" . 
                     "<b>Estado:</b> <span class='$estadoColor'>" . $columna['estadoProducto'] . "</span>";
