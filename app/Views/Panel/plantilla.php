@@ -269,18 +269,23 @@
   function tituloVentana(titulo) {
       document.title = 'Aldo Games | ' + titulo;
   }
-  function cambiarInterfaz(ruta, campos) {
+function cambiarInterfaz(ruta, campos) {
+    // Destruir todos los tooltips activos
+    $('[data-toggle="tooltip"]').tooltip('dispose');
+
     $.ajax({
-      url: '<?= site_url(); ?>' + ruta,
-      type: 'POST',
-      data: campos,
-      success: function(response) {
-          $('#divContenido').html(response);
-      },
-      error: function(xhr, status, error) {
-        console.error(xhr.responseText);
-      }
+        url: '<?= site_url(); ?>' + ruta,
+        type: 'POST',
+        data: campos,
+        success: function(response) {
+            $('#divContenido').html(response);
+            // Inicializar los tooltips en la nueva interfaz
+            $('[data-toggle="tooltip"]').tooltip();
+        },
+        error: function(xhr, status, error) {
+            console.error(xhr.responseText);
+        }
     });
-  }
+}
 </script>
 </html>
