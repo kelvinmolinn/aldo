@@ -70,8 +70,3 @@
     transform: translateY(-50%);
     pointer-events: none;
 }
-
-.form-outline .form-control[type="date"]:focus::before {
-    display: none; /* Esconde el placeholder cuando el input está enfocado */
-    color: black;
-}

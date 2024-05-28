@@ -13,6 +13,7 @@ use App\Models\log_productos_precios;
 use App\Models\conf_parametrizaciones;
 use App\Models\inv_descargos;
 use App\Models\inv_descargos_detalle;
+use App\Models\vista_usuarios_empleados;
 
 class AdministracionSalida extends Controller
 {
@@ -73,12 +74,15 @@ class AdministracionSalida extends Controller
             $operacion = $this->request->getPost('operacion');
             $descargosId = $this->request->getPost('descargosId');
             $model = new inv_descargos();
+            $session = session();
+            $usuarioIdAgrega = $session->get("usuarioId");
     
             $data = [
                 'sucursalId'        => $this->request->getPost('sucursalId'),
                 'fhDescargo'        => date('Y-m-d H:i:s'),
                 'obsDescargo'       => $this->request->getPost('obsDescargo'),
-                'estadoDescargo'    => "Pendiente"
+                'estadoDescargo'    => "Pendiente",
+                'usuarioIdAgrega'   => $usuarioIdAgrega
             ];
         
             if ($operacion == 'editar') {
@@ -105,47 +109,80 @@ class AdministracionSalida extends Controller
           
         }
 
-        public function tablaSalida()
-        {
-            $descargosId = $this->request->getPost('descargosId');
-            $mostrarSalida = new inv_descargos();
-            $datos = $mostrarSalida
-            ->select('inv_descargos.descargosId,inv_descargos.fhDescargo,inv_descargos.obsDescargo,conf_sucursales.sucursalId,conf_sucursales.sucursal')
-            ->join('conf_sucursales', 'conf_sucursales.sucursalId = inv_descargos.sucursalId')
-            ->where('inv_descargos.flgElimina', 0)
-            ->findAll();
-        
-            //validar si el producto en la sucursal ya existe sumar la nueva existencia al post
-            // Construye el array de salida  para solo mostrar una 
-            $output['data'] = array();
-            $n = 1; // Variable para contar las filas
-            foreach ($datos as $columna) {
-                // Aquí construye tus columnas
-                $columna1 = $n;
-                $columna2 = "<b>Sucursal:</b> " . $columna['sucursal'];
-                $columna3 = "<b>Fecha/Hora:</b> " . $columna['fhDescargo'];
-                $columna4 = "<b>Motivo/Justifiación:</b> " . $columna['obsDescargo'];
-                $columna5 = " " ;
-    
-                // Agrega la fila al array de salida
-                $output['data'][] = array(
-                    $columna1,
-                    $columna2,
-                    $columna3,
-                    $columna4,
-                    $columna5
-                );
-        
-                $n++;
-            }
-        
-            // Verifica si hay datos
-            if ($n > 1) {
-                return $this->response->setJSON($output);
-            } else {
-                return $this->response->setJSON(array('data' => '')); // No hay datos, devuelve un array vacío
-            }
+public function tablaSalida()
+{
+    $descargosId = $this->request->getPost('descargosId');
+    $mostrarSalida = new inv_descargos();
+    $vistaUsuariosEmpleados = new vista_usuarios_empleados();
+    $usuarioIdAgrega = $this->request->getPost("usuarioId");
+    $datos = $mostrarSalida
+        ->select('inv_descargos.descargosId, inv_descargos.fhDescargo, inv_descargos.obsDescargo, inv_descargos.estadoDescargo, conf_sucursales.sucursalId, conf_sucursales.sucursal, inv_descargos.usuarioIdAgrega, vista_usuarios_empleados.primerNombre, vista_usuarios_empleados.primerApellido')
+        ->join('conf_sucursales', 'conf_sucursales.sucursalId = inv_descargos.sucursalId')
+        ->join('vista_usuarios_empleados', 'inv_descargos.usuarioIdAgrega = vista_usuarios_empleados.usuarioId')
+        ->where('inv_descargos.flgElimina', 0)
+        ->findAll();
+
+    $output['data'] = array();
+    $n = 1; // Variable para contar las filas
+    foreach ($datos as $columna) {
+        // Determina la clase Bootstrap basada en el estado del descargo
+        $estadoClase = '';
+        if ($columna['estadoDescargo'] === 'Pendiente') {
+            $estadoClase = 'badge badge-secondary';
+        } elseif ($columna['estadoDescargo'] === 'Finalizado') {
+            $estadoClase = 'badge badge-success';
+        } elseif ($columna['estadoDescargo'] === 'Anulado') {
+            $estadoClase = 'badge badge-danger';
         }
+
+        // Aquí construye tus columnas
+        $columna1 = $n;
+        $columna2 = "<b>Sucursal:</b> " . $columna['sucursal'];
+        $columna3 = "<b>Usuario: </b> ". $columna['primerNombre'] . " " . $columna['primerApellido'] . "<br>" ."<b>Fecha/Hora:</b> " . $columna['fhDescargo'];
+        $columna4 = "<b>Motivo/Justificación:</b> " . $columna['obsDescargo'] . "<br>" . "<b>Estado:</b> <span class='" . $estadoClase . "'>" . $columna['estadoDescargo'] . "</span>";
         
+        // Construir botones basado en estadoDescargo
+        if ($columna['estadoDescargo'] === 'Pendiente') {
+            $columna5 = '
+                <button class="btn btn-primary mb-1" onclick="modalHistorial(`'.$columna['descargosId'].'`);" data-toggle="tooltip" data-placement="top" title="Continuar">
+                    <i class="fas fa-sync-alt"></i> <span>Continuar</span>
+                </button>
+                <button class="btn btn-danger mb-1" onclick="modalHistorial(`'.$columna['descargosId'].'`);" data-toggle="tooltip" data-placement="top" title="Anular">
+                    <i class="fas fa-ban"></i> <span>Anular</span>
+                </button>
+            ';
+        } elseif ($columna['estadoDescargo'] === 'Finalizado') {
+            $columna5 = '
+                <button class="btn btn-info mb-1" onclick="modalExistenciaProducto(`'.$columna['descargosId'].'`);" data-toggle="tooltip" data-placement="top" title="Ver descargo">
+                    <i class="fas fa-eye"></i>
+                </button>
+            ';
+        } else {
+            $columna5 = '
+                   <button class="btn btn-info mb-1" onclick="modalExistenciaProducto(`'.$columna['descargosId'].'`);" data-toggle="tooltip" data-placement="top" title="Ver descargo">
+        <i class="fas fa-eye"></i>
+                </button>'; // No buttons if the status is neither 'Pendiente' nor 'Finalizado'
+        }
+
+        // Agrega la fila al array de salida
+        $output['data'][] = array(
+            $columna1,
+            $columna2,
+            $columna3,
+            $columna4,
+            $columna5
+        );
+
+        $n++;
+    }
+
+    // Verifica si hay datos
+    if ($n > 1) {
+        return $this->response->setJSON($output);
+    } else {
+        return $this->response->setJSON(array('data' => '')); // No hay datos, devuelve un array vacío
+    }
+}
+    
     
 }

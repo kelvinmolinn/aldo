@@ -9,7 +9,7 @@ class inv_descargos extends Model
     protected $table = 'inv_descargos';
     protected $primaryKey = 'descargosId'; // si el nombre de la clave primaria es diferente
 
-    protected $allowedFields = ['sucursalId','fhDescargo','obsDescargo','estadoDescargo','flgElimina'];
+    protected $allowedFields = ['sucursalId','fhDescargo','obsDescargo','estadoDescargo','flgElimina','usuarioIdAgrega'];
 
     protected $useTimestamps = true; // Utiliza campos de timestamp para created_at y updated_at
 
