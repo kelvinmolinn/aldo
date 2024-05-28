@@ -111,7 +111,7 @@
                             title: 'Compra realizada con éxito',
                             text: response.mensaje
                         }).then((result) => {
-                            $("#tablaProveedores").DataTable().ajax.reload(null, false);
+                            $("#tablaCompras").DataTable().ajax.reload(null, false);
                             // Actualizar tabla de contactos
                             // Limpiar inputs con .val(null) o .val('')
                             

@@ -171,8 +171,8 @@ $routes->group('compras/admin-compras', function($routes) {
     $routes->post('tabla/compras', 'compras\administracionCompras::tablaCompras');
     $routes->post('form/nueva/compra', 'compras\administracionCompras::modalNuevaCompra');
     $routes->post('operacion/guardar/compra', 'compras\administracionCompras::modalCompraOperacion');
-    $routes->post('vista/actualizar/compra', 'compras\administracionCompras::vistaActualizarCompra');
-    $routes->post('operacion/actualizar/compra', 'compras\administracionCompras::vistaCompraOperacion');
+    $routes->post('vista/actualizar/compra', 'compras\administracionCompras::vistaContinuarCompra');
+    $routes->post('operacion/actualizar/compra', 'compras\administracionCompras::vistaActualizarCompraOperacion');
 });
 // Rutas de errores
 $routes->get('404', 'Errores::error404');

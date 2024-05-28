@@ -7,7 +7,7 @@ use CodeIgniter\Model;
 class comp_compras extends Model
 {
     protected $table = 'comp_compras';
-    protected $primaryKey = 'comprasId'; // si el nombre de la clave primaria es diferente
+    protected $primaryKey = 'compraId'; // si el nombre de la clave primaria es diferente
 
     protected $allowedFields = ['compraId', 'proveedorId', 'tipoDTEId', 'fechaDocumento', 'numFactura', 'paisId', 'ObsCompra', 'porcentajeIva', 'flgRetaceo', 'estadoCompra', 'fechaAnulacion', 'obsAnulacion', 'flgElimina'];
 
