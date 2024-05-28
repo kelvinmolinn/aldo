@@ -70,6 +70,7 @@
             }
         });
     }
+
     $(document).ready(function() {
 
     function añadirEventoEnter(inputId) {
@@ -96,6 +97,7 @@
         }
     });
         tituloVentana("Nueva Compra");
+
         $('#tablaCompras').DataTable({
             "ajax": {
                 "method": "POST",
@@ -115,11 +117,13 @@
                 { "width": "20%", "targets": 3 }, 
                 { "width": "20%", "targets": 4 } 
             ],
+            
             "language": {
                 "url": "../assets/plugins/datatables/js/spanish.json"
             },
-                "drawCallback": function(settings) {
-                // Inicializar tooltips de Bootstrap después de cada dibujo de la tabla
+
+            "drawCallback": function(settings) {
+            // Inicializar tooltips de Bootstrap después de cada dibujo de la tabla
                 $('[data-toggle="tooltip"]').tooltip();
             },
         });

@@ -84,7 +84,7 @@ class administracionCompras extends Controller
                 ];
 
                 $columna5 = '
-                    <button class="btn btn-primary mb-1" onclick="cambiarInterfaz(`compras/admin-compras/vista/actualizar/compra`, '.htmlspecialchars(json_encode($jsonActualizarCompra)).');" data-toggle="tooltip" data-placement="top" title="Continuar compra">
+                    <button type= "button" class="btn btn-primary mb-1" onclick="cambiarInterfaz(`compras/admin-compras/vista/actualizar/compra`, '.htmlspecialchars(json_encode($jsonActualizarCompra)).');" data-toggle="tooltip" data-placement="top" title="Continuar compra">
                         <i class="fas fa-sync-alt"></i>
                     </button>
                 ';
@@ -168,10 +168,11 @@ class administracionCompras extends Controller
         }
     }
 
-    public function vistaActualizarCompra(){
+    public function vistaContinuarCompra(){
         $session = session();
 
         $compraId = $this->request->getPost('compraId');
+
 
         $camposSession = [
             'renderVista' => 'No',
@@ -221,5 +222,37 @@ class administracionCompras extends Controller
         ];                      
 
         return view('compras/vistas/pageActualizarCompra', $data);
+    }
+
+    function vistaActualizarCompraOperacion(){
+        $compras = new comp_compras;
+
+        $data = [
+            'proveedorId'       => $this->request->getPost('selectProveedor'),
+            'tipoDTEId'         => $this->request->getPost('tipoDocumento'),
+            'fechaDocumento'    => $this->request->getPost('fechaFactura'),
+            'numFactura'        => $this->request->getPost('numeroFactura'),
+            'paisId'            => $this->request->getPost('selectPais'),
+            'flgRetaceo'        => $this->request->getPost('selectRetaceo')
+
+        ];
+
+            // Insertar datos en la base de datos
+            $operacionCompra = $compras->update($this->request->getPost('compraId'), $data);
+
+        if ($operacionCompra) {
+            // Si el insert fue exitoso, devuelve el último ID insertado
+            return $this->response->setJSON([
+                'success' => true,
+                'mensaje' => 'Compra actualizada correctamente',
+                'compraId' => $this->request->getPost('compraId')
+            ]);
+        } else {
+            // Si el insert falló, devuelve un mensaje de error
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'No se pudo actualizar la compra'
+            ]);
+        }
     }
 }
