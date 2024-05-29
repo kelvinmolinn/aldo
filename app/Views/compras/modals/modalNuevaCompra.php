@@ -82,16 +82,20 @@
     $(document).ready(function(){
 
     	$("#tipoDocumento").select2({
-            placeholder: 'Tipo documento'
+            placeholder: 'Tipo documento',
+            dropdownParent: $('#modalNuevaCompra')
         });
         $("#selectProveedor").select2({
-            placeholder: 'Proveedor'
+            placeholder: 'Proveedor',
+            dropdownParent: $('#modalNuevaCompra')
         });
         $("#selectPais").select2({
-            placeholder: 'Pais'
+            placeholder: 'Pais',
+            dropdownParent: $('#modalNuevaCompra')
         });
         $("#selectRetaceo").select2({
-            placeholder: 'Aplica retaceo'
+            placeholder: 'Aplica retaceo',
+            dropdownParent: $('#modalNuevaCompra')
         });    
 
 
