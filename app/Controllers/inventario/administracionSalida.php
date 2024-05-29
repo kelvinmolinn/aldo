@@ -143,8 +143,11 @@ public function tablaSalida()
         
         // Construir botones basado en estadoDescargo
         if ($columna['estadoDescargo'] === 'Pendiente') {
+            $jsonActualizarDescargo = [
+                "descargosId"          => $columna['descargosId']
+            ];
             $columna5 = '
-                <button class="btn btn-primary mb-1" onclick="modalHistorial(`'.$columna['descargosId'].'`);" data-toggle="tooltip" data-placement="top" title="Continuar">
+                <button class="btn btn-primary mb-1" onclick="cambiarInterfaz(`inventario/admin-salida/vista/actualizar/descargo`, '.htmlspecialchars(json_encode($jsonActualizarDescargo)).');" data-toggle="tooltip" data-placement="top" title="Continuar">
                     <i class="fas fa-sync-alt"></i> <span></span>
                 </button>
                 <button class="btn btn-danger mb-1" onclick="modalHistorial(`'.$columna['descargosId'].'`);" data-toggle="tooltip" data-placement="top" title="Anular">
@@ -182,6 +185,25 @@ public function tablaSalida()
     } else {
         return $this->response->setJSON(array('data' => '')); // No hay datos, devuelve un array vacío
     }
+}
+
+public function vistaContinuarDescargo(){
+    $session = session();
+
+    $descargosId = $this->request->getPost('descargosId');
+
+
+    $camposSession = [
+        'renderVista' => 'No',
+        'descargosId'    => $descargosId
+    ];
+    $session->set([
+        'route'             => 'inventario/admin-salida/vista/actualizar/descargo',
+        'camposSession'     => json_encode($camposSession)
+    ]);
+    $data['descargosId'] = $descargosId;
+    
+    return view('inventario/vistas/pageContinuarDescargo', $data);
 }
     
     
