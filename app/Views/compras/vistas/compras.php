@@ -73,7 +73,7 @@
 
     $(document).ready(function() {
 
-    function añadirEventoEnter(inputId) {
+    function EventoEnter(inputId) {
         $('#' + inputId).on('keypress', function(event) {
             if (event.key === 'Enter') {
                 event.preventDefault(); // Evita el comportamiento por defecto
@@ -81,9 +81,9 @@
             }
         });
     }
-    añadirEventoEnter('filtroNumFactura');
-    añadirEventoEnter('filtroFechaDocumento');
-    añadirEventoEnter('filtroProveedor');
+    EventoEnter('filtroNumFactura');
+    EventoEnter('filtroFechaDocumento');
+    EventoEnter('filtroProveedor');
     
 
     $('input, textarea').on('focus', function() {

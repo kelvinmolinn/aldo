@@ -255,4 +255,48 @@ class administracionCompras extends Controller
             ]);
         }
     }
+
+    function tablaContinuarCompras(){
+
+
+        $output['data'] = array();
+        $n = 0; // Variable para contar las filas
+           // foreach ($datos as $columna) {
+                $n++;
+                // Aquí construye tus columnas
+                $columna1 = $n;
+                $columna2 = "Productos";
+
+                $columna3 = "14";
+                $columna4 = "5";
+                $columna5 = "70";
+                $columna6 = '
+                    <button type= "button" class="btn btn-primary mb-1" onclick="">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                ';
+
+                $columna6 .= '
+                    <button class="btn btn-danger mb-1" onclick="" data-toggle="tooltip" data-placement="top" title="Anular compra">
+                        <i class="fas fa-ban"></i>
+                    </button>
+                ';
+                // Agrega la fila al array de salida
+                $output['data'][] = array(
+                    $columna1,
+                    $columna2,
+                    $columna3,
+                    $columna4,
+                    $columna5,
+                    $columna6
+                );
+           // }
+
+        // Verifica si hay datos
+        if ($n > 0) {
+            return $this->response->setJSON($output);
+        } else {
+            return $this->response->setJSON(array('data' => '')); // No hay datos, devuelve un array vacío
+        }
+    }
 }
