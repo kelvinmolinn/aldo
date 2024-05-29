@@ -14,6 +14,7 @@ use App\Models\cat_tipo_contribuyente;
 use App\Models\comp_compras;
 use App\Models\cat_02_tipo_dte;
 use App\Models\cat_20_paises;
+use App\Models\comp_compras_detalle;
 
 class administracionCompras extends Controller
 {
@@ -265,20 +266,19 @@ class administracionCompras extends Controller
                 $n++;
                 // Aquí construye tus columnas
                 $columna1 = $n;
-                $columna2 = "Productos";
-
-                $columna3 = "14";
-                $columna4 = "5";
-                $columna5 = "70";
+                $columna2 = "";
+                $columna3 = "";
+                $columna4 = "";
+                $columna5 = "";
                 $columna6 = '
-                    <button type= "button" class="btn btn-primary mb-1" onclick="">
-                        <i class="fas fa-sync-alt"></i>
+                    <button type= "button" class="btn btn-primary mb-1" onclick="" data-toggle="tooltip" data-placement="top" title="Editar">
+                        <i class="fas fa-pencil-alt"></i>
                     </button>
                 ';
 
                 $columna6 .= '
-                    <button class="btn btn-danger mb-1" onclick="" data-toggle="tooltip" data-placement="top" title="Anular compra">
-                        <i class="fas fa-ban"></i>
+                    <button class="btn btn-danger mb-1" onclick="" data-toggle="tooltip" data-placement="top" title="Eliminar">
+                        <i class="fas fa-trash"></i>
                     </button>
                 ';
                 // Agrega la fila al array de salida
@@ -297,6 +297,32 @@ class administracionCompras extends Controller
             return $this->response->setJSON($output);
         } else {
             return $this->response->setJSON(array('data' => '')); // No hay datos, devuelve un array vacío
+        }
+    }
+
+    function modalAgregarProducto(){
+
+        
+        $compras = new comp_compras;
+
+
+        $operacion = $this->request->getPost('operacion');
+        
+        $compraId = $this->request->getPost('compraId');
+
+        $consultaCompra = $compras
+        ->select("paisId")
+        ->where("flgElimina", 0)
+        ->where("compraId", $compraId)
+        ->first(); 
+
+        $data['variable'] = 0;
+
+        if ($consultaCompra['paisId'] == 61 ) {
+            return view('compras/modals/modalAgregarProductoLocales', $data);
+        }else{
+            return view('compras/modals/modalAgregarProductoInternacionales', $data);
+
         }
     }
 }

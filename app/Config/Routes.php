@@ -177,6 +177,7 @@ $routes->group('compras/admin-compras', function($routes) {
     $routes->post('vista/actualizar/compra', 'compras\administracionCompras::vistaContinuarCompra');
     $routes->post('operacion/actualizar/compra', 'compras\administracionCompras::vistaActualizarCompraOperacion');
     $routes->post('tabla/continuar/compra', 'compras\administracionCompras::tablaContinuarCompras');
+    $routes->post('form/producto/compra', 'compras\administracionCompras::modalAgregarProducto');
 });
 // Rutas de errores
 $routes->get('404', 'Errores::error404');

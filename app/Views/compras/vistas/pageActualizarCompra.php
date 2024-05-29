@@ -67,9 +67,9 @@
                 </div>
             </div>
         </div>
-        <div class="modal-footer">
+        <div class="text-right">
             <button type="submit" id="btnguardarProveedor" class="btn btn-primary">
-                <i class="fas fa-save"></i>
+                <i class="fas fa-pencil-alt"></i>
                 Actualizar compra
             </button>
         </div>
@@ -77,9 +77,9 @@
 <hr>
 <form id="frmContinuarCompra" method="post" action="<?php echo base_url(''); ?>">
     <div class="text-right mb-4">
-        <button type= "button" id="btnNuevoProveedor" class="btn btn-primary estilo-btn" onclick="modalProveedor()">
+        <button type= "button" id="btnNuevoProveedor" class="btn btn-primary estilo-btn" onclick="modalAgregarProducto(0,'insertar')">
             <i class="fas fa-save"></i>
-            Nueva compra
+            Agregar producto
         </button>
     </div>
     <div class="table-responsive">
@@ -100,6 +100,26 @@
     </div>
 </form>
 <script>
+    function modalAgregarProducto(paisId,operacion){
+        $.ajax({
+            url: '<?php echo base_url('compras/admin-compras/form/producto/compra'); ?>',
+            type: 'POST',
+            data: {compraId : <?php echo $compraId; ?>, operacion: operacion }, // Pasar el ID del módulo como parámetro
+            success: function(response) {
+                // Insertar el contenido de la modal en el cuerpo de la modal
+                $('#divModalContent').html(response);
+                // Mostrar la modal
+                $('#modalAgregarProducto').modal('show');
+
+                
+            },
+            error: function(xhr, status, error) {
+                // Manejar errores si los hay
+                console.error(xhr.responseText);
+            }
+        });
+    }
+
     $(document).ready(function(){
         
         tituloVentana("Continuar compra");
