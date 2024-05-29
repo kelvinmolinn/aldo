@@ -152,6 +152,8 @@ $routes->group('inventario/admin-salida', function($routes) {
     $routes->post('tabla/salida',  'inventario\AdministracionSalida::tablaSalida');
     $routes->post('operacion/guardar/salida', 'inventario\AdministracionSalida::modalSalidaOperacion');
     $routes->post('vista/actualizar/descargo', 'inventario\AdministracionSalida::vistaContinuarDescargo');
+    $routes->post('tabla/ContinuarSalida',  'inventario\AdministracionSalida::tablaContinuarSalida');
+    $routes->post('form2/Nuevasalida', 'inventario\AdministracionSalida::modalAdministracionNuevaSalida');
     //
 });
 

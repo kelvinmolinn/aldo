@@ -202,9 +202,69 @@ public function vistaContinuarDescargo(){
         'camposSession'     => json_encode($camposSession)
     ]);
     $data['descargosId'] = $descargosId;
+    $mostrarSalida = new inv_descargos();
+   
+            // Consulta para traer los valores de los input que se pueden actualizar
+            $data['dataSucursal'] = $mostrarSalida
+            ->select("conf_sucursales.sucursal")
+            ->join('conf_sucursales', 'conf_sucursales.sucursalId = inv_descargos.sucursalId')
+            ->where("inv_descargos.flgElimina", 0)
+            ->where("inv_descargos.descargosId", $descargosId)
+            ->first(); 
+
     
     return view('inventario/vistas/pageContinuarDescargo', $data);
 }
+public function tablaContinuarSalida()
+{
+
+    $descargosId = $this->request->getPost('descargosId');
+    $mostrarSalida = new inv_descargos_detalle();
+    $datos = $mostrarSalida
+        ->select('inv_descargos_detalle.descargoDetalleId,inv_descargos_detalle.descargosId,inv_descargos_detalle.cantidadDescargo,inv_descargos_detalle.obsDescargoDetalle,inv_productos.productoId, inv_productos.producto,inv_productos.codigoProducto,cat_14_unidades_medida.unidadMedida')
+        ->join('inv_productos', 'inv_productos.productoId = inv_descargos_detalle.productoId')
+        ->join('cat_14_unidades_medida', 'cat_14_unidades_medida.unidadMedidaId = inv_productos.unidadMedidaId')
+        ->join('inv_descargos', 'inv_descargos.descargosId = inv_descargos_detalle.descargosId')
+        ->where('inv_descargos_detalle.flgElimina', 0)
+        ->where('inv_descargos_detalle.descargosId', $descargosId)
+        ->findAll();
+
+    $output['data'] = array();
+    $n = 1; // Variable para contar las filas
+    foreach ($datos as $columna) {
     
+        // Aquí construye tus columnas
+        $columna1 = $n;
+        $columna2 = "<b>Producto:</b> " . $columna['producto']. "<br>" ."<b>Código :</b> " . $columna['codigoProducto'];
+        $columna3 = "<b>Cantidad: </b> ". $columna['cantidadDescargo'] ." (". $columna['unidadMedida'] .")" ;
+        $columna4 = "<b>Motivo/Justificación:</b> " . $columna['obsDescargoDetalle'] ;
+        
+
+            $columna5 = '
+
+                <button class="btn btn-danger mb-1" onclick="modalHistorial(`'.$columna['descargoDetalleId'].'`);" data-toggle="tooltip" data-placement="top" title="Anular">
+                    <i class="fas fa-ban"></i> <span></span>
+                </button>
+            ';
+
+        // Agrega la fila al array de salida
+        $output['data'][] = array(
+            $columna1,
+            $columna2,
+            $columna3,
+            $columna4,
+            $columna5
+        );
+
+        $n++;
+    }
+
+    // Verifica si hay datos
+    if ($n > 1) {
+        return $this->response->setJSON($output);
+    } else {
+        return $this->response->setJSON(array('data' => '')); // No hay datos, devuelve un array vacío
+    }
+}  
     
 }

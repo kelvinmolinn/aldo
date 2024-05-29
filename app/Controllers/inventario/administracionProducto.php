@@ -128,7 +128,7 @@ class AdministracionProducto extends Controller
         $estadoColor = $columna['estadoProducto'] == 'Activo' ? 'badge badge-success' : 'badge badge-danger';
         $columna2 = "<b>Código:</b> " . $columna['codigoProducto'] . "<br>" . 
                     "<b>Producto:</b> " . $columna['producto'] . "<br>" . 
-                    "<b>Estado:</b> <span class='$estadoColor'>" . $columna['estadoProducto'] . "</span>";
+                    "<b>Estado del producto :</b> <span class='$estadoColor'>" . $columna['estadoProducto'] . "</span>";
         
         $columna3 = "<b>Tipo Producto:</b> " . $columna['productoTipo'] . "<br>" . "<b>Plataforma:</b> " . $columna['productoPlataforma'] . "<br>" . "<b>Descripción:</b> " . $columna['descripcionProducto'];
          $columna4 = "<b>Sin IVA: $</b> " . $precioVenta . "<br>" . "<b>(+) IVA: $</b> " . $precioVentaConIVA;
