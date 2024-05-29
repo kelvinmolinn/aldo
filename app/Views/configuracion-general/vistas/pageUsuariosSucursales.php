@@ -3,7 +3,7 @@
 <div class="row mb-4">
     <div class="col-md-6">
         <button type= "button" id="btnRegresarUsuarios" class="btn btn-secondary">
-            <i class="fas fa-angle-double-left"></i>
+        <i class="fas fa-backspace "></i>
             Volver a usuarios
         </button>
     </div>
