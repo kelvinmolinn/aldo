@@ -4,6 +4,7 @@ namespace App\Controllers\inventario;
 
 use CodeIgniter\Controller;
 use App\Models\inv_productos;
+use App\Models\inv_productos_existencias;
 use App\Models\cat_14_unidades_medida;
 use App\Models\inv_productos_tipo;
 use App\Models\inv_productos_plataforma;
@@ -148,11 +149,9 @@ public function tablaSalida()
             ];
             $columna5 = '
                 <button class="btn btn-primary mb-1" onclick="cambiarInterfaz(`inventario/admin-salida/vista/actualizar/descargo`, '.htmlspecialchars(json_encode($jsonActualizarDescargo)).');" data-toggle="tooltip" data-placement="top" title="Continuar">
-                    <i class="fas fa-sync-alt"></i> <span></span>
+                    <i class="fas fa-sync-alt"></i> <span> Continuar</span>
                 </button>
-                <button class="btn btn-danger mb-1" onclick="modalHistorial(`'.$columna['descargosId'].'`);" data-toggle="tooltip" data-placement="top" title="Anular">
-                    <i class="fas fa-ban"></i> <span></span>
-                </button>
+
             ';
         } elseif ($columna['estadoDescargo'] === 'Finalizado') {
             $columna5 = '
@@ -215,6 +214,189 @@ public function vistaContinuarDescargo(){
     
     return view('inventario/vistas/pageContinuarDescargo', $data);
 }
+    public function modalAdministracionNuevaSalida()
+    { 
+               // Cargar el modelos
+            $productosModel = new inv_productos();
+            $data['producto'] = $productosModel->where('flgElimina', 0)->findAll();
+            $operacion = $this->request->getPost('operacion');
+            $data['productoId'] = $this->request->getPost('productoId');
+            $descargosId = $this->request->getPost('descargosId');
+    
+            if($operacion == 'editar') {
+                $descargoDetalleId = $this->request->getPost('descargoDetalleId');
+                $salidaProducto = new inv_descargos_detalle();
+    
+                 // seleccionar solo los campos que estan en la modal (solo los input y select)
+                $data['campos'] = $producto->select('inv_descargos_detalle.descargoDetalleId,inv_descargos_detalle.descargoId,inv_descargos_detalle.cantidadDescargo,inv_descargos_detalle.obsDescargoDetalle,inv_productos.productoId')
+                ->join('inv_productos', 'inv_productos.productoId = inv_descargos_detalle.productoId')
+                ->where('inv_descargos_detalle.flgElimina', 0)
+                //->where('inv_descargos_detalle.descargoDetalleId', $descargoDetalleId)
+                ->first();
+            } else {
+    
+                 // formar los campos que estan en la modal (input y select) con el nombre equivalente en la BD
+                $data['campos'] = [
+                    'descargoDetalleId'       => 0,
+                    'descargosId'             => $descargosId,
+                    'productoId'              => '',
+                    'cantidadDescargo'        => '',
+                    'obsDescargoDetalle'      => ''
+    
+                ];
+            }
+            $data['operacion'] = $operacion;
+    
+            return view('inventario/modals/modalAdministracionNuevaSalida', $data);
+        }
+
+  /*      public function modalNuevaSalidaOperacion()
+{
+    // Continuar con la operación de inserción o actualización en la base de datos
+    $operacion = $this->request->getPost('operacion');
+    $descargoDetalleId = $this->request->getPost('descargoDetalleId');
+    $model = new inv_descargos_detalle();
+    $descargosId = $this->request->getPost('descargosId');
+    $productoId = $this->request->getPost('productoId');
+    $cantidadDescargo = $this->request->getPost('cantidadDescargo');
+    
+    // Obtener la existencia actual del producto en la sucursal
+    $productosModel = new inv_productos_existencias();
+    $producto = $productosModel->find($productoId);
+
+    if (!$producto) {
+        return $this->response->setJSON([
+            'success' => false,
+            'mensaje' => 'Producto no encontrado'
+        ]);
+    }
+
+    $existenciaActual = $producto['existenciaProducto']; 
+
+    // Validar si la existencia es suficiente
+    if ($existenciaActual < $cantidadDescargo) {
+        return $this->response->setJSON([
+            'success' => false,
+            'mensaje' => 'No hay existencias suficientes para realizar la salida'
+        ]);
+    }
+
+    $data = [
+        'productoId'            => $productoId,
+        'cantidadDescargo'      => $cantidadDescargo,
+        'obsDescargoDetalle'    => $this->request->getPost('obsDescargoDetalle'),
+        'descargosId'           => $descargosId
+    ];
+
+    if ($operacion == 'editar') {
+        $operacionSalida = $model->update($descargoDetalleId, $data);
+    } else {
+        // Insertar datos en la base de datos
+        $operacionSalida = $model->insert($data);
+    }
+
+    if ($operacionSalida) {
+        // Si el insert fue exitoso, devuelve el último ID insertado
+        return $this->response->setJSON([
+            'success' => true,
+            'mensaje' => 'Salida ' . ($operacion == 'editar' ? 'actualizada' : 'agregada') . ' correctamente',
+            'descargoDetalleId' => ($operacion == 'editar' ? $descargoDetalleId : $model->insertID())
+        ]);
+    } else {
+        // Si el insert falló, devuelve un mensaje de error
+        return $this->response->setJSON([
+            'success' => false,
+            'mensaje' => 'No se pudo insertar la salida o descargo'
+        ]);
+    }
+}
+
+
+    Necesito una consulta que me muestre los detalles del descargo por productoId, descargoId, sucursalId, luego de eso si no hay descargoDetalleId hacer el insert, pero si hay descargoDetalleId hacer la validacion anterior, luego si se hace otro descargoDetalleId validar la existencia menos el descargoDetalleId y ver si se puuede hacer el descargo */
+
+public function modalNuevaSalidaOperacion()
+{
+    $operacion = $this->request->getPost('operacion');
+    $descargoDetalleId = $this->request->getPost('descargoDetalleId');
+    $model = new inv_descargos_detalle();
+    $descargosId = $this->request->getPost('descargosId');
+    $productoId = $this->request->getPost('productoId');
+    $cantidadDescargo = $this->request->getPost('cantidadDescargo');
+    
+    // Obtener la existencia actual del producto en la sucursal
+    $productosModel = new inv_productos_existencias();
+    $producto = $productosModel->find($productoId);
+
+    if (!$producto) {
+        return $this->response->setJSON([
+            'success' => false,
+            'mensaje' => 'Producto no encontrado'
+        ]);
+    }
+
+    $existenciaActual = $producto['existenciaProducto'];
+
+    if ($descargoDetalleId) {
+        $detalleActual = $model->find($descargoDetalleId);
+
+        if (!$detalleActual) {
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'Detalle de descargo no encontrado'
+            ]);
+        }
+
+        $cantidadAnterior = $detalleActual['cantidadDescargo'];
+        $nuevaCantidad = $existenciaActual + $cantidadAnterior - $cantidadDescargo;
+
+        if ($nuevaCantidad <= 0) {
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'No hay existencias suficientes para realizar la salida'
+            ]);
+        }
+    } else {
+        // Validar si la existencia es suficiente para una nueva inserción
+        if ($existenciaActual < $cantidadDescargo) {
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'No hay existencias suficientes para realizar la salida'
+            ]);
+        }
+    }
+
+    $data = [
+        'productoId'            => $productoId,
+        'cantidadDescargo'      => $cantidadDescargo,
+        'obsDescargoDetalle'    => $this->request->getPost('obsDescargoDetalle'),
+        'descargosId'           => $descargosId
+    ];
+
+    if ($operacion == 'editar' && $descargoDetalleId) {
+        $operacionSalida = $model->update($descargoDetalleId, $data);
+    } else {
+        // Insertar datos en la base de datos
+        $operacionSalida = $model->insert($data);
+    }
+
+    if ($operacionSalida) {
+        // Si el insert fue exitoso, devuelve el último ID insertado
+        return $this->response->setJSON([
+            'success' => true,
+            'mensaje' => 'Salida ' . ($operacion == 'editar' ? 'actualizada' : 'agregada') . ' correctamente',
+            'descargoDetalleId' => ($operacion == 'editar' ? $descargoDetalleId : $model->insertID())
+        ]);
+    } else {
+        // Si el insert falló, devuelve un mensaje de error
+        return $this->response->setJSON([
+            'success' => false,
+            'mensaje' => 'No se pudo insertar la salida o descargo'
+        ]);
+    }
+}
+
+ 
+
 public function tablaContinuarSalida()
 {
 
