@@ -12,8 +12,8 @@
     </div>
     <div class="col-md-6 text-right">
         <button type= "button" id="btnAbrirModalProducto" class="btn btn-primary" onclick="modalContinuarSalida(0, 'insertar');">
-            <i class="fas fa-plus nav-icon"></i>
-            Agregar producto
+        Agregar producto <i class="fas fa-plus nav-icon"></i>
+            
         </button>
     </div>
 </div>

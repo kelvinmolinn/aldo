@@ -239,13 +239,19 @@ public function tablaContinuarSalida()
         $columna3 = "<b>Cantidad: </b> ". $columna['cantidadDescargo'] ." (". $columna['unidadMedida'] .")" ;
         $columna4 = "<b>Motivo/Justificación:</b> " . $columna['obsDescargoDetalle'] ;
         
+        $columna5 = '
 
-            $columna5 = '
+        <button class="btn btn-primary mb-1" onclick="modalHistorial(`'.$columna['descargoDetalleId'].'`);" data-toggle="tooltip" data-placement="top" title="Editar">
+            <i class="fas fa-pen"></i> <span></span>
+        </button>
+        ';
+        $columna5 .= '
 
-                <button class="btn btn-danger mb-1" onclick="modalHistorial(`'.$columna['descargoDetalleId'].'`);" data-toggle="tooltip" data-placement="top" title="Anular">
-                    <i class="fas fa-ban"></i> <span></span>
-                </button>
-            ';
+            <button class="btn btn-danger mb-1" onclick="modalHistorial(`'.$columna['descargoDetalleId'].'`);" data-toggle="tooltip" data-placement="top" title="Eliminar">
+                <i class="fas fa-trash"></i> <span></span>
+            </button>
+        ';
+
 
         // Agrega la fila al array de salida
         $output['data'][] = array(
