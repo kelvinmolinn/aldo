@@ -11,9 +11,9 @@
         </button>
     </div>
     <div class="col-md-6 text-right">
-        <button type= "button" id="btnAbrirModalProducto" class="btn btn-primary" onclick="modalContinuarSalida(0, 'insertar');">
-        Agregar producto <i class="fas fa-plus nav-icon"></i>
-            
+        <button type= "button" id="btnAbrirModalProducto" class="btn btn-primary" onclick="modalAdministracionNuevaSalida(0, 'insertar');">
+        <i class="fas fa-save nav-icon "></i>
+            Agregar producto 
         </button>
     </div>
 </div>
@@ -35,17 +35,17 @@
 
 <script>
         //pendiente
-        function modalContinuarSalida(productoId, operacion) {
+        function modalAdministracionNuevaSalida(descargoDetalleId, operacion) {
         // Realizar una petición AJAX para obtener los datos del módulo por su ID
         $.ajax({
                 url: '<?php echo base_url('inventario/admin-salida/form2/Nuevasalida'); ?>',
                 type: 'POST',
-                data: { productoId: productoId, operacion: operacion}, // Pasar el ID del módulo como parámetro
+                data: { descargoDetalleId: descargoDetalleId, operacion: operacion, descargosId: <?= $descargosId; ?>}, // Pasar el ID del módulo como parámetro
                 success: function(response) {
                     // Insertar el contenido de la modal en el cuerpo de la modal
                     $('#divModalContent').html(response);
                     // Mostrar la modal
-                    $('#modalContinuarSalida').modal('show');
+                    $('#modalNuevaSalida').modal('show');
                 },
             error: function(xhr, status, error) {
                 // Manejar errores si los hay
@@ -54,7 +54,7 @@
         });
     }
     $(document).ready(function() {
-        tituloVentana("Descargos/Continuar salida");
+        tituloVentana("Descargos/Continuar Descargo");
         $('#btnRegresarDescargo').on('click', function() {
             cambiarInterfaz('inventario/admin-salida/index', {renderVista: 'No'});
         });

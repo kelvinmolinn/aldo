@@ -3,7 +3,7 @@
 <div class="row mb-4">
     <div class="col-md-12 text-right">
         <button type= "button" id="btnAbrirModal" class="btn btn-primary" onclick="modalSalida(0, 'insertar');">
-            <i class="fas fa-box-open nav-icon"></i>
+            <i class="fas fa-save nav-icon"></i>
             Nuevo descargo
         </button>
     </div>
