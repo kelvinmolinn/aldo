@@ -8,8 +8,8 @@
         </button>
     </div>
 </div>
-<div class= "table-responsive">
-    <table id="tblSalida" name = "tblSalida" class="table table-hover" style="width: 100%;">
+<div class= "table-responsive" >
+    <table id="tblSalida" name = "tblSalida" class="table table-hover" style="width: 100%;" >
         <thead>
             <tr>
                 <th>#</th>

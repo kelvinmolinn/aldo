@@ -323,9 +323,17 @@ public function modalNuevaSalidaOperacion()
     $productoId = $this->request->getPost('productoId');
     $cantidadDescargo = $this->request->getPost('cantidadDescargo');
     
+    // Traer sucursalId de inv_descargos
+    $sucursalId = 1;
+
     // Obtener la existencia actual del producto en la sucursal
     $productosModel = new inv_productos_existencias();
-    $producto = $productosModel->find($productoId);
+
+    $producto = $productosModel->select('existenciaProducto')
+                ->where('flgElimina', 0)
+                ->where('sucursalId', $sucursalId)
+                ->where('productoId', $productoId)
+                ->first();
 
     if (!$producto) {
         return $this->response->setJSON([
@@ -336,8 +344,27 @@ public function modalNuevaSalidaOperacion()
 
     $existenciaActual = $producto['existenciaProducto'];
 
-    if ($descargoDetalleId) {
-        $detalleActual = $model->find($descargoDetalleId);
+    $cantidadDetalleActual = $model->where('flgElimina', 0)
+                                ->where('descargosId', $descargosId)
+                                ->where('productoId', $productoId)
+                                ->countAllResults();
+
+    if ($descargoDetalleId || $cantidadDetalleActual > 0) {
+        if($descargoDetalleId) {
+            // Es update-editar
+            $detalleActual = $model->selectSum('cantidadDescargo')
+                                    ->where('flgElimina', 0)
+                                    ->where('descargosId', $descargosId)
+                                    ->where('productoId', $productoId)
+                                    ->where('descargoDetalleId <>', $descargoDetalleId)
+                                    ->first();
+        } else {
+            $detalleActual = $model->selectSum('cantidadDescargo')
+                                ->where('flgElimina', 0)
+                                ->where('descargosId', $descargosId)
+                                ->where('productoId', $productoId)
+                                ->first();
+        }
 
         if (!$detalleActual) {
             return $this->response->setJSON([
@@ -346,10 +373,7 @@ public function modalNuevaSalidaOperacion()
             ]);
         }
 
-        $cantidadAnterior = $detalleActual['cantidadDescargo'];
-        $nuevaCantidad = $existenciaActual + $cantidadAnterior - $cantidadDescargo;
-
-        if ($nuevaCantidad <= 0) {
+        if (($cantidadDescargo + $detalleActual['cantidadDescargo']) > $existenciaActual) {
             return $this->response->setJSON([
                 'success' => false,
                 'mensaje' => 'No hay existencias suficientes para realizar la salida'
@@ -357,7 +381,7 @@ public function modalNuevaSalidaOperacion()
         }
     } else {
         // Validar si la existencia es suficiente para una nueva inserción
-        if ($existenciaActual < $cantidadDescargo) {
+        if ($cantidadDescargo > $existenciaActual) {
             return $this->response->setJSON([
                 'success' => false,
                 'mensaje' => 'No hay existencias suficientes para realizar la salida'
@@ -477,5 +501,9 @@ public function tablaContinuarSalida()
         return $this->response->setJSON(array('data' => '')); // No hay datos, devuelve un array vacío
     }
 }  
+public function finalizarSalida(){
+    
+
+}
     
 }

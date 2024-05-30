@@ -17,7 +17,7 @@
         </button>
     </div>
 </div>
-<div class= "table-responsive">
+<div class= "table-responsive" style="max-height: 400px; overflow-y: auto;">
     <table id="tblContinuarSalida" name = "tblContinuarSalida" class="table table-hover" style="width: 100%;">
         <thead>
             <tr>
@@ -32,8 +32,48 @@
         </tbody>
     </table>
 </div>
-
+    <br>
+    <div class="row mb-4">
+    <div class="col-md-12 text-right">
+        <button type= "submit" id="btnFinalizar" class="btn btn-primary" onclick="finalizarDescargo();">
+        <i class="fas fa-save nav-icon "></i>
+            Finalizar descargo 
+        </button>
+    </div>
+</div>
 <script>
+    function finalizarDescargo(descargosId) {
+                $.ajax({
+                    url: '<?php echo base_url('inventario/admin-salida/operacion/finalizar/finalizar'); ?>',
+                    type: 'POST',
+                    data: {
+                        descargosId: <?php echo $descargosId ;?>
+                    },
+                    success: function(response) {
+                        console.log(response);
+                        if (response.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Salida/descargo eliminada con Éxito!',
+                                text: response.mensaje
+                            }).then((result) => {
+                                $("#tblContinuarSalida").DataTable().ajax.reload(null, false);
+                            });
+                        } else {
+                            // Insert fallido, mostrar mensaje de error
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: response.mensaje
+                            });
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        // Manejar errores si los hay
+                        console.error(xhr.responseText);
+                    }
+                });
+    }
     function eliminarSalida(id) {
         //alert("Vamos a eliminar " + id);
             Swal.fire({

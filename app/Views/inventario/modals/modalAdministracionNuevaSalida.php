@@ -94,21 +94,14 @@ $(document).ready(function() {
                             
                         });
                         console.log("Último ID insertado:", response.descargoDetalleId);
-
-                } else {
-                    // Insert fallido, mostrar mensaje de error con Sweet Alert
-                    let errorMessage = '<ul>';
-                    $.each(response.errors, function(key, value) {
-                        errorMessage += '<li>' + value + '</li>';
-                    });
-                    errorMessage += '</ul>';
-
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'No se completó la operación',
-                        text: 'No hay existencias suficientes para realizar la salida'
-                    });
-                }
+                    } else {
+                        // Insert fallido, mostrar mensaje de error con Sweet Alert
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'No se completó la operación',
+                            text: response.mensaje
+                        });
+                    }
             },
             error: function(xhr, status, error) {
                 // Manejar errores si los hay
