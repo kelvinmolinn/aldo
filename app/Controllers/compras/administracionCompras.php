@@ -304,11 +304,26 @@ class administracionCompras extends Controller
 
         
         $compras = new comp_compras;
+        $comprasDetalle = new comp_compras_detalle;
 
 
         $operacion = $this->request->getPost('operacion');
         
         $compraId = $this->request->getPost('compraId');
+
+        if($operacion == 'editar') {
+
+            $data['campos'] = $comprasDetalle
+            ->select('compraDetalleId,compraId,productoId,cantidadProducto,precioUnitario,precioUnitarioIVA,ivaUnitario,ivaTotal,totalCompraDetalle,totalCompraDetalleIVA')
+            ->where('flgElimina', 0)
+            ->where('compraId', $compraId)
+            ->first();
+        } else {
+            $data['campos'] = [
+                'proveedorId'               => 0,
+            ];
+        }
+        $data['operacion'] = $operacion;
 
         $consultaCompra = $compras
         ->select("paisId")
