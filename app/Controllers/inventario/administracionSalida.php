@@ -228,10 +228,10 @@ public function vistaContinuarDescargo(){
                 $salidaProducto = new inv_descargos_detalle();
     
                  // seleccionar solo los campos que estan en la modal (solo los input y select)
-                $data['campos'] = $producto->select('inv_descargos_detalle.descargoDetalleId,inv_descargos_detalle.descargoId,inv_descargos_detalle.cantidadDescargo,inv_descargos_detalle.obsDescargoDetalle,inv_productos.productoId')
+                $data['campos'] = $salidaProducto->select('inv_descargos_detalle.descargoDetalleId,inv_descargos_detalle.descargosId,inv_descargos_detalle.cantidadDescargo,inv_descargos_detalle.obsDescargoDetalle,inv_productos.productoId')
                 ->join('inv_productos', 'inv_productos.productoId = inv_descargos_detalle.productoId')
                 ->where('inv_descargos_detalle.flgElimina', 0)
-                //->where('inv_descargos_detalle.descargoDetalleId', $descargoDetalleId)
+                ->where('inv_descargos_detalle.descargoDetalleId', $descargoDetalleId)
                 ->first();
             } else {
     
@@ -395,6 +395,29 @@ public function modalNuevaSalidaOperacion()
     }
 }
 
+public function eliminarSalida(){
+    
+    $eliminarSalida = new inv_descargos_detalle();
+    
+    $descargoDetalleId = $this->request->getPost('descargoDetalleId');
+    $data = ['flgElimina' => 1];
+    
+    $eliminarSalida->update($descargoDetalleId, $data);
+
+    if($eliminarSalida) {
+        return $this->response->setJSON([
+            'success' => true,
+            'mensaje' => 'Salida de producto eliminado correctamente'
+        ]);
+    } else {
+        return $this->response->setJSON([
+            'success' => false,
+            'mensaje' => 'No se pudo eliminar La salida de producto'
+        ]);
+    }
+}
+
+
  
 
 public function tablaContinuarSalida()
@@ -423,15 +446,15 @@ public function tablaContinuarSalida()
         
         $columna5 = '
 
-        <button class="btn btn-primary mb-1" onclick="modalHistorial(`'.$columna['descargoDetalleId'].'`);" data-toggle="tooltip" data-placement="top" title="Editar">
+        <button class="btn btn-primary mb-1" onclick="modalAdministracionNuevaSalida(`'.$columna['descargoDetalleId'].'`, `editar`);" data-toggle="tooltip" data-placement="top" title="Editar">
             <i class="fas fa-pen"></i> <span></span>
         </button>
         ';
         $columna5 .= '
 
-            <button class="btn btn-danger mb-1" onclick="modalHistorial(`'.$columna['descargoDetalleId'].'`);" data-toggle="tooltip" data-placement="top" title="Eliminar">
-                <i class="fas fa-trash"></i> <span></span>
-            </button>
+            <button class="btn btn-danger mb-1" onclick="eliminarSalida(`'.$columna['descargoDetalleId'].'`);" data-toggle="tooltip" data-placement="top" title="Eliminar">
+            <i class="fas fa-trash"></i>
+        </button>
         ';
 
 

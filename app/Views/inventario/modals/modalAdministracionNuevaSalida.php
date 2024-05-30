@@ -48,7 +48,7 @@
                 <div class="modal-footer">
                     <button type="submit" id="btnGuardarExistencia" class="btn btn-primary">
                         <i class="fas fa-save"></i>
-                        Iniciar
+                        Guardar
                     </button>
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">
                         <i class="fas fa-times-circle"></i>
@@ -116,5 +116,6 @@ $(document).ready(function() {
             }
         });
     });
+    $("#productoId").val('<?= $campos["productoId"]; ?>').trigger("change");
 });
 </script>

@@ -34,6 +34,53 @@
 </div>
 
 <script>
+    function eliminarSalida(id) {
+        //alert("Vamos a eliminar " + id);
+            Swal.fire({
+                title: '¿Estás seguro que desea eliminar la salida de producto?',
+                text: "Se eiminara la salida de producto seleccionada.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Si el usuario confirma, enviar la solicitud AJAX para eliminar el usuario de la sucursal
+                        $.ajax({
+                            url: '<?php echo base_url('inventario/admin-salida/operacion/eliminar/salida'); ?>',
+                            type: 'POST',
+                            data: {
+                                descargoDetalleId: id
+                            },
+                            success: function(response) {
+                                console.log(response);
+                                if (response.success) {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Salida/descargo eliminada con Éxito!',
+                                        text: response.mensaje
+                                    }).then((result) => {
+                                        $("#tblContinuarSalida").DataTable().ajax.reload(null, false);
+                                    });
+                                } else {
+                                    // Insert fallido, mostrar mensaje de error
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Error',
+                                        text: response.mensaje
+                                    });
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                // Manejar errores si los hay
+                                console.error(xhr.responseText);
+                            }
+                        });
+                }
+            });
+    }
         //pendiente
         function modalAdministracionNuevaSalida(descargoDetalleId, operacion) {
         // Realizar una petición AJAX para obtener los datos del módulo por su ID
