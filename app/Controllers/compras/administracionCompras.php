@@ -258,20 +258,27 @@ class administracionCompras extends Controller
     }
 
     function tablaContinuarCompras(){
+        $comprasDetalle = new comp_compras_detalle;
+        $compraId = $this->request->getPost('compraId');
 
+        $datos = $comprasDetalle
+            ->select('compraDetalleId,compraId,productoId,cantidadProducto,precioUnitario,precioUnitarioIVA,ivaUnitario,ivaTotal,totalCompraDetalle,totalCompraDetalleIVA')
+            ->where('flgElimina', 0)
+            ->where('compraId', $compraId)
+            ->findAll();
 
         $output['data'] = array();
         $n = 0; // Variable para contar las filas
-           // foreach ($datos as $columna) {
+           foreach ($datos as $columna) {
                 $n++;
                 // Aquí construye tus columnas
                 $columna1 = $n;
-                $columna2 = "";
-                $columna3 = "";
-                $columna4 = "";
-                $columna5 = "";
+                $columna2 = $columna['compraId'];
+                $columna3 = $columna['productoId'];
+                $columna4 = $columna['cantidadProducto'];
+                $columna5 = $columna['precioUnitario'];
                 $columna6 = '
-                    <button type= "button" class="btn btn-primary mb-1" onclick="" data-toggle="tooltip" data-placement="top" title="Editar">
+                    <button type= "button" class="btn btn-primary mb-1" onclick="modalAgregarProducto(`'.$columna['compraDetalleId'].'`, `editar`);" data-toggle="tooltip" data-placement="top" title="Editar">
                         <i class="fas fa-pencil-alt"></i>
                     </button>
                 ';
@@ -290,7 +297,7 @@ class administracionCompras extends Controller
                     $columna5,
                     $columna6
                 );
-           // }
+           }
 
         // Verifica si hay datos
         if ($n > 0) {
@@ -320,7 +327,16 @@ class administracionCompras extends Controller
             ->first();
         } else {
             $data['campos'] = [
-                'proveedorId'               => 0,
+                'compraDetalleId'       => 0,
+                'compraId'              => '',
+                'productoId'            => '',
+                'cantidadProducto'      => '',
+                'precioUnitario'        => '',
+                'precioUnitarioIVA'     => '',
+                'ivaUnitario'           => '',
+                'ivaTotal'              => '',
+                'totalCompraDetalle'    => '',
+                'totalCompraDetalleIVA' => ''
             ];
         }
         $data['operacion'] = $operacion;

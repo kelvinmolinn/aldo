@@ -100,7 +100,7 @@
     </div>
 </form>
 <script>
-    function modalAgregarProducto(paisId,operacion){
+    function modalAgregarProducto(compraDetalleId,operacion){
         $.ajax({
             url: '<?php echo base_url('compras/admin-compras/form/producto/compra'); ?>',
             type: 'POST',
@@ -184,7 +184,7 @@
                 "method": "POST",
                 "url": '<?php echo base_url('compras/admin-compras/tabla/continuar/compra'); ?>',
                 "data": {
-                    x:''
+                    compraId: '<?= $compraId; ?>'
                 }
             },
             "columnDefs": [
