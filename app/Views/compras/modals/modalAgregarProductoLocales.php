@@ -47,7 +47,7 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-outline">
-                                <input type="number" id="costoTotal" name="costoTotal" class="form-control" required readonly>
+                                <input type="number" id="costoTotal" name="costoTotal" class="form-control" value="<?= $campos['totalCompraDetalleIVA']; ?>" required readonly>
                                 <label class="form-label" for="costoTotal">Costo total</label>
                             </div>
                         </div>
