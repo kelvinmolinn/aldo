@@ -255,12 +255,15 @@ public function modalNuevaSalidaOperacion()
     $operacion = $this->request->getPost('operacion');
     $descargoDetalleId = $this->request->getPost('descargoDetalleId');
     $model = new inv_descargos_detalle();
+    $sucursalModel = new inv_descargos();  // Renombrado para mayor claridad
     $descargosId = $this->request->getPost('descargosId');
     $productoId = $this->request->getPost('productoId');
     $cantidadDescargo = $this->request->getPost('cantidadDescargo');
     
-    // Traer sucursalId de inv_descargos
-    $sucursalId = 1;
+    //Necesito Traer sucursalId de inv_descargos 
+    $descargoData = $sucursalModel->find($descargosId);
+    $sucursalId = $descargoData['sucursalId'];  // Asegúrate de que el campo se llama sucursalId en la base de datos
+   // $sucursalId = 1;
 
     // Obtener la existencia actual del producto en la sucursal
     $productosModel = new inv_productos_existencias();
@@ -437,9 +440,9 @@ public function tablaContinuarSalida()
         return $this->response->setJSON(array('data' => '')); // No hay datos, devuelve un array vacío
     }
 }  
-public function finalizarSalida(){
-    
+    public function finalizarSalida(){
+        
 
-}
+    }
     
 }
