@@ -254,12 +254,12 @@
 <script>
   function cerrarSession(){
     Swal.fire({
-      title: 'Desea cerrar session',
-      text: 'La session terminará!',
+      title: '¿Está seguro que desea cerrar sesión?',
+      text: 'Recuerde guardar los últimos cambios realizados para evitar perderlos.',
       icon: 'warning',
       showCancelButton: true,
       cancelButton: '#d33',
-      confirmButtonText: 'Sí, salir' 
+      confirmButtonText: 'Cerrar sesión' 
     }).then((result) =>{
       if(result.isConfirmed){
         window.location.href = '<?= site_url('cerrarSession'); ?>';
