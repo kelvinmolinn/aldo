@@ -15,6 +15,7 @@ use App\Models\comp_compras;
 use App\Models\cat_02_tipo_dte;
 use App\Models\cat_20_paises;
 use App\Models\comp_compras_detalle;
+use App\Models\inv_productos;
 
 class administracionCompras extends Controller
 {
@@ -259,12 +260,14 @@ class administracionCompras extends Controller
 
     function tablaContinuarCompras(){
         $comprasDetalle = new comp_compras_detalle;
+        $compras = new comp_compras;
         $compraId = $this->request->getPost('compraId');
 
         $datos = $comprasDetalle
-            ->select('compraDetalleId,compraId,productoId,cantidadProducto,precioUnitario,precioUnitarioIVA,ivaUnitario,ivaTotal,totalCompraDetalle,totalCompraDetalleIVA')
-            ->where('flgElimina', 0)
-            ->where('compraId', $compraId)
+            ->select('comp_compras.paisId,comp_compras_detalle.compraDetalleId,comp_compras_detalle.compraId,comp_compras_detalle.productoId,comp_compras_detalle.cantidadProducto,comp_compras_detalle.precioUnitario,comp_compras_detalle.precioUnitarioIVA,comp_compras_detalle.ivaUnitario,comp_compras_detalle.ivaTotal,comp_compras_detalle.totalCompraDetalle,comp_compras_detalle.totalCompraDetalleIVA')
+            ->join('comp_compras','comp_compras.compraId = comp_compras_detalle.compraId')
+            ->where('comp_compras_detalle.flgElimina', 0)
+            ->where('comp_compras_detalle.compraId', $compraId)
             ->findAll();
 
         $output['data'] = array();
@@ -272,31 +275,61 @@ class administracionCompras extends Controller
            foreach ($datos as $columna) {
                 $n++;
                 // Aquí construye tus columnas
-                $columna1 = $n;
-                $columna2 = $columna['compraId'];
-                $columna3 = $columna['productoId'];
-                $columna4 = $columna['cantidadProducto'];
-                $columna5 = $columna['precioUnitario'];
-                $columna6 = '
-                    <button type= "button" class="btn btn-primary mb-1" onclick="modalAgregarProducto(`'.$columna['compraDetalleId'].'`, `editar`);" data-toggle="tooltip" data-placement="top" title="Editar">
-                        <i class="fas fa-pencil-alt"></i>
-                    </button>
-                ';
+                if ($columna['paisId'] == 61) {
+                    
+                    $columna1 = $n;
+                    $columna2 = '1';
+                    $columna3 = '<b>Con IVA</b>' . '<br>' . '<b>Sin IVA</b>';
+                    $columna4 = '5';
+                    $columna5 = '<b>Con IVA</b>' . '<br>' . '<b>Sin IVA</b>';
+                    $columna6 = '
+                        <button type= "button" class="btn btn-primary mb-1" onclick="modalAgregarProducto(`'.$columna['compraDetalleId'].'`, `editar`);" data-toggle="tooltip" data-placement="top" title="Editar">
+                            <i class="fas fa-pencil-alt"></i>
+                        </button>
+                    ';
 
-                $columna6 .= '
-                    <button class="btn btn-danger mb-1" onclick="" data-toggle="tooltip" data-placement="top" title="Eliminar">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                ';
-                // Agrega la fila al array de salida
-                $output['data'][] = array(
-                    $columna1,
-                    $columna2,
-                    $columna3,
-                    $columna4,
-                    $columna5,
-                    $columna6
-                );
+                    $columna6 .= '
+                        <button class="btn btn-danger mb-1" onclick="" data-toggle="tooltip" data-placement="top" title="Eliminar">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    ';
+                    // Agrega la fila al array de salida
+                    $output['data'][] = array(
+                        $columna1,
+                        $columna2,
+                        $columna3,
+                        $columna4,
+                        $columna5,
+                        $columna6
+                    );
+                }else{
+                    $columna1 = $n;
+                    $columna2 = '1';
+                    $columna3 = '12';
+                    $columna4 = '5';
+                    $columna5 = '20';
+                    $columna6 = '
+                        <button type= "button" class="btn btn-primary mb-1" onclick="modalAgregarProducto(`'.$columna['compraDetalleId'].'`, `editar`);" data-toggle="tooltip" data-placement="top" title="Editar">
+                            <i class="fas fa-pencil-alt"></i>
+                        </button>
+                    ';
+
+                    $columna6 .= '
+                        <button class="btn btn-danger mb-1" onclick="" data-toggle="tooltip" data-placement="top" title="Eliminar">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    ';
+                    // Agrega la fila al array de salida
+                    $output['data'][] = array(
+                        $columna1,
+                        $columna2,
+                        $columna3,
+                        $columna4,
+                        $columna5,
+                        $columna6
+                    );
+                }
+
            }
 
         // Verifica si hay datos
@@ -312,11 +345,17 @@ class administracionCompras extends Controller
         
         $compras = new comp_compras;
         $comprasDetalle = new comp_compras_detalle;
-
+        $productos = new inv_productos;
 
         $operacion = $this->request->getPost('operacion');
         
         $compraId = $this->request->getPost('compraId');
+
+
+        $data['producto'] = $productos
+            ->select('productoId,producto')
+            ->where('flgElimina', 0)
+            ->findAll();
 
         if($operacion == 'editar') {
 

@@ -11,9 +11,10 @@
                         <div class="col-md-4">
                             <div class="form-select-control">
                                 <select name="selectProductos" id="selectProductos" style="width: 100%;" required>
-                                    <option value=""></option>
-                                    <option value="Local">Proveedor local</option>
-                                    <option value="Internacional">Proveedor Internacional</option>
+                                    <option></option>
+                                    <?php foreach ($producto as $producto){ ?>
+                                        <option value="<?php echo $producto['productoId']; ?>"><?php echo $producto['producto']; ?></option>
+                                    <?php } ?>
                                 </select>
                             </div>
                         </div>
@@ -75,5 +76,7 @@
             dropdownParent: $('#modalAgregarProducto')
         });    
 
+        
+        $("#selectProductos").val('<?= $campos['productoId']; ?>').trigger("change");
     });
 </script>

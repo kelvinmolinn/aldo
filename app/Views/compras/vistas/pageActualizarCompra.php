@@ -158,7 +158,7 @@
                             text: response.mensaje
                         }).then((result) => {
                             $("#tablaCompras").DataTable().ajax.reload(null, false);
-
+                            $("#tablaContinuarCompra ").DataTable().ajax.reload(null, false);
                             // Actualizar tabla de contactos
                             // Limpiar inputs con .val(null) o .val('')
                             
