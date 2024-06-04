@@ -440,9 +440,140 @@ public function tablaContinuarSalida()
         return $this->response->setJSON(array('data' => '')); // No hay datos, devuelve un array vacío
     }
 }  
-    public function finalizarSalida(){
-        
+ /*   public function finalizarSalida(){
 
-    }
+        // Continuar con la operación de inserción o actualización en la base de datos
+        $operacion = $this->request->getPost('operacion');
+        $descargoDetalleId = $this->request->getPost('descargoDetalleId');
+        $modelDescargosDetalle = new inv_descargos_detalle();
+        $modelDescargos = new inv_descargos();
+        $productosModel = new inv_productos_existencias();
+        $cantidadMovimiento = 0;
+
+        $datos = $modelDescargosDetalle
+        ->select('inv_descargos_detalle.descargoDetalleId,inv_descargos_detalle.productoId,inv_descargos_detalle.descargosId,inv_descargos_detalle.cantidadDescargo,inv_descargos_detalle.obsDescargoDetalle,inv_descargos.sucursalId')
+        ->join('inv_descargos', 'inv_descargos.descargosId = inv_descargos_detalle.descargosId')
+        ->where('inv_descargos_detalle.flgElimina', 0)
+        ->firts();
+        
+        foreach ($datos as $descargo) {
+            $consultaExistencia = $productosModel->select('existenciaProducto')
+            ->where('flgElimina', 0)
+            ->where('sucursalId',  $descargo['sucursalId'])
+            ->where('productoId',  $descargo['productoId'])
+            ->first();
+            $existenciaAnterior = $consultaExistencia [existenciaProducto];
+            $cantidadMovimiento = $descargo[cantidadDescargo];
+            $nuevaExistencia = $existenciaAnterior - $cantidadMovimiento;
+            $productosModel->update( existenciaProducto, $nuevaExistencia);
+        }
+    }*/
+    public function finalizarSalida() {
+        // Continuar con la operación de inserción o actualización en la base de datos
+        $operacion = $this->request->getPost('operacion');
+        $descargoDetalleId = $this->request->getPost('descargoDetalleId');
+        $modelDescargosDetalle = new inv_descargos_detalle();
+        $modelDescargos = new inv_descargos();
+        $productosModel = new inv_productos_existencias();
+        $modelKardex = new inv_kardex();
+        $datos = $modelDescargosDetalle
+            ->select('inv_descargos_detalle.descargoDetalleId, inv_descargos_detalle.productoId, inv_descargos_detalle.descargosId, inv_descargos_detalle.cantidadDescargo, inv_descargos_detalle.obsDescargoDetalle, inv_descargos.sucursalId')
+            ->join('inv_descargos', 'inv_descargos.descargosId = inv_descargos_detalle.descargosId')
+            ->where('inv_descargos_detalle.flgElimina', 0)
+            ->findAll();
     
+        foreach ($datos as $descargo) {
+            $consultaExistencia = $productosModel->select('existenciaProducto')
+            ->where('flgElimina', 0)
+            ->where('sucursalId', $descargo['sucursalId'])
+            ->where('productoId', $descargo['productoId'])
+            ->first();
+    
+            $existenciaAnterior = $consultaExistencia['existenciaProducto'];
+            $cantidadMovimiento = $descargo['cantidadDescargo'];
+            $nuevaExistencia = $existenciaAnterior - $cantidadMovimiento;
+
+            $productosModel->set('existenciaProducto', $nuevaExistencia)
+            ->where('sucursalId', $descargo['sucursalId'])
+            ->where('productoId', $descargo['productoId'])
+            ->update();
+
+          //  $insert = inv_kardex = usando las variables de arriba y las columnas de la consulta
+
+                    
+                // Buscar la entrada existente del producto en la sucursal
+                $existingEntry = $productosModel->where('productoId', $productoId)
+                ->where('sucursalId', $sucursalId)
+                ->first();
+
+            // Construir datos para la inserción o actualización
+            $data = [
+            'productoId'             => $productoId,
+            'sucursalId'             => $sucursalId,
+            'existenciaProducto'     => $existenciaProducto,
+            'existenciaReservada'    => 0
+            ];
+
+            $dataProducto = [
+            'CostoPromedio'          => $CostoPromedio
+            ];
+
+            $dataKardex = [
+            'tipoMovimiento'                => "Salida",
+            'descripcionMovimiento'         => "Salida de producto por descargo",
+            'existenciaAntesMovimiento'     => 0,
+            'cantidadMovimiento'            => $existenciaProducto,
+            'existenciaDespuesMovimiento'   => $existenciaProducto,
+            'costoUnitarioFOB'              => $CostoPromedio,
+            'costoUnitarioRetaceo'          => $CostoPromedio,
+            'costoPromedio'                 => $CostoPromedio,
+            'precioVentaUnitario'           => 0,
+            'fechaDocumento'                 => date('Y-m-d'),
+            'fechaMovimiento'               => date('Y-m-d'),
+            'tablaMovimiento'               => "inv_descargos_detalle"
+            ];
+
+
+            // Si existe la entrada, actualizar; de lo contrario, insertar
+            if ($existingEntry) {
+            $data['existenciaProducto'] += $existingEntry['existenciaProducto'];
+            $operacionExistencia = $model->update($existingEntry['productoExistenciaId'], $data);
+            $productoExistencia = $modelProducto->update($existingEntry['productoId'], $dataProducto);
+            $productoExistenciaId = $existingEntry['productoExistenciaId'];
+
+            } else {
+            $operacionExistencia = $model->insert($data);
+            $productoExistenciaId = $operacionExistencia;
+            $productoExistencia = $modelProducto->update($productoId, $dataProducto);
+            }
+
+            // Preparar la respuesta JSON
+            if ($operacionExistencia) {
+            // insert a inv_kardex
+            // recordar if de operacionKardex y en if colocar el JSON de abajo Aqui me quede viendo lo del insert
+            $dataKardex += [
+            'productoExistenciaId'          => $productoExistenciaId
+            ];
+            $kardexId = $modelKardex->insert($dataKardex);
+
+            $dataKardexMovimiento = [
+            'tablaMovimientoId'         => $kardexId
+            ];
+            $operacionKardex = $modelKardex->update($kardexId, $dataKardexMovimiento);
+        }
+
+
+        if($productosModel) {
+            return $this->response->setJSON([
+                'success' => true,
+                'mensaje' => 'Salida de producto finalizada correctamente'
+            ]);
+        } else {
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'No se pudo finalizar La salida de producto'
+            ]);
+        }
+    }
+     
 }

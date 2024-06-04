@@ -54,7 +54,7 @@
                         if (response.success) {
                             Swal.fire({
                                 icon: 'success',
-                                title: 'Salida/descargo eliminada con Éxito!',
+                                title: 'Salida/descargo Finalizada con Éxito!',
                                 text: response.mensaje
                             }).then((result) => {
                                 $("#tblContinuarSalida").DataTable().ajax.reload(null, false);
