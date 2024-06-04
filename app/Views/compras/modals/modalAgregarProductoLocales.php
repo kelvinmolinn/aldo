@@ -78,5 +78,7 @@
 
         
         $("#selectProductos").val('<?= $campos['productoId']; ?>').trigger("change");
+
+        
     });
 </script>

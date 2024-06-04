@@ -96,6 +96,20 @@
             </thead>
             <tbody>
             </tbody>
+            <tfoot>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td id="tdFooterTotales" colspan="5"></td>
+                        <td></td>
+                    </tr>
+                </tfoot>
         </table>
     </div>
 </form>
@@ -187,13 +201,48 @@
                     compraId: '<?= $compraId; ?>'
                 }
             },
+            "footerCallback": function(tfoot) {    
+                var response = this.api().ajax.json();
+                if(response && Object.keys(response.footer).length !== 0) {
+                    var td = $(tfoot).find('td');
+                    td.eq(1).html(response["footer"][0]);
+                    td.eq(3).html(response["footer"][1]);
+                    td.eq(4).html(response["footer"][2]);
+                    $("#tdFooterTotales").html(response["footerTotales"]);
+                } else {
+                    var td = $(tfoot).find('td');
+                    td.eq(1).html('<b>Sumas</b>');
+                    td.eq(3).html('<div class="text-right"><b>0.00</b></div>');
+                    td.eq(4).html('<div class="text-right"><b>$ 0.00</b></div>');
+                    $("#tdFooterTotales").html(`
+                        <b>
+                        <div class="row text-right">
+                            <div class="col-8">
+                                Subtotal
+                            </div>
+                            <div class="col-4">
+                                $ 0.00
+                            </div>
+                        </div>
+                        <div class="row text-right">
+                            <div class="col-8">
+                                IVA 13%
+                            </div>
+                            <div class="col-4">
+                                $ 0.00
+                            </div>
+                        </div>
+                        </b>
+                    `);
+                }
+            },
             "columnDefs": [
-                { "width": "10%", "targets": 0 }, 
-                { "width": "30%", "targets": 1 }, 
-                { "width": "20%", "targets": 2 }, 
-                { "width": "20%", "targets": 3 },
-                { "width": "10%", "targets": 4 },
-                { "width": "10%", "targets": 5 }
+                { "width": "10%", "targets": 0, "className": "text-left" }, 
+                { "width": "30%", "targets": 1, "className": "text-left" }, 
+                { "width": "20%", "targets": 2, "className": "text-left" }, 
+                { "width": "15%", "targets": 3, "className": "text-left" },
+                { "width": "15%", "targets": 4, "className": "text-left" },
+                { "width": "10%", "targets": 5, "className": "text-left" }
             ],
             "language": {
                 "url": "../assets/plugins/datatables/js/spanish.json"

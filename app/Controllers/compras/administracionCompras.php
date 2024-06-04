@@ -16,6 +16,7 @@ use App\Models\cat_02_tipo_dte;
 use App\Models\cat_20_paises;
 use App\Models\comp_compras_detalle;
 use App\Models\inv_productos;
+use App\Models\conf_parametrizaciones;
 
 class administracionCompras extends Controller
 {
@@ -138,36 +139,62 @@ class administracionCompras extends Controller
     }
 
     public function modalCompraOperacion(){
+        // Consulta para traer el 13% de la parametrizacion
+        $porcentajeIva = new conf_parametrizaciones;
         $compras = new comp_compras;
 
-        $data = [
-            'proveedorId'       => $this->request->getPost('selectProveedor'),
-            'tipoDTEId'         => $this->request->getPost('tipoDocumento'),
-            'fechaDocumento'    => $this->request->getPost('fechaFactura'),
-            'numFactura'        => $this->request->getPost('numeroFactura'),
-            'paisId'            => $this->request->getPost('selectPais'),
-            'flgRetaceo'        => $this->request->getPost('selectRetaceo'),
-            'estadoCompra'      => 'Pendiente'
+        $IVA = $porcentajeIva 
+        ->select("valorParametrizacion")
+        ->where("flgElimina", 0)
+        ->where("parametrizacionId", 1)
+        ->first(); 
 
-        ];
+        $IvaCalcular = $IVA['valorParametrizacion'];
 
-            // Insertar datos en la base de datos
-            $operacionCompra = $compras->insert($data);
+        $numFactura = $this->request->getPost('numeroFactura');
 
-        if ($operacionCompra) {
-            // Si el insert fue exitoso, devuelve el último ID insertado
-            return $this->response->setJSON([
-                'success' => true,
-                'mensaje' => 'Compra agregada correctamente',
-                'compraId' =>  $compras->insertID()
-            ]);
-        } else {
-            // Si el insert falló, devuelve un mensaje de error
+        // Verificar si el numFactura ya existe
+        $facturaExistente = $compras
+            ->where('numFactura', $numFactura)
+            ->first();
+    
+        if ($facturaExistente) {
+            // Si el número de factura ya existe, devolver un mensaje de error
             return $this->response->setJSON([
                 'success' => false,
-                'mensaje' => 'No se pudo insertar la compra'
+                'mensaje' => 'El número de factura ya está registrado'
             ]);
+        } else {
+            $data = [
+                'proveedorId'       => $this->request->getPost('selectProveedor'),
+                'tipoDTEId'         => $this->request->getPost('tipoDocumento'),
+                'fechaDocumento'    => $this->request->getPost('fechaFactura'),
+                'numFactura'        => $this->request->getPost('numeroFactura'),
+                'paisId'            => $this->request->getPost('selectPais'),
+                'flgRetaceo'        => $this->request->getPost('selectRetaceo'),
+                'estadoCompra'      => 'Pendiente',
+                'porcentajeIva'     => $IvaCalcular
+            ];
+    
+                // Insertar datos en la base de datos
+                $operacionCompra = $compras->insert($data);
+    
+            if ($operacionCompra) {
+                // Si el insert fue exitoso, devuelve el último ID insertado
+                return $this->response->setJSON([
+                    'success' => true,
+                    'mensaje' => 'Compra agregada correctamente',
+                    'compraId' =>  $compras->insertID()
+                ]);
+            } else {
+                // Si el insert falló, devuelve un mensaje de error
+                return $this->response->setJSON([
+                    'success' => false,
+                    'mensaje' => 'No se pudo insertar la compra'
+                ]);
+            }
         }
+
     }
 
     public function vistaContinuarCompra(){
@@ -264,8 +291,10 @@ class administracionCompras extends Controller
         $compraId = $this->request->getPost('compraId');
 
         $datos = $comprasDetalle
-            ->select('comp_compras.paisId,comp_compras_detalle.compraDetalleId,comp_compras_detalle.compraId,comp_compras_detalle.productoId,comp_compras_detalle.cantidadProducto,comp_compras_detalle.precioUnitario,comp_compras_detalle.precioUnitarioIVA,comp_compras_detalle.ivaUnitario,comp_compras_detalle.ivaTotal,comp_compras_detalle.totalCompraDetalle,comp_compras_detalle.totalCompraDetalleIVA')
+            ->select('comp_compras.paisId,inv_productos.codigoProducto,inv_productos.producto,cat_14_unidades_medida.abreviaturaUnidadMedida,comp_compras_detalle.compraDetalleId,comp_compras_detalle.compraId,comp_compras_detalle.productoId,comp_compras_detalle.cantidadProducto,comp_compras_detalle.precioUnitario,comp_compras_detalle.precioUnitarioIVA,comp_compras_detalle.ivaUnitario,comp_compras_detalle.ivaTotal,comp_compras_detalle.totalCompraDetalle,comp_compras_detalle.totalCompraDetalleIVA')
             ->join('comp_compras','comp_compras.compraId = comp_compras_detalle.compraId')
+            ->join('inv_productos','inv_productos.productoId = comp_compras_detalle.productoId')
+            ->join('cat_14_unidades_medida','cat_14_unidades_medida.unidadMedidaId = inv_productos.unidadMedidaId')
             ->where('comp_compras_detalle.flgElimina', 0)
             ->where('comp_compras_detalle.compraId', $compraId)
             ->findAll();
@@ -273,15 +302,16 @@ class administracionCompras extends Controller
         $output['data'] = array();
         $n = 0; // Variable para contar las filas
            foreach ($datos as $columna) {
+                $paisId = $columna['paisId'];
                 $n++;
                 // Aquí construye tus columnas
                 if ($columna['paisId'] == 61) {
                     
                     $columna1 = $n;
-                    $columna2 = '1';
-                    $columna3 = '<b>Con IVA</b>' . '<br>' . '<b>Sin IVA</b>';
-                    $columna4 = '5';
-                    $columna5 = '<b>Con IVA</b>' . '<br>' . '<b>Sin IVA</b>';
+                    $columna2 = '('.$columna['codigoProducto'].') ' . $columna['producto'];
+                    $columna3 = '<b>Con IVA: </b>$ '. number_format($columna['precioUnitario'], 2, '.', ',') . '<br>' . '<b>Sin IVA: </b>$ ' .  number_format($columna['precioUnitarioIVA'], 2, '.', ',');
+                    $columna4 = $columna['cantidadProducto'] . ' ('.$columna['abreviaturaUnidadMedida'].')';
+                    $columna5 = '<b>Con IVA: </b>$ '. number_format($columna['totalCompraDetalle'], 2, '.', ',') . '<br>' . '<b>Sin IVA: </b>$ ' . number_format($columna['totalCompraDetalleIVA'], 2, '.', ',');
                     $columna6 = '
                         <button type= "button" class="btn btn-primary mb-1" onclick="modalAgregarProducto(`'.$columna['compraDetalleId'].'`, `editar`);" data-toggle="tooltip" data-placement="top" title="Editar">
                             <i class="fas fa-pencil-alt"></i>
@@ -334,9 +364,80 @@ class administracionCompras extends Controller
 
         // Verifica si hay datos
         if ($n > 0) {
+            if($paisId == 61) {
+                $output['footer'] = array(
+                    '<b>Sumas</b>',
+                    'Sumas de cantidad',
+                    'Sumas de costo total'
+                );
+
+                $output['footerTotales'] = '
+                    <b>
+                    <div class="row text-right">
+                        <div class="col-8">
+                            Subtotal
+                        </div>
+                        <div class="col-4">
+                            $ 0.00
+                        </div>
+                    </div>
+                    <div class="row text-right">
+                        <div class="col-8">
+                            IVA 13%
+                        </div>
+                        <div class="col-4">
+                            $ 0.00
+                        </div>
+                    </div>
+                    <div class="row text-right">
+                        <div class="col-8">
+                            (+) IVA Percibido
+                        </div>
+                        <div class="col-4">
+                            $ 0.00
+                        </div>
+                    </div>
+                    <div class="row text-right">
+                        <div class="col-8">
+                            Total a pagar
+                        </div>
+                        <div class="col-4">
+                            $ 0.00
+                        </div>
+                    </div>                    
+                    </b>
+                ';
+            }  else {
+                $output['footer'] = array(
+                    '<b>Sumas</b>',
+                    'Sumas de cantidad',
+                    'Sumas de costo total'
+                );
+
+                $output['footerTotales'] = '
+                    <b>
+                    <div class="row text-right">
+                        <div class="col-8">
+                            Subtotal
+                        </div>
+                        <div class="col-4">
+                            $ 0.00
+                        </div>
+                    </div>
+                    <div class="row text-right">
+                        <div class="col-8">
+                            Total a pagar
+                        </div>
+                        <div class="col-4">
+                            $ 0.00
+                        </div>
+                    </div>
+                    </b>
+                ';
+            }
             return $this->response->setJSON($output);
         } else {
-            return $this->response->setJSON(array('data' => '')); // No hay datos, devuelve un array vacío
+            return $this->response->setJSON(array('data' => '', 'footer'=>'')); // No hay datos, devuelve un array vacío
         }
     }
 
