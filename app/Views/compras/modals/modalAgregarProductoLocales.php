@@ -24,7 +24,7 @@
                                 <label class="form-label" for="costoUnitario">Costo unitario</label>
                             </div>
                             <div class="text-right">
-                                <small>Con IVA: $ <span><?= $campos['precioUnitarioIVA']; ?></span></small>
+                                <small>Con IVA: $ <span id="precioUnitarioIVA"><?= $campos['precioUnitarioIVA']; ?></span></small>
                             </div>
                         </div>
                         <div class="col-md-4">
@@ -39,11 +39,11 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-outline">
-                                <input type="number" id="IVATotal" name="IVATotal" class="form-control" value="<?= $campos['ivaTotal']; ?>" required>
+                                <input type="number" id="IVATotal" name="IVATotal" class="form-control" value="<?= $campos['ivaTotal']; ?>" required readonly>
                                 <label class="form-label" for="IVATotal">IVA Total</label>
                             </div>
                              <div class="text-right">
-                                <small>IVA unitario: $ <?= $campos['ivaUnitario']; ?></small>
+                                <small>IVA unitario: $ <span id="ivaUnitario"> <?= $campos['ivaUnitario']; ?></span></small>
                             </div>
                         </div>
                         <div class="col-md-4">
@@ -79,6 +79,27 @@
         
         $("#selectProductos").val('<?= $campos['productoId']; ?>').trigger("change");
 
+        function actualizarCosto() {
+            var costoUnitario = parseFloat($("#costoUnitario").val());
+            var cantidad = parseFloat($("#cantidadProducto").val());
+
+            
+            if (!isNaN(costoUnitario) && costoUnitario !== 0) {
+                var iva = costoUnitario * 1.13; // Suponiendo que el IVA es del 16%
+                var costoConIVA = costoUnitario + iva;
+                $("#precioUnitarioIVA").text(costoConIVA.toFixed(2));
+            } else{
+                $("#precioUnitarioIVA").text("0.00");
+            }
+        }
+
+        // Actualizar cuando se cambia el valor de costoUnitario
+        $("#costoUnitario").on('input', function() {
+            actualizarCosto();
+        });
+
+        // Inicializar el valor al cargar
+        actualizarCosto();
         
     });
 </script>

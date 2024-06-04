@@ -45,7 +45,7 @@ class administracionCompras extends Controller
         
         $consultaCompras = $com_compras
                 ->select('comp_compras.compraId,comp_proveedores.tipoProveedorOrigen, cat_02_tipo_dte.tipoDocumentoDTE, 
-                          comp_compras.fechaDocumento, comp_compras.numFactura,
+                          DATE_FORMAT(comp_compras.fechaDocumento, "%d-%m-%Y") as fechaDocumento, comp_compras.numFactura,
                           cat_20_paises.pais,comp_proveedores.proveedor,comp_proveedores.proveedorComercial')
                 ->join('comp_proveedores','comp_proveedores.proveedorId = comp_compras.proveedorId')
                 ->join('cat_02_tipo_dte','cat_02_tipo_dte.tipoDTEId = comp_compras.tipoDTEId')
@@ -152,10 +152,14 @@ class administracionCompras extends Controller
         $IvaCalcular = $IVA['valorParametrizacion'];
 
         $numFactura = $this->request->getPost('numeroFactura');
+        $proveedorId = $this->request->getPost('selectProveedor');
+        $fecha = $this->request->getPost('fechaFactura');
 
         // Verificar si el numFactura ya existe
         $facturaExistente = $compras
             ->where('numFactura', $numFactura)
+            ->where('proveedorId', $proveedorId)
+            ->where('fechaDocumento', $fecha)
             ->first();
     
         if ($facturaExistente) {
