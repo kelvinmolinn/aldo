@@ -43,6 +43,17 @@
 </div>
 <script>
     function finalizarDescargo(descargosId) {
+        Swal.fire({
+            title: '¿Estás seguro que desea Finlizar el descargo?',
+            text: "Se Finalizará el descargo seleccionado.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, Finalizar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
                 $.ajax({
                     url: '<?php echo base_url('inventario/admin-salida/operacion/finalizar/finalizar'); ?>',
                     type: 'POST',
@@ -57,7 +68,8 @@
                                 title: 'Salida/descargo Finalizada con Éxito!',
                                 text: response.mensaje
                             }).then((result) => {
-                                $("#tblContinuarSalida").DataTable().ajax.reload(null, false);
+                               // $("#tblContinuarSalida").DataTable().ajax.reload(null, false);
+                               cambiarInterfaz('inventario/admin-salida/index', {renderVista:'No'});
                             });
                         } else {
                             // Insert fallido, mostrar mensaje de error
@@ -73,6 +85,8 @@
                         console.error(xhr.responseText);
                     }
                 });
+            }
+        });
     }
     function eliminarSalida(id) {
         //alert("Vamos a eliminar " + id);
