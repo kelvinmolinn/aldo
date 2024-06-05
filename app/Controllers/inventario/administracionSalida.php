@@ -148,7 +148,7 @@ public function tablaSalida()
                 "descargosId"          => $columna['descargosId']
             ];
             $columna5 = '
-                <button class="btn btn-primary mb-1" onclick="cambiarInterfaz(`inventario/admin-salida/vista/actualizar/descargo`, '.htmlspecialchars(json_encode($jsonActualizarDescargo)).');" data-toggle="tooltip" data-placement="top" title="Continuar">
+                <button class="btn btn-primary mb-1" onclick="cambiarInterfaz(`inventario/admin-salida/vista/actualizar/descargo`, '.htmlspecialchars(json_encode($jsonActualizarDescargo)).');" data-toggle="tooltip" data-placement="top" title="Continuar descargo">
                     <i class="fas fa-sync-alt"></i> <span> Continuar</span>
                 </button>
 
@@ -156,13 +156,13 @@ public function tablaSalida()
         } elseif ($columna['estadoDescargo'] === 'Finalizado') {
             $columna5 = '
                 <button class="btn btn-info mb-1" onclick="modalExistenciaProducto(`'.$columna['descargosId'].'`);" data-toggle="tooltip" data-placement="top" title="Ver descargo">
-                    <i class="fas fa-eye"></i>
+                    <i class="fas fa-eye"></i><span> Ver Descargo</span>
                 </button>
             ';
         } else {
             $columna5 = '
                    <button class="btn btn-info mb-1" onclick="modalExistenciaProducto(`'.$columna['descargosId'].'`);" data-toggle="tooltip" data-placement="top" title="Ver descargo">
-        <i class="fas fa-eye"></i>
+        <i class="fas fa-eye"></i><span> Ver</span>
                 </button>'; // No buttons if the status is neither 'Pendiente' nor 'Finalizado'
         }
 
@@ -440,34 +440,7 @@ public function tablaContinuarSalida()
         return $this->response->setJSON(array('data' => '')); // No hay datos, devuelve un array vacío
     }
 }  
- /*   public function finalizarSalida(){
 
-        // Continuar con la operación de inserción o actualización en la base de datos
-        $operacion = $this->request->getPost('operacion');
-        $descargoDetalleId = $this->request->getPost('descargoDetalleId');
-        $modelDescargosDetalle = new inv_descargos_detalle();
-        $modelDescargos = new inv_descargos();
-        $productosModel = new inv_productos_existencias();
-        $cantidadMovimiento = 0;
-
-        $datos = $modelDescargosDetalle
-        ->select('inv_descargos_detalle.descargoDetalleId,inv_descargos_detalle.productoId,inv_descargos_detalle.descargosId,inv_descargos_detalle.cantidadDescargo,inv_descargos_detalle.obsDescargoDetalle,inv_descargos.sucursalId')
-        ->join('inv_descargos', 'inv_descargos.descargosId = inv_descargos_detalle.descargosId')
-        ->where('inv_descargos_detalle.flgElimina', 0)
-        ->firts();
-        
-        foreach ($datos as $descargo) {
-            $consultaExistencia = $productosModel->select('existenciaProducto')
-            ->where('flgElimina', 0)
-            ->where('sucursalId',  $descargo['sucursalId'])
-            ->where('productoId',  $descargo['productoId'])
-            ->first();
-            $existenciaAnterior = $consultaExistencia [existenciaProducto];
-            $cantidadMovimiento = $descargo[cantidadDescargo];
-            $nuevaExistencia = $existenciaAnterior - $cantidadMovimiento;
-            $productosModel->update( existenciaProducto, $nuevaExistencia);
-        }
-    }*/
     public function finalizarSalida() {
         // Continuar con la operación de inserción o actualización en la base de datos
         $operacion = $this->request->getPost('operacion');
@@ -478,14 +451,15 @@ public function tablaContinuarSalida()
         $modelKardex = new inv_kardex();
 
         $datos = $modelDescargosDetalle
-            ->select('inv_descargos_detalle.descargoDetalleId, inv_descargos_detalle.productoId, inv_descargos_detalle.descargosId, inv_descargos_detalle.cantidadDescargo, inv_descargos_detalle.obsDescargoDetalle, inv_descargos.sucursalId')
+            ->select('inv_descargos_detalle.descargoDetalleId, inv_descargos_detalle.productoId, inv_descargos_detalle.descargosId, inv_descargos_detalle.cantidadDescargo, inv_descargos_detalle.obsDescargoDetalle, inv_descargos.sucursalId,inv_descargos.estadoDescargo')
             ->join('inv_descargos', 'inv_descargos.descargosId = inv_descargos_detalle.descargosId')
             ->where('inv_descargos_detalle.flgElimina', 0)
             ->where('inv_descargos_detalle.descargosId', $descargosId)
             ->findAll();
     
+
         foreach ($datos as $descargo) {
-            $consultaExistencia = $productosModel->select('existenciaProducto')
+            $consultaExistencia = $productosModel->select('existenciaProducto, productoExistenciaId')
             ->where('flgElimina', 0)
             ->where('sucursalId', $descargo['sucursalId'])
             ->where('productoId', $descargo['productoId'])
@@ -500,13 +474,38 @@ public function tablaContinuarSalida()
             ->where('productoId', $descargo['productoId'])
             ->update();
 
-          //  $insert = inv_kardex = usando las variables de arriba y las columnas de la consulta 
-           
+          //  $insert = inv_kardex = usando las variables de arriba y las columnas de la consulta  
+          $dataKardex = [
+            'tipoMovimiento'                => "Salida",
+            'descripcionMovimiento'         => "Salida de producto por descargo",
+            'productoExistenciaId'          => $consultaExistencia['productoExistenciaId'],
+            'existenciaAntesMovimiento'     => $existenciaAnterior,
+            'cantidadMovimiento'            => $cantidadMovimiento,
+            'existenciaDespuesMovimiento'   => $nuevaExistencia,
+            'precioVentaUnitario'           => 0,
+            'fechaDocumento'                 => date('Y-m-d'),
+            'fechaMovimiento'               => date('Y-m-d'),
+            'tablaMovimiento'               => "inv_descargos_detalle"
+        ];
+          
               
     }
-
-
         if($productosModel) {
+
+            $dataKardex += [
+                'descargoDetalleId'          => $descargo['descargoDetalleId']
+            ];
+            $kardexId = $modelKardex->insert($dataKardex);
+    
+            $dataKardexMovimiento = [
+                'tablaMovimientoId'         => $kardexId
+            ];
+            $operacionKardex = $modelKardex->update($kardexId, $dataKardexMovimiento);
+
+            $dataDescargoEstado = [
+                'estadoDescargo'         => "Finalizado"
+            ];
+            $operacionEstado = $modelDescargos->update($this->request->getPost('descargosId'), $dataDescargoEstado);
             return $this->response->setJSON([
                 'success' => true,
                 'mensaje' => 'Salida de producto finalizada correctamente'
