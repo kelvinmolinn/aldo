@@ -1,4 +1,10 @@
-
+<?php
+    if($operacion == "editar") {
+        $mensajeAlerta = "Compra actualizada con éxito";
+    } else {
+        $mensajeAlerta = "Compra creada con éxito";
+    }
+?>
 <form id="frmModal" method="post" action="<?php echo base_url(''); ?>">
     <div id="modalAgregarProducto" class="modal" tabindex="-1" data-backdrop="static" data-keyboard="false">
         <div class="modal-dialog  modal-lg">
@@ -112,6 +118,42 @@
             let ivaUnitario = parseFloat(precioUnitarioIVA - $("#costoUnitario").val());
 
             calcularTotales(precioUnitarioIVA, ivaUnitario, $(this).val());
+        });
+
+        $("#frmModal").submit(function(event) {
+            event.preventDefault();
+            $.ajax({
+                url: $(this).attr('action'), 
+                type: $(this).attr('method'),
+                data: $(this).serialize(),
+                success: function(response) {
+                    console.log(response);
+                    if (response.success) {
+                        // Insert exitoso, ocultar modal y mostrar mensaje
+                        $('#modalAgregarProducto').modal('hide');
+                        Swal.fire({
+                            icon: 'success',
+                            title: '<?php echo $mensajeAlerta; ?>',
+                            text: response.mensaje
+                        }).then((result) => {
+                            $("#tablaContinuarCompra").DataTable().ajax.reload(null, false);
+                            
+                        });
+                        console.log("Último ID insertado:", response.compraDetalleId);
+                    } else {
+                        // Insert fallido, mostrar mensaje de error
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.mensaje
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    // Manejar errores si los hay
+                    console.error(xhr.responseText);
+                }
+            });
         });
 
         $("#selectProductos").val('<?= $campos['productoId']; ?>').trigger("change");
