@@ -446,8 +446,6 @@ class administracionCompras extends Controller
     }
 
     function modalAgregarProducto(){
-
-        
         $compras = new comp_compras;
         $comprasDetalle = new comp_compras_detalle;
         $productos = new inv_productos;
@@ -455,6 +453,7 @@ class administracionCompras extends Controller
         $operacion = $this->request->getPost('operacion');
         
         $compraId = $this->request->getPost('compraId');
+        $compraDetalleId = $this->request->getPost('compraDetalleId');
 
 
         $data['producto'] = $productos
@@ -467,7 +466,7 @@ class administracionCompras extends Controller
             $data['campos'] = $comprasDetalle
             ->select('compraDetalleId,compraId,productoId,cantidadProducto,precioUnitario,precioUnitarioIVA,ivaUnitario,ivaTotal,totalCompraDetalle,totalCompraDetalleIVA')
             ->where('flgElimina', 0)
-            ->where('compraId', $compraId)
+            ->where('compraDetalleId', $compraDetalleId)
             ->first();
         } else {
             $data['campos'] = [
@@ -476,22 +475,23 @@ class administracionCompras extends Controller
                 'productoId'            => '',
                 'cantidadProducto'      => '',
                 'precioUnitario'        => '',
-                'precioUnitarioIVA'     => '',
-                'ivaUnitario'           => '',
-                'ivaTotal'              => '',
+                'precioUnitarioIVA'     => '0.00',
+                'ivaUnitario'           => '0.00',
+                'ivaTotal'              => '0.00',
                 'totalCompraDetalle'    => '',
-                'totalCompraDetalleIVA' => ''
+                'totalCompraDetalleIVA' => '0.00'
             ];
         }
         $data['operacion'] = $operacion;
 
         $consultaCompra = $compras
-        ->select("paisId")
+        ->select("paisId, porcentajeIva")
         ->where("flgElimina", 0)
         ->where("compraId", $compraId)
         ->first(); 
 
-        $data['variable'] = 0;
+        $data['porcentajeIva'] = $consultaCompra['porcentajeIva'];
+        $data['ivaMultiplicar'] = ($consultaCompra['porcentajeIva'] / 100) + 1;
 
         if ($consultaCompra['paisId'] == 61 ) {
             return view('compras/modals/modalAgregarProductoLocales', $data);

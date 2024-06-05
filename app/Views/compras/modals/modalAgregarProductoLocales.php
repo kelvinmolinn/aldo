@@ -70,36 +70,50 @@
 </form>
 
 <script>
+    function calcularTotales(precioIVA, ivaUnitario, cantidad) {
+        if(cantidad == "") {
+            $("#IVATotal").val('0.00');
+            $("#costoTotal").val('0.00');
+        } else if(cantidad < 0) {
+            $("#IVATotal").val('0.00');
+            $("#costoTotal").val('0.00');
+        } else {
+            let costoTotal = parseFloat(precioIVA * cantidad);
+            let ivaTotal = parseFloat(ivaUnitario * cantidad);
+
+            $("#IVATotal").val(ivaTotal.toFixed(2));
+            $("#costoTotal").val(costoTotal.toFixed(2));
+        }
+    }
+
     $(document).ready(function() {
         $("#selectProductos").select2({
             placeholder: 'Productos',
             dropdownParent: $('#modalAgregarProducto')
         });    
 
-        
-        $("#selectProductos").val('<?= $campos['productoId']; ?>').trigger("change");
+        $("#costoUnitario").keyup(function(e) {
+            if($(this).val() == "") {
+                $("#precioUnitarioIVA").html('0.00');
+            } else if($(this).val() < 0) {
+                $("#precioUnitarioIVA").html('0.00');
+            } else {
+                let precioUnitarioIVA = parseFloat($(this).val() * <?= $ivaMultiplicar; ?>);
+                let ivaUnitario = parseFloat(precioUnitarioIVA - $(this).val());
+                $("#precioUnitarioIVA").html(precioUnitarioIVA.toFixed(2));
+                $("#ivaUnitario").html(ivaUnitario.toFixed(2));
 
-        function actualizarCosto() {
-            var costoUnitario = parseFloat($("#costoUnitario").val());
-            var cantidad = parseFloat($("#cantidadProducto").val());
-
-            
-            if (!isNaN(costoUnitario) && costoUnitario !== 0) {
-                var iva = costoUnitario * 1.13; // Suponiendo que el IVA es del 16%
-                var costoConIVA = costoUnitario + iva;
-                $("#precioUnitarioIVA").text(costoConIVA.toFixed(2));
-            } else{
-                $("#precioUnitarioIVA").text("0.00");
+                calcularTotales(precioUnitarioIVA, ivaUnitario, $("#cantidadProducto").val());
             }
-        }
+        });
+        
+        $("#cantidadProducto").keyup(function(e) {
+            let precioUnitarioIVA = parseFloat($("#costoUnitario").val() * <?= $ivaMultiplicar; ?>);
+            let ivaUnitario = parseFloat(precioUnitarioIVA - $("#costoUnitario").val());
 
-        // Actualizar cuando se cambia el valor de costoUnitario
-        $("#costoUnitario").on('input', function() {
-            actualizarCosto();
+            calcularTotales(precioUnitarioIVA, ivaUnitario, $(this).val());
         });
 
-        // Inicializar el valor al cargar
-        actualizarCosto();
-        
+        $("#selectProductos").val('<?= $campos['productoId']; ?>').trigger("change");
     });
 </script>
