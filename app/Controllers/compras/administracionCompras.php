@@ -313,9 +313,9 @@ class administracionCompras extends Controller
                     
                     $columna1 = $n;
                     $columna2 = '('.$columna['codigoProducto'].') ' . $columna['producto'];
-                    $columna3 = '<b>Con IVA: </b>$ '. number_format($columna['precioUnitario'], 2, '.', ',') . '<br>' . '<b>Sin IVA: </b>$ ' .  number_format($columna['precioUnitarioIVA'], 2, '.', ',');
+                    $columna3 = '<b>Con IVA: </b>$ '. number_format($columna['precioUnitarioIVA'], 2, '.', ',') . '<br>' . '<b>Sin IVA: </b>$ ' .  number_format($columna['precioUnitario'], 2, '.', ',');
                     $columna4 = $columna['cantidadProducto'] . ' ('.$columna['abreviaturaUnidadMedida'].')';
-                    $columna5 = '<b>Con IVA: </b>$ '. number_format($columna['totalCompraDetalle'], 2, '.', ',') . '<br>' . '<b>Sin IVA: </b>$ ' . number_format($columna['totalCompraDetalleIVA'], 2, '.', ',');
+                    $columna5 = '<b>Con IVA: </b>$ '. number_format($columna['totalCompraDetalleIVA'], 2, '.', ',') . '<br>' . '<b>Sin IVA: </b>$ ' . number_format($columna['totalCompraDetalle'], 2, '.', ',');
                     $columna6 = '
                         <button type= "button" class="btn btn-primary mb-1" onclick="modalAgregarProducto(`'.$columna['compraDetalleId'].'`, `editar`);" data-toggle="tooltip" data-placement="top" title="Editar">
                             <i class="fas fa-pencil-alt"></i>
@@ -492,7 +492,7 @@ class administracionCompras extends Controller
 
         $data['porcentajeIva'] = $consultaCompra['porcentajeIva'];
         $data['ivaMultiplicar'] = ($consultaCompra['porcentajeIva'] / 100) + 1;
-
+        $data['compraDetalleId'] = $compraDetalleId;
         if ($consultaCompra['paisId'] == 61 ) {
             return view('compras/modals/modalAgregarProductoLocales', $data);
         }else{
@@ -505,6 +505,16 @@ class administracionCompras extends Controller
         $operacion = $this->request->getPost('operacion');
         $compraDetalleId = $this->request->getPost('compraDetalleId');
 
+        $ivaMultiplicar =   $this->request->getPost('ivaMultiplicar');
+        $cantidad =         $this->request->getPost('cantidadProducto');
+        $precioUnitario =   $this->request->getPost('costoUnitario');
+        
+        $precioUnitarioIva      = $precioUnitario * $ivaMultiplicar;
+        $ivaUnitario            = $precioUnitarioIva - $precioUnitario;
+        $ivaTotal               = $ivaUnitario * $cantidad;
+        $totalCompraDetalle     = $precioUnitario * $cantidad;
+        $totalCompraDetalleIVA  = $precioUnitarioIva * $cantidad;
+
         $comprasDetalle = new comp_compras_detalle;
 
 
@@ -513,12 +523,12 @@ class administracionCompras extends Controller
             "productoId"            => $this->request->getPost('selectProductos'),
             "cantidadProducto"      => $this->request->getPost('cantidadProducto'),
             "precioUnitario"        => $this->request->getPost('costoUnitario'),
-            
-            "precioUnitarioIVA"     => $this->request->getPost('compraId'),
-            "ivaUnitario"           => $this->request->getPost('compraId'),
-            "ivaTotal"              => $this->request->getPost('compraId'),
-            "totalCompraDetalle"    => $this->request->getPost('compraId'),
-            "totalCompraDetalleIVA" => $this->request->getPost('compraId'),
+
+            "precioUnitarioIVA"     => $precioUnitarioIva,
+            "ivaUnitario"           => $ivaUnitario,
+            "ivaTotal"              => $ivaTotal,
+            "totalCompraDetalle"    => $totalCompraDetalle,
+            "totalCompraDetalleIVA" => $totalCompraDetalleIVA
         ];
 
         if($operacion == 'editar') {

@@ -75,7 +75,7 @@
         </div>
 </form>
 <hr>
-<form id="frmContinuarCompra" method="post" action="<?php echo base_url('compras/admin-compras/operacion/guardar/productos'); ?>">
+<form id="frmContinuarCompra" method="post" action="<?php echo base_url(''); ?>">
     <div class="text-right mb-4">
         <button type= "button" id="btnNuevoProveedor" class="btn btn-primary estilo-btn" onclick="modalAgregarProducto(0,'insertar')">
             <i class="fas fa-save"></i>

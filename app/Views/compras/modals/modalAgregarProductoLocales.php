@@ -5,7 +5,7 @@
         $mensajeAlerta = "Compra creada con éxito";
     }
 ?>
-<form id="frmModal" method="post" action="<?php echo base_url(''); ?>">
+<form id="frmModal" method="post" action="<?php echo base_url('compras/admin-compras/operacion/guardar/productos'); ?>">
     <div id="modalAgregarProducto" class="modal" tabindex="-1" data-backdrop="static" data-keyboard="false">
         <div class="modal-dialog  modal-lg">
             <div class="modal-content">
@@ -15,8 +15,10 @@
                 <div class="modal-body">
                     <div class="row mb-4">
                         <div class="col-md-4">
-                            
+
                             <input type="hidden" id="operacion" name="operacion" value="<?php echo $operacion;?>">
+                            <input type="hidden" id="ivaMultiplicar" name="ivaMultiplicar" value="<?php echo $ivaMultiplicar;?>">
+                            <input type="hidden" id="compraDetalleId" name="compraDetalleId" value="<?php echo $compraDetalleId;?>">
 
                             <div class="form-select-control">
                                 <select name="selectProductos" id="selectProductos" style="width: 100%;" required>
