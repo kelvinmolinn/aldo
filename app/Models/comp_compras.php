@@ -9,11 +9,48 @@ class comp_compras extends Model
     protected $table = 'comp_compras';
     protected $primaryKey = 'compraId'; // si el nombre de la clave primaria es diferente
 
-    protected $allowedFields = ['compraId', 'proveedorId', 'tipoDTEId', 'fechaDocumento', 'numFactura', 'paisId', 'ObsCompra', 'porcentajeIva', 'flgRetaceo', 'estadoCompra', 'fechaAnulacion', 'obsAnulacion', 'flgElimina'];
+    protected $allowedFields = ['compraId', 'proveedorId', 'tipoDTEId', 'fechaDocumento', 'numFactura', 'paisId', 'ObsCompra', 'porcentajeIva', 'flgRetaceo', 'estadoCompra', 'fechaAnulacion', 'obsAnulacion', 'flgElimina','fhAgrega','fhEdita','usuarioIdAgrega','usuarioIdEdita','fhElimina','usuarioIdElimina'];
 
-    protected $useTimestamps = true; // Utiliza campos de timestamp para created_at y updated_at
+       //Agregar desde aqui
 
-    protected $createdField  = 'fhAgrega'; // Campo creado automáticamente al insertar
-    protected $updatedField  = 'fhEdita'; // Campo actualizado automáticamente al actualizar
+       protected $beforeInsert = ['manageInsertTimestamps'];
+       protected $beforeUpdate = ['manageUpdateTimestamps'];
+   
+       protected function manageInsertTimestamps(array $data)
+       {
+           // Obtén la sesión y el ID del usuario
+           $session = session();
+           $usuarioId = $session->get('usuarioId');
+   
+           // Establecer usuarioIdAgrega
+           $data['data']['usuarioIdAgrega'] = $usuarioId;
+   
+           // Establecer fhAgrega
+           $data['data']['fhAgrega'] = date('Y-m-d H:i:s');
+   
+           return $data;
+       }
+   
+       protected function manageUpdateTimestamps(array $data)
+       {
+           // Obtén la sesión y el ID del usuario
+           $session = session();
+           $usuarioId = $session->get('usuarioId');
+   
+           // Establecer usuarioIdEdita
+           $data['data']['usuarioIdEdita'] = $usuarioId;
+   
+           // Actualiza fhEdita
+           $data['data']['fhEdita'] = date('Y-m-d H:i:s');
+   
+           // Si se hace una eliminación lógica, actualiza fhElimina y usuarioIdElimina
+           if (isset($data['data']['flgElimina']) && $data['data']['flgElimina'] == 1) {
+               $data['data']['fhElimina'] = date('Y-m-d H:i:s');
+               $data['data']['usuarioIdElimina'] = $usuarioId; // Establece usuarioIdElimina desde la sesión
+           }
+   
+           return $data;
+       }
+   
 
 }
