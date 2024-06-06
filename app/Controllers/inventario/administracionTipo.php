@@ -119,20 +119,6 @@ class AdministracionTipo extends Controller
 
     public function modalTipoOperacion()
     {
-        // Establecer reglas de validación
-        $validation = service('validation');
-        $validation->setRules([
-            'productoTipo' => 'required|is_unique[inv_productos_tipo.productoTipo]'
-        ]);
-    
-        // Ejecutar la validación
-        if (!$validation->withRequest($this->request)->run()) {
-            // Si la validación falla, devolver los errores al cliente
-            return $this->response->setJSON([
-                'success' => false,
-                'errors' => $validation->getErrors()
-            ]);
-        }
     
         // Continuar con la operación de inserción o actualización en la base de datos
         $operacion = $this->request->getPost('operacion');

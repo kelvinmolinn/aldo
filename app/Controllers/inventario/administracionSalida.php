@@ -449,6 +449,7 @@ public function tablaContinuarSalida()
         $modelDescargos = new inv_descargos();
         $productosModel = new inv_productos_existencias();
         $modelKardex = new inv_kardex();
+       
 
         $datos = $modelDescargosDetalle
             ->select('inv_descargos_detalle.descargoDetalleId, inv_descargos_detalle.productoId, inv_descargos_detalle.descargosId, inv_descargos_detalle.cantidadDescargo, inv_descargos_detalle.obsDescargoDetalle, inv_descargos.sucursalId,inv_descargos.estadoDescargo')
@@ -468,6 +469,8 @@ public function tablaContinuarSalida()
             $existenciaAnterior = $consultaExistencia['existenciaProducto'];
             $cantidadMovimiento = $descargo['cantidadDescargo'];
             $nuevaExistencia = $existenciaAnterior - $cantidadMovimiento;
+            $session = session();
+            $usuarioIdAgrega = $session->get("usuarioId");
 
             $productosModel->set('existenciaProducto', $nuevaExistencia)
             ->where('sucursalId', $descargo['sucursalId'])
@@ -485,7 +488,8 @@ public function tablaContinuarSalida()
             'precioVentaUnitario'           => 0,
             'fechaDocumento'                 => date('Y-m-d'),
             'fechaMovimiento'               => date('Y-m-d'),
-            'tablaMovimiento'               => "inv_descargos_detalle"
+            'tablaMovimiento'               => "inv_descargos_detalle",
+            'usuarioIdAgrega'               => $usuarioIdAgrega
         ];
           
               
