@@ -15,6 +15,9 @@
                 <div class="modal-body">
                     <div class="row mb-4">
                         <div class="col-md-4">
+                            
+                            <input type="hidden" id="operacion" name="operacion" value="<?php echo $operacion;?>">
+
                             <div class="form-select-control">
                                 <select name="selectProductos" id="selectProductos" style="width: 100%;" required>
                                     <option></option>

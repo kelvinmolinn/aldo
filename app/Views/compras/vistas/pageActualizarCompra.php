@@ -75,7 +75,7 @@
         </div>
 </form>
 <hr>
-<form id="frmContinuarCompra" method="post" action="<?php echo base_url(''); ?>">
+<form id="frmContinuarCompra" method="post" action="<?php echo base_url('compras/admin-compras/operacion/guardar/productos'); ?>">
     <div class="text-right mb-4">
         <button type= "button" id="btnNuevoProveedor" class="btn btn-primary estilo-btn" onclick="modalAgregarProducto(0,'insertar')">
             <i class="fas fa-save"></i>
@@ -118,7 +118,7 @@
         $.ajax({
             url: '<?php echo base_url('compras/admin-compras/form/producto/compra'); ?>',
             type: 'POST',
-            data: {compraId : <?php echo $compraId; ?>, operacion: operacion }, // Pasar el ID del módulo como parámetro
+            data: {compraId : <?php echo $compraId; ?>, operacion: operacion,  compraDetalleId: compraDetalleId }, // Pasar el ID del módulo como parámetro
             success: function(response) {
                 // Insertar el contenido de la modal en el cuerpo de la modal
                 $('#divModalContent').html(response);

@@ -500,4 +500,46 @@ class administracionCompras extends Controller
 
         }
     }
+
+    function modalProductosOperacion(){
+        $operacion = $this->request->getPost('operacion');
+        $compraDetalleId = $this->request->getPost('compraDetalleId');
+
+        $comprasDetalle = new comp_compras_detalle;
+
+
+        $data = [
+            "compraId"              => $this->request->getPost('compraId'),
+            "productoId"            => $this->request->getPost('selectProductos'),
+            "cantidadProducto"      => $this->request->getPost('cantidadProducto'),
+            "precioUnitario"        => $this->request->getPost('costoUnitario'),
+            
+            "precioUnitarioIVA"     => $this->request->getPost('compraId'),
+            "ivaUnitario"           => $this->request->getPost('compraId'),
+            "ivaTotal"              => $this->request->getPost('compraId'),
+            "totalCompraDetalle"    => $this->request->getPost('compraId'),
+            "totalCompraDetalleIVA" => $this->request->getPost('compraId'),
+        ];
+
+        if($operacion == 'editar') {
+            $productoCompras = $comprasDetalle->update($this->request->getPost('compraDetalleId'), $data);
+        } else {
+            // Insertar datos en la base de datos
+            $productoCompras = $comprasDetalle->insert($data);
+        }
+        if ($productoCompras) {
+            // Si el insert fue exitoso, devuelve el último ID insertado
+            return $this->response->setJSON([
+                'success' => true,
+                'mensaje' => 'Producto de la compra '.($operacion == 'editar' ? 'actualizado' : 'agregado').' correctamente',
+                'compraDetalleId' => ($operacion == 'editar' ? $this->request->getPost('compraDetalleId') : $comprasDetalle->insertID())
+            ]);
+        } else {
+            // Si el insert falló, devuelve un mensaje de error
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'No se pudo insertar el producto'
+            ]);
+        }
+    }
 }
