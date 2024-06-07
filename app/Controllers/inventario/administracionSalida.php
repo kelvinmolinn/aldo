@@ -155,13 +155,13 @@ public function tablaSalida()
             ';
         } elseif ($columna['estadoDescargo'] === 'Finalizado') {
             $columna5 = '
-                <button class="btn btn-info mb-1" onclick="modalExistenciaProducto(`'.$columna['descargosId'].'`);" data-toggle="tooltip" data-placement="top" title="Ver descargo">
+                <button class="btn btn-info mb-1" onclick="modalAdministracionVerDescargo(`'.$columna['descargosId'].'`);" data-toggle="tooltip" data-placement="top" title="Ver descargo">
                     <i class="fas fa-eye"></i><span> Ver Descargo</span>
                 </button>
             ';
         } else {
             $columna5 = '
-                   <button class="btn btn-info mb-1" onclick="modalExistenciaProducto(`'.$columna['descargosId'].'`);" data-toggle="tooltip" data-placement="top" title="Ver descargo">
+                   <button class="btn btn-info mb-1" onclick="modalAdministracionVerDescargo(`'.$columna['descargosId'].'`);" data-toggle="tooltip" data-placement="top" title="Ver descargo">
         <i class="fas fa-eye"></i><span> Ver</span>
                 </button>'; // No buttons if the status is neither 'Pendiente' nor 'Finalizado'
         }
@@ -449,6 +449,7 @@ public function tablaContinuarSalida()
         $modelDescargos = new inv_descargos();
         $productosModel = new inv_productos_existencias();
         $modelKardex = new inv_kardex();
+        $productosInfoModel = new inv_productos(); // Nuevo modelo para obtener información de costos
        
 
         $datos = $modelDescargosDetalle
@@ -477,6 +478,11 @@ public function tablaContinuarSalida()
             ->where('productoId', $descargo['productoId'])
             ->update();
 
+                    // Obtener costos del producto
+        $productoInfo = $productosInfoModel->select('costoUnitarioFOB, CostoUnitarioRetaceo, CostoPromedio')
+        ->where('productoId', $descargo['productoId'])
+        ->first();
+
           //  $insert = inv_kardex = usando las variables de arriba y las columnas de la consulta  
           $dataKardex = [
             'tipoMovimiento'                => "Salida",
@@ -485,8 +491,11 @@ public function tablaContinuarSalida()
             'existenciaAntesMovimiento'     => $existenciaAnterior,
             'cantidadMovimiento'            => $cantidadMovimiento,
             'existenciaDespuesMovimiento'   => $nuevaExistencia,
+            'costoUnitarioFOB'              => $productoInfo['costoUnitarioFOB'],
+            'costoUnitarioRetaceo'          => $productoInfo['CostoUnitarioRetaceo'],
+            'costoPromedio'                 => $productoInfo['CostoPromedio'],
             'precioVentaUnitario'           => 0,
-            'fechaDocumento'                 => date('Y-m-d'),
+            'fechaDocumento'                => date('Y-m-d'),
             'fechaMovimiento'               => date('Y-m-d'),
             'tablaMovimiento'               => "inv_descargos_detalle",
             'usuarioIdAgrega'               => $usuarioIdAgrega
@@ -522,5 +531,56 @@ public function tablaContinuarSalida()
         }
     
      
+    }
+
+    public function modalAdministracionVerDescargo()
+    { 
+        $data["descargosId"] = $this->request->getPost('descargosId');
+    
+        return view('inventario/modals/modalAdministracionVerDescargo', $data);
+    }
+    public function tablaVerDescargo()
+    {
+
+        $descargosId = $this->request->getPost('descargosId');
+        $mostrarSalida = new inv_descargos_detalle();
+        $datos = $mostrarSalida
+            ->select('inv_descargos_detalle.descargoDetalleId,inv_descargos_detalle.descargosId,inv_descargos_detalle.cantidadDescargo,inv_descargos_detalle.obsDescargoDetalle,inv_productos.productoId, inv_productos.producto,inv_productos.codigoProducto,cat_14_unidades_medida.unidadMedida')
+            ->join('inv_productos', 'inv_productos.productoId = inv_descargos_detalle.productoId')
+            ->join('cat_14_unidades_medida', 'cat_14_unidades_medida.unidadMedidaId = inv_productos.unidadMedidaId')
+            ->join('inv_descargos', 'inv_descargos.descargosId = inv_descargos_detalle.descargosId')
+            ->where('inv_descargos_detalle.flgElimina', 0)
+            ->where('inv_descargos_detalle.descargosId', $descargosId)
+            ->findAll();
+    
+        $output['data'] = array();
+        $n = 1; // Variable para contar las filas
+        foreach ($datos as $columna) {
+        
+            // Aquí construye tus columnas
+            $columna1 = $n;
+            $columna2 = "<b>Producto:</b> " . $columna['producto']. "<br>" ."<b>Código :</b> " . $columna['codigoProducto'];
+            $columna3 = "<b>Cantidad: </b> ". $columna['cantidadDescargo'] ." (". $columna['unidadMedida'] .")" ;
+            $columna4 = "<b>Motivo/Justificación:</b> " . $columna['obsDescargoDetalle'] ;
+            
+    
+    
+            // Agrega la fila al array de salida
+            $output['data'][] = array(
+                $columna1,
+                $columna2,
+                $columna3,
+                $columna4
+            );
+    
+            $n++;
+        }
+    
+        // Verifica si hay datos
+        if ($n > 1) {
+            return $this->response->setJSON($output);
+        } else {
+            return $this->response->setJSON(array('data' => '')); // No hay datos, devuelve un array vacío
+        }
     }
 }
