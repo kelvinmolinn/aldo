@@ -58,7 +58,7 @@ class AdministracionProducto extends Controller
             $producto = new inv_productos();
 
              // seleccionar solo los campos que estan en la modal (solo los input y select)
-            $data['campos'] = $producto->select('inv_productos.productoId,inv_productos.codigoProducto,inv_productos.producto,inv_productos.descripcionProducto,inv_productos.existenciaMinima,inv_productos_plataforma.productoPlataformaId,inv_productos_tipo.productoTipoId,cat_14_unidades_medida.unidadMedidaId')
+            $data['campos'] = $producto->select('inv_productos.productoId,inv_productos.fechaInicioInventario,inv_productos.codigoProducto,inv_productos.producto,inv_productos.descripcionProducto,inv_productos.existenciaMinima,inv_productos_plataforma.productoPlataformaId,inv_productos_tipo.productoTipoId,cat_14_unidades_medida.unidadMedidaId')
             ->join('inv_productos_tipo', 'inv_productos_tipo.productoTipoId = inv_productos.productoTipoId')
             ->join('inv_productos_plataforma', 'inv_productos_plataforma.productoPlataformaId = inv_productos.productoPlataformaId')
             ->join('cat_14_unidades_medida', 'cat_14_unidades_medida.unidadMedidaId = inv_productos.unidadMedidaId')
@@ -227,29 +227,7 @@ class AdministracionProducto extends Controller
 
     public function modalProductoOperacion()
     {
-        // Establecer reglas de validación
-        $validation = service('validation');
-        $validation->setRules([
-            'productoTipoId'        => 'required',
-            'productoPlataformaId'  => 'required',
-            'unidadMedidaId'        => 'required',
-            'producto'              => 'required',
-            'codigoProducto'        => 'required',
-            'descripcionProducto'   => 'required',
-            'existenciaMinima'      => 'required',
-            'fechaInicioInventario' => 'required',
-            'flgProductoVenta'      => 'required'
-        ]);
-    
-        // Ejecutar la validación
-        if (!$validation->withRequest($this->request)->run()) {
-            // Si la validación falla, devolver los errores al cliente
-            return $this->response->setJSON([
-                'success' => false,
-                'errors' => $validation->getErrors()
-            ]);
-        }
-    
+
         // Continuar con la operación de inserción o actualización en la base de datos
         $codigoProducto = $this->request->getPost('codigoProducto');
         $operacion = $this->request->getPost('operacion');

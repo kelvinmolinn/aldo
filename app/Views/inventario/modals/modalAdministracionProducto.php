@@ -42,7 +42,7 @@
                     <div class="row mb-4">
                         <div class="col-md-4">
                             <div class="form-outline">
-                                <input type="date" id="fechaInicioInventario" name="fechaInicioInventario" class="form-control" required>
+                                <input type="date" id="fechaInicioInventario" name="fechaInicioInventario" class="form-control" value="<?= $campos['fechaInicioInventario']; ?>" required>
                                 <label class="form-label" for="fechaInicioInventario">Fecha inicio</label>
                             </div>
                         </div>
@@ -80,7 +80,7 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-outline">
-                                <input type="number" id="existenciaMinima" name="existenciaMinima" class="form-control" value="<?= $campos['existenciaMinima']; ?>" required>
+                                <input type="number" id="existenciaMinima" name="existenciaMinima" class="form-control" value="<?= $campos['existenciaMinima']; ?>"  min="0" step="1" required>
                                 <label class="form-label" for="existenciaMinima">Existencia mínima</label>
                             </div>
                         </div>
@@ -96,7 +96,7 @@
                 </div>
                 
                 <div class="modal-footer">
-                    <button type="button" id="btnguardarProducto" class="btn btn-primary">
+                    <button type="submit" id="btnguardarProducto" class="btn btn-primary">
                         <i class="fas fa-save"></i> Guardar
                     </button>
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">
@@ -122,39 +122,35 @@ $(document).ready(function() {
     $("#flgProductoVenta").select2({
         placeholder: 'Uso de producto'
     });
-
-    $('#btnguardarProducto').on('click', function() {
-        // Realizar una petición AJAX para obtener el contenido de la modal
-        $.ajax({
-            url: '<?= base_url('inventario/admin-producto/operacion/guardar/producto'); ?>',
-            type: 'POST',
-            data: $("#frmModal").serialize(),
-            success: function(response) {
-                console.log(response);
-                if (response.success) {
-                    // Insert exitoso, ocultar modal y mostrar mensaje con Sweet Alert
-                    $('#modalProducto').modal('hide');
-                    Swal.fire({
-                        icon: 'success',
-                        title: '<?= $mensajeAlerta; ?>',
-                        text: response.mensaje
-                    }).then((result) => {
-                        $("#tblProducto").DataTable().ajax.reload(null, false);
-                    });
-                } else {
-                    // Insert fallido, mostrar mensaje de error con Sweet Alert
-                    let errorMessage = '<ul>';
-                    $.each(response.errors, function(key, value) {
-                        errorMessage += '<li>' + value + '</li>';
-                    });
-                    errorMessage += '</ul>';
-
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error de validación',
-                        text: 'El Código de producto ya está registrado en la base de datos o Hay algún dato incompleto, ¡Verifique las validaciones!'
-                    });
-                }
+        
+    $("#frmModal").submit(function(event) {
+            event.preventDefault();
+            $.ajax({
+                url: $(this).attr('action'), 
+                type: $(this).attr('method'),
+                data: $(this).serialize(),
+                success: function(response) {
+                    console.log(response);
+                    if (response.success) {
+                        // Insert exitoso, ocultar modal y mostrar mensaje
+                        $('#modalProducto').modal('hide');
+                        Swal.fire({
+                            icon: 'success',
+                            title: '<?php echo $mensajeAlerta; ?>',
+                            text: response.mensaje
+                        }).then((result) => {
+                            $("#tblProducto").DataTable().ajax.reload(null, false);
+                            
+                        });
+                        console.log("Último ID insertado:", response.productoId);
+                    } else {
+                        // Insert fallido, mostrar mensaje de error con Sweet Alert
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'No se completó la operación',
+                            text: response.mensaje
+                        });
+                    }
             },
             error: function(xhr, status, error) {
                 // Manejar errores si los hay
