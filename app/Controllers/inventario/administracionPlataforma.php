@@ -119,49 +119,46 @@ class AdministracionPlataforma extends Controller
 
     public function modalPlataformaOperacion()
     {
-        // Establecer reglas de validación
-        $validation = service('validation');
-        $validation->setRules([
-            'productoPlataforma' => 'required|is_unique[inv_productos_plataforma.productoPlataforma]'
-        ]);
-    
-        // Ejecutar la validación
-        if (!$validation->withRequest($this->request)->run()) {
-            // Si la validación falla, devolver los errores al cliente
+
+
+            // Continuar con la operación de inserción o actualización en la base de datos
+            $operacion = $this->request->getPost('operacion');
+            $model = new inv_productos_plataforma();
+            $productoPlataforma = $this->request->getPost('productoPlataforma');
+            $productoPlataformaId = $this->request->getPost('productoPlataformaId');
+
+        if ($model->existePlataforma($productoPlataforma, $productoPlataformaId)) {
             return $this->response->setJSON([
                 'success' => false,
-                'errors' => $validation->getErrors()
-            ]);
-        }
-    
-        // Continuar con la operación de inserción o actualización en la base de datos
-        $operacion = $this->request->getPost('operacion');
-        $model = new inv_productos_plataforma();
-    
-        $data = [
-            'productoPlataforma' => $this->request->getPost('productoPlataforma')
-        ];
-    
-        if ($operacion == 'editar') {
-            $operacionPlataforma = $model->update($this->request->getPost('productoPlataformaId'), $data);
-        } else {
-            // Insertar datos en la base de datos
-            $operacionPlataforma = $model->insert($data);
-        }
-    
-        if ($operacionPlataforma) {
-            // Si el insert fue exitoso, devuelve el último ID insertado
-            return $this->response->setJSON([
-                'success' => true,
-                'mensaje' => 'Plataforma de producto ' . ($operacion == 'editar' ? 'actualizado' : 'agregado') . ' correctamente',
-                'productoPlataformaId' => ($operacion == 'editar' ? $this->request->getPost('productoPlataformaId') : $model->insertID())
+                'mensaje' => 'La plataforma ya está registrada en la base de datos'
             ]);
         } else {
-            // Si el insert falló, devuelve un mensaje de error
-            return $this->response->setJSON([
-                'success' => false,
-                'mensaje' => 'No se pudo insertar la plataforma de producto'
-            ]);
+        
+            $data = [
+                'productoPlataforma' => $this->request->getPost('productoPlataforma')
+            ];
+        
+            if ($operacion == 'editar') {
+                $operacionPlataforma = $model->update($this->request->getPost('productoPlataformaId'), $data);
+            } else {
+                // Insertar datos en la base de datos
+                $operacionPlataforma = $model->insert($data);
+            }
+        
+            if ($operacionPlataforma) {
+                // Si el insert fue exitoso, devuelve el último ID insertado
+                return $this->response->setJSON([
+                    'success' => true,
+                    'mensaje' => 'Plataforma de producto ' . ($operacion == 'editar' ? 'actualizado' : 'agregado') . ' correctamente',
+                    'productoPlataformaId' => ($operacion == 'editar' ? $this->request->getPost('productoPlataformaId') : $model->insertID())
+                ]);
+            } else {
+                // Si el insert falló, devuelve un mensaje de error
+                return $this->response->setJSON([
+                    'success' => false,
+                    'mensaje' => 'No se pudo insertar la plataforma de producto'
+                ]);
+            }
         }
     }
         

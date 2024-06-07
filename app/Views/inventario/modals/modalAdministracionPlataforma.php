@@ -26,7 +26,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" id="btnguardarPlataforma" class="btn btn-primary">
+                    <button type="submit" id="btnguardarPlataforma" class="btn btn-primary">
                         <i class="fas fa-save"></i>
                         Guardar
                     </button>
@@ -42,38 +42,35 @@
 
 <script>
 $(document).ready(function() {
-    $('#btnguardarPlataforma').on('click', function() {
-        // Realizar una petición AJAX para obtener el contenido de la modal
-        $.ajax({
-            url: '<?php echo base_url('inventario/admin-plataforma/operacion/guardar/plataforma'); ?>',
-            type: 'POST',
-            data: $("#frmModal").serialize(),
-            success: function(response) {
-                console.log(response);
-                if (response.success) {
-                    // Insert exitoso, ocultar modal y mostrar mensaje con Sweet Alert
-                    $('#modalPlataforma').modal('hide');
-                    Swal.fire({
-                        icon: 'success',
-                        title: '<?= $mensajeAlerta; ?>',
-                        text: response.mensaje
-                    }).then((result) => {
-                        $("#tblPlataforma").DataTable().ajax.reload(null, false);
-                    });
-                } else {
-                    // Insert fallido, mostrar mensaje de error con Sweet Alert
-                    let errorMessage = '<ul>';
-                    $.each(response.errors, function(key, value) {
-                        errorMessage += '<li>' + value + '</li>';
-                    });
-                    errorMessage += '</ul>';
 
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error de validación',
-                        text: 'Verifique las validaciones! No puede ir vacío o Agregar una plataforma ya Existente'
-                    });
-                }
+        $("#frmModal").submit(function(event) {
+            event.preventDefault();
+            $.ajax({
+                url: $(this).attr('action'), 
+                type: $(this).attr('method'),
+                data: $(this).serialize(),
+                success: function(response) {
+                    console.log(response);
+                    if (response.success) {
+                        // Insert exitoso, ocultar modal y mostrar mensaje
+                        $('#modalPlataforma').modal('hide');
+                        Swal.fire({
+                            icon: 'success',
+                            title: '<?php echo $mensajeAlerta; ?>',
+                            text: response.mensaje
+                        }).then((result) => {
+                            $("#tblPlataforma").DataTable().ajax.reload(null, false);
+                            
+                        });
+                        console.log("Último ID insertado:", response.productoTipoId);
+                    } else {
+                        // Insert fallido, mostrar mensaje de error con Sweet Alert
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'No se completó la operación',
+                            text: response.mensaje
+                        });
+                    }
             },
             error: function(xhr, status, error) {
                 // Manejar errores si los hay

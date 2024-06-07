@@ -58,11 +58,12 @@ class AdministracionProducto extends Controller
             $producto = new inv_productos();
 
              // seleccionar solo los campos que estan en la modal (solo los input y select)
-            $data['campos'] = $producto->select('inv_productos.productoId,inv_productos.fechaInicioInventario,inv_productos.codigoProducto,inv_productos.producto,inv_productos.descripcionProducto,inv_productos.existenciaMinima,inv_productos_plataforma.productoPlataformaId,inv_productos_tipo.productoTipoId,cat_14_unidades_medida.unidadMedidaId')
+            $data['campos'] = $producto->select('inv_productos.productoId,inv_productos.fechaInicioInventario,inv_productos.codigoProducto,inv_productos.producto,inv_productos.descripcionProducto,inv_productos.existenciaMinima,inv_productos.estadoProducto,inv_productos_plataforma.productoPlataformaId,inv_productos_tipo.productoTipoId,cat_14_unidades_medida.unidadMedidaId')
             ->join('inv_productos_tipo', 'inv_productos_tipo.productoTipoId = inv_productos.productoTipoId')
             ->join('inv_productos_plataforma', 'inv_productos_plataforma.productoPlataformaId = inv_productos.productoPlataformaId')
             ->join('cat_14_unidades_medida', 'cat_14_unidades_medida.unidadMedidaId = inv_productos.unidadMedidaId')
             ->where('inv_productos.flgElimina', 0)
+            //->where('inv_productos.estadoProducto', 'Activo')
             ->where('inv_productos.productoId', $productoId)->first();
         } else {
 
@@ -88,86 +89,76 @@ class AdministracionProducto extends Controller
 
     public function tablaProducto()
     {
+        // Obtener el valor de la parametrización
+        $parametrizacionModel = new conf_parametrizaciones();
+        $parametrizacion = $parametrizacionModel->select('valorParametrizacion')->where('parametrizacionId', 1)->first();
 
-    // Obtener el valor de la parametrización
-    $parametrizacionModel = new conf_parametrizaciones();
-    $parametrizacion = $parametrizacionModel->select('valorParametrizacion')->where('parametrizacionId', 1)->first();
+        if (!$parametrizacion) {
+            // Manejar el caso en que la parametrización no se encuentra
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'Parametrización no encontrada'
+            ]);
+        }
 
-    if (!$parametrizacion) {
-        // Manejar el caso en que la parametrización no se encuentra
-        return $this->response->setJSON([
-            'success' => false,
-            'mensaje' => 'Parametrización no encontrada'
-        ]);
-    }
+        $valorParametrizacion = $parametrizacion['valorParametrizacion'];
 
-    $valorParametrizacion = $parametrizacion['valorParametrizacion'];
-
-    $mostrarProducto = new inv_productos();
-    $datos = $mostrarProducto
-        ->select('inv_productos.productoId, inv_productos.codigoProducto, inv_productos.producto, inv_productos.descripcionProducto, inv_productos.existenciaMinima, inv_productos.estadoProducto, inv_productos.precioVenta, inv_productos_plataforma.productoPlataformaId, inv_productos_plataforma.productoPlataforma, inv_productos_tipo.productoTipoId, inv_productos_tipo.productoTipo, cat_14_unidades_medida.unidadMedidaId')
-        ->join('inv_productos_tipo', 'inv_productos_tipo.productoTipoId = inv_productos.productoTipoId')
-        ->join('inv_productos_plataforma', 'inv_productos_plataforma.productoPlataformaId = inv_productos.productoPlataformaId')
-        ->join('cat_14_unidades_medida', 'cat_14_unidades_medida.unidadMedidaId = inv_productos.unidadMedidaId')
-        ->where('inv_productos.flgElimina', 0)
-        ->findAll();
+        $mostrarProducto = new inv_productos();
+        $datos = $mostrarProducto
+            ->select('inv_productos.productoId, inv_productos.codigoProducto, inv_productos.producto, inv_productos.descripcionProducto, inv_productos.existenciaMinima, inv_productos.estadoProducto, inv_productos.precioVenta, inv_productos_plataforma.productoPlataformaId, inv_productos_plataforma.productoPlataforma, inv_productos_tipo.productoTipoId, inv_productos_tipo.productoTipo, cat_14_unidades_medida.unidadMedidaId')
+            ->join('inv_productos_tipo', 'inv_productos_tipo.productoTipoId = inv_productos.productoTipoId')
+            ->join('inv_productos_plataforma', 'inv_productos_plataforma.productoPlataformaId = inv_productos.productoPlataformaId')
+            ->join('cat_14_unidades_medida', 'cat_14_unidades_medida.unidadMedidaId = inv_productos.unidadMedidaId')
+            ->where('inv_productos.flgElimina', 0)
+            ->findAll();
 
         // Construye el array de salida
         $output['data'] = array();
         $n = 1; // Variable para contar las filas
         foreach ($datos as $columna) {
-            //  $precioVenta = $columna['precioVenta'];
-            //   $precioVentaConIVA = $precioVenta * ($valorParametrizacion/100+1);
+            // Formatear el campo precioVenta y calcular el precioVentaConIVA
+            $precioVenta = number_format($columna['precioVenta'], 2);
+            $precioVentaConIVA = number_format($columna['precioVenta'] * ($valorParametrizacion / 100 + 1), 2);
 
-                    // Formatear el campo precioVenta y calcular el precioVentaConIVA
-        $precioVenta = number_format($columna['precioVenta'], 2);
-        $precioVentaConIVA = number_format($columna['precioVenta'] * ($valorParametrizacion / 100 + 1), 2);
+            // Construye tus columnas
+            $columna1 = $n;
+            $estadoColor = $columna['estadoProducto'] == 'Activo' ? 'badge badge-success' : 'badge badge-danger';
+            $columna2 = "<b>Código:</b> " . $columna['codigoProducto'] . "<br>" . 
+                        "<b>Producto:</b> " . $columna['producto'] . "<br>" . 
+                        "<b>Estado del producto :</b> <span class='$estadoColor'>" . $columna['estadoProducto'] . "</span>";
+            
+            $columna3 = "<b>Tipo Producto:</b> " . $columna['productoTipo'] . "<br>" . "<b>Plataforma:</b> " . $columna['productoPlataforma'] . "<br>" . "<b>Descripción:</b> " . $columna['descripcionProducto'];
+            $columna4 = "<b>Sin IVA: $</b> " . $precioVenta . "<br>" . "<b>(+) IVA: $</b> " . $precioVentaConIVA;
 
-        // Construye tus columnas
-        $columna1 = $n;
-        $estadoColor = $columna['estadoProducto'] == 'Activo' ? 'badge badge-success' : 'badge badge-danger';
-        $columna2 = "<b>Código:</b> " . $columna['codigoProducto'] . "<br>" . 
-                    "<b>Producto:</b> " . $columna['producto'] . "<br>" . 
-                    "<b>Estado del producto :</b> <span class='$estadoColor'>" . $columna['estadoProducto'] . "</span>";
-        
-        $columna3 = "<b>Tipo Producto:</b> " . $columna['productoTipo'] . "<br>" . "<b>Plataforma:</b> " . $columna['productoPlataforma'] . "<br>" . "<b>Descripción:</b> " . $columna['descripcionProducto'];
-         $columna4 = "<b>Sin IVA: $</b> " . $precioVenta . "<br>" . "<b>(+) IVA: $</b> " . $precioVentaConIVA;
-
-
-            // Aquí puedes construir tus botones en la última columna
-        $columna5 = '
-            <button class="btn btn-info mb-1" onclick="modalExistenciaProducto(`'.$columna['productoId'].'`);" data-toggle="tooltip" data-placement="top" title="Existencias de producto">
-                <span></span>
-                <i class="fas fa-box-open"></i>
-            </button>
-        ';
-        $columna5 .= '
-                <button class="btn btn-primary mb-1 " onclick="modalProducto(`'.$columna['productoId'].'`, `editar`);" data-toggle="tooltip" data-placement="top" title="Editar producto">
+            // Construir los botones
+            $columna5 = '
+                <button class="btn btn-info mb-1" onclick="modalExistenciaProducto(`'.$columna['productoId'].'`);" data-toggle="tooltip" data-placement="top" title="Existencias de producto">
                     <span></span>
-                    <i class="fas fa-pencil-alt"></i>
+                    <i class="fas fa-box-open"></i>
                 </button>
             ';
-        $columna5 .= '
-            <button class="btn btn-success mb-1 " onclick="modalPrecios(`'.$columna['productoId'].'`);" data-toggle="tooltip" data-placement="top" title="Actualizar precios de venta">
-                <span></span>
-                <i class="fas fa-dollar-sign"></i>
-            </button>
-        ';
-        $columna5 .= '
-        <button class="btn btn-info mb-1 " onclick="modalHistorial(`'.$columna['productoId'].'`);" data-toggle="tooltip" data-placement="top" title="Historiales">
-            <span></span>
-            <i class="fas fa-clock"></i>
-        </button>
-        ';
-        /*  
-        $columna5 .= '
-                <button class="btn btn-danger mb-1" onclick="eliminarProducto(`'.$columna['productoId'].'`);" data-toggle="tooltip" data-placement="top" title="Eliminar">
-                    <i class="fas fa-trash"></i>
-                </button>
-            ';
-        */
 
-            if($columna['estadoProducto'] == 'Activo'){
+            if ($columna['estadoProducto'] == 'Activo') {
+                $columna5 .= '
+                    <button class="btn btn-primary mb-1 " onclick="modalProducto(`'.$columna['productoId'].'`, `editar`);" data-toggle="tooltip" data-placement="top" title="Editar producto">
+                        <span></span>
+                        <i class="fas fa-pencil-alt"></i>
+                    </button>
+                    <button class="btn btn-success mb-1 " onclick="modalPrecios(`'.$columna['productoId'].'`);" data-toggle="tooltip" data-placement="top" title="Actualizar precios de venta">
+                        <span></span>
+                        <i class="fas fa-dollar-sign"></i>
+                    </button>
+                ';
+            }
+
+            $columna5 .= '
+                <button class="btn btn-info mb-1 " onclick="modalHistorial(`'.$columna['productoId'].'`);" data-toggle="tooltip" data-placement="top" title="Historiales">
+                    <span></span>
+                    <i class="fas fa-clock"></i>
+                </button>
+            ';
+
+            if ($columna['estadoProducto'] == 'Activo') {
                 $mensaje = "¿Estás seguro que desea Desactivar el producto?";
                 $mensaje2 = "pasará a Desactivado";
                 $columna5 .= '
@@ -191,10 +182,10 @@ class AdministracionProducto extends Controller
                 $columna4,
                 $columna5
             );
-    
+
             $n++;
         }
-    
+
         // Verifica si hay datos
         if ($n > 1) {
             return $this->response->setJSON($output);
@@ -343,6 +334,11 @@ class AdministracionProducto extends Controller
         $data['productoId'] = $this->request->getPost('productoId');
         $data['sucursalId'] = $this->request->getPost('sucursalId');
 
+                // Obtener productos activos y sucursales no eliminadas
+        $data['producto'] = $productoModel->where('flgElimina', 0)
+                                          ->where('estadoProducto', 'Activo')
+                                          ->findAll();
+
         if($operacion == 'editar') {
             $productoExistenciaId = $this->request->getPost('productoExistenciaId');
             $existenciaProducto = new inv_productos_existencias();
@@ -353,6 +349,7 @@ class AdministracionProducto extends Controller
             ->join('inv_productos', 'inv_productos.productoId = inv_productos_existencias.productoId')
             ->join('conf_sucursales', 'conf_sucursales.sucursalId = inv_productos_existencias.sucursalId')
             ->where('inv_productos_existencias.flgElimina', 0)
+              ->where('inv_productos.estadoProducto', 'Activo')
             ->where('inv_productos_existencias.productoExistenciaId', $productoExistenciaId)->first();
         } else {
 
@@ -592,8 +589,8 @@ class AdministracionProducto extends Controller
     $dataLog = [
         'productoId'        => $productoId,
         'precioVentaNuevo'  => $precioVentaNuevo,
-        'precioVentaAntes'  => $precioVentaActual, // Asegúrate de tener este campo en la tabla log_productos_precios
-        'costoPromedio'     => $costoPromedio, // Asegúrate de tener este campo en la tabla log_productos_precios
+        'precioVentaAntes'  => $precioVentaActual, 
+        'costoPromedio'     => $costoPromedio, 
         'costoUnitarioFOB'  => $costoUnitarioFOB,
         'usuarioIdAgrega'   => $usuarioIdAgrega
     ];

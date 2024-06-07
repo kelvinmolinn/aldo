@@ -57,7 +57,9 @@ class inv_productos extends Model
     public function existeCodigo($codigoProducto, $productoId)
     {
         // Realizar una consulta para verificar si el producto ya existe en la base de datos
-        $resultado = $this->where('codigoProducto', $codigoProducto)->whereNotIn('productoId', [$productoId])->countAllResults();
+        $resultado = $this->where('codigoProducto', $codigoProducto)
+        ->where('flgElimina', 0)
+        ->whereNotIn('productoId', [$productoId])->countAllResults();
 
         return $resultado > 0; // Devuelve true si el producto existe, false en caso contrario
     }

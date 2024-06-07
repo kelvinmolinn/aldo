@@ -52,5 +52,15 @@ class inv_productos_tipo extends Model
         return $data;
     }
 
+        public function existeTipo($productoTipo, $productoTipoId)
+    {
+        // Realizar una consulta para verificar si el producto ya existe en la base de datos
+        $resultado = $this->where('productoTipo', $productoTipo)
+        ->where('flgElimina', 0)
+        ->whereNotIn('productoTipoId', [$productoTipoId])->countAllResults();
+
+        return $resultado > 0; // Devuelve true si el producto existe, false en caso contrario
+    }
+
 
 }

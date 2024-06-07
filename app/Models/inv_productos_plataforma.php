@@ -50,6 +50,18 @@ class inv_productos_plataforma extends Model
    
            return $data;
        }
+
+
+    public function existePlataforma($productoPlataforma, $productoPlataformaId)
+    {
+        // Realizar una consulta para verificar si el producto ya existe en la base de datos
+        $resultado = $this->where('productoPlataforma', $productoPlataforma)
+        ->where('flgElimina', 0)
+        ->whereNotIn('productoPlataformaId', [$productoPlataformaId])->countAllResults();
+
+        return $resultado > 0; // Devuelve true si el producto existe, false en caso contrario
+    }
+
    
 
 

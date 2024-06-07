@@ -123,32 +123,42 @@ class AdministracionTipo extends Controller
         // Continuar con la operación de inserción o actualización en la base de datos
         $operacion = $this->request->getPost('operacion');
         $model = new inv_productos_tipo();
-    
-        $data = [
-            'productoTipo' => $this->request->getPost('productoTipo')
-        ];
-    
-        if ($operacion == 'editar') {
-            $operacionTipo = $model->update($this->request->getPost('productoTipoId'), $data);
-        } else {
-            // Insertar datos en la base de datos
-            $operacionTipo = $model->insert($data);
-        }
-    
-        if ($operacionTipo) {
-            // Si el insert fue exitoso, devuelve el último ID insertado
-            return $this->response->setJSON([
-                'success' => true,
-                'mensaje' => 'Tipo de producto ' . ($operacion == 'editar' ? 'actualizado' : 'agregado') . ' correctamente',
-                'productoTipoId' => ($operacion == 'editar' ? $this->request->getPost('productoTipoId') : $model->insertID())
-            ]);
-        } else {
-            // Si el insert falló, devuelve un mensaje de error
+        $productoTipo = $this->request->getPost('productoTipo');
+        $productoTipoId = $this->request->getPost('productoTipoId');
+
+        if ($model->existeTipo($productoTipo, $productoTipoId)) {
             return $this->response->setJSON([
                 'success' => false,
-                'mensaje' => 'No se pudo insertar el tipo de producto'
+                'mensaje' => 'El tipo de producto ya está registrado'
             ]);
-        }
+        } else {
+    
+            $data = [
+                'productoTipo' => $this->request->getPost('productoTipo')
+            ];
+        
+            if ($operacion == 'editar') {
+                $operacionTipo = $model->update($this->request->getPost('productoTipoId'), $data);
+            } else {
+                // Insertar datos en la base de datos
+                $operacionTipo = $model->insert($data);
+            }
+        
+            if ($operacionTipo) {
+                // Si el insert fue exitoso, devuelve el último ID insertado
+                return $this->response->setJSON([
+                    'success' => true,
+                    'mensaje' => 'Tipo de producto ' . ($operacion == 'editar' ? 'actualizado' : 'agregado') . ' correctamente',
+                    'productoTipoId' => ($operacion == 'editar' ? $this->request->getPost('productoTipoId') : $model->insertID())
+                ]);
+            } else {
+                // Si el insert falló, devuelve un mensaje de error
+                return $this->response->setJSON([
+                    'success' => false,
+                    'mensaje' => 'No se pudo insertar el tipo de producto'
+                ]);
+            }
+     }
     }
         
 }
