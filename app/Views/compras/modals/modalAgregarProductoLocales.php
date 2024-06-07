@@ -19,6 +19,7 @@
                             <input type="hidden" id="operacion" name="operacion" value="<?php echo $operacion;?>">
                             <input type="hidden" id="ivaMultiplicar" name="ivaMultiplicar" value="<?php echo $ivaMultiplicar;?>">
                             <input type="hidden" id="compraDetalleId" name="compraDetalleId" value="<?php echo $compraDetalleId;?>">
+                            <input type="hidden" id="compraId" name="compraId" value="<?php echo $compraId;?>">
 
                             <div class="form-select-control">
                                 <select name="selectProductos" id="selectProductos" style="width: 100%;" required>
@@ -61,6 +62,9 @@
                             <div class="form-outline">
                                 <input type="number" id="costoTotal" name="costoTotal" class="form-control" value="<?= $campos['totalCompraDetalleIVA']; ?>" required readonly>
                                 <label class="form-label" for="costoTotal">Costo total</label>
+                            </div>
+                            <div class="text-right">
+                                <small>Sin IVA: $ <span id=""></span></small>
                             </div>
                         </div>
                     </div>
@@ -106,8 +110,10 @@
         $("#costoUnitario").keyup(function(e) {
             if($(this).val() == "") {
                 $("#precioUnitarioIVA").html('0.00');
+                $("#ivaUnitario").html('0.00');
             } else if($(this).val() < 0) {
                 $("#precioUnitarioIVA").html('0.00');
+                $("#ivaUnitario").html('0.00');
             } else {
                 let precioUnitarioIVA = parseFloat($(this).val() * <?= $ivaMultiplicar; ?>);
                 let ivaUnitario = parseFloat(precioUnitarioIVA - $(this).val());

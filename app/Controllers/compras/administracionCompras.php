@@ -493,6 +493,7 @@ class administracionCompras extends Controller
         $data['porcentajeIva'] = $consultaCompra['porcentajeIva'];
         $data['ivaMultiplicar'] = ($consultaCompra['porcentajeIva'] / 100) + 1;
         $data['compraDetalleId'] = $compraDetalleId;
+        $data['compraId'] = $compraId;
         if ($consultaCompra['paisId'] == 61 ) {
             return view('compras/modals/modalAgregarProductoLocales', $data);
         }else{
