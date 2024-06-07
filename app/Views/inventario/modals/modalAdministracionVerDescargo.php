@@ -1,9 +1,11 @@
+
 <form id="frmModal">
     <div id="modalAdministracionVerDescargo" class="modal" tabindex="-1" data-backdrop="static" data-keyboard="false">
         <div class="modal-dialog  modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title"><?= ('Ver Descargos/Salidas'); ?></h5>
+                    <input type="hidden" id="descargosId" name="descargosId" value="<?= $descargosId; ?>">
+                    <h2>Visualización del descargo N°: <?php echo $descargosId;?> </h2>
                 </div>
                 <div class="modal-body">
 
