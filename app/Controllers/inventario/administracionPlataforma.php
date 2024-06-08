@@ -4,6 +4,7 @@ namespace App\Controllers\inventario;
 
 use CodeIgniter\Controller;
 use App\Models\inv_productos_plataforma;
+use App\Models\inv_productos;
 class AdministracionPlataforma extends Controller
 {
 
@@ -46,24 +47,35 @@ class AdministracionPlataforma extends Controller
         return view('inventario/modals/modalAdministracionPlataforma', $data);
     }
 
-    public function eliminarPlataforma(){
-    
-        $eliminarPlataforma = new inv_productos_plataforma();
-        
+    public function eliminarPlataforma()
+    {
         $productoPlataformaId = $this->request->getPost('productoPlataformaId');
-        $data = ['flgElimina' => 1];
         
-        $eliminarPlataforma->update($productoPlataformaId, $data);
+        // Verificar si la plataforma de producto está asignada a algún producto
+        $productosModel = new Inv_Productos();
+        $plataformaAsignada = $productosModel->where('productoPlataformaId', $productoPlataformaId)->first();
 
-        if($eliminarPlataforma) {
+        if ($plataformaAsignada) {
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'La plataforma de producto no se puede eliminar porque ya está asignada a un producto'
+            ]);
+        }
+
+        // Proceder con la eliminación si no está asignada
+        $eliminarPlataforma = new Inv_Productos_Plataforma();
+        $data = ['flgElimina' => 1];
+        $resultado = $eliminarPlataforma->update($productoPlataformaId, $data);
+
+        if ($resultado) {
             return $this->response->setJSON([
                 'success' => true,
-                'mensaje' => 'Plataforma de producto eliminado correctamente'
+                'mensaje' => 'Plataforma de producto eliminada correctamente'
             ]);
         } else {
             return $this->response->setJSON([
                 'success' => false,
-                'mensaje' => 'No se pudo eliminar La plataforma de producto'
+                'mensaje' => 'No se pudo eliminar la plataforma de producto'
             ]);
         }
     }

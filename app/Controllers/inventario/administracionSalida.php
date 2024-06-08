@@ -441,7 +441,7 @@ public function tablaContinuarSalida()
     }
 }  
 
-    public function finalizarSalida() {
+    /*public function finalizarSalida() {
         // Continuar con la operación de inserción o actualización en la base de datos
         $operacion = $this->request->getPost('operacion');
         $descargosId = $this->request->getPost('descargosId');
@@ -502,7 +502,7 @@ public function tablaContinuarSalida()
         ];
           
               
-    }
+     }
         if($productosModel) {
 
             $dataKardex += [
@@ -531,6 +531,96 @@ public function tablaContinuarSalida()
         }
     
      
+    }*/
+
+
+    public function finalizarSalida()
+    {
+        $operacion = $this->request->getPost('operacion');
+        $descargosId = $this->request->getPost('descargosId');
+        $modelDescargosDetalle = new Inv_Descargos_Detalle();
+        $modelDescargos = new Inv_Descargos();
+        $productosModel = new Inv_Productos_Existencias();
+        $modelKardex = new Inv_Kardex();
+        $productosInfoModel = new Inv_Productos();
+
+        $datos = $modelDescargosDetalle
+            ->select('inv_descargos_detalle.descargoDetalleId, inv_descargos_detalle.productoId, inv_descargos_detalle.descargosId, inv_descargos_detalle.cantidadDescargo, inv_descargos_detalle.obsDescargoDetalle, inv_descargos.sucursalId, inv_descargos.estadoDescargo')
+            ->join('inv_descargos', 'inv_descargos.descargosId = inv_descargos_detalle.descargosId')
+            ->where('inv_descargos_detalle.flgElimina', 0)
+            ->where('inv_descargos_detalle.descargosId', $descargosId)
+            ->findAll();
+
+        $totalCantidadMovimiento = 0; // Para almacenar la cantidad total de movimiento
+
+        foreach ($datos as $descargo) {
+            $consultaExistencia = $productosModel->select('existenciaProducto, productoExistenciaId')
+                ->where('flgElimina', 0)
+                ->where('sucursalId', $descargo['sucursalId'])
+                ->where('productoId', $descargo['productoId'])
+                ->first();
+
+            $existenciaAnterior = $consultaExistencia['existenciaProducto'];
+            $cantidadMovimiento = $descargo['cantidadDescargo'];
+            $nuevaExistencia = $existenciaAnterior - $cantidadMovimiento;
+            $session = session();
+            $usuarioIdAgrega = $session->get("usuarioId");
+
+            $productosModel->set('existenciaProducto', $nuevaExistencia)
+                ->where('sucursalId', $descargo['sucursalId'])
+                ->where('productoId', $descargo['productoId'])
+                ->update();
+
+            // Obtener costos del producto
+            $productoInfo = $productosInfoModel->select('costoUnitarioFOB, CostoUnitarioRetaceo, CostoPromedio')
+                ->where('productoId', $descargo['productoId'])
+                ->first();
+
+            $totalCantidadMovimiento += $cantidadMovimiento; // Acumular la cantidad de movimiento
+
+            $dataKardex = [
+                'tipoMovimiento' => "Salida",
+                'descripcionMovimiento' => "Salida de producto por descargo",
+                'productoExistenciaId' => $consultaExistencia['productoExistenciaId'],
+                'existenciaAntesMovimiento' => $existenciaAnterior,
+                'cantidadMovimiento' => $cantidadMovimiento, // La cantidad de este movimiento
+                'existenciaDespuesMovimiento' => $nuevaExistencia,
+                'costoUnitarioFOB' => $productoInfo['costoUnitarioFOB'],
+                'costoUnitarioRetaceo' => $productoInfo['CostoUnitarioRetaceo'],
+                'costoPromedio' => $productoInfo['CostoPromedio'],
+                'precioVentaUnitario' => 0,
+                'fechaDocumento' => date('Y-m-d'),
+                'fechaMovimiento' => date('Y-m-d'),
+                'tablaMovimiento' => "inv_descargos_detalle",
+                'usuarioIdAgrega' => $usuarioIdAgrega,
+                'descargoDetalleId' => $descargo['descargoDetalleId']
+            ];
+
+            // Insertar en Kardex
+            $kardexId = $modelKardex->insert($dataKardex);
+
+            $dataKardexMovimiento = [
+                'tablaMovimientoId' => $descargo['descargoDetalleId'] // Guardar el descargoDetalleId aquí
+            ];
+            $modelKardex->update($kardexId, $dataKardexMovimiento);
+        }
+
+        if ($modelKardex) {
+            $dataDescargoEstado = [
+                'estadoDescargo' => "Finalizado"
+            ];
+            $modelDescargos->update($descargosId, $dataDescargoEstado);
+
+            return $this->response->setJSON([
+                'success' => true,
+                'mensaje' => 'Salida de producto finalizada correctamente'
+            ]);
+        } else {
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'No se pudo finalizar la salida de producto'
+            ]);
+        }
     }
 
     public function modalAdministracionVerDescargo()

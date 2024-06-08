@@ -4,6 +4,7 @@ namespace App\Controllers\inventario;
 
 use CodeIgniter\Controller;
 use App\Models\cat_14_unidades_medida;
+use App\Models\inv_productos;
 class AdministracionUnidades extends Controller
 {
     public function index()
@@ -46,17 +47,27 @@ class AdministracionUnidades extends Controller
         return view('inventario/modals/modalAdministracionUnidades', $data);
     }
     
-    public function eliminarUnidades(){
-        //$data['sucursalUsuarioId'] = $sucursalUsuarioId;
-
-        $eliminarUnidades = new cat_14_unidades_medida();
-        
+    public function eliminarUnidades()
+    {
         $unidadMedidaId = $this->request->getPost('unidadMedidaId');
-        $data = ['flgElimina' => 1];
         
-        $eliminarUnidades->update($unidadMedidaId, $data);
+        // Verificar si la unidad de medida está asignada a algún producto
+        $productosModel = new Inv_Productos();
+        $productoAsignado = $productosModel->where('unidadMedidaId', $unidadMedidaId)->first();
 
-        if($eliminarUnidades) {
+        if ($productoAsignado) {
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'La unidad de medida no se puede eliminar porque ya está asignada a un producto'
+            ]);
+        }
+
+        // Proceder con la eliminación si no está asignada
+        $eliminarUnidades = new Cat_14_Unidades_Medida();
+        $data = ['flgElimina' => 1];
+        $resultado = $eliminarUnidades->update($unidadMedidaId, $data);
+
+        if ($resultado) {
             return $this->response->setJSON([
                 'success' => true,
                 'mensaje' => 'Unidad de medida eliminada correctamente'
@@ -68,7 +79,6 @@ class AdministracionUnidades extends Controller
             ]);
         }
     }
-
     public function modalUnidadesOperacion()
     {
         // Establecer reglas de validación

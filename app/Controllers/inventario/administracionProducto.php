@@ -124,7 +124,7 @@ class AdministracionProducto extends Controller
             $columna1 = $n;
             $estadoColor = $columna['estadoProducto'] == 'Activo' ? 'badge badge-success' : 'badge badge-danger';
             $columna2 = "<b>Código:</b> " . $columna['codigoProducto'] . "<br>" . 
-                        "<b>Producto:</b> " . $columna['producto'] . "<br>" . 
+                        "<b>Nombre del producto:</b> " . $columna['producto'] . "<br>" . 
                         "<b>Estado del producto :</b> <span class='$estadoColor'>" . $columna['estadoProducto'] . "</span>";
             
             $columna3 = "<b>Tipo Producto:</b> " . $columna['productoTipo'] . "<br>" . "<b>Plataforma:</b> " . $columna['productoPlataforma'] . "<br>" . "<b>Descripción:</b> " . $columna['descripcionProducto'];
@@ -159,10 +159,10 @@ class AdministracionProducto extends Controller
             ';
 
             if ($columna['estadoProducto'] == 'Activo') {
-                $mensaje = "¿Estás seguro que desea Desactivar el producto?";
-                $mensaje2 = "pasará a Desactivado";
+                $mensaje = "¿Estás seguro que desea deshabilitar el producto?";
+                $mensaje2 = "pasará a Inactivo";
                 $columna5 .= '
-                <button class="btn btn-danger mb-1 " data-toggle="tooltip" data-placement="top" title="Desactivar" onclick="cambiarEstadoProducto({productoId: \''.$columna['productoId'].'\', estadoProducto: \''.$columna['estadoProducto'].'\', mensaje: \''.$mensaje.'\', mensaje2: \''.$mensaje2.'\'});">
+                <button class="btn btn-danger mb-1 " data-toggle="tooltip" data-placement="top" title="Deshabilitar" onclick="cambiarEstadoProducto({productoId: \''.$columna['productoId'].'\', estadoProducto: \''.$columna['estadoProducto'].'\', mensaje: \''.$mensaje.'\', mensaje2: \''.$mensaje2.'\'});">
                     <i class="fas fa-ban"></i>
                 </button>';
             } else {
@@ -510,38 +510,41 @@ class AdministracionProducto extends Controller
     }
 
     public function modalAdministracionPrecio()
-    { 
-
-            // Cargar el modelos
-        $productoModel = new inv_productos();
+    {
+        // Cargar los modelos
+        $productoModel = new Inv_Productos();
         $data['producto'] = $productoModel->where('flgElimina', 0)->findAll();
         $operacion = $this->request->getPost('operacion');
         $data['productoId'] = $this->request->getPost('productoId');
 
+        $precioVenta = new Log_Productos_Precios();
 
-        if($operacion == 'editar') {
+        if ($operacion == 'editar') {
             $logProductoPrecioId = $this->request->getPost('logProductoPrecioId');
-            $precioVenta = new log_productos_precios();
 
-             // seleccionar solo los campos que estan en la modal (solo los input y select)
-            $data['campos'] = $precioVenta->select('inv_productos.productoId,log_productos_precios.precioVentaNuevo,log_productos_precios.costoPromedio')
-            ->join('inv_productos', 'inv_productos.productoId = log_productos_precios.productoId')
-            ->where('log_productos_precios.flgElimina', 0)
-            ->where('log_productos_precios.logProductoPrecioId', $logProductoPrecioId)->first();
+            // Seleccionar solo los campos que están en la modal (solo los input y select)
+            $data['campos'] = $precioVenta->select('inv_productos.productoId, log_productos_precios.precioVentaNuevo, log_productos_precios.costoPromedio')
+                ->join('inv_productos', 'inv_productos.productoId = log_productos_precios.productoId')
+                ->where('log_productos_precios.flgElimina', 0)
+                ->where('log_productos_precios.logProductoPrecioId', $logProductoPrecioId)
+                ->first();
         } else {
+            // Obtener el último precio ingresado para el producto
+            $ultimoPrecio = $precioVenta->select('precioVentaNuevo')
+                ->where('productoId', $data['productoId'])
+                ->orderBy('logProductoPrecioId', 'DESC')
+                ->first();
 
-             // formar los campos que estan en la modal (input y select) con el nombre equivalente en la BD
+            // Formar los campos que están en la modal (input y select) con el nombre equivalente en la BD
             $data['campos'] = [
-                'logProductoPrecioId'   => 0,
-                'precioVentaNuevo'      => '',
-                'costoPromedio'         => '',
-                'productoId'            => $this->request->getPost('productoId')
-
+                'logProductoPrecioId' => 0,
+                'precioVentaNuevo' => $ultimoPrecio ? $ultimoPrecio['precioVentaNuevo'] : '',
+                'costoPromedio' => '',
+                'productoId' => $this->request->getPost('productoId')
             ];
         }
         $data['operacion'] = $operacion;
 
-    
         return view('inventario/modals/modalAdministracionPrecio', $data);
     }
 

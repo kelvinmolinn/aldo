@@ -2,7 +2,13 @@
 <hr>
 
 <div class="row mb-4">
-    <div class="col-md-12 text-right">
+    <div class="col-md-6 text-left">
+        <button type= "button" id="btnAbrirModal2" class="btn btn-info" onclick="modalAlertaExistencia(0);">
+            <i class="fas fa-eye"></i>
+            Existencia mínina
+        </button>
+    </div>
+    <div class="col-md-6 text-right">
         <button type= "button" id="btnAbrirModal2" class="btn btn-primary" onclick="modalExistencia(0, 'insertar');">
             <i class="fas fa-save"></i>
             Existencia Inicial
@@ -103,7 +109,7 @@
                                 if (response.success) {
                                     Swal.fire({
                                         icon: 'success',
-                                        title: '¡Producto desactivado con Éxito!',
+                                        title: '¡Se cambió el estado con Éxito!',
                                         text: response.mensaje
                                     }).then((result) => {
                                         $("#tblProducto").DataTable().ajax.reload(null, false);

@@ -1,6 +1,5 @@
 
 <input type="hidden" id="descargosId" name="descargosId" value="<?= $descargosId; ?>">
-
 <h2>Continuar descargo N°: <?php echo $descargosId;?> - <?php echo $dataSucursal['sucursal'];?></h2>
 <hr>
 <div class="row mb-4">

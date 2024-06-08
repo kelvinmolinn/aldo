@@ -4,6 +4,7 @@ namespace App\Controllers\inventario;
 
 use CodeIgniter\Controller;
 use App\Models\inv_productos_tipo;
+use App\Models\inv_productos;
 class AdministracionTipo extends Controller
 {
 
@@ -46,16 +47,27 @@ class AdministracionTipo extends Controller
         return view('inventario/modals/modalAdministracionTipo', $data);
     }
 
-    public function eliminarTipo(){
-    
-        $eliminarTipo = new inv_productos_tipo();
-        
+    public function eliminarTipo()
+    {
         $productoTipoId = $this->request->getPost('productoTipoId');
-        $data = ['flgElimina' => 1];
         
-        $eliminarTipo->update($productoTipoId, $data);
+        // Verificar si el tipo de producto está asignado a algún producto
+        $productosModel = new Inv_Productos();
+        $tipoAsignado = $productosModel->where('productoTipoId', $productoTipoId)->first();
 
-        if($eliminarTipo) {
+        if ($tipoAsignado) {
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'El tipo de producto no se puede eliminar porque ya está asignado a un producto'
+            ]);
+        }
+
+        // Proceder con la eliminación si no está asignado
+        $eliminarTipo = new Inv_Productos_Tipo();
+        $data = ['flgElimina' => 1];
+        $resultado = $eliminarTipo->update($productoTipoId, $data);
+
+        if ($resultado) {
             return $this->response->setJSON([
                 'success' => true,
                 'mensaje' => 'Tipo de producto eliminado correctamente'
@@ -63,7 +75,7 @@ class AdministracionTipo extends Controller
         } else {
             return $this->response->setJSON([
                 'success' => false,
-                'mensaje' => 'No se pudo eliminar El tipo de producto'
+                'mensaje' => 'No se pudo eliminar el tipo de producto'
             ]);
         }
     }
