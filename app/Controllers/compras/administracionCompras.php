@@ -338,10 +338,10 @@ class administracionCompras extends Controller
                     );
                 }else{
                     $columna1 = $n;
-                    $columna2 = '1';
-                    $columna3 = '12';
-                    $columna4 = '5';
-                    $columna5 = '20';
+                    $columna2 = '('.$columna['codigoProducto'].') ' . $columna['producto'];;
+                    $columna3 = '<b>Costo Unitario: </b>$ ' .  number_format($columna['precioUnitario'], 2, '.', ',');;
+                    $columna4 = $columna['cantidadProducto'] . ' ('.$columna['abreviaturaUnidadMedida'].')';;
+                    $columna5 = '<b>Costo total: </b>$ ' . number_format($columna['totalCompraDetalle'], 2, '.', ',');;
                     $columna6 = '
                         <button type= "button" class="btn btn-primary mb-1" onclick="modalAgregarProducto(`'.$columna['compraDetalleId'].'`, `editar`);" data-toggle="tooltip" data-placement="top" title="Editar">
                             <i class="fas fa-pencil-alt"></i>
@@ -494,6 +494,8 @@ class administracionCompras extends Controller
         $data['ivaMultiplicar'] = ($consultaCompra['porcentajeIva'] / 100) + 1;
         $data['compraDetalleId'] = $compraDetalleId;
         $data['compraId'] = $compraId;
+        $data['paidId'] = $consultaCompra['paisId'];
+
         if ($consultaCompra['paisId'] == 61 ) {
             return view('compras/modals/modalAgregarProductoLocales', $data);
         }else{
@@ -509,7 +511,9 @@ class administracionCompras extends Controller
         $ivaMultiplicar =   $this->request->getPost('ivaMultiplicar');
         $cantidad =         $this->request->getPost('cantidadProducto');
         $precioUnitario =   $this->request->getPost('costoUnitario');
-        
+
+        $paisId =   $this->request->getPost('paisId');
+
         $precioUnitarioIva      = $precioUnitario * $ivaMultiplicar;
         $ivaUnitario            = $precioUnitarioIva - $precioUnitario;
         $ivaTotal               = $ivaUnitario * $cantidad;

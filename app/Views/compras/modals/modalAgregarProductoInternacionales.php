@@ -1,12 +1,23 @@
-
-<form id="frmModal" method="post" action="<?php echo base_url(''); ?>">
+<?php
+    if($operacion == "editar") {
+        $mensajeAlerta = "Compra actualizada con éxito";
+    } else {
+        $mensajeAlerta = "Compra creada con éxito";
+    }
+?>
+<form id="frmModal" method="post" action="<?php echo base_url('compras/admin-compras/operacion/guardar/productos'); ?>">
     <div id="modalAgregarProducto" class="modal" tabindex="-1" data-backdrop="static" data-keyboard="false">
         <div class="modal-dialog  modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title"><?php echo ($operacion == 'editar' ? 'Editar producto nacional' : 'Agregar producto nacional');?></h5>
+                    <h5 class="modal-title"><?php echo ($operacion == 'editar' ? 'Editar producto internacional' : 'Agregar producto internacional');?></h5>
                 </div>
                 <div class="modal-body">
+                    <input type="hidden" id="paisId" name="paisId" value="<?php echo $paisId;?>">
+                    <input type="hidden" id="operacion" name="operacion" value="<?php echo $operacion;?>">
+                    <input type="hidden" id="compraDetalleId" name="compraDetalleId" value="<?php echo $compraDetalleId;?>">
+                    <input type="hidden" id="compraId" name="compraId" value="<?php echo $compraId;?>">
+
                     <div class="row mb-4">
                         <div class="col-md-4">
                             <div class="form-select-control">
@@ -63,6 +74,41 @@
             dropdownParent: $('#modalAgregarProducto')
         });    
 
+        $("#frmModal").submit(function(event) {
+            event.preventDefault();
+            $.ajax({
+                url: $(this).attr('action'), 
+                type: $(this).attr('method'),
+                data: $(this).serialize(),
+                success: function(response) {
+                    console.log(response);
+                    if (response.success) {
+                        // Insert exitoso, ocultar modal y mostrar mensaje
+                        $('#modalAgregarProducto').modal('hide');
+                        Swal.fire({
+                            icon: 'success',
+                            title: '<?php echo $mensajeAlerta; ?>',
+                            text: response.mensaje
+                        }).then((result) => {
+                            $("#tablaContinuarCompra").DataTable().ajax.reload(null, false);
+                            
+                        });
+                        console.log("Último ID insertado:", response.compraDetalleId);
+                    } else {
+                        // Insert fallido, mostrar mensaje de error
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.mensaje
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    // Manejar errores si los hay
+                    console.error(xhr.responseText);
+                }
+            });
+        });
         
         $("#selectProductos").val('<?= $producto['productoId']; ?>').trigger("change");
     });

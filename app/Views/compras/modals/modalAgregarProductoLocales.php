@@ -64,15 +64,28 @@
                                 <label class="form-label" for="costoTotal">Costo total</label>
                             </div>
                             <div class="text-right">
-                                <small>Sin IVA: $ <span id=""></span></small>
+                                <small>Sin IVA: $ <span id="costoTotalSinIva"></span></small>
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer">
+                        <?php 
+                            if($operacion == "editar"){
+                        ?>
+                        <button type="submit" id="btnguardarProveedor" class="btn btn-primary">
+                            <i class="fas fa-save"></i>
+                            Actualizar producto
+                        </button>
+                        <?php 
+                            } else {
+                        ?>
                         <button type="submit" id="btnguardarProveedor" class="btn btn-primary">
                             <i class="fas fa-save"></i>
                             Agregar producto
                         </button>
+                        <?php 
+                            } 
+                        ?>
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">
                             <i class="fas fa-times-circle"></i>
                             Cerrar
@@ -111,9 +124,11 @@
             if($(this).val() == "") {
                 $("#precioUnitarioIVA").html('0.00');
                 $("#ivaUnitario").html('0.00');
+                $("#costoTotalSinIva").html('0.00');
             } else if($(this).val() < 0) {
                 $("#precioUnitarioIVA").html('0.00');
                 $("#ivaUnitario").html('0.00');
+                $("#costoTotalSinIva").html('0.00');
             } else {
                 let precioUnitarioIVA = parseFloat($(this).val() * <?= $ivaMultiplicar; ?>);
                 let ivaUnitario = parseFloat(precioUnitarioIVA - $(this).val());
