@@ -113,6 +113,22 @@
         </table>
     </div>
 </form>
+    <div class="row mb-4 mt-4">
+        <div class="col-md-6">
+            <div class="form-outline">
+                <textarea name="" id="" class="form-control" style="width: 100%;" required></textarea>
+                <label class="form-label" for="">Observación de la compra</label>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="text-right">
+                <button type="submit" id="btnFinalizarCompra" class="btn btn-primary">
+                    <i class="fas fa-pencil-alt"></i>
+                    Finalizar compra
+                </button>
+            </div>
+        </div>
+    </div>
 <script>
     function modalAgregarProducto(compraDetalleId,operacion){
         $.ajax({

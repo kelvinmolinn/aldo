@@ -64,7 +64,7 @@
                                 <label class="form-label" for="costoTotal">Costo total</label>
                             </div>
                             <div class="text-right">
-                                <small>Sin IVA: $ <span id="costoTotalSinIva"></span></small>
+                                <small>Sin IVA: $ <span id="costoTotalSinIva"><?= $campos['totalCompraDetalle']; ?></span></small>
                             </div>
                         </div>
                     </div>
@@ -102,15 +102,19 @@
         if(cantidad == "") {
             $("#IVATotal").val('0.00');
             $("#costoTotal").val('0.00');
+            $("#costoTotalSinIva").html('0.00');
         } else if(cantidad < 0) {
             $("#IVATotal").val('0.00');
             $("#costoTotal").val('0.00');
+            $("#costoTotalSinIva").html('0.00');
         } else {
             let costoTotal = parseFloat(precioIVA * cantidad);
             let ivaTotal = parseFloat(ivaUnitario * cantidad);
-
+            let costoTotalSinIva = costoTotal / <?= $ivaMultiplicar; ?>;
+            
             $("#IVATotal").val(ivaTotal.toFixed(2));
             $("#costoTotal").val(costoTotal.toFixed(2));
+            $("#costoTotalSinIva").html(costoTotalSinIva.toFixed(2));
         }
     }
 
@@ -125,15 +129,21 @@
                 $("#precioUnitarioIVA").html('0.00');
                 $("#ivaUnitario").html('0.00');
                 $("#costoTotalSinIva").html('0.00');
+
             } else if($(this).val() < 0) {
                 $("#precioUnitarioIVA").html('0.00');
                 $("#ivaUnitario").html('0.00');
                 $("#costoTotalSinIva").html('0.00');
+
             } else {
                 let precioUnitarioIVA = parseFloat($(this).val() * <?= $ivaMultiplicar; ?>);
                 let ivaUnitario = parseFloat(precioUnitarioIVA - $(this).val());
+
+
+
                 $("#precioUnitarioIVA").html(precioUnitarioIVA.toFixed(2));
                 $("#ivaUnitario").html(ivaUnitario.toFixed(2));
+
 
                 calcularTotales(precioUnitarioIVA, ivaUnitario, $("#cantidadProducto").val());
             }
@@ -142,7 +152,7 @@
         $("#cantidadProducto").keyup(function(e) {
             let precioUnitarioIVA = parseFloat($("#costoUnitario").val() * <?= $ivaMultiplicar; ?>);
             let ivaUnitario = parseFloat(precioUnitarioIVA - $("#costoUnitario").val());
-
+            
             calcularTotales(precioUnitarioIVA, ivaUnitario, $(this).val());
         });
 

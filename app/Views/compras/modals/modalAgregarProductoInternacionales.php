@@ -22,7 +22,7 @@
                         <div class="col-md-4">
                             <div class="form-select-control">
                                 <select name="selectProductos" id="selectProductos" style="width: 100%;" required>
-                                    <option value=""></option>
+                                    <option></option>
                                     <?php foreach ($producto as $producto){ ?>
                                         <option value="<?php echo $producto['productoId']; ?>"><?php echo $producto['producto']; ?></option>
                                     <?php } ?>
@@ -36,7 +36,6 @@
                                 <input type="number" id="costoUnitario" name="costoUnitario" class="form-control" value="<?= $campos['precioUnitario']; ?>" required>
                                 <label class="form-label" for="costoUnitario">Costo unitario</label>
                             </div>
-
                         </div>
                         <div class="col-md-4">
                             <div class="form-outline">
@@ -46,7 +45,7 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-outline">
-                                <input type="number" id="costoTotal" name="costoTotal" class="form-control" value="<?= $campos['totalCompraDetalleIVA']; ?>" required readonly>
+                                <input type="number" id="costoTotal" name="costoTotal" class="form-control" value="<?= $campos['totalCompraDetalle']; ?>" required readonly>
                                 <label class="form-label" for="costoTotal">Costo total</label>
                             </div>
                         </div>
@@ -68,11 +67,28 @@
 </form>
 
 <script>
+
+    function calcularTotales(precioUnitario, cantidad) {
+        if(cantidad == "") {
+            $("#costoTotal").val('0.00');
+        } else if(cantidad < 0) {
+            $("#costoTotal").val('0.00');
+        } else {
+            let costoTotal = parseFloat(precioUnitario * cantidad);
+
+            $("#costoTotal").val(costoTotal.toFixed(2));
+        }
+    }
+
     $(document).ready(function() {
         $("#selectProductos").select2({
             placeholder: 'Productos',
             dropdownParent: $('#modalAgregarProducto')
         });    
+
+        $("#cantidadProducto").keyup(function(e) {
+            calcularTotales($("#costoUnitario").val(), $(this).val());
+        });
 
         $("#frmModal").submit(function(event) {
             event.preventDefault();
@@ -110,6 +126,6 @@
             });
         });
         
-        $("#selectProductos").val('<?= $producto['productoId']; ?>').trigger("change");
+        $("#selectProductos").val('<?= $campos['productoId']; ?>').trigger("change");
     });
 </script>
