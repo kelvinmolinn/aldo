@@ -305,6 +305,7 @@ class administracionCompras extends Controller
 
         $output['data'] = array();
         $n = 0; // Variable para contar las filas
+        $totalCantidad = 0;
            foreach ($datos as $columna) {
                 $paisId = $columna['paisId'];
                 $n++;
@@ -364,14 +365,16 @@ class administracionCompras extends Controller
                     );
                 }
 
+            $totalCantidad += $columna['cantidadProducto'];
            }
+
 
         // Verifica si hay datos
         if ($n > 0) {
             if($paisId == 61) {
                 $output['footer'] = array(
                     '<b>Sumas</b>',
-                    'Sumas de cantidad',
+                    $totalCantidad,
                     'Sumas de costo total'
                 );
 
@@ -528,7 +531,6 @@ class administracionCompras extends Controller
                 "productoId"            => $this->request->getPost('selectProductos'),
                 "cantidadProducto"      => $this->request->getPost('cantidadProducto'),
                 "precioUnitario"        => $this->request->getPost('costoUnitario'),
-
                 "precioUnitarioIVA"     => $precioUnitarioIva,
                 "ivaUnitario"           => $ivaUnitario,
                 "ivaTotal"              => $ivaTotal,
@@ -542,6 +544,7 @@ class administracionCompras extends Controller
                 // Insertar datos en la base de datos
                 $productoCompras = $comprasDetalle->insert($data);
             }
+
             if ($productoCompras) {
                 // Si el insert fue exitoso, devuelve el último ID insertado
                 return $this->response->setJSON([
@@ -588,7 +591,5 @@ class administracionCompras extends Controller
                 ]);
             }
         }
-
-
     }
 }
