@@ -44,10 +44,11 @@ class administracionCompras extends Controller
         $filtroProveedor = $this->request->getPost('nombreProveedor');
         
         $consultaCompras = $com_compras
-                ->select('comp_compras.compraId,comp_proveedores.tipoProveedorOrigen, cat_02_tipo_dte.tipoDocumentoDTE, 
+                ->select('cat_tipo_contribuyente.tipoContribuyenteId,comp_compras.compraId,comp_proveedores.tipoProveedorOrigen, cat_02_tipo_dte.tipoDocumentoDTE, 
                           DATE_FORMAT(comp_compras.fechaDocumento, "%d-%m-%Y") as fechaDocumento, comp_compras.numFactura,
                           cat_20_paises.pais,comp_proveedores.proveedor,comp_proveedores.proveedorComercial')
                 ->join('comp_proveedores','comp_proveedores.proveedorId = comp_compras.proveedorId')
+                ->join('cat_tipo_contribuyente','cat_tipo_contribuyente.tipoContribuyenteId = comp_proveedores.tipoContribuyenteId')
                 ->join('cat_02_tipo_dte','cat_02_tipo_dte.tipoDTEId = comp_compras.tipoDTEId')
                 ->join('cat_20_paises','cat_20_paises.paisId = comp_compras.paisId')
                 ->where('comp_compras.flgElimina', 0);
@@ -83,7 +84,8 @@ class administracionCompras extends Controller
                 $columna4 = "<b>Monto: </b>";
                 
                 $jsonActualizarCompra = [
-                    "compraId"          => $columna['compraId']
+                    "compraId"              => $columna['compraId'],
+                    "tipoContribuyenteId"   => $columna['tipoContribuyenteId']
                 ];
 
                 $columna5 = '
@@ -205,7 +207,7 @@ class administracionCompras extends Controller
         $session = session();
 
         $compraId = $this->request->getPost('compraId');
-
+        $tipoContribuyenteId = $this->request->getPost('tipoContribuyenteId');
 
         $camposSession = [
             'renderVista' => 'No',
@@ -236,6 +238,7 @@ class administracionCompras extends Controller
                         ->findAll();     
 
         $data['compraId'] = $compraId;
+        $data['tipoContribuyenteId'] = $tipoContribuyenteId;
 
         // Consulta para traer los valores de los input que se pueden actualizar
         $consultaCompra = $compras
@@ -293,6 +296,7 @@ class administracionCompras extends Controller
         $comprasDetalle = new comp_compras_detalle;
         $compras = new comp_compras;
         $compraId = $this->request->getPost('compraId');
+        $tipoContribuyenteId = $this->request->getPost('tipoContribuyenteId');
 
         $datos = $comprasDetalle
             ->select('comp_compras.paisId,inv_productos.codigoProducto,inv_productos.producto,cat_14_unidades_medida.abreviaturaUnidadMedida,comp_compras_detalle.compraDetalleId,comp_compras_detalle.compraId,comp_compras_detalle.productoId,comp_compras_detalle.cantidadProducto,comp_compras_detalle.precioUnitario,comp_compras_detalle.precioUnitarioIVA,comp_compras_detalle.ivaUnitario,comp_compras_detalle.ivaTotal,comp_compras_detalle.totalCompraDetalle,comp_compras_detalle.totalCompraDetalleIVA')
@@ -306,6 +310,8 @@ class administracionCompras extends Controller
         $output['data'] = array();
         $n = 0; // Variable para contar las filas
         $totalCantidad = 0;
+        $totalConIVA = 0;
+        $totalSinIVA = 0;
            foreach ($datos as $columna) {
                 $paisId = $columna['paisId'];
                 $n++;
@@ -340,9 +346,9 @@ class administracionCompras extends Controller
                 }else{
                     $columna1 = $n;
                     $columna2 = '('.$columna['codigoProducto'].') ' . $columna['producto'];;
-                    $columna3 = '<b>Costo Unitario: </b>$ ' .  number_format($columna['precioUnitario'], 2, '.', ',');;
-                    $columna4 = $columna['cantidadProducto'] . ' ('.$columna['abreviaturaUnidadMedida'].')';;
-                    $columna5 = '<b>Costo total: </b>$ ' . number_format($columna['totalCompraDetalle'], 2, '.', ',');;
+                    $columna3 = '<b>Costo Unitario: </b>$ ' .  number_format($columna['precioUnitario'], 2, '.', ',');
+                    $columna4 = $columna['cantidadProducto'] . ' ('.$columna['abreviaturaUnidadMedida'].')';
+                    $columna5 = '<b>Costo total: </b>$ ' . number_format($columna['totalCompraDetalle'], 2, '.', ',');
                     $columna6 = '
                         <button type= "button" class="btn btn-primary mb-1" onclick="modalAgregarProducto(`'.$columna['compraDetalleId'].'`, `editar`);" data-toggle="tooltip" data-placement="top" title="Editar">
                             <i class="fas fa-pencil-alt"></i>
@@ -366,6 +372,9 @@ class administracionCompras extends Controller
                 }
 
             $totalCantidad += $columna['cantidadProducto'];
+            $UDM = $columna['abreviaturaUnidadMedida'];
+            $totalConIVA += $columna['totalCompraDetalleIVA'];
+            $totalSinIVA += $columna['totalCompraDetalle'];
            }
 
 
@@ -373,47 +382,80 @@ class administracionCompras extends Controller
         if ($n > 0) {
             if($paisId == 61) {
                 $output['footer'] = array(
-                    '<b>Sumas</b>',
-                    $totalCantidad,
-                    'Sumas de costo total'
+                    '<b>Totales</b>',
+                    $totalCantidad . ' ('. $UDM .')',
+                    '<b>Total con IVA:</b> $ ' . number_format($totalConIVA, 2, '.', ',') . '<br>' . '<b>Total Sin IVA:</b> $ ' . number_format($totalSinIVA, 2, '.', ',')
                 );
+                if($tipoContribuyenteId == 1){
+                    $output['footerTotales'] = '
+                        <b>
+                        <div class="row text-right">
+                            <div class="col-8">
+                                Subtotal
+                            </div>
+                            <div class="col-4">
+                                $ '.$totalSinIVA.'
+                            </div>
+                        </div>
+                        <div class="row text-right">
+                            <div class="col-8">
+                                IVA 13%
+                            </div>
+                            <div class="col-4">
+                                $ 0.00
+                            </div>
+                        </div>
+                        <div class="row text-right">
+                            <div class="col-8">
+                                (+) IVA Percibido
+                            </div>
+                            <div class="col-4">
+                                $ 0.00
+                            </div>
+                        </div>
+                        <div class="row text-right">
+                            <div class="col-8">
+                                Total a pagar
+                            </div>
+                            <div class="col-4">
+                                $ 0.00
+                            </div>
+                        </div>                    
+                        </b>
+                    ';
+                } else {
+                    // IMPORTANTE: EL TOTAL A PAGAR NETO ES MAYOR O IGUAL A $100.00, PERO EL PROVEEDOR NO FUE REGISTRADO COMO GRAN CONTRIBUYENTE, POR FAVOR ACTUALICE LA INFORMACIÓN DEL PROVEEDOR PARA PODER APLICAR LA PERCEPCIÓN.
+                    $output['footerTotales'] = '
+                        <b>
+                        <div class="row text-right">
+                            <div class="col-8">
+                                Subtotal
+                            </div>
+                            <div class="col-4">
+                                $ '.$totalSinIVA.'
+                            </div>
+                        </div>
+                        <div class="row text-right">
+                            <div class="col-8">
+                                IVA 13%
+                            </div>
+                            <div class="col-4">
+                                $ 0.00
+                            </div>
+                        </div>
+                        <div class="row text-right">
+                            <div class="col-8">
+                                Total a pagar
+                            </div>
+                            <div class="col-4">
+                                $ 0.00
+                            </div>
+                        </div>                    
+                        </b>
+                    ';
 
-                $output['footerTotales'] = '
-                    <b>
-                    <div class="row text-right">
-                        <div class="col-8">
-                            Subtotal
-                        </div>
-                        <div class="col-4">
-                            $ 0.00
-                        </div>
-                    </div>
-                    <div class="row text-right">
-                        <div class="col-8">
-                            IVA 13%
-                        </div>
-                        <div class="col-4">
-                            $ 0.00
-                        </div>
-                    </div>
-                    <div class="row text-right">
-                        <div class="col-8">
-                            (+) IVA Percibido
-                        </div>
-                        <div class="col-4">
-                            $ 0.00
-                        </div>
-                    </div>
-                    <div class="row text-right">
-                        <div class="col-8">
-                            Total a pagar
-                        </div>
-                        <div class="col-4">
-                            $ 0.00
-                        </div>
-                    </div>                    
-                    </b>
-                ';
+                }
+
             }  else {
                 $output['footer'] = array(
                     '<b>Sumas</b>',
@@ -513,11 +555,11 @@ class administracionCompras extends Controller
 
         $ivaMultiplicar =   $this->request->getPost('ivaMultiplicar');
         $cantidad =         $this->request->getPost('cantidadProducto');
-        $precioUnitario =   $this->request->getPost('costoUnitario');
+        $precioUnitarioIva =   $this->request->getPost('costoUnitario');
 
         $paisId =   $this->request->getPost('paisId');
 
-        $precioUnitarioIva      = $precioUnitario * $ivaMultiplicar;
+        $precioUnitario         = $precioUnitarioIva / $ivaMultiplicar;
         $ivaUnitario            = $precioUnitarioIva - $precioUnitario;
         $ivaTotal               = $ivaUnitario * $cantidad;
         $totalCompraDetalle     = $precioUnitario * $cantidad;
@@ -530,7 +572,7 @@ class administracionCompras extends Controller
                 "compraId"              => $this->request->getPost('compraId'),
                 "productoId"            => $this->request->getPost('selectProductos'),
                 "cantidadProducto"      => $this->request->getPost('cantidadProducto'),
-                "precioUnitario"        => $this->request->getPost('costoUnitario'),
+                "precioUnitario"        => $precioUnitario,
                 "precioUnitarioIVA"     => $precioUnitarioIva,
                 "ivaUnitario"           => $ivaUnitario,
                 "ivaTotal"              => $ivaTotal,

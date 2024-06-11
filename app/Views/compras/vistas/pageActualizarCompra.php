@@ -123,7 +123,7 @@
         <div class="col-md-6">
             <div class="text-right">
                 <button type="submit" id="btnFinalizarCompra" class="btn btn-primary">
-                    <i class="fas fa-pencil-alt"></i>
+                    <i class="fas fa-save"></i>
                     Finalizar compra
                 </button>
             </div>
@@ -214,7 +214,8 @@
                 "method": "POST",
                 "url": '<?php echo base_url('compras/admin-compras/tabla/continuar/compra'); ?>',
                 "data": {
-                    compraId: '<?= $compraId; ?>'
+                    compraId: '<?= $compraId; ?>',
+                    tipoContribuyenteId: '<?= $tipoContribuyenteId;?>'
                 }
             },
             "footerCallback": function(tfoot) {    
@@ -230,26 +231,7 @@
                     td.eq(1).html('<b>Sumas</b>');
                     td.eq(3).html('<div class="text-right"><b>0.00</b></div>');
                     td.eq(4).html('<div class="text-right"><b>$ 0.00</b></div>');
-                    $("#tdFooterTotales").html(`
-                        <b>
-                        <div class="row text-right">
-                            <div class="col-8">
-                                Subtotal
-                            </div>
-                            <div class="col-4">
-                                $ 0.00
-                            </div>
-                        </div>
-                        <div class="row text-right">
-                            <div class="col-8">
-                                IVA 13%
-                            </div>
-                            <div class="col-4">
-                                $ 0.00
-                            </div>
-                        </div>
-                        </b>
-                    `);
+                    $("#tdFooterTotales").html(``);
                 }
             },
             "columnDefs": [

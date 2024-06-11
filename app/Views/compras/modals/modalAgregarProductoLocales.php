@@ -33,11 +33,11 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-outline">
-                                <input type="number" id="costoUnitario" name="costoUnitario" class="form-control" value="<?= $campos['precioUnitario']; ?>" required>
-                                <label class="form-label" for="costoUnitario">Costo unitario</label>
+                                <input type="number" id="costoUnitario" name="costoUnitario" class="form-control" value="<?= $campos['precioUnitario']; ?>" step="0.01" required>
+                                <label class="form-label" for="costoUnitario">Costo unitario (IVA)</label>
                             </div>
                             <div class="text-right">
-                                <small>Con IVA: $ <span id="precioUnitarioIVA"><?= $campos['precioUnitarioIVA']; ?></span></small>
+                                <small>Sin IVA: $ <span id="precioUnitarioIVA"><?= $campos['precioUnitarioIVA']; ?></span></small>
                             </div>
                         </div>
                         <div class="col-md-4">
@@ -62,7 +62,7 @@
                         <div class="col-md-4">
                             <div class="form-outline">
                                 <input type="number" id="costoTotal" name="costoTotal" class="form-control" value="<?= $campos['totalCompraDetalleIVA']; ?>" required readonly>
-                                <label class="form-label" for="costoTotal">Costo total</label>
+                                <label class="form-label" for="costoTotal">Costo total (IVA)</label>
                             </div>
                             <div class="text-right">
                                 <small>Sin IVA: $ <span id="costoTotalSinIva"><?= $campos['totalCompraDetalle']; ?></span></small>
@@ -137,24 +137,22 @@
                 $("#costoTotalSinIva").html('0.00');
 
             } else {
-                let precioUnitarioIVA = parseFloat($(this).val() * <?= $ivaMultiplicar; ?>);
-                let ivaUnitario = parseFloat(precioUnitarioIVA - $(this).val());
+                let precioUnitario = parseFloat($(this).val() / <?= $ivaMultiplicar; ?>);
+                let ivaUnitario = parseFloat($(this).val() - precioUnitario);
 
-
-
-                $("#precioUnitarioIVA").html(precioUnitarioIVA.toFixed(2));
+                $("#precioUnitarioIVA").html(precioUnitario.toFixed(2));
                 $("#ivaUnitario").html(ivaUnitario.toFixed(2));
 
 
-                calcularTotales(precioUnitarioIVA, ivaUnitario, $("#cantidadProducto").val());
+                calcularTotales($(this).val(), ivaUnitario, $("#cantidadProducto").val());
             }
         });
         
         $("#cantidadProducto").keyup(function(e) {
-            let precioUnitarioIVA = parseFloat($("#costoUnitario").val() * <?= $ivaMultiplicar; ?>);
-            let ivaUnitario = parseFloat(precioUnitarioIVA - $("#costoUnitario").val());
+            let precioUnitario = parseFloat($("#costoUnitario").val() / <?= $ivaMultiplicar; ?>);
+            let ivaUnitario = parseFloat($(this).val() - precioUnitario);
             
-            calcularTotales(precioUnitarioIVA, ivaUnitario, $(this).val());
+            calcularTotales($("#costoUnitario").val(), ivaUnitario, $(this).val());
         });
 
         $("#frmModal").submit(function(event) {
