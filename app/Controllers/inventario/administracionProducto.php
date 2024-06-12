@@ -754,16 +754,16 @@ class AdministracionProducto extends Controller
         $columna4 = "<b>Existencia mínima:</b> " . $columna['existenciaMinima'].' '.'('.$columna['abreviaturaUnidadMedida'].')';
 
         if ($columna['existenciaProducto'] == 0) {
-            $columna5 = '<span class="text-danger">Stock agotado</span>';
+            $columna5 = '<span class="text-danger">Existencias agotadas</span>';
             $countMinima++; // Incrementa el contador
         } elseif ($columna['existenciaProducto'] < $columna['existenciaMinima']) {
-            $columna5 = '<span class="text-warning">Stock por debajo del nivel mínimo</span>';
+            $columna5 = '<span class="text-warning">Existencia por debajo del nivel mínimo</span>';
             $countMinima++; // Incrementa el contador
         } elseif ($columna['existenciaProducto'] == $columna['existenciaMinima']) {
-            $columna5 = '<span class="text-warning">Stock en niveles mínimos</span>';
+            $columna5 = '<span class="text-warning">Existencia en niveles mínimos</span>';
             $countMinima++; // Incrementa el contador
         } else {
-            $columna5 = '<span class="text-success">Stock en niveles aceptables</span>';
+            $columna5 = '<span class="text-success">Existencia en niveles aceptables</span>';
         }
 
         $output['data'][] = array(
@@ -785,8 +785,5 @@ class AdministracionProducto extends Controller
         return $this->response->setJSON(array('data' => '', 'countMinima' => 0)); // No hay datos, devuelve un array vacío
     }
 }
-
-    
-    
 
 }
