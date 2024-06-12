@@ -1,13 +1,14 @@
 <h2>Inventario de productos</h2>
 <hr>
 
-<div class="row mb-4">
-    <div class="col-md-6 text-left">
-        <button type= "button" id="btnAbrirModal2" class="btn btn-info" onclick="modalAlertaExistencia(0);">
+    <div class="row mb-4">
+        <div class="col-md-6 text-left">
+            <button type="button" id="btnAbrirModal2" class="btn btn-info" onclick="modalAlertaExistencia(0);">
             <i class="fas fa-eye"></i>
-            Existencia mínina
+            Existencia mínima (<span id="countMinima">0</span>)
         </button>
     </div>
+
     <div class="col-md-6 text-right">
         <button type= "button" id="btnAbrirModal2" class="btn btn-primary" onclick="modalExistencia(0, 'insertar');">
             <i class="fas fa-save"></i>
@@ -139,9 +140,29 @@
                 data: { productoId: productoId, operacion: operacion}, // Pasar el ID del módulo como parámetro
                 success: function(response) {
                     // Insertar el contenido de la modal en el cuerpo de la modal
+                   
                     $('#divModalContent').html(response);
                     // Mostrar la modal
                     $('#modalProducto').modal('show');
+                },
+            error: function(xhr, status, error) {
+                // Manejar errores si los hay
+                console.error(xhr.responseText);
+            }
+        });
+    }
+
+    function modalAlertaExistencia(productoId, operacion, countMinima) {
+        // Realizar una petición AJAX para obtener los datos del módulo por su ID
+        $.ajax({
+                url: '<?php echo base_url('inventario/admin-producto/form5/AlertaExistencia'); ?>',
+                type: 'POST',
+                data: { productoId: productoId, operacion: operacion,  countMinima: countMinima}, // Pasar el ID del módulo como parámetro
+                success: function(response) {
+                    // Insertar el contenido de la modal en el cuerpo de la modal
+                    $('#divModalContent').html(response);
+                    // Mostrar la modal
+                    $('#modalAlertaExistencia').modal('show');
                 },
             error: function(xhr, status, error) {
                 // Manejar errores si los hay
