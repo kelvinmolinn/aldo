@@ -215,7 +215,9 @@
                 "url": '<?php echo base_url('compras/admin-compras/tabla/continuar/compra'); ?>',
                 "data": {
                     compraId: '<?= $compraId; ?>',
-                    tipoContribuyenteId: '<?= $tipoContribuyenteId;?>'
+                    tipoContribuyenteId: '<?= $tipoContribuyenteId;?>',
+                    ivaPercibido: '<?= $ivaPercibido;?>' 
+
                 }
             },
             "footerCallback": function(tfoot) {    

@@ -255,7 +255,18 @@ class administracionCompras extends Controller
             'paisId'            => $consultaCompra['paisId'],
             'flgRetaceo'        => $consultaCompra['flgRetaceo']
             // Sacar estos valores de la consulta
-        ];                      
+        ];
+        
+        
+        $porcentajeIva = new conf_parametrizaciones;
+
+        $IVAPercibido = $porcentajeIva 
+        ->select("valorParametrizacion")
+        ->where("flgElimina", 0)
+        ->where("parametrizacionId", 3)
+        ->first(); 
+        $percepcionIVA = ($IVAPercibido['valorParametrizacion'] / 100);
+        $data['ivaPercibido'] = $percepcionIVA;
 
         return view('compras/vistas/pageActualizarCompra', $data);
     }
@@ -297,6 +308,7 @@ class administracionCompras extends Controller
         $compras = new comp_compras;
         $compraId = $this->request->getPost('compraId');
         $tipoContribuyenteId = $this->request->getPost('tipoContribuyenteId');
+        $IVAPercibido = $this->request->getPost('ivaPercibido');
 
         $datos = $comprasDetalle
             ->select('comp_compras.paisId,inv_productos.codigoProducto,inv_productos.producto,cat_14_unidades_medida.abreviaturaUnidadMedida,comp_compras_detalle.compraDetalleId,comp_compras_detalle.compraId,comp_compras_detalle.productoId,comp_compras_detalle.cantidadProducto,comp_compras_detalle.precioUnitario,comp_compras_detalle.precioUnitarioIVA,comp_compras_detalle.ivaUnitario,comp_compras_detalle.ivaTotal,comp_compras_detalle.totalCompraDetalle,comp_compras_detalle.totalCompraDetalleIVA')
@@ -312,6 +324,7 @@ class administracionCompras extends Controller
         $totalCantidad = 0;
         $totalConIVA = 0;
         $totalSinIVA = 0;
+        $totalIVA = 0;
            foreach ($datos as $columna) {
                 $paisId = $columna['paisId'];
                 $n++;
@@ -375,9 +388,13 @@ class administracionCompras extends Controller
             $UDM = $columna['abreviaturaUnidadMedida'];
             $totalConIVA += $columna['totalCompraDetalleIVA'];
             $totalSinIVA += $columna['totalCompraDetalle'];
+            $totalIVA += $columna['ivaTotal'];
            }
+           $Percibido = $totalSinIVA * $IVAPercibido;
 
-
+           $totalPagar = $totalSinIVA + $totalIVA + $Percibido;
+           $totalPagarSinPercepcion = $totalSinIVA + $totalIVA;
+           $totalPagarInternacional = $totalSinIVA;
         // Verifica si hay datos
         if ($n > 0) {
             if($paisId == 61) {
@@ -394,7 +411,7 @@ class administracionCompras extends Controller
                                 Subtotal
                             </div>
                             <div class="col-4">
-                                $ '.$totalSinIVA.'
+                                $ '.number_format($totalSinIVA, 2, '.', ',').'
                             </div>
                         </div>
                         <div class="row text-right">
@@ -402,7 +419,7 @@ class administracionCompras extends Controller
                                 IVA 13%
                             </div>
                             <div class="col-4">
-                                $ 0.00
+                                $ '.number_format($totalIVA, 2, '.', ',').'
                             </div>
                         </div>
                         <div class="row text-right">
@@ -410,7 +427,7 @@ class administracionCompras extends Controller
                                 (+) IVA Percibido
                             </div>
                             <div class="col-4">
-                                $ 0.00
+                                $ '.number_format($Percibido, 2, '.', ',').'
                             </div>
                         </div>
                         <div class="row text-right">
@@ -418,7 +435,7 @@ class administracionCompras extends Controller
                                 Total a pagar
                             </div>
                             <div class="col-4">
-                                $ 0.00
+                                $ '.number_format($totalPagar, 2, '.', ',').'
                             </div>
                         </div>                    
                         </b>
@@ -432,7 +449,7 @@ class administracionCompras extends Controller
                                 Subtotal
                             </div>
                             <div class="col-4">
-                                $ '.$totalSinIVA.'
+                                $ '.number_format($totalSinIVA, 2, '.', ',').'
                             </div>
                         </div>
                         <div class="row text-right">
@@ -440,7 +457,7 @@ class administracionCompras extends Controller
                                 IVA 13%
                             </div>
                             <div class="col-4">
-                                $ 0.00
+                                $ '.number_format($totalIVA, 2, '.', ',').'
                             </div>
                         </div>
                         <div class="row text-right">
@@ -448,7 +465,7 @@ class administracionCompras extends Controller
                                 Total a pagar
                             </div>
                             <div class="col-4">
-                                $ 0.00
+                                $ '.number_format($totalPagarSinPercepcion, 2, '.', ',').'
                             </div>
                         </div>                    
                         </b>
@@ -458,9 +475,9 @@ class administracionCompras extends Controller
 
             }  else {
                 $output['footer'] = array(
-                    '<b>Sumas</b>',
-                    'Sumas de cantidad',
-                    'Sumas de costo total'
+                    '<b>Totales</b>',
+                    $totalCantidad . ' ('. $UDM .')',
+                    '<b>Total:</b> $ '. number_format($totalSinIVA, 2, '.', ',')
                 );
 
                 $output['footerTotales'] = '
@@ -470,7 +487,7 @@ class administracionCompras extends Controller
                             Subtotal
                         </div>
                         <div class="col-4">
-                            $ 0.00
+                            $ '.number_format($totalPagarInternacional, 2, '.', ',').'
                         </div>
                     </div>
                     <div class="row text-right">
@@ -478,7 +495,7 @@ class administracionCompras extends Controller
                             Total a pagar
                         </div>
                         <div class="col-4">
-                            $ 0.00
+                            $ '.number_format($totalPagarInternacional, 2, '.', ',').'
                         </div>
                     </div>
                     </b>

@@ -20,7 +20,7 @@
                             <input type="hidden" id="ivaMultiplicar" name="ivaMultiplicar" value="<?php echo $ivaMultiplicar;?>">
                             <input type="hidden" id="compraDetalleId" name="compraDetalleId" value="<?php echo $compraDetalleId;?>">
                             <input type="hidden" id="compraId" name="compraId" value="<?php echo $compraId;?>">
-                            <input type="hidden" id = "paisId" name="paisId" value="<?php echo $paisId;?>">
+                            <input type="hidden" id="paisId" name="paisId" value="<?php echo $paisId;?>">
 
                             <div class="form-select-control">
                                 <select name="selectProductos" id="selectProductos" style="width: 100%;" required>
@@ -150,7 +150,8 @@
         
         $("#cantidadProducto").keyup(function(e) {
             let precioUnitario = parseFloat($("#costoUnitario").val() / <?= $ivaMultiplicar; ?>);
-            let ivaUnitario = parseFloat($(this).val() - precioUnitario);
+
+            let ivaUnitario = parseFloat($("#costoUnitario").val() - precioUnitario);
             
             calcularTotales($("#costoUnitario").val(), ivaUnitario, $(this).val());
         });
