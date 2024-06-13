@@ -468,12 +468,10 @@ class administracionCompras extends Controller
                                 <div class="col-4">
                                     $ '.number_format($totalPagarSinPercepcion, 2, '.', ',').'
                                 </div>
-                            </div>
-                            <div class="alert alert-warning" role="alert">
-                                EL TOTAL A PAGAR NETO ES MAYOR O IGUAL A $100.00, PERO EL PROVEEDOR NO FUE REGISTRADO COMO GRAN CONTRIBUYENTE, POR FAVOR ACTUALICE LA INFORMACIÓN DEL PROVEEDOR PARA PODER APLICAR LA PERCEPCIÓN.
-                            </div>                    
-                            </b>
+                            </div>                 
+                            </b>  
                         ';
+
                     } else {
 
                     }
@@ -545,8 +543,8 @@ class administracionCompras extends Controller
                 'compraId'              => '',
                 'productoId'            => '',
                 'cantidadProducto'      => '',
-                'precioUnitario'        => '',
-                'precioUnitarioIVA'     => '0.00',
+                'precioUnitario'        => '0.00',
+                'precioUnitarioIVA'     => '',
                 'ivaUnitario'           => '0.00',
                 'ivaTotal'              => '0.00',
                 'totalCompraDetalle'    => '0.00',

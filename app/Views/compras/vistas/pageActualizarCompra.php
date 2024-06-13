@@ -111,6 +111,11 @@
                     </tr>
                 </tfoot>
         </table>
+        <div>
+            <div class="alert alert-warning " role="alert">
+                EL TOTAL A PAGAR NETO ES MAYOR O IGUAL A $100.00, PERO EL PROVEEDOR NO FUE REGISTRADO COMO GRAN CONTRIBUYENTE, POR FAVOR ACTUALICE LA INFORMACIÓN DEL PROVEEDOR PARA PODER APLICAR LA PERCEPCIÓN.
+            </div>
+        </div>
     </div>
 </form>
     <div class="row mb-4 mt-4">
@@ -238,10 +243,10 @@
             },
             "columnDefs": [
                 { "width": "10%", "targets": 0, "className": "text-left" }, 
-                { "width": "30%", "targets": 1, "className": "text-left" }, 
+                { "width": "25%", "targets": 1, "className": "text-left" }, 
                 { "width": "20%", "targets": 2, "className": "text-left" }, 
                 { "width": "15%", "targets": 3, "className": "text-left" },
-                { "width": "15%", "targets": 4, "className": "text-left" },
+                { "width": "20%", "targets": 4, "className": "text-left" },
                 { "width": "10%", "targets": 5, "className": "text-left" }
             ],
             "language": {
