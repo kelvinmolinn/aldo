@@ -3,8 +3,8 @@
 
 <div class="row mb-4">
     <div class="col-md-6 text-left">
-        <button type="button" id="btnAbrirModal2" class="btn btn-secondary" onclick="modalAlertaExistencia(0);">
-            Existencia mínima (<span id="countMinima">0</span>)
+        <button type="button" id="btnAbrirModal2" class="btn btn-warning" onclick="modalAlertaExistencia(0);">
+            Existencia mínima 
         </button>
     </div>
     <div class="col-md-6 text-right">

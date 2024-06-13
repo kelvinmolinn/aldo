@@ -164,6 +164,16 @@ $routes->group('inventario/admin-salida', function($routes) {
     //
 });
 
+$routes->group('inventario/admin-traslados', function($routes) {
+    // Definir las rutas específicas para el grupo 'admin-salidas'
+    $routes->post('index', 'inventario\AdministracionTraslados::index');
+    $routes->post('form/traslados', 'inventario\AdministracionTraslados::modalAdministracionTraslados');
+    $routes->post('tabla/traslados',  'inventario\AdministracionSalida::tablaTraslados');
+    $routes->post('operacion/guardar/traslados', 'inventario\AdministracionSalida::modalSalidaOperacion');
+
+    //
+});
+
 $routes->group('compras/admin-proveedores', function($routes) {
     $routes->post('index', 'compras\administracionProveedores::index');
     $routes->post('tabla/proveedores',  'compras\administracionProveedores::tablaProveedores');
