@@ -33,6 +33,8 @@ class AdministracionProducto extends Controller
                 'camposSession'     => json_encode($camposSession)
             ]);
 
+            
+
             return view('inventario/vistas/administracionProducto', $data);
         }
     }

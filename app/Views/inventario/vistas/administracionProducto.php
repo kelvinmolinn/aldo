@@ -3,8 +3,13 @@
 
 <div class="row mb-4">
     <div class="col-md-6 text-left">
+<<<<<<< Updated upstream
         <button type="button" id="btnAbrirModal2" class="btn btn-warning" onclick="modalAlertaExistencia(0);">
             Existencia mínima 
+=======
+        <button type="button" id="btnAbrirModal2" class="btn btn-secondary" onclick="modalAlertaExistencia(0);">
+            Existencias mínimas (<span id="countMinima">0</span>)
+>>>>>>> Stashed changes
         </button>
     </div>
     <div class="col-md-6 text-right">
@@ -34,6 +39,7 @@
     </table>
 </div>
 <script>
+
 
        function eliminarProducto(id) {
         //alert("Vamos a eliminar " + id);
@@ -158,9 +164,9 @@
                 success: function(response) {
                     $('#divModalContent').html(response);
                     $('#modalAlertaExistencia').modal('show');
-
                     // Actualizamos el contador en el botón
-                    $('#btnAbrirModal2').find('acountMinima').text(response.countMinima);
+                    $('#btnAbrirModal2').find('countMinima').text(response.countMinima);
+
                 },
             error: function(xhr, status, error) {
                 // Manejar errores si los hay
@@ -226,6 +232,7 @@
         });
     }
         $(document).ready(function() {
+
             tituloVentana("Existencias Productos");
             $('#tblProducto').DataTable({
                 "ajax": {
