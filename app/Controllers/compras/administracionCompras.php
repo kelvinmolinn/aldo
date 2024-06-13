@@ -208,16 +208,6 @@ class administracionCompras extends Controller
 
         $compraId = $this->request->getPost('compraId');
         $tipoContribuyenteId = $this->request->getPost('tipoContribuyenteId');
-
-        $camposSession = [
-            'renderVista' => 'No',
-            'compraId'    => $compraId
-        ];
-        $session->set([
-            'route'             => 'compras/admin-compras/vista/actualizar/compra',
-            'camposSession'     => json_encode($camposSession)
-        ]);
-
         
         $tipoDte = new cat_02_tipo_dte;
         $proveedor = new comp_proveedores;
@@ -267,6 +257,17 @@ class administracionCompras extends Controller
         ->first(); 
         $percepcionIVA = ($IVAPercibido['valorParametrizacion'] / 100);
         $data['ivaPercibido'] = $percepcionIVA;
+
+        $camposSession = [
+            'renderVista' => 'No',
+            'compraId'    => $compraId,
+            'tipoContribuyenteId' => $tipoContribuyenteId,
+            'ivaPercibido' => $percepcionIVA
+        ];
+        $session->set([
+            'route'             => 'compras/admin-compras/vista/actualizar/compra',
+            'camposSession'     => json_encode($camposSession)
+        ]);
 
         return view('compras/vistas/pageActualizarCompra', $data);
     }
@@ -441,35 +442,43 @@ class administracionCompras extends Controller
                         </b>
                     ';
                 } else {
+                    if($totalSinIVA >= 100.00){
+                        $output['footerTotales'] = '
+                            <b>
+                            <div class="row text-right">
+                                <div class="col-8">
+                                    Subtotal
+                                </div>
+                                <div class="col-4">
+                                    $ '.number_format($totalSinIVA, 2, '.', ',').'
+                                </div>
+                            </div>
+                            <div class="row text-right">
+                                <div class="col-8">
+                                    IVA 13%
+                                </div>
+                                <div class="col-4">
+                                    $ '.number_format($totalIVA, 2, '.', ',').'
+                                </div>
+                            </div>
+                            <div class="row text-right">
+                                <div class="col-8">
+                                    Total a pagar
+                                </div>
+                                <div class="col-4">
+                                    $ '.number_format($totalPagarSinPercepcion, 2, '.', ',').'
+                                </div>
+                            </div>
+                            <div class="alert alert-warning" role="alert">
+                                EL TOTAL A PAGAR NETO ES MAYOR O IGUAL A $100.00, PERO EL PROVEEDOR NO FUE REGISTRADO COMO GRAN CONTRIBUYENTE, POR FAVOR ACTUALICE LA INFORMACIÓN DEL PROVEEDOR PARA PODER APLICAR LA PERCEPCIÓN.
+                            </div>                    
+                            </b>
+                        ';
+                    } else {
+
+                    }
                     // IMPORTANTE: EL TOTAL A PAGAR NETO ES MAYOR O IGUAL A $100.00, PERO EL PROVEEDOR NO FUE REGISTRADO COMO GRAN CONTRIBUYENTE, POR FAVOR ACTUALICE LA INFORMACIÓN DEL PROVEEDOR PARA PODER APLICAR LA PERCEPCIÓN.
-                    $output['footerTotales'] = '
-                        <b>
-                        <div class="row text-right">
-                            <div class="col-8">
-                                Subtotal
-                            </div>
-                            <div class="col-4">
-                                $ '.number_format($totalSinIVA, 2, '.', ',').'
-                            </div>
-                        </div>
-                        <div class="row text-right">
-                            <div class="col-8">
-                                IVA 13%
-                            </div>
-                            <div class="col-4">
-                                $ '.number_format($totalIVA, 2, '.', ',').'
-                            </div>
-                        </div>
-                        <div class="row text-right">
-                            <div class="col-8">
-                                Total a pagar
-                            </div>
-                            <div class="col-4">
-                                $ '.number_format($totalPagarSinPercepcion, 2, '.', ',').'
-                            </div>
-                        </div>                    
-                        </b>
-                    ';
+
 
                 }
 
