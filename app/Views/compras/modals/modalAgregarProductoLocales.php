@@ -33,11 +33,11 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-outline">
-                                <input type="number" id="costoUnitario" name="costoUnitario" class="form-control" value="<?= $campos['precioUnitario']; ?>" step="0.01" required>
+                                <input type="number" id="costoUnitario" name="costoUnitario" class="form-control" value="<?= $campos['precioUnitarioIVA']; ?>" step="0.01" required>
                                 <label class="form-label" for="costoUnitario">Costo unitario (IVA)</label>
                             </div>
                             <div class="text-right">
-                                <small>Sin IVA: $ <span id="precioUnitarioIVA"><?= $campos['precioUnitarioIVA']; ?></span></small>
+                                <small>Sin IVA: $ <span id="precioUnitarioIVA"><?= $campos['precioUnitario']; ?></span></small>
                             </div>
                         </div>
                         <div class="col-md-4">
