@@ -111,11 +111,6 @@
                     </tr>
                 </tfoot>
         </table>
-        <div>
-            <div class="alert alert-warning " role="alert">
-                EL TOTAL A PAGAR NETO ES MAYOR O IGUAL A $100.00, PERO EL PROVEEDOR NO FUE REGISTRADO COMO GRAN CONTRIBUYENTE, POR FAVOR ACTUALICE LA INFORMACIÓN DEL PROVEEDOR PARA PODER APLICAR LA PERCEPCIÓN.
-            </div>
-        </div>
     </div>
 </form>
     <div class="row mb-4 mt-4">
