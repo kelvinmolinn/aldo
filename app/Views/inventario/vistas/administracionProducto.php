@@ -3,13 +3,9 @@
 
 <div class="row mb-4">
     <div class="col-md-6 text-left">
-<<<<<<< Updated upstream
+
         <button type="button" id="btnAbrirModal2" class="btn btn-warning" onclick="modalAlertaExistencia(0);">
             Existencia mínima 
-=======
-        <button type="button" id="btnAbrirModal2" class="btn btn-secondary" onclick="modalAlertaExistencia(0);">
-            Existencias mínimas (<span id="countMinima">0</span>)
->>>>>>> Stashed changes
         </button>
     </div>
     <div class="col-md-6 text-right">
