@@ -196,6 +196,8 @@ $routes->group('compras/admin-compras', function($routes) {
     $routes->post('tabla/continuar/compra', 'compras\administracionCompras::tablaContinuarCompras');
     $routes->post('form/producto/compra', 'compras\administracionCompras::modalAgregarProducto');
     $routes->post('operacion/guardar/productos', 'compras\administracionCompras::modalProductosOperacion');
+    $routes->post('eliminar/producto/compra', 'compras\administracionCompras::eliminarProductoCompra');
+
 });
 // Rutas de errores
 $routes->get('404', 'Errores::error404');
