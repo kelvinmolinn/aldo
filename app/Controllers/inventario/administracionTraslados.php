@@ -52,7 +52,7 @@ class AdministracionTraslados extends Controller
                 $salidaProducto = new inv_traslados();
     
                  // seleccionar solo los campos que estan en la modal (solo los input y select)
-                $data['campos'] = $producto->select('inv_traslados.trasladosId,inv_traslados.sucursalIdSalida,inv_traslados.sucursalIdEntrada,inv_traslados.estadoDescargo,conf_sucursales.sucursalId,conf_sucursales.sucursal')
+                $data['campos'] = $producto->select('inv_traslados.trasladosId,inv_traslados.sucursalIdSalida,inv_traslados.sucursalIdEntrada,inv_traslados.obsSolicitud,inv_traslados.estadoTraslado,conf_sucursales.sucursalId,conf_sucursales.sucursal')
                 ->join('conf_sucursales', 'conf_sucursales.sucursalId = inv_traslados.sucursalId')
                 ->where('inv_traslados.flgElimina', 0)
                 ->where('inv_traslados.trasladosId', $trasladosId)->first();
@@ -62,13 +62,56 @@ class AdministracionTraslados extends Controller
                 $data['campos'] = [
                     'trasladosId'             => 0,
                     'sucursalIdSalida'        => '',
-                    'sucursalIdEntrada'       => ''
+                    'sucursalIdEntrada'       => '',
+                    'obsSolicitud'             => ''
     
                 ];
             }
             $data['operacion'] = $operacion;
     
             return view('inventario/modals/modalAdministracionTraslados', $data);
+        }
+
+        public function modalTrasladoOperacion()
+        {
+            // Continuar con la operación de inserción o actualización en la base de datos
+            $operacion = $this->request->getPost('operacion');
+            $trasladosId = $this->request->getPost('trasladosId');
+            $model = new inv_traslados();
+            $session = session();
+            $usuarioIdAgrega = $session->get("usuarioId");
+    
+            $data = [
+                'sucursalIdSalida'        => $this->request->getPost('sucursalIdSalida'),
+                'sucursalIdEntrada'       => $this->request->getPost('sucursalIdEntrada'),
+                'fhSolicitud'              => date('Y-m-d H:i:s'),
+                'obsSolicitud'             => $this->request->getPost('obsSolicitud'),
+                'estadoTraslado'          => "Pendiente",
+                'usuarioIdSalida'         => $usuarioIdAgrega
+            ];
+        
+            if ($operacion == 'editar') {
+                $operacionSalida = $model->update($this->request->getPost('trasladosId'), $data);
+            } else {
+                // Insertar datos en la base de datos
+                $operacionSalida = $model->insert($data);
+            }
+        
+            if ($operacionSalida) {
+                // Si el insert fue exitoso, devuelve el último ID insertado
+                return $this->response->setJSON([
+                    'success' => true,
+                    'mensaje' => 'Traslado ' . ($operacion == 'editar' ? 'actualizado' : 'agregado') . ' correctamente',
+                    'trasladosId' => ($operacion == 'editar' ? $this->request->getPost('trasladosId') : $model->insertID())
+                ]);
+            } else {
+                // Si el insert falló, devuelve un mensaje de error
+                return $this->response->setJSON([
+                    'success' => false,
+                    'mensaje' => 'No se pudo insertar el traslado'
+                ]);
+            }
+          
         }
 
 }

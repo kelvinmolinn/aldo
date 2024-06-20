@@ -28,12 +28,20 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-select-control">
-                                <select name="usuarioIdEntrada" id="usuarioIdEntrada" class="form-control" style="width: 100%;">
+                                <select name="sucursalIdEntrada" id="sucursalIdEntrada" class="form-control" style="width: 100%;">
                                     <option></option>
                                     <?php foreach ($sucursales as $sucursal) : ?>
                                         <option value="<?php echo $sucursal['sucursalId']; ?>"><?php echo $sucursal['sucursal']; ?></option>
                                     <?php endforeach; ?>
                                 </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col-md-12">
+                            <div class="form-outline">
+                                <input type="text" id="obsSolicitud" name="obsSolicitud" class="form-control"  value="<?= $campos['obsSolicitud']; ?>" required>
+                                <label class="form-label" for="obsSolicitud">Observación de la solicitud del traslado</label>
                             </div>
                         </div>
                     </div>
@@ -58,7 +66,7 @@
 $(document).ready(function() {
     // Inicializar Select2
     $("#sucursalIdSalida").select2({ placeholder: 'Sucursal Salida' });
-    $("#usuarioIdEntrada").select2({ placeholder: 'Sucursal Entrada' });
+    $("#sucursalIdEntrada").select2({ placeholder: 'Sucursal Entrada' });
    
     // Evitar la entrada de 'e', 'E', '+', y '-' en los campos de número
     document.querySelectorAll('.number-input').forEach(function(input) {
