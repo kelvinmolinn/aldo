@@ -730,7 +730,11 @@ class administracionCompras extends Controller
                         "productoId"            => $this->request->getPost('selectProductos'),
                         "cantidadProducto"      => $this->request->getPost('cantidadProducto'),
                         "precioUnitario"        => $this->request->getPost('costoUnitario'),
-                        "totalCompraDetalle"    => $totalCompraDetalle
+                        "precioUnitarioIVA"     => '0.00',
+                        "ivaUnitario"           => '0.00',
+                        "ivaTotal"              => '0.00',
+                        "totalCompraDetalle"    => $totalCompraDetalle,
+                        "totalCompraDetalleIVA" => '0.00'
                     ];
         
                     // Insertar datos en la base de datos
