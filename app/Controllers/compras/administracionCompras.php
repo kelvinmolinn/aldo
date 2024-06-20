@@ -370,7 +370,7 @@ class administracionCompras extends Controller
                     ';
 
                     $columna6 .= '
-                        <button class="btn btn-danger mb-1" onclick="eliminarProducto(`'.$columna['compraDetalleId'].'`)" data-toggle="tooltip" data-placement="top" title="Eliminar">
+                        <button type= "button" class="btn btn-danger mb-1" onclick="eliminarProducto(`'.$columna['compraDetalleId'].'`)" data-toggle="tooltip" data-placement="top" title="Eliminar">
                             <i class="fas fa-trash"></i>
                         </button>
                     ';
@@ -533,6 +533,12 @@ class administracionCompras extends Controller
             ->select('productoId,producto')
             ->where('flgElimina', 0)
             ->findAll();
+        
+        $consultaCompra = $compras
+            ->select("paisId, porcentajeIva")
+            ->where("flgElimina", 0)
+            ->where("compraId", $compraId)
+            ->first(); 
 
         if($operacion == 'editar') {
 
@@ -542,26 +548,37 @@ class administracionCompras extends Controller
             ->where('compraDetalleId', $compraDetalleId)
             ->first();
         } else {
-            $data['campos'] = [
-                'compraDetalleId'       => 0,
-                'compraId'              => '',
-                'productoId'            => '',
-                'cantidadProducto'      => '',
-                'precioUnitario'        => '0.00',
-                'precioUnitarioIVA'     => '',
-                'ivaUnitario'           => '0.00',
-                'ivaTotal'              => '0.00',
-                'totalCompraDetalle'    => '0.00',
-                'totalCompraDetalleIVA' => '0.00'
-            ];
+            if ($consultaCompra['paisId'] == 61 ) {
+                $data['campos'] = [
+                    'compraDetalleId'       => 0,
+                    'compraId'              => '',
+                    'productoId'            => '',
+                    'cantidadProducto'      => '',
+                    'precioUnitario'        => '0.00',
+                    'precioUnitarioIVA'     => '',
+                    'ivaUnitario'           => '0.00',
+                    'ivaTotal'              => '0.00',
+                    'totalCompraDetalle'    => '0.00',
+                    'totalCompraDetalleIVA' => '0.00'
+                ];
+            }else{
+                $data['campos'] = [
+                    'compraDetalleId'       => 0,
+                    'compraId'              => '',
+                    'productoId'            => '',
+                    'cantidadProducto'      => '',
+                    'precioUnitario'        => '',
+                    'precioUnitarioIVA'     => '',
+                    'ivaUnitario'           => '0.00',
+                    'ivaTotal'              => '0.00',
+                    'totalCompraDetalle'    => '0.00',
+                    'totalCompraDetalleIVA' => '0.00'
+                ];
+            }
         }
         $data['operacion'] = $operacion;
 
-        $consultaCompra = $compras
-        ->select("paisId, porcentajeIva")
-        ->where("flgElimina", 0)
-        ->where("compraId", $compraId)
-        ->first(); 
+
 
         $data['porcentajeIva'] = $consultaCompra['porcentajeIva'];
         $data['ivaMultiplicar'] = ($consultaCompra['porcentajeIva'] / 100) + 1;
@@ -585,13 +602,25 @@ class administracionCompras extends Controller
         $cantidad =         $this->request->getPost('cantidadProducto');
         $precioUnitarioIva =   $this->request->getPost('costoUnitario');
 
+        $precioUnitarioInternacional = $this->request->getPost('costoUnitario');
+
+
         $paisId =   $this->request->getPost('paisId');
 
-        $precioUnitario         = $precioUnitarioIva / $ivaMultiplicar;
-        $ivaUnitario            = $precioUnitarioIva - $precioUnitario;
-        $ivaTotal               = $ivaUnitario * $cantidad;
-        $totalCompraDetalle     = $precioUnitario * $cantidad;
-        $totalCompraDetalleIVA  = $precioUnitarioIva * $cantidad;
+        if($paisId == 61) {
+            $precioUnitario         = $precioUnitarioIva / $ivaMultiplicar;
+            $ivaUnitario            = $precioUnitarioIva - $precioUnitario;
+            $ivaTotal               = $ivaUnitario * $cantidad;
+            $totalCompraDetalle     = $precioUnitario * $cantidad;
+            $totalCompraDetalleIVA  = $precioUnitarioIva * $cantidad;
+        } else {
+            $precioUnitario         = $precioUnitarioInternacional;
+            $precioUnitarioiva      = 0;
+            $ivaUnitario            = 0;
+            $ivaTotal               = 0;
+            $totalCompraDetalle     = $precioUnitario * $cantidad;
+            $totalCompraDetalleIVA  = 0;
+        }
 
         if($operacion == 'editar') {
             // Todo el camino de un "Editar", sin validar si existe o no, simplemente es un editar del registro
@@ -639,11 +668,10 @@ class administracionCompras extends Controller
                     }
                 } else {
                     // Internacional, pero ya existe un producto con ese costo, actualizar y usar de ejemplo el local para reasignar variables
+                    $cantidadProducto = $ExisteProducto["cantidadProducto"] + $this->request->getPost('cantidadProducto');
+
                     $data = [
-                        "compraId"              => $this->request->getPost('compraId'),
-                        "productoId"            => $this->request->getPost('selectProductos'),
-                        "cantidadProducto"      => $this->request->getPost('cantidadProducto'),
-                        "precioUnitario"        => $this->request->getPost('costoUnitario'),
+                        "cantidadProducto"      => $cantidadProducto,
                         "totalCompraDetalle"    => $totalCompraDetalle
                     ];
         
@@ -670,7 +698,7 @@ class administracionCompras extends Controller
                     $data = [
                         "compraId"              => $this->request->getPost('compraId'),
                         "productoId"            => $this->request->getPost('selectProductos'),
-                        "cantidadProducto"      => $this->request->getPost('cantidadProducto') + $this->request->getPost('cantidadProducto'),
+                        "cantidadProducto"      => $this->request->getPost('cantidadProducto'),
                         "precioUnitario"        => $precioUnitario,
                         "precioUnitarioIVA"     => $precioUnitarioIva,
                         "ivaUnitario"           => $ivaUnitario,
@@ -792,7 +820,7 @@ class administracionCompras extends Controller
                 $data = [
                     "compraId"              => $this->request->getPost('compraId'),
                     "productoId"            => $this->request->getPost('selectProductos'),
-                    "cantidadProducto"      => $this->request->getPost('cantidadProducto') + $this->request->getPost('cantidadProducto'),
+                    "cantidadProducto"      => $this->request->getPost('cantidadProducto'),
                     "precioUnitario"        => $precioUnitario,
                     "precioUnitarioIVA"     => $precioUnitarioIva,
                     "ivaUnitario"           => $ivaUnitario,
