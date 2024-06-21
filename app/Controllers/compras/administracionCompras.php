@@ -595,6 +595,8 @@ class administracionCompras extends Controller
     }
 
     function modalProductosOperacion(){
+        $comprasDetalle = new comp_compras_detalle;
+
         $operacion = $this->request->getPost('operacion');
         $compraDetalleId = $this->request->getPost('compraDetalleId');
 
@@ -624,13 +626,69 @@ class administracionCompras extends Controller
 
         if($operacion == 'editar') {
             // Todo el camino de un "Editar", sin validar si existe o no, simplemente es un editar del registro
+            if($paisId == 61){
+                $data = [
+                    "compraId"              => $this->request->getPost('compraId'),
+                    "productoId"            => $this->request->getPost('selectProductos'),
+                    "cantidadProducto"      => $this->request->getPost('cantidadProducto'),
+                    "precioUnitario"        => $precioUnitario,
+                    "precioUnitarioIVA"     => $precioUnitarioIva,
+                    "ivaUnitario"           => $ivaUnitario,
+                    "ivaTotal"              => $ivaTotal,
+                    "totalCompraDetalle"    => $totalCompraDetalle,
+                    "totalCompraDetalleIVA" => $totalCompraDetalleIVA
+                ];
+    
+                    $productoCompras = $comprasDetalle->update($this->request->getPost('compraDetalleId'), $data);
+    
+                if ($productoCompras) {
+                    // Si el insert fue exitoso, devuelve el último ID insertado
+                    return $this->response->setJSON([
+                        'success' => true,
+                        'mensaje' => 'Producto de la compra actualizada correctamente',
+                        'compraDetalleId' =>  $this->request->getPost('compraDetalleId')
+                    ]);
+                } else {
+                    // Si el insert falló, devuelve un mensaje de error
+                    return $this->response->setJSON([
+                        'success' => false,
+                        'mensaje' => 'No se pudo actualizar la compra'
+                    ]);
+                }
+    
+            } else {
+    
+                $data = [
+                    "compraId"              => $this->request->getPost('compraId'),
+                    "productoId"            => $this->request->getPost('selectProductos'),
+                    "cantidadProducto"      => $this->request->getPost('cantidadProducto'),
+                    "precioUnitario"        => $this->request->getPost('costoUnitario'),
+                    "totalCompraDetalle"    => $totalCompraDetalle
+                ];
+    
+                    $productoCompras = $comprasDetalle->update($this->request->getPost('compraDetalleId'), $data);
+
+                if ($productoCompras) {
+                    // Si el insert fue exitoso, devuelve el último ID insertado
+                    return $this->response->setJSON([
+                        'success' => true,
+                        'mensaje' => 'Producto de la compra actualizada correctamente',
+                        'compraDetalleId' =>  $this->request->getPost('compraDetalleId') 
+                    ]);
+                } else {
+                    // Si el insert falló, devuelve un mensaje de error
+                    return $this->response->setJSON([
+                        'success' => false,
+                        'mensaje' => 'No se pudo actualizar la compra'
+                    ]);
+                }
+            }
 
         } else {
             // Todo el camino del "Agregar", evaluando y verificando si el producto ya fue agregado al mismo costo, recalculando, etc
-            $comprasDetalle = new comp_compras_detalle;
-
             $ExisteProducto = $comprasDetalle
                 ->select('compraDetalleId, cantidadProducto')
+                ->where('compraId', $this->request->getPost('compraId'))
                 ->where('productoId', $this->request->getPost('selectProductos'))
                 ->where('precioUnitarioIVA', $precioUnitarioIva)
                 ->first();
@@ -656,7 +714,7 @@ class administracionCompras extends Controller
                         // Si el insert fue exitoso, devuelve el último ID insertado
                         return $this->response->setJSON([
                             'success' => true,
-                            'mensaje' => 'Producto de la compra '.($operacion == 'editar' ? 'actualizado' : 'agregado').' correctamente',
+                            'mensaje' => 'Producto de la compra agregado correctamente',
                             'compraDetalleId' => ($operacion == 'editar' ? $compraDetalleId : $comprasDetalle->insertID())
                         ]);
                     } else {
@@ -714,14 +772,14 @@ class administracionCompras extends Controller
                         // Si el insert fue exitoso, devuelve el último ID insertado
                         return $this->response->setJSON([
                             'success' => true,
-                            'mensaje' => 'Producto de la compra '.($operacion == 'editar' ? 'actualizado' : 'agregado').' correctamente',
-                            'compraDetalleId' => ($operacion == 'editar' ? $this->request->getPost('compraDetalleId') : $comprasDetalle->insertID())
+                            'mensaje' => 'Producto de la compra agregado correctamente',
+                            'compraDetalleId' =>  $this->request->getPost('compraDetalleId') 
                         ]);
                     } else {
                         // Si el insert falló, devuelve un mensaje de error
                         return $this->response->setJSON([
                             'success' => false,
-                            'mensaje' => 'No se pudo insertar el producto'
+                            'mensaje' => 'No se pudo insertar la compra'
                         ]);
                     }
                 } else {
@@ -744,14 +802,14 @@ class administracionCompras extends Controller
                         // Si el insert fue exitoso, devuelve el último ID insertado
                         return $this->response->setJSON([
                             'success' => true,
-                            'mensaje' => 'Producto de la compra '.($operacion == 'editar' ? 'actualizado' : 'agregado').' correctamente',
-                            'compraDetalleId' => ($operacion == 'editar' ? $this->request->getPost('compraDetalleId') : $comprasDetalle->insertID())
+                            'mensaje' => 'Producto de la compra agregada correctamente',
+                            'compraDetalleId' => $this->request->getPost('compraDetalleId') 
                         ]);
                     } else {
                         // Si el insert falló, devuelve un mensaje de error
                         return $this->response->setJSON([
                             'success' => false,
-                            'mensaje' => 'No se pudo insertar el producto'
+                            'mensaje' => 'No se pudo insertar la compra'
                         ]);
                     }
                 }
