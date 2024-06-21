@@ -33,12 +33,47 @@
                     </div>
 
                     <div class="row mb-2">
-                        <div class="col-md-4">
+                        <div class="col-md-6">
                             <div class="form-select-control">
+                                <select name="selectTipoCompra" id="selectTipoCompra" style="width: 100%;" required>
+                                    <option value=""></option>
+                                    <option value="Local">Local</option>
+                                    <option value="Internacional">Internacional</option>                                    
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-select-control">
+                                <select name="selectSucursal" id="selectSucursal" style="width: 100%;" required>
+                                    <option value=""></option>
+                                    
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div id="select" class="form-select-control">
+                                <select name="selectVacio" id="selectVacio" style="width: 100%;" required>
+                                    <option value=""></option>
+                                </select>
+                            </div>
+
+                            <div id="proveedorLocal" class="form-select-control">
                                 <select name="selectProveedor" id="selectProveedor" style="width: 100%;" required>
                                     <option value=""></option>
                                     <?php foreach ($selectProveedor as $selectProveedor){ ?>
                                         <option value="<?php echo $selectProveedor['proveedorId']; ?>"><?php echo $selectProveedor['proveedor']; ?></option>
+                                    <?php } ?>
+                                </select>
+                            </div>
+
+                            <div id="proveedorInternacional" class="form-select-control">
+                                <select name="selectProveedorInternacionales" id="selectProveedorInternacionales" style="width: 100%;" required>
+                                    <option value=""></option>
+                                    <?php foreach ($selectProveedorInternacionales as $selectProveedorInternacionales){ ?>
+                                        <option value="<?php echo $selectProveedorInternacionales['proveedorId']; ?>"><?php echo $selectProveedorInternacionales['proveedor']; ?></option>
                                     <?php } ?>
                                 </select>
                             </div>
@@ -80,12 +115,24 @@
 </form>
 <script>
     $(document).ready(function(){
+        
+        $("#select").show();
+        $("#proveedorLocal").hide();
+        $("#proveedorInternacional").hide();
 
-    	$("#tipoDocumento").select2({
+        $("#tipoDocumento").select2({
             placeholder: 'Tipo documento',
             dropdownParent: $('#modalNuevaCompra')
         });
         $("#selectProveedor").select2({
+            placeholder: 'Proveedor',
+            dropdownParent: $('#modalNuevaCompra')
+        });
+        $("#selectProveedorInternacionales").select2({
+            placeholder: 'Proveedor',
+            dropdownParent: $('#modalNuevaCompra')
+        });
+        $("#selectVacio").select2({
             placeholder: 'Proveedor',
             dropdownParent: $('#modalNuevaCompra')
         });
@@ -96,8 +143,32 @@
         $("#selectRetaceo").select2({
             placeholder: 'Aplica retaceo',
             dropdownParent: $('#modalNuevaCompra')
-        });    
+        });
+        $("#selectTipoCompra").select2({
+            placeholder: 'Tipo de compra',
+            dropdownParent: $('#modalNuevaCompra')
+        });
+        $("#selectSucursal").select2({
+            placeholder: 'Sucursal',
+            dropdownParent: $('#modalNuevaCompra')
+        });
 
+
+        $("#selectTipoCompra").on('change', function() {
+            if ($(this).val() == 'Local') {
+                $("#selectPais").val('61').trigger('change');
+                $("#selectPais").prop('readonly', true);
+                $("#proveedorLocal").show();
+                $("#proveedorInternacional").hide();
+                $("#select").hide();
+            } else {
+                $("#selectPais").val('').trigger('change');
+                $("#selectPais").prop('readonly', false);
+                $("#proveedorInternacional").show();
+                $("#proveedorLocal").hide();
+                $("#select").hide();
+            }
+        });
 
         $("#frmModal").submit(function(event) {
             event.preventDefault();

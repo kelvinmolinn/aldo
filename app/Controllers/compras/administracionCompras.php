@@ -131,7 +131,14 @@ class administracionCompras extends Controller
         $data['selectProveedor'] = $proveedor
                         ->select("proveedorId,proveedor")
                         ->where("flgElimina", 0)
+                        ->where("tipoProveedorOrigen", "Local")
                         ->findAll();
+        $data['selectProveedorInternacionales'] = $proveedor
+                        ->select("proveedorId,proveedor")
+                        ->where("flgElimina", 0)
+                        ->where("tipoProveedorOrigen", "Internacional")
+                        ->findAll();
+
         $data['selectPais'] = $pais
                         ->select("paisId,pais")
                         ->where("flgElimina", 0)
