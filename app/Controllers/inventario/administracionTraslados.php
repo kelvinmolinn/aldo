@@ -114,4 +114,80 @@ class AdministracionTraslados extends Controller
           
         }
 
+        public function tablaTraslados()
+{
+    $trasladosId = $this->request->getPost('trasladosId');
+    $mostrarTraslado = new inv_traslados();
+    $vistaUsuariosEmpleados = new vista_usuarios_empleados();
+    $usuarioIdAgrega = $this->request->getPost("usuarioId");
+    $datos = $mostrarTraslado
+        ->select('inv_traslados.trasladosId,inv_traslados.usuarioIdSalida,inv_traslados.usuarioIdEntrada,inv_traslados.sucursalIdSalida,inv_traslados.sucursalIdEntrada, inv_traslados.fhSolicitud, inv_traslados.obsSolicitud, inv_traslados.estadoTraslado, conf_sucursales.sucursalId, conf_sucursales.sucursal, , vista_usuarios_empleados.primerNombre, vista_usuarios_empleados.primerApellido')
+        ->join('conf_sucursales', 'conf_sucursales.sucursalId = inv_traslados.sucursalIdSalida')
+        ->join('vista_usuarios_empleados', 'inv_traslados.usuarioIdSalida = vista_usuarios_empleados.usuarioId')
+        ->where('inv_traslados.flgElimina', 0)
+        ->findAll();
+
+    $output['data'] = array();
+    $n = 1; // Variable para contar las filas
+    foreach ($datos as $columna) {
+        // Determina la clase Bootstrap basada en el estado del descargo
+        $estadoClase = '';
+        if ($columna['estadoTraslado'] === 'Pendiente') {
+            $estadoClase = 'badge badge-secondary';
+        } elseif ($columna['estadoTraslado'] === 'Finalizado') {
+            $estadoClase = 'badge badge-success';
+        } elseif ($columna['estadoTraslado'] === 'Anulado') {
+            $estadoClase = 'badge badge-danger';
+        }
+
+        // Aquí construye tus columnas
+        $columna1 = $n;
+        $columna2 = "<b>Solicitado por:</b> " . $columna['primerNombre'] . " " . $columna['primerApellido'] . " (" . $columna['sucursal'] . ")"."<br>"."<b>Autorizado por: </b>";
+        $columna3 = "<b>Solicitud:</b> " . $columna['fhSolicitud']. "<br>" . "<b>Autorización:</b>";
+        $columna4 = "<b>Motivo/Justificación:</b> " . $columna['obsSolicitud'] . "<br>" . "<b>Estado:</b> <span class='" . $estadoClase . "'>" . $columna['estadoTraslado'] . "</span>";
+        
+        // Construir botones basado en estadoTraslado
+        if ($columna['estadoTraslado'] === 'Pendiente') {
+            $jsonActualizarDescargo = [
+                "trasladosId"          => $columna['trasladosId']
+            ];
+            $columna5 = '
+                <button class="btn btn-primary mb-1" onclick="cambiarInterfaz(`inventario/admin-salida/vista/actualizar/descargo`, '.htmlspecialchars(json_encode($jsonActualizarDescargo)).');" data-toggle="tooltip" data-placement="top" title="Continuar traslado">
+                    <i class="fas fa-sync-alt"></i> <span> Continuar</span>
+                </button>
+
+            ';
+        } elseif ($columna['estadoTraslado'] === 'Finalizado') {
+            $columna5 = '
+                <button class="btn btn-info mb-1" onclick="modalAdministracionVerDescargo(`'.$columna['trasladosId'].'`);" data-toggle="tooltip" data-placement="top" title="Ver ">
+                    </i><span> Ver Traslado</span>
+                </button>
+            ';
+        } else {
+            $columna5 = '
+                   <button class="btn btn-info mb-1" onclick="modalAdministracionVerDescargo(`'.$columna['trasladosId'].'`);" data-toggle="tooltip" data-placement="top" title="Ver descargo">
+        <span> Ver Traslado</span>
+                </button>'; // No buttons if the status is neither 'Pendiente' nor 'Finalizado'
+        }
+
+        // Agrega la fila al array de salida
+        $output['data'][] = array(
+            $columna1,
+            $columna2,
+            $columna3,
+            $columna4,
+            $columna5
+        );
+
+        $n++;
+    }
+
+    // Verifica si hay datos
+    if ($n > 1) {
+        return $this->response->setJSON($output);
+    } else {
+        return $this->response->setJSON(array('data' => '')); // No hay datos, devuelve un array vacío
+    }
+}
+
 }
