@@ -681,59 +681,7 @@ class AdministracionProducto extends Controller
         return view('inventario/modals/modalAdministracionAlertaExistencia', $data);
     }
 
- /*   public function tablaExistenciaMinima()
-    {
-        $productoId = $this->request->getPost('productoId');
-        $mostrarProductoExistencia = new inv_productos_existencias();
-        $datos = $mostrarProductoExistencia
-            ->select('inv_productos_existencias.productoExistenciaId,inv_productos_existencias.existenciaProducto,inv_productos_existencias.existenciaReservada,conf_sucursales.sucursalId,conf_sucursales.sucursal,inv_productos.productoId,inv_productos.producto,inv_productos.existenciaMinima,cat_14_unidades_medida.abreviaturaUnidadMedida')
-            ->join('conf_sucursales', 'conf_sucursales.sucursalId = inv_productos_existencias.sucursalId')
-            ->join('inv_productos', 'inv_productos.productoId = inv_productos_existencias.productoId')
-            ->join('cat_14_unidades_medida', 'cat_14_unidades_medida.unidadMedidaId = inv_productos.unidadMedidaId')
-            ->where('inv_productos_existencias.flgElimina', 0)
-            ->findAll();
-    
-        // Construye el array de salida para solo mostrar una 
-        $output['data'] = array();
-        $n = 1; // Variable para contar las filas
-        foreach ($datos as $columna) {
-            // Aquí construye tus columnas
-            $columna1 = $n;
-            $columna2 = "<b>Producto:</b> " . $columna['producto'].' '.'('.$columna['sucursal'].')';
-            $columna3 = "<b>Existencia:</b> " . $columna['existenciaProducto'].' '.'('.$columna['abreviaturaUnidadMedida'].')';
-            $columna4 = "<b>Existencia mínima:</b> " . $columna['existenciaMinima'].' '.'('.$columna['abreviaturaUnidadMedida'].')';
-    
-            // Lógica para definir el mensaje en la columna 5 con clases CSS
-            if ($columna['existenciaProducto'] == 0) {
-                $columna5 = '<span class="text-danger">Stock agotado</span>';
-            } elseif ($columna['existenciaProducto'] < $columna['existenciaMinima']) {
-                $columna5 = '<span class="text-warning">Stock por debajo del nivel mínimo</span>';
-            } elseif ($columna['existenciaProducto'] == $columna['existenciaMinima']) {
-                $columna5 = '<span class="text-warning">Stock en niveles mínimos</span>';
-            } else {
-                $columna5 = '<span class="text-success">Stock en niveles aceptables</span>';
-            }
-    
-            // Agrega la fila al array de salida
-            $output['data'][] = array(
-                $columna1,
-                $columna2,
-                $columna3,
-                $columna4,
-                $columna5,
-            );
-    
-            $n++;
-        }
-    
-        // Verifica si hay datos
-        if ($n > 1) {
-            return $this->response->setJSON($output);
-        } else {
-            return $this->response->setJSON(array('data' => '')); // No hay datos, devuelve un array vacío
-        }
-    }
-    */
+
     public function tablaExistenciaMinima()
 {
     $productoId = $this->request->getPost('productoId');
