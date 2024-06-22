@@ -170,6 +170,7 @@ $routes->group('inventario/admin-traslados', function($routes) {
     $routes->post('form/traslados', 'inventario\AdministracionTraslados::modalAdministracionTraslados');
     $routes->post('tabla/traslados',  'inventario\AdministracionTraslados::tablaTraslados');
     $routes->post('operacion/guardar/traslados', 'inventario\AdministracionTraslados::modalTrasladoOperacion');
+    $routes->post('vista/actualizar/traslados', 'inventario\AdministracionTraslados::vistaContinuarTraslados');
 
     //
 });

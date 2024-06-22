@@ -121,8 +121,9 @@ class AdministracionTraslados extends Controller
     $vistaUsuariosEmpleados = new vista_usuarios_empleados();
     $usuarioIdAgrega = $this->request->getPost("usuarioId");
     $datos = $mostrarTraslado
-        ->select('inv_traslados.trasladosId,inv_traslados.usuarioIdSalida,inv_traslados.usuarioIdEntrada,inv_traslados.sucursalIdSalida,inv_traslados.sucursalIdEntrada, inv_traslados.fhSolicitud, inv_traslados.obsSolicitud, inv_traslados.estadoTraslado, conf_sucursales.sucursalId, conf_sucursales.sucursal, , vista_usuarios_empleados.primerNombre, vista_usuarios_empleados.primerApellido')
-        ->join('conf_sucursales', 'conf_sucursales.sucursalId = inv_traslados.sucursalIdSalida')
+        ->select('inv_traslados.trasladosId,inv_traslados.usuarioIdSalida,inv_traslados.usuarioIdEntrada,inv_traslados.sucursalIdSalida,inv_traslados.sucursalIdEntrada, inv_traslados.fhSolicitud, inv_traslados.obsSolicitud, inv_traslados.estadoTraslado, cs.sucursal AS sucursalEntrada, s.sucursal AS sucursalSalida, vista_usuarios_empleados.primerNombre, vista_usuarios_empleados.primerApellido')
+        ->join('conf_sucursales AS s', 's.sucursalId = inv_traslados.sucursalIdSalida')
+        ->join('conf_sucursales AS cs', 'cs.sucursalId = inv_traslados.sucursalIdEntrada','left')
         ->join('vista_usuarios_empleados', 'inv_traslados.usuarioIdSalida = vista_usuarios_empleados.usuarioId')
         ->where('inv_traslados.flgElimina', 0)
         ->findAll();
@@ -142,7 +143,7 @@ class AdministracionTraslados extends Controller
 
         // Aquí construye tus columnas
         $columna1 = $n;
-        $columna2 = "<b>Solicitado por:</b> " . $columna['primerNombre'] . " " . $columna['primerApellido'] . " (" . $columna['sucursal'] . ")"."<br>"."<b>Autorizado por: </b>";
+        $columna2 = "<b>Solicitado por:</b> " . $columna['primerNombre'] . " " . $columna['primerApellido'] . " (" . $columna['sucursalSalida'] . ")"."<br>"."<b>Autorizado por: </b>". $columna['sucursalEntrada'];
         $columna3 = "<b>Solicitud:</b> " . $columna['fhSolicitud']. "<br>" . "<b>Autorización:</b>";
         $columna4 = "<b>Motivo/Justificación:</b> " . $columna['obsSolicitud'] . "<br>" . "<b>Estado:</b> <span class='" . $estadoClase . "'>" . $columna['estadoTraslado'] . "</span>";
         
@@ -152,7 +153,7 @@ class AdministracionTraslados extends Controller
                 "trasladosId"          => $columna['trasladosId']
             ];
             $columna5 = '
-                <button class="btn btn-primary mb-1" onclick="cambiarInterfaz(`inventario/admin-salida/vista/actualizar/descargo`, '.htmlspecialchars(json_encode($jsonActualizarDescargo)).');" data-toggle="tooltip" data-placement="top" title="Continuar traslado">
+                <button class="btn btn-primary mb-1" onclick="cambiarInterfaz(`inventario/admin-traslados/vista/actualizar/traslados`, '.htmlspecialchars(json_encode($jsonActualizarDescargo)).');" data-toggle="tooltip" data-placement="top" title="Continuar traslado">
                     <i class="fas fa-sync-alt"></i> <span> Continuar</span>
                 </button>
 
@@ -189,5 +190,34 @@ class AdministracionTraslados extends Controller
         return $this->response->setJSON(array('data' => '')); // No hay datos, devuelve un array vacío
     }
 }
+
+    public function vistaContinuarTraslados(){
+        $session = session();
+
+        $trasladosId = $this->request->getPost('trasladosId');
+
+
+        $camposSession = [
+            'renderVista' => 'No',
+            'trasladosId'    => $trasladosId
+        ];
+        $session->set([
+            'route'             => 'inventario/admin-traslados/vista/actualizar/traslados',
+            'camposSession'     => json_encode($camposSession)
+        ]);
+        $data['trasladosId'] = $trasladosId;
+        $mostrarSalida = new inv_traslados();
+    
+                // Consulta para traer los valores de los input que se pueden actualizar
+                $data['dataSucursal'] = $mostrarSalida
+                ->select("conf_sucursales.sucursal")
+                ->join('conf_sucursales', 'conf_sucursales.sucursalId = inv_traslados.usuarioIdSalida')
+                ->where("inv_traslados.flgElimina", 0)
+                ->where("inv_traslados.trasladosId", $trasladosId)
+                ->first(); 
+
+        
+        return view('inventario/vistas/pageContinuarTraslados', $data);
+    }
 
 }

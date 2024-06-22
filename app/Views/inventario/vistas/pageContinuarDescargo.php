@@ -3,7 +3,7 @@
 <h2>Continuar descargo N°: <?php echo $descargosId;?> - <?php echo $dataSucursal['sucursal'];?></h2>
 <hr>
 <div class="row mb-4">
-<div class="col-md-6">
+    <div class="col-md-6">
         <button type= "button" id="btnRegresarDescargo" class="btn btn-secondary estilo-btn">
         <i class="fas fa-backspace "></i>
             Volver 
