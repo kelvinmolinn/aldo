@@ -144,13 +144,11 @@ class administracionCompras extends Controller
         $data['selectPais'] = $pais
                         ->select("paisId,pais")
                         ->where("flgElimina", 0)
-                        ->findAll();
-
+                        ->findAll(); 
         $data['selectSucursal'] = $sucursal
                         ->select("sucursalId,sucursal")
                         ->where("flgElimina", 0)
                         ->findAll();
-        
         return view('compras/modals/modalNuevaCompra', $data);
     }
 
@@ -170,7 +168,10 @@ class administracionCompras extends Controller
         $numFactura = $this->request->getPost('numeroFactura');
         $proveedorId = $this->request->getPost('selectProveedor');
         $fecha = $this->request->getPost('fechaFactura');
-
+        $proveedorInternacional = $this->request->getPost('selectProveedorInternacionales');
+        $proveedorNacional = $this->request->getPost('selectProveedor');
+        $tipoCompra = $this->request->getPost('selectTipoCompra');
+        $sucursal = $this->request->getPost('selectSucursal');
         // Verificar si el numFactura ya existe
         $facturaExistente = $compras
             ->where('numFactura', $numFactura)
@@ -185,36 +186,70 @@ class administracionCompras extends Controller
                 'mensaje' => 'El número de factura ya está registrado'
             ]);
         } else {
-            $data = [
-                'proveedorId'       => $this->request->getPost('selectProveedor'),
-                'tipoCompra'        => $this->request->getPost('selectTipoCompra'),
-                'sucursalId'        => $this->request->getPost('selectSucursal'),
-                'tipoDTEId'         => $this->request->getPost('tipoDocumento'),
-                'fechaDocumento'    => $this->request->getPost('fechaFactura'),
-                'numFactura'        => $this->request->getPost('numeroFactura'),
-                'paisId'            => $this->request->getPost('selectPais'),
-                'flgRetaceo'        => $this->request->getPost('selectRetaceo'),
-                'estadoCompra'      => 'Pendiente',
-                'porcentajeIva'     => $IvaCalcular
-            ];
-    
-                // Insertar datos en la base de datos
-                $operacionCompra = $compras->insert($data);
-    
-            if ($operacionCompra) {
-                // Si el insert fue exitoso, devuelve el último ID insertado
-                return $this->response->setJSON([
-                    'success' => true,
-                    'mensaje' => 'Compra agregada correctamente',
-                    'compraId' =>  $compras->insertID()
-                ]);
-            } else {
-                // Si el insert falló, devuelve un mensaje de error
-                return $this->response->setJSON([
-                    'success' => false,
-                    'mensaje' => 'No se pudo insertar la compra'
-                ]);
+            if($this->request->getPost('selectTipoCompra') == "Local"){
+                $data = [
+                    'proveedorId'       => $proveedorNacional,
+                    'tipoCompra'        => $tipoCompra,
+                    'sucursalId'        => $sucursal,
+                    'tipoDTEId'         => $this->request->getPost('tipoDocumento'),
+                    'fechaDocumento'    => $this->request->getPost('fechaFactura'),
+                    'numFactura'        => $this->request->getPost('numeroFactura'),
+                    'paisId'            => $this->request->getPost('selectPais'),
+                    'flgRetaceo'        => $this->request->getPost('selectRetaceo'),
+                    'estadoCompra'      => 'Pendiente',
+                    'porcentajeIva'     => $IvaCalcular
+                ];
+        
+                    // Insertar datos en la base de datos
+                    $operacionCompra = $compras->insert($data);
+        
+                if ($operacionCompra) {
+                    // Si el insert fue exitoso, devuelve el último ID insertado
+                    return $this->response->setJSON([
+                        'success' => true,
+                        'mensaje' => 'Compra agregada correctamente',
+                        'compraId' =>  $compras->insertID()
+                    ]);
+                } else {
+                    // Si el insert falló, devuelve un mensaje de error
+                    return $this->response->setJSON([
+                        'success' => false,
+                        'mensaje' => 'No se pudo insertar la compra'
+                    ]);
+                }
+            }else{
+                $data = [
+                    'proveedorId'       => $proveedorInternacional,
+                    'tipoCompra'        => $tipoCompra,
+                    'sucursalId'        => $sucursal,
+                    'tipoDTEId'         => $this->request->getPost('tipoDocumento'),
+                    'fechaDocumento'    => $this->request->getPost('fechaFactura'),
+                    'numFactura'        => $this->request->getPost('numeroFactura'),
+                    'paisId'            => $this->request->getPost('selectPais'),
+                    'flgRetaceo'        => $this->request->getPost('selectRetaceo'),
+                    'estadoCompra'      => 'Pendiente',
+                    'porcentajeIva'     => $IvaCalcular
+                ];
+        
+                    // Insertar datos en la base de datos
+                    $operacionCompra = $compras->insert($data);
+        
+                if ($operacionCompra) {
+                    // Si el insert fue exitoso, devuelve el último ID insertado
+                    return $this->response->setJSON([
+                        'success' => true,
+                        'mensaje' => 'Compra agregada correctamente',
+                        'compraId' =>  $compras->insertID()
+                    ]);
+                } else {
+                    // Si el insert falló, devuelve un mensaje de error
+                    return $this->response->setJSON([
+                        'success' => false,
+                        'mensaje' => 'No se pudo insertar la compra'
+                    ]);
+                }
             }
+
         }
 
     }

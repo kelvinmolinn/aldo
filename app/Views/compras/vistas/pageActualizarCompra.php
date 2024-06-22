@@ -217,7 +217,7 @@
             placeholder: 'Aplica retaceo'
         });    
         $("#fechaFactura").val('<?= $camposEncabezado["fechaDocumento"]; ?>');
-        $("#numeroFactura").val(<?= $camposEncabezado["numFactura"]; ?>);
+        $("#numeroFactura").val('<?= $camposEncabezado["numFactura"]; ?>');
 
         $("#frmActualizarCompra").submit(function(event) {
             event.preventDefault();
