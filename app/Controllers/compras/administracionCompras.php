@@ -17,6 +17,7 @@ use App\Models\cat_20_paises;
 use App\Models\comp_compras_detalle;
 use App\Models\inv_productos;
 use App\Models\conf_parametrizaciones;
+use App\Models\conf_sucursales;
 
 class administracionCompras extends Controller
 {
@@ -123,6 +124,7 @@ class administracionCompras extends Controller
         $tipoDte = new cat_02_tipo_dte;
         $proveedor = new comp_proveedores;
         $pais = new cat_20_paises;
+        $sucursal = new conf_sucursales;
 
         $data['tipoDTE'] = $tipoDte
                         ->select("tipoDTEId,tipoDocumentoDTE")
@@ -142,8 +144,13 @@ class administracionCompras extends Controller
         $data['selectPais'] = $pais
                         ->select("paisId,pais")
                         ->where("flgElimina", 0)
-                        ->findAll();                               
+                        ->findAll();
 
+        $data['selectSucursal'] = $sucursal
+                        ->select("sucursalId,sucursal")
+                        ->where("flgElimina", 0)
+                        ->findAll();
+        
         return view('compras/modals/modalNuevaCompra', $data);
     }
 
@@ -180,6 +187,8 @@ class administracionCompras extends Controller
         } else {
             $data = [
                 'proveedorId'       => $this->request->getPost('selectProveedor'),
+                'tipoCompra'        => $this->request->getPost('selectTipoCompra'),
+                'sucursalId'        => $this->request->getPost('selectSucursal'),
                 'tipoDTEId'         => $this->request->getPost('tipoDocumento'),
                 'fechaDocumento'    => $this->request->getPost('fechaFactura'),
                 'numFactura'        => $this->request->getPost('numeroFactura'),

@@ -46,7 +46,9 @@
                             <div class="form-select-control">
                                 <select name="selectSucursal" id="selectSucursal" style="width: 100%;" required>
                                     <option value=""></option>
-                                    
+                                    <?php foreach ($selectSucursal as $selectSucursal){ ?>
+                                        <option value="<?php echo $selectSucursal['sucursalId']; ?>"><?php echo $selectSucursal['sucursal']; ?></option>
+                                    <?php } ?>
                                 </select>
                             </div>
                         </div>

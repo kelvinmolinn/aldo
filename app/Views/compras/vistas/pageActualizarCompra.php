@@ -19,7 +19,7 @@
             </div>
             <div class="col-md-4">
                 <div class="form-outline">
-                    <input type="number" id="numeroFactura" name="numeroFactura" class="form-control active" required>
+                    <input type="text" id="numeroFactura" name="numeroFactura" class="form-control active" required>
                     <label class="form-label" for="numeroFactura">Numero de factura</label>
 
                 </div>
