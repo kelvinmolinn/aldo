@@ -867,136 +867,6 @@ class administracionCompras extends Controller
             }
         }
 
-        /*
-        if($ExisteProducto){
-            $compraDetalleId = $ExisteProducto["compraDetalleId"];
-            if($paisId == 61){
-                $data = [
-                    "compraId"              => $this->request->getPost('compraId'),
-                    "productoId"            => $this->request->getPost('selectProductos'),
-                    "cantidadProducto"      => $this->request->getPost('cantidadProducto'),
-                    "precioUnitario"        => $precioUnitario,
-                    "precioUnitarioIVA"     => $precioUnitarioIva,
-                    "ivaUnitario"           => $ivaUnitario + $ivaUnitario,
-                    "ivaTotal"              => $ivaTotal + $ivaTotal,
-                    "totalCompraDetalle"    => $totalCompraDetalle + $totalCompraDetalle,
-                    "totalCompraDetalleIVA" => $totalCompraDetalleIVA + $totalCompraDetalleIVA
-                ];
-    
-                    $productoCompras = $comprasDetalle->update($compraDetalleId, $data);
-
-    
-                if ($productoCompras) {
-                    // Si el insert fue exitoso, devuelve el último ID insertado
-                    return $this->response->setJSON([
-                        'success' => true,
-                        'mensaje' => 'Producto de la compra '.($operacion == 'editar' ? 'actualizado' : 'agregado').' correctamente',
-                        'compraDetalleId' => ($operacion == 'editar' ? $compraDetalleId : $comprasDetalle->insertID())
-                    ]);
-                } else {
-                    // Si el insert falló, devuelve un mensaje de error
-                    return $this->response->setJSON([
-                        'success' => false,
-                        'mensaje' => 'No se pudo insertar el producto'
-                    ]);
-                }
-    
-            } else {
-    
-                $data = [
-                    "compraId"              => $this->request->getPost('compraId'),
-                    "productoId"            => $this->request->getPost('selectProductos'),
-                    "cantidadProducto"      => $this->request->getPost('cantidadProducto'),
-                    "precioUnitario"        => $this->request->getPost('costoUnitario'),
-                    "totalCompraDetalle"    => $totalCompraDetalle
-                ];
-    
-                    $productoCompras = $comprasDetalle->update($this->request->getPost('compraDetalleId'), $data);
-
-                if ($productoCompras) {
-                    // Si el insert fue exitoso, devuelve el último ID insertado
-                    return $this->response->setJSON([
-                        'success' => true,
-                        'mensaje' => 'Producto de la compra '.($operacion == 'editar' ? 'actualizado' : 'agregado').' correctamente',
-                        'compraDetalleId' => ($operacion == 'editar' ? $this->request->getPost('compraDetalleId') : $comprasDetalle->insertID())
-                    ]);
-                } else {
-                    // Si el insert falló, devuelve un mensaje de error
-                    return $this->response->setJSON([
-                        'success' => false,
-                        'mensaje' => 'No se pudo insertar el producto'
-                    ]);
-                }
-            }            
-        }else{
-            if($paisId == 61){
-                $data = [
-                    "compraId"              => $this->request->getPost('compraId'),
-                    "productoId"            => $this->request->getPost('selectProductos'),
-                    "cantidadProducto"      => $this->request->getPost('cantidadProducto'),
-                    "precioUnitario"        => $precioUnitario,
-                    "precioUnitarioIVA"     => $precioUnitarioIva,
-                    "ivaUnitario"           => $ivaUnitario,
-                    "ivaTotal"              => $ivaTotal,
-                    "totalCompraDetalle"    => $totalCompraDetalle,
-                    "totalCompraDetalleIVA" => $totalCompraDetalleIVA
-                ];
-    
-                if($operacion == 'editar') {
-                    $productoCompras = $comprasDetalle->update($this->request->getPost('compraDetalleId'), $data);
-                } else {
-                    // Insertar datos en la base de datos
-                    $productoCompras = $comprasDetalle->insert($data);
-                }
-    
-                if ($productoCompras) {
-                    // Si el insert fue exitoso, devuelve el último ID insertado
-                    return $this->response->setJSON([
-                        'success' => true,
-                        'mensaje' => 'Producto de la compra '.($operacion == 'editar' ? 'actualizado' : 'agregado').' correctamente',
-                        'compraDetalleId' => ($operacion == 'editar' ? $this->request->getPost('compraDetalleId') : $comprasDetalle->insertID())
-                    ]);
-                } else {
-                    // Si el insert falló, devuelve un mensaje de error
-                    return $this->response->setJSON([
-                        'success' => false,
-                        'mensaje' => 'No se pudo insertar el producto'
-                    ]);
-                }
-    
-            } else {
-    
-                $data = [
-                    "compraId"              => $this->request->getPost('compraId'),
-                    "productoId"            => $this->request->getPost('selectProductos'),
-                    "cantidadProducto"      => $this->request->getPost('cantidadProducto'),
-                    "precioUnitario"        => $this->request->getPost('costoUnitario'),
-                    "totalCompraDetalle"    => $totalCompraDetalle
-                ];
-    
-                if($operacion == 'editar') {
-                    $productoCompras = $comprasDetalle->update($this->request->getPost('compraDetalleId'), $data);
-                } else {
-                    // Insertar datos en la base de datos
-                    $productoCompras = $comprasDetalle->insert($data);
-                }
-                if ($productoCompras) {
-                    // Si el insert fue exitoso, devuelve el último ID insertado
-                    return $this->response->setJSON([
-                        'success' => true,
-                        'mensaje' => 'Producto de la compra '.($operacion == 'editar' ? 'actualizado' : 'agregado').' correctamente',
-                        'compraDetalleId' => ($operacion == 'editar' ? $this->request->getPost('compraDetalleId') : $comprasDetalle->insertID())
-                    ]);
-                } else {
-                    // Si el insert falló, devuelve un mensaje de error
-                    return $this->response->setJSON([
-                        'success' => false,
-                        'mensaje' => 'No se pudo insertar el producto'
-                    ]);
-                }
-            }
-        }
-        */
     }
     function eliminarProductoCompra(){
         $eliminarProducto = new comp_compras_detalle();
@@ -1017,5 +887,9 @@ class administracionCompras extends Controller
                     'mensaje' => 'No se pudo eliminar el producto'
                 ]);
             }
+    }
+
+    function finalizarCompra(){
+        
     }
 }

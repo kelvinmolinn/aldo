@@ -198,6 +198,7 @@ $routes->group('compras/admin-compras', function($routes) {
     $routes->post('form/producto/compra', 'compras\administracionCompras::modalAgregarProducto');
     $routes->post('operacion/guardar/productos', 'compras\administracionCompras::modalProductosOperacion');
     $routes->post('eliminar/producto/compra', 'compras\administracionCompras::eliminarProductoCompra');
+    $routes->post('finalizar/compra', 'compras\administracionCompras::finalizarCompra');
 
 });
 // Rutas de errores
