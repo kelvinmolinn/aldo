@@ -19,6 +19,7 @@ use App\Models\inv_productos;
 use App\Models\inv_kardex;
 use App\Models\conf_parametrizaciones;
 use App\Models\conf_sucursales;
+use App\Models\inv_productos_existencias;
 
 class administracionCompras extends Controller
 {
@@ -894,11 +895,13 @@ class administracionCompras extends Controller
         $comp_compras = new comp_compras;
         $comp_compras_detalle = new comp_compras_detalle;
         $inv_kardex = new inv_kardex;
+        $inv_productos_existencias = new inv_productos_existencias;
+        $inv_productos = new inv_productos;
     
         $compraId = $this->request->getPost("compraId");
 
         $compras = $comp_compras 
-            ->select("flgRetaceo")
+            ->select("sucursalId,fechaDocumento,flgRetaceo")
             ->where("compraId",$compraId)
             ->first();
 
@@ -906,9 +909,48 @@ class administracionCompras extends Controller
             //aplica a retaceo
         }else{
             $comprasDetalle = $comp_compras_detalle 
-                ->select()
-                ->where()
+                ->select("productoId,cantidadProducto")
+                ->where("compraId", $compraId)
                 ->findAll()
+            foreach($comprasDetalle AS $comprasDetalle){
+                $consultaInventario = $inv_productos_existencias
+                    ->select("productoExistenciaId,existenciaProducto")
+                    ->where("productoId", $comprasDetalle['productoId'])
+                    ->where("sucursalId", $compras['sucursalId'])
+                    ->first();
+
+                    $existenciaAntes = $consultaInventario["existenciaProducto"];
+                    $cantidadMovimiento = $comprasDetalle["cantidadProducto"];
+                    $existenciaDespues = $existenciaAntes + $cantidadMovimiento
+
+                $consultaProveedor = $inv_productos
+                    ->select("CostoPromedio,precioVenta")
+                    ->where("productoId", $comprasDetalle['productoId'])
+                    ->first();
+
+                $data = [
+                        
+                    ];
+        
+                    // Insertar datos en la base de datos
+                    $insertKardex = $inv_kardex->insert($data);
+
+                    if ($insertKardex) {
+                        // Si el insert fue exitoso, devuelve el último ID insertado
+                        return $this->response->setJSON([
+                            'success' => true,
+                            'mensaje' => 'Productos agregados al kardex correctamente',
+                            'compraDetalleId' =>  $this->request->getPost('compraDetalleId') 
+                        ]);
+                    } else {
+                        // Si el insert falló, devuelve un mensaje de error
+                        return $this->response->setJSON([
+                            'success' => false,
+                            'mensaje' => 'No se pudo insertar el producto al kardex'
+                        ]);
+                    }
+
+            }
         }
     }
 }
