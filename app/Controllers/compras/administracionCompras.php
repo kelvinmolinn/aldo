@@ -16,6 +16,7 @@ use App\Models\cat_02_tipo_dte;
 use App\Models\cat_20_paises;
 use App\Models\comp_compras_detalle;
 use App\Models\inv_productos;
+use App\Models\inv_kardex;
 use App\Models\conf_parametrizaciones;
 use App\Models\conf_sucursales;
 
@@ -890,6 +891,24 @@ class administracionCompras extends Controller
     }
 
     function finalizarCompra(){
-        
+        $comp_compras = new comp_compras;
+        $comp_compras_detalle = new comp_compras_detalle;
+        $inv_kardex = new inv_kardex;
+    
+        $compraId = $this->request->getPost("compraId");
+
+        $compras = $comp_compras 
+            ->select("flgRetaceo")
+            ->where("compraId",$compraId)
+            ->first();
+
+        if($compras['flgRetaceo'] == "Si"){
+            //aplica a retaceo
+        }else{
+            $comprasDetalle = $comp_compras_detalle 
+                ->select()
+                ->where()
+                ->findAll()
+        }
     }
 }

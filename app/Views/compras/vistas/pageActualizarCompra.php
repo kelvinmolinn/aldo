@@ -76,6 +76,9 @@
 </form>
 <hr>
 <form id="frmContinuarCompra" method="post" action="<?php echo base_url('finalizar/compra/compras/admin-compras'); ?>">
+    
+    <input type="hidden" id="compraId" name="compraId" value="<?= $compraId; ?>">
+    
     <div class="text-right mb-4">
         <button type= "button" id="btnNuevoProveedor" class="btn btn-primary estilo-btn" onclick="modalAgregarProducto(0,'insertar')">
             <i class="fas fa-save"></i>
