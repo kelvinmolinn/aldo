@@ -424,7 +424,7 @@ class AdministracionProducto extends Controller
     ];
 
     $dataKardex = [
-        'tipoMovimiento'                => "Inicial",
+        'tipoMovimiento'                => "Entrada Existancia Inicial",
         'descripcionMovimiento'         => "Entrada a inventario registrada como existencia inicial",
         'existenciaAntesMovimiento'     => 0,
         'cantidadMovimiento'            => $existenciaProducto,

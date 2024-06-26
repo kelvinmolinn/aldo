@@ -579,7 +579,7 @@ public function tablaContinuarSalida()
             $totalCantidadMovimiento += $cantidadMovimiento; // Acumular la cantidad de movimiento
 
             $dataKardex = [
-                'tipoMovimiento' => "Salida",
+                'tipoMovimiento' => "Salida por descargo",
                 'descripcionMovimiento' => "Salida de producto por descargo",
                 'productoExistenciaId' => $consultaExistencia['productoExistenciaId'],
                 'existenciaAntesMovimiento' => $existenciaAnterior,
