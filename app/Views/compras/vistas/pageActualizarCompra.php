@@ -75,7 +75,7 @@
         </div>
 </form>
 <hr>
-<form id="frmContinuarCompra" method="post" action="<?php echo base_url('finalizar/compra/compras/admin-compras'); ?>">
+<form id="frmContinuarCompra" method="post" action="<?php echo base_url('compras/admin-compras/finalizar/compra'); ?>">
     
     <input type="hidden" id="compraId" name="compraId" value="<?= $compraId; ?>">
     
@@ -119,7 +119,7 @@
     <div class="row mb-4 mt-4">
         <div class="col-md-6">
             <div class="form-outline">
-                <textarea name="" id="" class="form-control" style="width: 100%;" required></textarea>
+                <textarea name="observacionFinalizarComrpa" id="observacionFinalizarComrpa" class="form-control" style="width: 100%;" required></textarea>
                 <label class="form-label" for="">Observación de la compra</label>
             </div>
         </div>
@@ -272,7 +272,6 @@
                 cancelButtonText: 'Cancelar'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    event.preventDefault();
                     $.ajax({
                         url: $(this).attr('action'), 
                         type: $(this).attr('method'),
@@ -285,7 +284,8 @@
                                     title: 'Compra finalizada con éxito',
                                     text: response.mensaje
                                 }).then((result) => {
-                                    
+
+                                    cambiarInterfaz(`compras/admin-compras/index`);
                                     // Actualizar tabla de contactos
                                     // Limpiar inputs con .val(null) o .val('')
                                     

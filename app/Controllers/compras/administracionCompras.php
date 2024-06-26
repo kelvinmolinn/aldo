@@ -91,6 +91,7 @@ class administracionCompras extends Controller
                     "tipoContribuyenteId"   => $columna['tipoContribuyenteId']
                 ];
 
+
                 $columna5 = '
                     <button type= "button" class="btn btn-primary mb-1" onclick="cambiarInterfaz(`compras/admin-compras/vista/actualizar/compra`, '.htmlspecialchars(json_encode($jsonActualizarCompra)).');" data-toggle="tooltip" data-placement="top" title="Continuar compra">
                         <i class="fas fa-sync-alt"></i>
@@ -901,7 +902,8 @@ class administracionCompras extends Controller
         $compraId = $this->request->getPost("compraId");
 
         $compras = $comp_compras 
-            ->select("sucursalId,fechaDocumento,flgRetaceo")
+            ->select("compraId,sucursalId,fechaDocumento,flgRetaceo")
+            ->where("flgElimina",0)
             ->where("compraId",$compraId)
             ->first();
 
@@ -909,27 +911,45 @@ class administracionCompras extends Controller
             //aplica a retaceo
         }else{
             $comprasDetalle = $comp_compras_detalle 
-                ->select("productoId,cantidadProducto")
+                ->select("compraDetalleId,productoId,cantidadProducto,precioUnitario")
+                ->where("flgElimina",0)
                 ->where("compraId", $compraId)
-                ->findAll()
+                ->findAll();
             foreach($comprasDetalle AS $comprasDetalle){
+                // Validar si el productoId en la sucursalId existe, si existe hacer consulta de abajo
+                // Si no existe, colocar en quemado $existenciaAntes = 0; y en lugar de UPDATE a inv_productos_existencias, se hará un INSERT con la sucursalId, productoiD y existenciaproducto = $cantidadMovimiento
                 $consultaInventario = $inv_productos_existencias
                     ->select("productoExistenciaId,existenciaProducto")
+                    ->where("flgElimina",0)
                     ->where("productoId", $comprasDetalle['productoId'])
                     ->where("sucursalId", $compras['sucursalId'])
                     ->first();
 
                     $existenciaAntes = $consultaInventario["existenciaProducto"];
                     $cantidadMovimiento = $comprasDetalle["cantidadProducto"];
-                    $existenciaDespues = $existenciaAntes + $cantidadMovimiento
+                    $existenciaDespues = $existenciaAntes + $cantidadMovimiento;
 
                 $consultaProveedor = $inv_productos
                     ->select("CostoPromedio,precioVenta")
+                    ->where("flgElimina",0)
                     ->where("productoId", $comprasDetalle['productoId'])
                     ->first();
 
                 $data = [
-                        
+                    "tipoMovimiento"                => "Entrada de la comra", 
+                    "descripcionMovimiento"         => "Entrada registrada desde compras", 
+                    "productoExistenciaId"          => $consultaInventario["productoExistenciaId"], 
+                    "existenciaAntesMovimiento"     => $existenciaAntes, 
+                    "cantidadMovimiento"            => $cantidadMovimiento, 
+                    "existenciaDespuesMovimiento"   => $existenciaDespues, 
+                    "costoUnitarioFOB"              => $comprasDetalle['precioUnitario'], 
+                    "costoUnitarioRetaceo"          => $comprasDetalle['precioUnitario'], 
+                    "costoPromedio"                 => $consultaProveedor['CostoPromedio'],
+                    "precioVentaUnitario"           => $consultaProveedor['precioVenta'],
+                    "fechaDocumento"                => $compras['fechaDocumento'], 
+                    "fechaMovimiento"               => date("Y-m-d"), 
+                    "tablaMovimiento"               => "comp_compras_detalle", 
+                    "tablaMovimientoId"             => $comprasDetalle['compraDetalleId']
                     ];
         
                     // Insertar datos en la base de datos
@@ -940,7 +960,7 @@ class administracionCompras extends Controller
                         return $this->response->setJSON([
                             'success' => true,
                             'mensaje' => 'Productos agregados al kardex correctamente',
-                            'compraDetalleId' =>  $this->request->getPost('compraDetalleId') 
+                            'kardexId' =>  $inv_kardex->insertID() 
                         ]);
                     } else {
                         // Si el insert falló, devuelve un mensaje de error
@@ -950,7 +970,52 @@ class administracionCompras extends Controller
                         ]);
                     }
 
+                $data = [
+                    "existenciaProducto"  => $existenciaDespues
+                    ];
+        
+                    // Insertar datos en la base de datos
+                    $updateProductosExistencias = $inv_productos_existencias->update($consultaInventario['productoExistenciaId'],$data);
+
+                    if ($updateProductosExistencias) {
+                        // Si el insert fue exitoso, devuelve el último ID insertado
+                        return $this->response->setJSON([
+                            'success' => true,
+                            'mensaje' => 'Existencia actualizada correctamente',
+                            'productoExistenciaId' =>  $consultaInventario['productoExistenciaId']
+                        ]);
+                    } else {
+                        // Si el insert falló, devuelve un mensaje de error
+                        return $this->response->setJSON([
+                            'success' => false,
+                            'mensaje' => 'No se pudo actualizar la existencia de productos existencia'
+                        ]);
+                    }
+
             }
+
+            $data = [
+                "estadoCompra"  => "Finalizada",
+                "obsCompra"     => $this->request->getPost('observacionFinalizarComrpa')
+                ];
+    
+                // Insertar datos en la base de datos
+                $updateEstadoCompra = $comp_compras->update($compraId,$data);
+
+                if ($updateEstadoCompra) {
+                    // Si el insert fue exitoso, devuelve el último ID insertado
+                    return $this->response->setJSON([
+                        'success' => true,
+                        'mensaje' => 'Estado Actualizado con exito',
+                        'compraId' =>  $compras['compraId'] 
+                    ]);
+                } else {
+                    // Si el insert falló, devuelve un mensaje de error
+                    return $this->response->setJSON([
+                        'success' => false,
+                        'mensaje' => 'No se pudo actualizar el estado de de la compra'
+                    ]);
+                }
         }
     }
 }
