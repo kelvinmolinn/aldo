@@ -19,7 +19,7 @@
             </div>
             <div class="col-md-4">
                 <div class="form-outline">
-                    <input type="number" id="numeroFactura" name="numeroFactura" class="form-control active" required>
+                    <input type="text" id="numeroFactura" name="numeroFactura" class="form-control active" required>
                     <label class="form-label" for="numeroFactura">Numero de factura</label>
 
                 </div>
@@ -75,7 +75,10 @@
         </div>
 </form>
 <hr>
-<form id="frmContinuarCompra" method="post" action="<?php echo base_url(''); ?>">
+<form id="frmContinuarCompra" method="post" action="<?php echo base_url('finalizar/compra/compras/admin-compras'); ?>">
+    
+    <input type="hidden" id="compraId" name="compraId" value="<?= $compraId; ?>">
+    
     <div class="text-right mb-4">
         <button type= "button" id="btnNuevoProveedor" class="btn btn-primary estilo-btn" onclick="modalAgregarProducto(0,'insertar')">
             <i class="fas fa-save"></i>
@@ -112,7 +115,7 @@
                 </tfoot>
         </table>
     </div>
-</form>
+
     <div class="row mb-4 mt-4">
         <div class="col-md-6">
             <div class="form-outline">
@@ -129,52 +132,54 @@
             </div>
         </div>
     </div>
+</form>
+
 <script>
-        function eliminarProducto(id) {
-            Swal.fire({
-                title: '¿Estás seguro que desea eliminar el producto?',
-                text: "Se eiminara el producto seleccionado.",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Sí, eliminar',
-                cancelButtonText: 'Cancelar'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Si el usuario confirma, enviar la solicitud AJAX para eliminar el usuario de la sucursal
-                        $.ajax({
-                            url: '<?php echo base_url('compras/admin-compras/eliminar/producto/compra'); ?>',
-                            type: 'POST',
-                            data: {
-                                compraDetalleId: id
-                            },
-                            success: function(response) {
-                                console.log(response);
-                                if (response.success) {
-                                    Swal.fire({
-                                        icon: 'success',
-                                        title: '¡Producto eliminado con Éxito!',
-                                        text: response.mensaje
-                                    }).then((result) => {
-                                        $("#tablaContinuarCompra").DataTable().ajax.reload(null, false);
-                                    });
-                                } else {
-                                    // Insert fallido, mostrar mensaje de error
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Error',
-                                        text: response.mensaje
-                                    });
-                                }
-                            },
-                            error: function(xhr, status, error) {
-                                // Manejar errores si los hay
-                                console.error(xhr.responseText);
+    function eliminarProducto(id) {
+        Swal.fire({
+            title: '¿Estás seguro que desea eliminar el producto?',
+            text: "Se eiminara el producto seleccionado.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Si el usuario confirma, enviar la solicitud AJAX para eliminar el usuario de la sucursal
+                    $.ajax({
+                        url: '<?php echo base_url('compras/admin-compras/eliminar/producto/compra'); ?>',
+                        type: 'POST',
+                        data: {
+                            compraDetalleId: id
+                        },
+                        success: function(response) {
+                            console.log(response);
+                            if (response.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: '¡Producto eliminado con Éxito!',
+                                    text: response.mensaje
+                                }).then((result) => {
+                                    $("#tablaContinuarCompra").DataTable().ajax.reload(null, false);
+                                });
+                            } else {
+                                // Insert fallido, mostrar mensaje de error
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: response.mensaje
+                                });
                             }
-                        });
-                }
-            });
+                        },
+                        error: function(xhr, status, error) {
+                            // Manejar errores si los hay
+                            console.error(xhr.responseText);
+                        }
+                    });
+            }
+        });
     }
     function modalAgregarProducto(compraDetalleId,operacion){
         $.ajax({
@@ -217,7 +222,7 @@
             placeholder: 'Aplica retaceo'
         });    
         $("#fechaFactura").val('<?= $camposEncabezado["fechaDocumento"]; ?>');
-        $("#numeroFactura").val(<?= $camposEncabezado["numFactura"]; ?>);
+        $("#numeroFactura").val('<?= $camposEncabezado["numFactura"]; ?>');
 
         $("#frmActualizarCompra").submit(function(event) {
             event.preventDefault();
@@ -251,6 +256,54 @@
                 error: function(xhr, status, error) {
                     // Manejar errores si los hay
                     console.error(xhr.responseText);
+                }
+            });
+        });
+
+        $("#frmContinuarCompra").submit(function(event) {
+            Swal.fire({
+                title: '¿Estás seguro que desea finalizar la compra?',
+                text: "Se finalizara la compra seleccionada.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    event.preventDefault();
+                    $.ajax({
+                        url: $(this).attr('action'), 
+                        type: $(this).attr('method'),
+                        data: $(this).serialize(),
+                        success: function(response) {
+                            console.log(response);
+                            if (response.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Compra finalizada con éxito',
+                                    text: response.mensaje
+                                }).then((result) => {
+                                    
+                                    // Actualizar tabla de contactos
+                                    // Limpiar inputs con .val(null) o .val('')
+                                    
+                                });
+                            } else {
+                                // Insert fallido, mostrar mensaje de error
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: response.mensaje
+                                });
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            // Manejar errores si los hay
+                            console.error(xhr.responseText);
+                        }
+                    });
                 }
             });
         });

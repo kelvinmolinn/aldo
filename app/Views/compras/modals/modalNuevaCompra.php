@@ -46,7 +46,9 @@
                             <div class="form-select-control">
                                 <select name="selectSucursal" id="selectSucursal" style="width: 100%;" required>
                                     <option value=""></option>
-                                    
+                                    <?php foreach ($selectSucursal as $selectSucursal){ ?>
+                                        <option value="<?php echo $selectSucursal['sucursalId']; ?>"><?php echo $selectSucursal['sucursal']; ?></option>
+                                    <?php } ?>
                                 </select>
                             </div>
                         </div>
@@ -55,13 +57,13 @@
                     <div class="row">
                         <div class="col-md-4">
                             <div id="select" class="form-select-control">
-                                <select name="selectVacio" id="selectVacio" style="width: 100%;" required>
+                                <select name="selectVacio" id="selectVacio" style="width: 100%;">
                                     <option value=""></option>
                                 </select>
                             </div>
 
                             <div id="proveedorLocal" class="form-select-control">
-                                <select name="selectProveedor" id="selectProveedor" style="width: 100%;" required>
+                                <select name="selectProveedor" id="selectProveedor" style="width: 100%;">
                                     <option value=""></option>
                                     <?php foreach ($selectProveedor as $selectProveedor){ ?>
                                         <option value="<?php echo $selectProveedor['proveedorId']; ?>"><?php echo $selectProveedor['proveedor']; ?></option>
@@ -70,7 +72,7 @@
                             </div>
 
                             <div id="proveedorInternacional" class="form-select-control">
-                                <select name="selectProveedorInternacionales" id="selectProveedorInternacionales" style="width: 100%;" required>
+                                <select name="selectProveedorInternacionales" id="selectProveedorInternacionales" style="width: 100%;">
                                     <option value=""></option>
                                     <?php foreach ($selectProveedorInternacionales as $selectProveedorInternacionales){ ?>
                                         <option value="<?php echo $selectProveedorInternacionales['proveedorId']; ?>"><?php echo $selectProveedorInternacionales['proveedor']; ?></option>
@@ -119,6 +121,7 @@
         $("#select").show();
         $("#proveedorLocal").hide();
         $("#proveedorInternacional").hide();
+        $("#selectVacio").prop('required', true);
 
         $("#tipoDocumento").select2({
             placeholder: 'Tipo documento',
@@ -161,12 +164,18 @@
                 $("#proveedorLocal").show();
                 $("#proveedorInternacional").hide();
                 $("#select").hide();
+                $("#selectVacio").prop('required', false);
+                $("#selectProveedor").prop('required', true);
+                $("#selectProveedorInternacionales").prop('required', false);
             } else {
                 $("#selectPais").val('').trigger('change');
                 $("#selectPais").prop('readonly', false);
                 $("#proveedorInternacional").show();
                 $("#proveedorLocal").hide();
                 $("#select").hide();
+                $("#selectVacio").prop('required', false);
+                $("#selectProveedor").prop('required', false);
+                $("#selectProveedorInternacionales").prop('required', true);
             }
         });
 
