@@ -261,6 +261,7 @@
         });
 
         $("#frmContinuarCompra").submit(function(event) {
+            event.preventDefault();
             Swal.fire({
                 title: '¿Estás seguro que desea finalizar la compra?',
                 text: "Se finalizara la compra seleccionada.",

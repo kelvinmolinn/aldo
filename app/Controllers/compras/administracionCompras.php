@@ -918,6 +918,16 @@ class administracionCompras extends Controller
             foreach($comprasDetalle AS $comprasDetalle){
                 // Validar si el productoId en la sucursalId existe, si existe hacer consulta de abajo
                 // Si no existe, colocar en quemado $existenciaAntes = 0; y en lugar de UPDATE a inv_productos_existencias, se hará un INSERT con la sucursalId, productoiD y existenciaproducto = $cantidadMovimiento
+                
+                /*$conteo = $sucursalesUsuarios->where('flgElimina', 0)
+                                        ->where('empleadoId', $empleado['empleadoId'])
+                                        ->countAllResults();*/ 
+                $ExisteProducto = $inv_productos_existencias
+                    ->where("flgElimina",0)
+                    ->where('sucursalId', $compras['sucursalId'])
+                    ->where('productoId', $comprasDetalle['productoId'])
+                    ->first();
+                
                 $consultaInventario = $inv_productos_existencias
                     ->select("productoExistenciaId,existenciaProducto")
                     ->where("flgElimina",0)
@@ -925,97 +935,166 @@ class administracionCompras extends Controller
                     ->where("sucursalId", $compras['sucursalId'])
                     ->first();
 
-                    $existenciaAntes = $consultaInventario["existenciaProducto"];
-                    $cantidadMovimiento = $comprasDetalle["cantidadProducto"];
-                    $existenciaDespues = $existenciaAntes + $cantidadMovimiento;
-
                 $consultaProveedor = $inv_productos
                     ->select("CostoPromedio,precioVenta")
                     ->where("flgElimina",0)
                     ->where("productoId", $comprasDetalle['productoId'])
                     ->first();
 
-                $data = [
-                    "tipoMovimiento"                => "Entrada de la comra", 
-                    "descripcionMovimiento"         => "Entrada registrada desde compras", 
-                    "productoExistenciaId"          => $consultaInventario["productoExistenciaId"], 
-                    "existenciaAntesMovimiento"     => $existenciaAntes, 
-                    "cantidadMovimiento"            => $cantidadMovimiento, 
-                    "existenciaDespuesMovimiento"   => $existenciaDespues, 
-                    "costoUnitarioFOB"              => $comprasDetalle['precioUnitario'], 
-                    "costoUnitarioRetaceo"          => $comprasDetalle['precioUnitario'], 
-                    "costoPromedio"                 => $consultaProveedor['CostoPromedio'],
-                    "precioVentaUnitario"           => $consultaProveedor['precioVenta'],
-                    "fechaDocumento"                => $compras['fechaDocumento'], 
-                    "fechaMovimiento"               => date("Y-m-d"), 
-                    "tablaMovimiento"               => "comp_compras_detalle", 
-                    "tablaMovimientoId"             => $comprasDetalle['compraDetalleId']
-                    ];
-        
-                    // Insertar datos en la base de datos
-                    $insertKardex = $inv_kardex->insert($data);
+                if(!$ExisteProducto){
+                    $existenciaAntes = 0;
+                    $cantidadMovimiento = $comprasDetalle["cantidadProducto"];
+                    $existenciaDespues = $existenciaAntes + $cantidadMovimiento;
 
-                    if ($insertKardex) {
-                        // Si el insert fue exitoso, devuelve el último ID insertado
-                        return $this->response->setJSON([
-                            'success' => true,
-                            'mensaje' => 'Productos agregados al kardex correctamente',
-                            'kardexId' =>  $inv_kardex->insertID() 
-                        ]);
-                    } else {
-                        // Si el insert falló, devuelve un mensaje de error
-                        return $this->response->setJSON([
-                            'success' => false,
-                            'mensaje' => 'No se pudo insertar el producto al kardex'
-                        ]);
-                    }
+                    $data = [
+                        "sucursalId"            => $compras['sucursalId'],
+                        "productoId"            => $comprasDetalle['productoId'],
+                        "existenciaProducto"    => $cantidadMovimiento,
+                        "existenciaReservada"   => 0
+                        ];
+            
+                        // Insertar datos en la base de datos
+                        $productoExistenciaId = $inv_productos_existencias->insert($data);
+                        /*
+                        if ($insertExistencia) {
+                            // Si el insert fue exitoso, devuelve el último ID insertado
+                            return $this->response->setJSON([
+                                'success' => true,
+                                'mensaje' => 'Existencia Agregada correctamente',
+                                'productoExistenciaId' =>  $consultaInventario['productoExistenciaId']
+                            ]);
+                        } else {
+                            // Si el insert falló, devuelve un mensaje de error
+                            return $this->response->setJSON([
+                                'success' => false,
+                                'mensaje' => 'No se pudo agregar la existencia de productos existencia'
+                            ]);
+                        }
+                        */
+                    $data = [
+                        "tipoMovimiento"                => "Entrada de la compra", 
+                        "descripcionMovimiento"         => "Entrada registrada desde compras", 
+                        "productoExistenciaId"          => $productoExistenciaId, 
+                        "existenciaAntesMovimiento"     => "0", 
+                        "cantidadMovimiento"            => $cantidadMovimiento, 
+                        "existenciaDespuesMovimiento"   => $existenciaDespues, 
+                        "costoUnitarioFOB"              => $comprasDetalle['precioUnitario'], 
+                        "costoUnitarioRetaceo"          => $comprasDetalle['precioUnitario'], 
+                        "costoPromedio"                 => $consultaProveedor['CostoPromedio'],
+                        "precioVentaUnitario"           => $consultaProveedor['precioVenta'],
+                        "fechaDocumento"                => $compras['fechaDocumento'], 
+                        "fechaMovimiento"               => date("Y-m-d"), 
+                        "tablaMovimiento"               => "comp_compras_detalle", 
+                        "tablaMovimientoId"             => $comprasDetalle['compraDetalleId']
+                        ];
+            
+                        // Insertar datos en la base de datos
+                        $insertKardex = $inv_kardex->insert($data);
+                        /*
+                        if ($insertKardex) {
+                            // Si el insert fue exitoso, devuelve el último ID insertado
+                            return $this->response->setJSON([
+                                'success' => true,
+                                'mensaje' => 'Productos agregados al kardex correctamente',
+                                'kardexId' =>  $inv_kardex->insertID() 
+                            ]);
+                        } else {
+                            // Si el insert falló, devuelve un mensaje de error
+                            return $this->response->setJSON([
+                                'success' => false,
+                                'mensaje' => 'No se pudo insertar el producto al kardex'
+                            ]);
+                        }
+                        */
+                }else{
+                    $existenciaAntes = $consultaInventario["existenciaProducto"];
+                    $cantidadMovimiento = $comprasDetalle["cantidadProducto"];
+                    $existenciaDespues = $existenciaAntes + $cantidadMovimiento;
 
-                $data = [
-                    "existenciaProducto"  => $existenciaDespues
-                    ];
-        
-                    // Insertar datos en la base de datos
-                    $updateProductosExistencias = $inv_productos_existencias->update($consultaInventario['productoExistenciaId'],$data);
+                    $data = [
+                        "tipoMovimiento"                => "Entrada de la compra", 
+                        "descripcionMovimiento"         => "Entrada registrada desde compras", 
+                        "productoExistenciaId"          => $consultaInventario["productoExistenciaId"], 
+                        "existenciaAntesMovimiento"     => $existenciaAntes, 
+                        "cantidadMovimiento"            => $cantidadMovimiento, 
+                        "existenciaDespuesMovimiento"   => $existenciaDespues, 
+                        "costoUnitarioFOB"              => $comprasDetalle['precioUnitario'], 
+                        "costoUnitarioRetaceo"          => $comprasDetalle['precioUnitario'], 
+                        "costoPromedio"                 => $consultaProveedor['CostoPromedio'],
+                        "precioVentaUnitario"           => $consultaProveedor['precioVenta'],
+                        "fechaDocumento"                => $compras['fechaDocumento'], 
+                        "fechaMovimiento"               => date("Y-m-d"), 
+                        "tablaMovimiento"               => "comp_compras_detalle", 
+                        "tablaMovimientoId"             => $comprasDetalle['compraDetalleId']
+                        ];
+            
+                        // Insertar datos en la base de datos
+                        $insertKardex = $inv_kardex->insert($data);
+                        /*
+                        if ($insertKardex) {
+                            // Si el insert fue exitoso, devuelve el último ID insertado
+                            return $this->response->setJSON([
+                                'success' => true,
+                                'mensaje' => 'Productos agregados al kardex correctamente',
+                                'kardexId' =>  $inv_kardex->insertID() 
+                            ]);
+                        } else {
+                            // Si el insert falló, devuelve un mensaje de error
+                            return $this->response->setJSON([
+                                'success' => false,
+                                'mensaje' => 'No se pudo insertar el producto al kardex'
+                            ]);
+                        }
+                        */
+                    $data = [
+                        "existenciaProducto"  => $existenciaDespues
+                        ];
+            
+                        // Insertar datos en la base de datos
+                        $updateProductosExistencias = $inv_productos_existencias->update($consultaInventario['productoExistenciaId'],$data);
 
-                    if ($updateProductosExistencias) {
-                        // Si el insert fue exitoso, devuelve el último ID insertado
-                        return $this->response->setJSON([
-                            'success' => true,
-                            'mensaje' => 'Existencia actualizada correctamente',
-                            'productoExistenciaId' =>  $consultaInventario['productoExistenciaId']
-                        ]);
-                    } else {
-                        // Si el insert falló, devuelve un mensaje de error
-                        return $this->response->setJSON([
-                            'success' => false,
-                            'mensaje' => 'No se pudo actualizar la existencia de productos existencia'
-                        ]);
-                    }
-
-            }
-
-            $data = [
-                "estadoCompra"  => "Finalizada",
-                "obsCompra"     => $this->request->getPost('observacionFinalizarComrpa')
-                ];
-    
-                // Insertar datos en la base de datos
-                $updateEstadoCompra = $comp_compras->update($compraId,$data);
-
-                if ($updateEstadoCompra) {
-                    // Si el insert fue exitoso, devuelve el último ID insertado
-                    return $this->response->setJSON([
-                        'success' => true,
-                        'mensaje' => 'Estado Actualizado con exito',
-                        'compraId' =>  $compras['compraId'] 
-                    ]);
-                } else {
-                    // Si el insert falló, devuelve un mensaje de error
-                    return $this->response->setJSON([
-                        'success' => false,
-                        'mensaje' => 'No se pudo actualizar el estado de de la compra'
-                    ]);
+                        /*
+                        if ($updateProductosExistencias) {
+                            // Si el insert fue exitoso, devuelve el último ID insertado
+                            return $this->response->setJSON([
+                                'success' => true,
+                                'mensaje' => 'Existencia actualizada correctamente',
+                                'productoExistenciaId' =>  $consultaInventario['productoExistenciaId']
+                            ]);
+                        } else {
+                            // Si el insert falló, devuelve un mensaje de error
+                            return $this->response->setJSON([
+                                'success' => false,
+                                'mensaje' => 'No se pudo actualizar la existencia de productos existencia'
+                            ]);
+                        }
+                        */
                 }
+
+                $data = [
+                    "estadoCompra"  => "Finalizada",
+                    "obsCompra"     => $this->request->getPost('observacionFinalizarComrpa')
+                    ];
+        
+                    // Insertar datos en la base de datos
+                    $updateEstadoCompra = $comp_compras->update($compraId,$data);
+
+                    if ($updateEstadoCompra) {
+                        // Si el insert fue exitoso, devuelve el último ID insertado
+                        return $this->response->setJSON([
+                            'success' => true,
+                            'mensaje' => 'Estado Actualizado con exito',
+                            'compraId' =>  $compras['compraId'] 
+                        ]);
+                    } else {
+                        // Si el insert falló, devuelve un mensaje de error
+                        return $this->response->setJSON([
+                            'success' => false,
+                            'mensaje' => 'No se pudo actualizar el estado de de la compra'
+                        ]);
+                    }
+                }
+                
         }
     }
 }
