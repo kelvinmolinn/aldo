@@ -33,6 +33,17 @@
   <script src="<?php echo base_url();?>../assets/plugins/datatables/js/dataTables.min.js"></script>
   <script src="<?php echo base_url();?>../assets/plugins/bootstrap/js/jquery.inputmask.min.js"></script>
   <!--<script src="<?php echo base_url();?>../assets/plugins/bootstrap/js/jquery.inputmask.bundle.js"></script>-->
+
+    <style>
+    /* Estilo personalizado para cambiar la sombra al pasar el mouse */
+    .nav-color:hover {
+      box-shadow: 0 4px 8px rgba(255, 255, 255, 0.5); 
+    }
+
+    .nav-cerrar-sesion:hover {
+      box-shadow: 2px 2px 8px 4px rgba(0, 0, 0, 0.5); /* Sombra de color rojo */
+    }
+  </style>
 </head>
 <body class="hold-transition sidebar-mini">
 <!-- Site wrapper -->
@@ -85,54 +96,54 @@
         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
           <!-- Add icons to the links using the .nav-icon class with font-awesome or any other icon font library -->
           <li class="nav-item">
-            <a role="button" class="nav-link" onclick="cambiarInterfaz('escritorio/dashboard', {renderVista: 'No'});">
+            <a role="button" class="nav-link nav-color" onclick="cambiarInterfaz('escritorio/dashboard', {renderVista: 'No'});">
               <i class="nav-icon fas fa-home"></i>
               <p>INICIO</p>
             </a>
           </li>
           <li class="nav-item">
-            <a href="#" class="nav-link">
+            <a href="#" class="nav-link nav-color">
               <i class="nav-icon fas fa-cog"></i>
               <p>Configuración usuario
                 <i class="right fas fa-angle-left"></i>
               </p>
             </a>
-            <ul class="nav nav-treeview">
+            <ul class="nav nav-treeview ml-3">
               <li class="nav-item">
-                <a href="#" class="nav-link">
-                  <i class="nav-icon fas fa-user-cog"></i>
+                <a href="#" class="nav-link nav-color">
+                  <i class=" fas fa-user-cog"></i>
                   <p> Admin. usuario
                     <i class="right fas fa-angle-left"></i>
                   </p>
                 </a>
-                <ul class="nav nav-treeview">
+                <ul class="nav nav-treeview ml-4">
                   <li class="nav-item">
-                    <a role="button" class="nav-link" onclick="cambiarInterfaz('conf-general/admin-usuarios/index', {renderVista: 'No'});">
-                      <i class="fas fa-user nav-icon"></i>
+                    <a role="button" class="nav-link nav-color" onclick="cambiarInterfaz('conf-general/admin-usuarios/index', {renderVista: 'No'});">
+                      <i class="fas fa-user "></i>
                       <p>Usuarios</p>
                     </a>
                   </li>
                 </ul>
-                <ul class="nav nav-treeview">
+                <ul class="nav nav-treeview ml-4">
                   <li class="nav-item">
-                    <a role="button" class="nav-link" onclick="cambiarInterfaz('conf-general/admin-roles/index', {renderVista: 'No'});">
-                      <i class="fas fa-user nav-icon"></i>
+                    <a role="button" class="nav-link nav-color" onclick="cambiarInterfaz('conf-general/admin-roles/index', {renderVista: 'No'});">
+                      <i class="fas fa-user "></i>
                       <p>Roles</p>
                     </a>
                   </li>
                 </ul>
               </li>
               <li class="nav-item">
-                <a href="#" class="nav-link">
-                  <i class="nav-icon fas fa-wrench"></i>
+                <a href="#" class="nav-link nav-color">
+                  <i class=" fas fa-wrench"></i>
                   <p> Admin. módulos
                     <i class="right fas fa-angle-left"></i>
                   </p>
                 </a>
-                <ul class="nav nav-treeview">
+                <ul class="nav nav-treeview ml-4">
                   <li class="nav-item">
-                    <a role="button" class="nav-link" onclick="cambiarInterfaz('conf-general/admin-modulos/index', {renderVista: 'No'});">
-                      <i class="fas fa-tasks nav-icon"></i>
+                    <a role="button" class="nav-link nav-color" onclick="cambiarInterfaz('conf-general/admin-modulos/index', {renderVista: 'No'});">
+                      <i class="fas fa-tasks "></i>
                       <p>Módulos</p>
                     </a>
                   </li>
@@ -141,74 +152,81 @@
             </ul>
           </li>
           <li class="nav-item">
-            <a href="#" class="nav-link">
+            <a href="#" class="nav-link nav-color">
               <i class="nav-icon fas fa-shopping-cart"></i>
               <p>Compras
                 <i class="right fas fa-angle-left"></i>
               </p>
             </a>
-            <ul class="nav nav-treeview">
+            <ul class="nav nav-treeview ml-3">
               <li class="nav-item">
-                <a role="button" class="nav-link" onclick="cambiarInterfaz('compras/admin-proveedores/index', {renderVista: 'No'});">
+                <a role="button" class="nav-link nav-color" onclick="cambiarInterfaz('compras/admin-proveedores/index', {renderVista: 'No'});">
                   <i class="fas fa-users"></i>
                   <p> Proveedores  
                   </p>
                 </a>
               </li>
               <li class="nav-item">
-                <a role="button" class="nav-link" onclick="cambiarInterfaz('compras/admin-compras/index', {renderVista: 'No'});">
+                <a role="button" class="nav-link nav-color" onclick="cambiarInterfaz('compras/admin-compras/index', {renderVista: 'No'});">
                   <i class="fas fa-store"></i>
-                  <p> compras  
+                  <p> Compras  
+                  </p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a role="button" class="nav-link nav-color" onclick="cambiarInterfaz('compras/admin-retaceo/index', {renderVista: 'No'});">
+                  <i class="fas fa-store"></i>
+                  <p> Retaceo  
                   </p>
                 </a>
               </li>
             </ul>
           </li>
           <li class="nav-item">
-            <a href="#" class="nav-link">
+            <a href="#" class="nav-link nav-color">
               <i class="nav-icon fas fa-box-open"></i>
               <p>Inventario
                 <i class="right fas fa-angle-left"></i>
               </p>
             </a>
-                <ul class="nav nav-treeview">
+                <ul class="nav nav-treeview ml-3">
                   <li class="nav-item">
-                    <a role="button" class="nav-link" onclick="cambiarInterfaz('inventario/admin-producto/index', {renderVista: 'No'});">
+                    <a role="button" class="nav-link nav-color" onclick="cambiarInterfaz('inventario/admin-producto/index', {renderVista: 'No'});">
                       <i class="fas fa-box-open"></i>
                       <p>Existencia productos</p>
                     </a>
                   </li>
 
                   <li class="nav-item">
-                    <a role="button" class="nav-link" onclick="cambiarInterfaz('inventario/admin-salida/index', {renderVista: 'No'});">
+                    <a role="button" class="nav-link nav-color" onclick="cambiarInterfaz('inventario/admin-salida/index', {renderVista: 'No'});">
                       <i class="fas fa-arrow-circle-right"></i>
                       <p>Descargos/Salidas</p>
                     </a>
                   </li>
 
                   <li class="nav-item">
-                    <a role="button" class="nav-link" onclick="cambiarInterfaz('inventario/admin-traslados/index', {renderVista: 'No'});">
+                    <a role="button" class="nav-link nav-color" onclick="cambiarInterfaz('inventario/admin-traslados/index', {renderVista: 'No'});">
                       <i class="fas fa-truck"></i>
                       <p>Traslados de productos</p>
                     </a>
                   </li>
 
                   <li class="nav-item">
-                    <a role="button" class="nav-link" onclick="cambiarInterfaz('inventario/admin-tipo/index', {renderVista: 'No'});">
+                    <a role="button" class="nav-link nav-color" onclick="cambiarInterfaz('inventario/admin-tipo/index', {renderVista: 'No'});">
                       <i class="fas fa-box"></i>
                       <p>Tipos de producto</p>
                     </a>
                   </li>
 
                   <li class="nav-item">
-                    <a role= "button" class="nav-link" onclick="cambiarInterfaz('inventario/admin-plataforma/index', {renderVista: 'No'});">
+                    <a role= "button" class="nav-link nav-color" onclick="cambiarInterfaz('inventario/admin-plataforma/index', {renderVista: 'No'});">
                       <i class="fas fa-gamepad"></i>
                       <p>Plataforma</p>
                     </a>
                   </li>
 
                   <li class="nav-item">
-                    <a role="button" class="nav-link" onclick="cambiarInterfaz('inventario/admin-unidades/index', {renderVista: 'No'});">
+                    <a role="button" class="nav-link nav-color" onclick="cambiarInterfaz('inventario/admin-unidades/index', {renderVista: 'No'});">
                       <i class="fas fa-tag"></i>
                       <p>Unidades de medida</p>
                     </a>
@@ -216,31 +234,27 @@
                 </ul>
           </li>
           <li class="nav-item">
-            <a href="#" class="nav-link">
-              <i class="nav-icon fas fa-box-open"></i>
+            <a href="#" class="nav-link nav-color">
+              <i class="nav-icon fas fa-money-check-alt"></i>
               <p>Ventas
                 <i class="right fas fa-angle-left"></i>
               </p>
             </a>
-                <ul class="nav nav-treeview">
+                <ul class="nav nav-treeview ml-3">
                   <li class="nav-item">
-                    <a role="button" class="nav-link" onclick="">
-                      <i class="fas fa-file-alt"></i>
-                      <p>Cotizaciones</p>
+                    <a role="button" class="nav-link nav-color" onclick="cambiarInterfaz('ventas/admin-clientes/index', {renderVista: 'No'});">
+                      <i class="fas fa-users"></i>
+                      <p>Clientes</p>
                     </a>
                   </li>
-                </ul>
-                <ul class="nav nav-treeview">
                   <li class="nav-item">
-                    <a role="button" class="nav-link" onclick="">
+                    <a role="button" class="nav-link nav-color" onclick="cambiarInterfaz('ventas/admin-reservas/index', {renderVista: 'No'});">
                       <i class="fas fa-dolly"></i>
                       <p>Reservas</p>
                     </a>
                   </li>
-                </ul>
-                <ul class="nav nav-treeview">
                   <li class="nav-item">
-                    <a role="button" class="nav-link" onclick="">
+                    <a role="button" class="nav-link nav-color" onclick="cambiarInterfaz('ventas/admin-facturacion/index', {renderVista: 'No'});">
                       <i class="fas fa-cash-register"></i>
                       <p>Facturación</p>
                     </a>
@@ -248,13 +262,18 @@
                 </ul>
           </li>
           <li class="nav-item">
-            <a href="#" onclick="cerrarSession();" class="nav-link">
-              <i class="fas fa-sign-out-alt text-danger"></i>
+            <a href="#" onclick="cerrarSession();" class="nav-link nav-cerrar-sesion">
+              <i class="fas fa-sign-out-alt"></i>
               <p>Cerrar Sesión</p>
             </a>
           </li>
         </ul>
       </nav>
+      <!--<nav class="mt-2">
+        <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+
+        </ul>
+      </nav>-->
       <!-- /.sidebar-menu -->
     </div>
     <!-- /.sidebar -->

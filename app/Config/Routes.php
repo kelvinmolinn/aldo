@@ -201,6 +201,26 @@ $routes->group('compras/admin-compras', function($routes) {
     $routes->post('finalizar/compra', 'compras\administracionCompras::finalizarCompra');
 
 });
+
+$routes->group('compras/admin-retaceo', function($routes) {
+    $routes->post('index', 'compras\administracionRetaceo::index');
+
+});
+
+$routes->group('ventas/admin-clientes', function($routes) {
+    $routes->post('index', 'ventas\administracionClientes::index');
+
+});
+
+$routes->group('ventas/admin-reservas', function($routes) {
+    $routes->post('index', 'ventas\administracionReservas::index');
+
+});
+
+$routes->group('ventas/admin-facturacion', function($routes) {
+    $routes->post('index', 'ventas\administracionFacturacion::index');
+
+});
 // Rutas de errores
 $routes->get('404', 'Errores::error404');
 

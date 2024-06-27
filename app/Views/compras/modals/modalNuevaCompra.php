@@ -20,14 +20,14 @@
                         <div class="col-md-4">
                             <div class="form-outline">
                                 <input type="text" id="numeroFactura" name="numeroFactura" class="form-control" required>
-                                <label class="form-label" for="numeroFactura">Numero de factura</label>
+                                <label class="form-label" for="numeroFactura">Numero de documento</label>
 
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-outline">
                                 <input type="date" id="fechaFactura" name="fechaFactura" class="form-control" required>
-                                <label class="form-label" for="fechaFactura">Fecha Factura</label>
+                                <label class="form-label" for="fechaFactura">Fecha documento</label>
                             </div>
                         </div>
                     </div>

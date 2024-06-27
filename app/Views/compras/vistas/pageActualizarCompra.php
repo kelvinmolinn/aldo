@@ -1,6 +1,6 @@
 <form id="frmActualizarCompra" method="post" action="<?php echo base_url('compras/admin-compras/operacion/actualizar/compra'); ?>">
     <input type="hidden" id="compraId" name="compraId" value="<?= $compraId; ?>">
-    <h2>Continuar compra: <?php echo $camposEncabezado["numFactura"];?> (<?php echo $compraId;?>)</h2>
+    <h2>Continuar compra - Número de documento: <?php echo $camposEncabezado["numFactura"];?></h2>
     <hr>
     <button type= "button" id="btnRegresarCompra" class="btn btn-secondary estilo-btn mb-4">
         <i class="fas fa-backspace"></i>
@@ -20,14 +20,14 @@
             <div class="col-md-4">
                 <div class="form-outline">
                     <input type="text" id="numeroFactura" name="numeroFactura" class="form-control active" required>
-                    <label class="form-label" for="numeroFactura">Numero de factura</label>
+                    <label class="form-label" for="numeroFactura">Numero de documento</label>
 
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="form-outline">
                     <input type="date" id="fechaFactura" name="fechaFactura" class="form-control active" required>
-                    <label class="form-label" for="fechaFactura">Fecha Factura</label>
+                    <label class="form-label" for="fechaFactura">Fecha documento</label>
                 </div>
             </div>
         </div>
