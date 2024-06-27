@@ -946,7 +946,7 @@ class administracionCompras extends Controller
                     $cantidadMovimiento = $comprasDetalle["cantidadProducto"];
                     $existenciaDespues = $existenciaAntes + $cantidadMovimiento;
 
-                    $data = [
+                    $dataExistencias = [
                         "sucursalId"            => $compras['sucursalId'],
                         "productoId"            => $comprasDetalle['productoId'],
                         "existenciaProducto"    => $cantidadMovimiento,
@@ -954,7 +954,7 @@ class administracionCompras extends Controller
                         ];
             
                         // Insertar datos en la base de datos
-                        $productoExistenciaId = $inv_productos_existencias->insert($data);
+                        $productoExistenciaId = $inv_productos_existencias->insert($dataExistencias);
                         /*
                         if ($insertExistencia) {
                             // Si el insert fue exitoso, devuelve el último ID insertado
@@ -971,7 +971,7 @@ class administracionCompras extends Controller
                             ]);
                         }
                         */
-                    $data = [
+                    $dataKardexNuevo = [
                         "tipoMovimiento"                => "Entrada de la compra", 
                         "descripcionMovimiento"         => "Entrada registrada desde compras", 
                         "productoExistenciaId"          => $productoExistenciaId, 
@@ -989,7 +989,7 @@ class administracionCompras extends Controller
                         ];
             
                         // Insertar datos en la base de datos
-                        $insertKardex = $inv_kardex->insert($data);
+                        $insertKardex = $inv_kardex->insert($dataKardexNuevo);
                         /*
                         if ($insertKardex) {
                             // Si el insert fue exitoso, devuelve el último ID insertado
@@ -1011,7 +1011,7 @@ class administracionCompras extends Controller
                     $cantidadMovimiento = $comprasDetalle["cantidadProducto"];
                     $existenciaDespues = $existenciaAntes + $cantidadMovimiento;
 
-                    $data = [
+                    $dataKardex = [
                         "tipoMovimiento"                => "Entrada de la compra", 
                         "descripcionMovimiento"         => "Entrada registrada desde compras", 
                         "productoExistenciaId"          => $consultaInventario["productoExistenciaId"], 
@@ -1029,7 +1029,7 @@ class administracionCompras extends Controller
                         ];
             
                         // Insertar datos en la base de datos
-                        $insertKardex = $inv_kardex->insert($data);
+                        $insertKardex = $inv_kardex->insert($dataKardex);
                         /*
                         if ($insertKardex) {
                             // Si el insert fue exitoso, devuelve el último ID insertado
@@ -1046,12 +1046,12 @@ class administracionCompras extends Controller
                             ]);
                         }
                         */
-                    $data = [
+                    $dataActualizarExistencias = [
                         "existenciaProducto"  => $existenciaDespues
                         ];
             
                         // Insertar datos en la base de datos
-                        $updateProductosExistencias = $inv_productos_existencias->update($consultaInventario['productoExistenciaId'],$data);
+                        $updateProductosExistencias = $inv_productos_existencias->update($consultaInventario['productoExistenciaId'],$dataActualizarExistencias);
 
                         /*
                         if ($updateProductosExistencias) {
@@ -1071,13 +1071,13 @@ class administracionCompras extends Controller
                         */
                 }
 
-                $data = [
+                $dataCompra = [
                     "estadoCompra"  => "Finalizada",
                     "obsCompra"     => $this->request->getPost('observacionFinalizarComrpa')
                     ];
         
                     // Insertar datos en la base de datos
-                    $updateEstadoCompra = $comp_compras->update($compraId,$data);
+                    $updateEstadoCompra = $comp_compras->update($compraId,$dataCompra);
 
                     if ($updateEstadoCompra) {
                         // Si el insert fue exitoso, devuelve el último ID insertado
