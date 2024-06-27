@@ -85,6 +85,12 @@
         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
           <!-- Add icons to the links using the .nav-icon class with font-awesome or any other icon font library -->
           <li class="nav-item">
+            <a role="button" class="nav-link" onclick="cambiarInterfaz('escritorio/dashboard', {renderVista: 'No'});">
+              <i class="nav-icon fas fa-home"></i>
+              <p>INICIO</p>
+            </a>
+          </li>
+          <li class="nav-item">
             <a href="#" class="nav-link">
               <i class="nav-icon fas fa-cog"></i>
               <p>Configuración usuario
@@ -136,63 +142,7 @@
           </li>
           <li class="nav-item">
             <a href="#" class="nav-link">
-              <i class="nav-icon fas fa-box-open"></i>
-              <p>Inventario
-                <i class="right fas fa-angle-left"></i>
-              </p>
-            </a>
-                <ul class="nav nav-treeview">
-                  <li class="nav-item">
-                    <a role="button" class="nav-link" onclick="cambiarInterfaz('inventario/admin-producto/index', {renderVista: 'No'});">
-                      <i class="fas fa-box-open nav-icon"></i>
-                      <p>Existencia productos</p>
-                    </a>
-                  </li>
-                </ul>
-                <ul class="nav nav-treeview">
-                  <li class="nav-item">
-                    <a role="button" class="nav-link" onclick="cambiarInterfaz('inventario/admin-salida/index', {renderVista: 'No'});">
-                      <i class="fas fa-arrow-circle-right nav-icon"></i>
-                      <p>Descargos/Salidas</p>
-                    </a>
-                  </li>
-                </ul>
-                <ul class="nav nav-treeview">
-                  <li class="nav-item">
-                    <a role="button" class="nav-link" onclick="cambiarInterfaz('inventario/admin-traslados/index', {renderVista: 'No'});">
-                      <i class="fas fa-truck nav-icon"></i>
-                      <p>Traslados de productos</p>
-                    </a>
-                  </li>
-                </ul>
-                <ul class="nav nav-treeview">
-                  <li class="nav-item">
-                    <a role="button" class="nav-link" onclick="cambiarInterfaz('inventario/admin-tipo/index', {renderVista: 'No'});">
-                      <i class="fas fa-box nav-icon"></i>
-                      <p>Tipos de producto</p>
-                    </a>
-                  </li>
-                </ul>
-                <ul class="nav nav-treeview">
-                  <li class="nav-item">
-                    <a role= "button" class="nav-link" onclick="cambiarInterfaz('inventario/admin-plataforma/index', {renderVista: 'No'});">
-                      <i class="fas fa-gamepad nav-icon"></i>
-                      <p>Plataforma</p>
-                    </a>
-                  </li>
-                </ul>
-                <ul class="nav nav-treeview">
-                  <li class="nav-item">
-                    <a role="button" class="nav-link" onclick="cambiarInterfaz('inventario/admin-unidades/index', {renderVista: 'No'});">
-                      <i class="fas fa-tag nav-icon"></i>
-                      <p>Unidades de medida</p>
-                    </a>
-                  </li>
-                </ul>
-          </li>
-          <li class="nav-item">
-            <a href="#" class="nav-link">
-              <i class="fas fa-shopping-cart"></i>
+              <i class="nav-icon fas fa-shopping-cart"></i>
               <p>Compras
                 <i class="right fas fa-angle-left"></i>
               </p>
@@ -213,6 +163,89 @@
                 </a>
               </li>
             </ul>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="nav-icon fas fa-box-open"></i>
+              <p>Inventario
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+                <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                    <a role="button" class="nav-link" onclick="cambiarInterfaz('inventario/admin-producto/index', {renderVista: 'No'});">
+                      <i class="fas fa-box-open"></i>
+                      <p>Existencia productos</p>
+                    </a>
+                  </li>
+
+                  <li class="nav-item">
+                    <a role="button" class="nav-link" onclick="cambiarInterfaz('inventario/admin-salida/index', {renderVista: 'No'});">
+                      <i class="fas fa-arrow-circle-right"></i>
+                      <p>Descargos/Salidas</p>
+                    </a>
+                  </li>
+
+                  <li class="nav-item">
+                    <a role="button" class="nav-link" onclick="cambiarInterfaz('inventario/admin-traslados/index', {renderVista: 'No'});">
+                      <i class="fas fa-truck"></i>
+                      <p>Traslados de productos</p>
+                    </a>
+                  </li>
+
+                  <li class="nav-item">
+                    <a role="button" class="nav-link" onclick="cambiarInterfaz('inventario/admin-tipo/index', {renderVista: 'No'});">
+                      <i class="fas fa-box"></i>
+                      <p>Tipos de producto</p>
+                    </a>
+                  </li>
+
+                  <li class="nav-item">
+                    <a role= "button" class="nav-link" onclick="cambiarInterfaz('inventario/admin-plataforma/index', {renderVista: 'No'});">
+                      <i class="fas fa-gamepad"></i>
+                      <p>Plataforma</p>
+                    </a>
+                  </li>
+
+                  <li class="nav-item">
+                    <a role="button" class="nav-link" onclick="cambiarInterfaz('inventario/admin-unidades/index', {renderVista: 'No'});">
+                      <i class="fas fa-tag"></i>
+                      <p>Unidades de medida</p>
+                    </a>
+                  </li>
+                </ul>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="nav-icon fas fa-box-open"></i>
+              <p>Ventas
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+                <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                    <a role="button" class="nav-link" onclick="">
+                      <i class="fas fa-file-alt"></i>
+                      <p>Cotizaciones</p>
+                    </a>
+                  </li>
+                </ul>
+                <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                    <a role="button" class="nav-link" onclick="">
+                      <i class="fas fa-dolly"></i>
+                      <p>Reservas</p>
+                    </a>
+                  </li>
+                </ul>
+                <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                    <a role="button" class="nav-link" onclick="">
+                      <i class="fas fa-cash-register"></i>
+                      <p>Facturación</p>
+                    </a>
+                  </li>
+                </ul>
           </li>
           <li class="nav-item">
             <a href="#" onclick="cerrarSession();" class="nav-link">

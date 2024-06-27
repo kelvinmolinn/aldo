@@ -49,7 +49,7 @@ class administracionCompras extends Controller
         $consultaCompras = $com_compras
                 ->select('cat_tipo_contribuyente.tipoContribuyenteId,comp_compras.compraId,comp_proveedores.tipoProveedorOrigen, cat_02_tipo_dte.tipoDocumentoDTE, 
                           DATE_FORMAT(comp_compras.fechaDocumento, "%d-%m-%Y") as fechaDocumento, comp_compras.numFactura,
-                          cat_20_paises.pais,comp_proveedores.proveedor,comp_proveedores.proveedorComercial')
+                          cat_20_paises.pais,comp_proveedores.proveedor,comp_proveedores.proveedorComercial,comp_compras.estadoCompra')
                 ->join('comp_proveedores','comp_proveedores.proveedorId = comp_compras.proveedorId')
                 ->join('cat_tipo_contribuyente','cat_tipo_contribuyente.tipoContribuyenteId = comp_proveedores.tipoContribuyenteId')
                 ->join('cat_02_tipo_dte','cat_02_tipo_dte.tipoDTEId = comp_compras.tipoDTEId')
@@ -91,18 +91,27 @@ class administracionCompras extends Controller
                     "tipoContribuyenteId"   => $columna['tipoContribuyenteId']
                 ];
 
+                if($columna['estadoCompra'] == "Finalizada"){
+                    $columna5 = '
+                        <button class="btn btn-primary mb-1" onclick="" data-toggle="tooltip" data-placement="top" title="Ver compra">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    ';
+                }else{
+                    $columna5 = '
+                        <button type= "button" class="btn btn-primary mb-1" onclick="cambiarInterfaz(`compras/admin-compras/vista/actualizar/compra`, '.htmlspecialchars(json_encode($jsonActualizarCompra)).');" data-toggle="tooltip" data-placement="top" title="Continuar compra">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    ';
 
-                $columna5 = '
-                    <button type= "button" class="btn btn-primary mb-1" onclick="cambiarInterfaz(`compras/admin-compras/vista/actualizar/compra`, '.htmlspecialchars(json_encode($jsonActualizarCompra)).');" data-toggle="tooltip" data-placement="top" title="Continuar compra">
-                        <i class="fas fa-sync-alt"></i>
-                    </button>
-                ';
+                    $columna5 .= '
+                        <button class="btn btn-danger mb-1" onclick="" data-toggle="tooltip" data-placement="top" title="Anular compra">
+                            <i class="fas fa-ban"></i>
+                        </button>
+                    ';
+                }
 
-                $columna5 .= '
-                    <button class="btn btn-danger mb-1" onclick="" data-toggle="tooltip" data-placement="top" title="Anular compra">
-                        <i class="fas fa-ban"></i>
-                    </button>
-                ';
+
                 // Agrega la fila al array de salida
                 $output['data'][] = array(
                     $columna1,
@@ -458,7 +467,7 @@ class administracionCompras extends Controller
                     $totalCantidad . ' ('. $UDM .')',
                     '<b>Total con IVA:</b> $ ' . number_format($totalConIVA, 2, '.', ',') . '<br>' . '<b>Total Sin IVA:</b> $ ' . number_format($totalSinIVA, 2, '.', ',')
                 );
-                if($tipoContribuyenteId == 1){
+                if($tipoContribuyenteId == 3){
                     $output['footerTotales'] = '
                         <b>
                         <div class="row text-right">
