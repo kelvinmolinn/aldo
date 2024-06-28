@@ -122,21 +122,26 @@
     $(document).ready(function() {
 
         $("#selectTipoProveedor").select2({
-            placeholder: 'Tipo proveedor'
+            placeholder: 'Tipo proveedor',
+            dropdownParent: $('#modalProveedores')
         });
 
         $("#selectTipoPersona").select2({
-            placeholder: 'Tipo persona'
+            placeholder: 'Tipo persona',
+            dropdownParent: $('#modalProveedores')
         });
 
         $("#selectTipoContribuyente").select2({
-            placeholder: 'Tipo contribuyente'
+            placeholder: 'Tipo contribuyente',
+            dropdownParent: $('#modalProveedores')
         });
         $("#selectTipoDocumento").select2({
-            placeholder: 'Tipo de documento'
+            placeholder: 'Tipo de documento',
+            dropdownParent: $('#modalProveedores')
         });
         $("#selectActividadEconomica").select2({
-            placeholder: 'Actividad economica'
+            placeholder: 'Actividad economica',
+            dropdownParent: $('#modalProveedores')
         });
         document.querySelectorAll('#nrc').forEach(function(input) {
             input.addEventListener('keydown', function(event) {

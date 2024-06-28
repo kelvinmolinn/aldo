@@ -18,9 +18,132 @@ class administracionClientes extends Controller
             'renderVista' => 'No'
         ];
         $session->set([
-            'route'             => 'ventas/admin-clientes',
+            'route'             => 'ventas/admin-clientes/index',
             'camposSession'     => json_encode($camposSession)
         ]);
         return view('ventas/vistas/clientes', $data);
+    }
+    public function tablaClientes(){
+        $output['data'] = array();
+        $n = 0;
+
+        $n++;
+        // Aquí construye tus columnas
+        $columna1 = $n;
+        $columna2 = "<b>Tipo de persona: </b>" . "<br>" . "<b>Cliente:</b> " . "<br>" . "<b>Giro:</b>" . "<br>" . "<b>Dirección:</b> ";
+
+        $columna3 = "<b>Categoría: </b>" . "<br>" . "<b>NRC:</b> " . "<br>" . "<b>DUI:</b>";
+        
+        $columna4 = '
+                        <button type= "button" class="btn btn-primary mb-1" onclick="" data-toggle="tooltip" data-placement="top" title="Editar">
+                            <i class="fas fa-pencil-alt"></i>
+                        </button>';
+        $columna4 .= '
+                        <button type= "button" class="btn btn-primary mb-1" onclick="modalContactoClientes()" data-toggle="tooltip" data-placement="top" title="Contactos">
+                            <i class="fas fa-address-book"></i>
+                        </button>';
+
+        $columna4 .= '
+                         <button type= "button" class="btn btn-primary mb-1" onclick="modalHistorialVentas()" data-toggle="tooltip" data-placement="top" title="Historial de ventas">
+                            <i class="fas fa-history"></i>
+                        </button>
+                    ';
+
+        $output['data'][] = array(
+            $columna1,
+            $columna2,
+            $columna3,
+            $columna4
+        );
+
+        // Verifica si hay datos
+        if ($n > 0) {
+            return $this->response->setJSON($output);
+        } else {
+            return $this->response->setJSON(array('data' => '')); // No hay datos, devuelve un array vacío
+        }
+    }
+
+    public function modalNuevoCliente(){
+
+        $data['variable'] = 0;
+        return view('ventas/modals/modalNuevoCliente', $data);
+    }
+
+    public function modalContactoCliente(){
+        $data['variable'] = 0;
+        return view('ventas/modals/modalContactoCliente', $data);
+    }
+
+    public function tablaContactoClientes(){
+        $output['data'] = array();
+        $n = 0;
+
+        $n++;
+        // Aquí construye tus columnas
+        $columna1 = $n;
+        $columna2 = "<b>Correo electronico: </b> prueba@gmail.com";
+        
+        $columna3 = '
+                        <button type= "button" class="btn btn-danger mb-1" onclick="" data-toggle="tooltip" data-placement="top" title="Editar">
+                            <i class="fas fa-trash"></i>
+                        </button> 
+                    ';
+
+        $output['data'][] = array(
+            $columna1,
+            $columna2,
+            $columna3
+        );
+
+        // Verifica si hay datos
+        if ($n > 0) {
+            return $this->response->setJSON($output);
+        } else {
+            return $this->response->setJSON(array('data' => '')); // No hay datos, devuelve un array vacío
+        }
+    }
+
+    public function modalHistorialVentas(){
+
+        $data['variable'] = 0;
+        return view('ventas/modals/modalHistorialVentas', $data);
+    }
+
+    public function tablaHistorialVentas(){
+            $output['data'] = array();
+            $n = 0;
+            $n++;
+            
+            $columna1 = "<b>Sucursal: </b> " . "<br>" . "<b>Tipo de DTE: </b> ";
+            
+            $columna2 = "<b>Cód. Generación: </b> " . "<br>" . "<b>Núm. control: </b> ";
+            $columna3 = "<b>Fecha: </b> 05/05/2024" . "<br>" . "<b>Hora: </b>05:25:01 ";
+
+            $columna4 = "$ 200.00";
+
+            $columna5 = '
+                            <button type= "button" class="btn btn-primary mb-1" onclick="" data-toggle="tooltip" data-placement="top" title="Ver factura">
+                                <i class="fas fa-eye"></i>
+                            </button>';
+            $columna5 .= '
+                            <button type= "button" class="btn btn-danger mb-1" onclick="" data-toggle="tooltip" data-placement="top" title="Anular">
+                                <i class="fas fa-ban"></i>
+                            </button>';
+
+            $output['data'][] = array(
+                $columna1,
+                $columna2,
+                $columna3,
+                $columna4,
+                $columna5
+            );
+
+            // Verifica si hay datos
+            if ($n > 0) {
+                return $this->response->setJSON($output);
+            } else {
+                return $this->response->setJSON(array('data' => '')); // No hay datos, devuelve un array vacío
+            }       
     }
 }
