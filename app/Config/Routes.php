@@ -207,11 +207,17 @@ $routes->group('compras/admin-retaceo', function($routes) {
     $routes->post('tabla/retaceo', 'compras\administracionRetaceo::tablaRetaceo');
     $routes->post('form/nuevo/retaceo', 'compras\administracionRetaceo::modalNuevoRetaceo');
     $routes->post('vista/continuar/retaceo', 'compras\administracionRetaceo::vistaContinuarRetaceo');
+    $routes->post('tabla/continuar/retaceo', 'compras\administracionRetaceo::tablaContinuarRetaceo');
 });
 
 $routes->group('ventas/admin-clientes', function($routes) {
     $routes->post('index', 'ventas\administracionClientes::index');
-
+    $routes->post('tabla/clientes', 'ventas\administracionClientes::tablaClientes');
+    $routes->post('form/nuevo/cliente', 'ventas\administracionClientes::modalNuevoCliente');
+    $routes->post('form/nuevo/contacto/cliente', 'ventas\administracionClientes::modalContactoCliente');
+    $routes->post('tabla/contacto/cliente', 'ventas\administracionClientes::tablaContactoClientes');
+    $routes->post('form/historial/ventas', 'ventas\administracionClientes::modalHistorialVentas');
+    $routes->post('tabla/historial/ventas', 'ventas\administracionClientes::tablaHistorialVentas');
 });
 
 $routes->group('ventas/admin-reservas', function($routes) {

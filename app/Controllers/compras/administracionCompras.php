@@ -1082,7 +1082,7 @@ class administracionCompras extends Controller
 
                 $dataCompra = [
                     "estadoCompra"  => "Finalizada",
-                    "obsCompra"     => $this->request->getPost('observacionFinalizarComrpa')
+                    "obsCompra"     => $this->request->getPost('observacionFinalizarCompra')
                     ];
         
                     // Insertar datos en la base de datos

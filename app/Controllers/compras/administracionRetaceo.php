@@ -82,4 +82,64 @@ class administracionRetaceo extends Controller
 
         return view('compras/vistas/pageContinuarRetaceo', $data);
     }
+
+    public function tablaContinuarRetaceo(){
+        $output['data'] = array();
+        $n = 0;
+
+        $n++;
+        // Aquí construye tus columnas
+        $columna1 = $n;
+        $columna2 = "(001)Control";
+
+        $columna3 = "2";
+
+        $columna4 = "$ 10.00";
+
+        $columna5 = "$ 20.00 ";
+
+        $columna6 = "$ 50.00";
+
+        $columna7 = "$ 40.00 ";
+
+        $columna8 = "$ 20.00 ";
+
+        $columna9 = "$ 5.00 ";
+
+        $columna10 = "$ 10.00 ";
+
+        $columna11 = "$ 30.00 ";
+
+        /*$columna4 = '
+                        <button type= "button" class="btn btn-primary mb-1" onclick="cambiarInterfaz(`compras/admin-retaceo/vista/continuar/retaceo`);" data-toggle="tooltip" data-placement="top" title="Continuar retaceo">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>';
+
+        $columna4 .= '
+                         <button type= "button" class="btn btn-danger mb-1" onclick="" data-toggle="tooltip" data-placement="top" title="Anular">
+                            <i class="fas fa-ban"></i>
+                        </button>
+                    ';*/
+
+        $output['data'][] = array(
+            $columna1,
+            $columna2,
+            $columna3,
+            $columna4,
+            $columna5,
+            $columna6,
+            $columna7,
+            $columna8,
+            $columna9,
+            $columna10,
+            $columna11
+        );
+
+        // Verifica si hay datos
+        if ($n > 0) {
+            return $this->response->setJSON($output);
+        } else {
+            return $this->response->setJSON(array('data' => '')); // No hay datos, devuelve un array vacío
+        }
+    }
 }

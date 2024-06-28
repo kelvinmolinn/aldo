@@ -16,7 +16,9 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-outline">
-                                <input type="text" id="tipoContacto" name="tipoContacto" class="form-control " placeholder="Contacto" min ="0" required>
+                                <input type="text" id="tipoContacto" name="tipoContacto" class="form-control " min ="0" required>
+                                <label class="form-label" for="tipoContacto">Contacto</label>
+
                             </div>
                         </div>
                         <div class="col-md-4 text-right">

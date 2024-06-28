@@ -24,25 +24,27 @@
                     </div>
 
                     <div class="row mb-2">
-                            <div class="col-md-4">
+                            <div class="col-md-6">
                                 <div class="form-outline">
-                                    <input type="text" id="flete" name="flete" class="form-control" required>
+                                    <input type="number" id="flete" name="flete" class="form-control" required>
                                     <label class="form-label" for="flete">Flete</label>
 
                                 </div>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-6">
                                     <div class="form-outline">
-                                        <input type="text" id="Gastos" name="flete" class="form-control" required>
+                                        <input type="number" id="Gastos" name="flete" class="form-control" required>
                                         <label class="form-label" for="flete">Gastos</label>
                                     </div>
                             </div>
-                            <div class="col-md-4">
-                                    <div class="form-outline">
-                                        <input type="text" id="observaciones" name="observaciones" class="form-control" required>
-                                        <label class="form-label" for="observaciones">Observaciones</label>
-                                    </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-outline">
+                                <textarea name="observacionRetaceo" id="observacionRetaceo" class="form-control" style="width: 100%;" required></textarea>
+                                <label class="form-label" for="observacionRetaceo">Observación</label>
                             </div>
+                        </div>    
                     </div>
                 </div>
                 <div class="modal-footer">

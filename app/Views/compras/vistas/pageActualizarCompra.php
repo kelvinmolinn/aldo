@@ -119,7 +119,7 @@
     <div class="row mb-4 mt-4">
         <div class="col-md-6">
             <div class="form-outline">
-                <textarea name="observacionFinalizarComrpa" id="observacionFinalizarComrpa" class="form-control" style="width: 100%;" required></textarea>
+                <textarea name="observacionFinalizarCompra" id="observacionFinalizarCompra" class="form-control" style="width: 100%;" required></textarea>
                 <label class="form-label" for="">Observación de la compra</label>
             </div>
         </div>
