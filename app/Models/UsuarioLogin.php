@@ -18,7 +18,7 @@
         public function obtenerUsuario($data)
         {
             // Agregar JOIN a conf_empleados (cambiar cof a conf) 
-            $usuario = $this->db->table('conf_usuarios'); // Establecer la tabla 'conf_usuarios'
+            $usuario = $this->db->table('vista_usuarios_empleados'); // Establecer la tabla 'conf_usuarios'
             $usuario->where($data);
             $usuario->limit(1);
             return $usuario->get()->getRowArray();

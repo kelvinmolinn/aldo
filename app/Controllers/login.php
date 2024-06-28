@@ -9,12 +9,19 @@ class Login extends BaseController
 {
     public function index()
     {
-        // Cargar la vista de inicio de sesión
-        return view('login');
+        $session = session();
+
+        if($session->get('nombreUsuario')) {
+            return redirect()->to(base_url('app'));
+        } else {
+            // Cargar la vista de inicio de sesión
+            return view('login');
+        }
     }
 
     public function validarIngreso()
     {
+        $defaultPass = "aldo" . date("Y") . "$";
         // Obtener los datos del formulario de inicio de sesión
         $correoUsuario = $this->request->getPost("correoUsuario");
         $clave = $this->request->getPost("claveUsuario");
@@ -51,13 +58,20 @@ class Login extends BaseController
 
                 $logUsuarioId = $logUsuariosModel->insert($dataBitacora);
 
+                if($clave == $defaultPass) {
+                    $flgDefaultPassword = "Default";
+                } else {
+                    $flgDefaultPassword = "Propia";
+                }
+
                 // Iniciar sesión y redirigir al dashboard
                 $session = session();
                 // Establecer variables de sesión
                 $session->set([
                     'usuarioId'     => $dataUsuario['usuarioId'],
-                    'nombreUsuario' => $dataUsuario['correo'],
+                    'nombreUsuario' => $dataUsuario['primerNombre'] . " " . $dataUsuario['primerApellido'],
                     'logUsuarioId'  => $logUsuarioId,
+                    'defaultPass'   => $flgDefaultPassword,
                     'route'         => 'escritorio/dashboard'
                     // 'nombreUsuario' => $dataUsuario['primerNombre'] . ' ' . $dataUsuario['primerApellido']
                 ]);
