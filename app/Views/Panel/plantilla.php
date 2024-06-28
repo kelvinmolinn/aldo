@@ -101,7 +101,7 @@
               <p>INICIO</p>
             </a>
           </li>
-          <li class="nav-item">
+                    <li class="nav-item">
             <a href="#" class="nav-link nav-color">
               <i class="nav-icon fas fa-cog"></i>
               <p>Configuración usuario
@@ -182,6 +182,7 @@
               </li>
             </ul>
           </li>
+
           <li class="nav-item">
             <a href="#" class="nav-link nav-color">
               <i class="nav-icon fas fa-box-open"></i>
