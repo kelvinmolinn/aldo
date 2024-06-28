@@ -204,7 +204,9 @@ $routes->group('compras/admin-compras', function($routes) {
 
 $routes->group('compras/admin-retaceo', function($routes) {
     $routes->post('index', 'compras\administracionRetaceo::index');
-
+    $routes->post('tabla/retaceo', 'compras\administracionRetaceo::tablaRetaceo');
+    $routes->post('form/nuevo/retaceo', 'compras\administracionRetaceo::modalNuevoRetaceo');
+    $routes->post('vista/continuar/retaceo', 'compras\administracionRetaceo::vistaContinuarRetaceo');
 });
 
 $routes->group('ventas/admin-clientes', function($routes) {

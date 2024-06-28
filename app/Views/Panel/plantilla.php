@@ -175,7 +175,7 @@
               </li>
               <li class="nav-item">
                 <a role="button" class="nav-link nav-color" onclick="cambiarInterfaz('compras/admin-retaceo/index', {renderVista: 'No'});">
-                  <i class="fas fa-store"></i>
+                <i class="fas fa-list-ol"></i>
                   <p> Retaceo  
                   </p>
                 </a>

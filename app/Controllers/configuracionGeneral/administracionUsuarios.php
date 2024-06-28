@@ -115,7 +115,7 @@ class AdministracionUsuarios extends Controller
                 'fechaNacimiento'   => $this->request->getPost('fechaUsuario'),
                 'sexoEmpleado'      => $this->request->getPost('selectGenero'),
                 'estadoEmpleado'    => "Activo"
-                //'contrasena' => password_hash('aldo'.date('Y').'$', PASSWORD_DEFAULT) // Encriptar contraseña
+                //'clave' => password_hash('aldo'.date('Y').'$', PASSWORD_DEFAULT) // Encriptar contraseña
             ];
             // Insertar datos en la base de datos
             

@@ -12,7 +12,7 @@
     <div class="col-md-4">
         <div class="form-outline">
             <input type="text" id="filtroNumFactura" name="filtroNumFactura" class="form-control ">
-            <label class="form-label" for="filtroNumFactura">Numero de factura</label>
+            <label class="form-label" for="filtroNumFactura">Numero de documento</label>
         </div>
     </div>
     <div class="col-md-4">
