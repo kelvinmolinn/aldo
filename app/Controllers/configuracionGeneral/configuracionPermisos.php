@@ -12,36 +12,31 @@ class ConfiguracionPermisos extends Controller
     public function indexPermisos()
     {        
         $session = session();
-        
-        if(!$session->get('nombreUsuario')) {
-            return view('login');
-        } else {
     
-            $data['menu'] = $this->request->getPost('menu');
-            $data['menuId'] = $this->request->getPost('menuId');
+        $data['menu'] = $this->request->getPost('menu');
+        $data['menuId'] = $this->request->getPost('menuId');
 
-            $menus = new conf_menus();
+        $menus = new conf_menus();
 
-            $datos = $menus->select('conf_modulos.modulo,conf_modulos.moduloId')
-                           ->join('conf_modulos', 'conf_modulos.moduloId = conf_menus.moduloId')
-                           ->where('conf_menus.flgElimina', 0)
-                           ->where('conf_menus.menuId', $data['menuId'])
-                           ->first();
-            //$modeloModulos = consulta hacia menus con jOIN a modulos
-            $data['modulo'] = $datos;
+        $datos = $menus->select('conf_modulos.modulo,conf_modulos.moduloId')
+                       ->join('conf_modulos', 'conf_modulos.moduloId = conf_menus.moduloId')
+                       ->where('conf_menus.flgElimina', 0)
+                       ->where('conf_menus.menuId', $data['menuId'])
+                       ->first();
+        //$modeloModulos = consulta hacia menus con jOIN a modulos
+        $data['modulo'] = $datos;
 
-            $camposSession = [
-                'renderVista'           => 'No',
-                'menuId'                => $data['menuId'],
-                'menu'                  => $data['menu']
-            ];
-            $session->set([
-                'route'             => 'conf-general/admin-permisos/index',
-                'camposSession'     => json_encode($camposSession)
-            ]);
+        $camposSession = [
+            'renderVista'           => 'No',
+            'menuId'                => $data['menuId'],
+            'menu'                  => $data['menu']
+        ];
+        $session->set([
+            'route'             => 'conf-general/admin-permisos/index',
+            'camposSession'     => json_encode($camposSession)
+        ]);
 
-            return view('configuracion-general/vistas/administracionPermisos', $data);
-        }
+        return view('configuracion-general/vistas/administracionPermisos', $data);
     }
 
     public function tablaPermisos()
@@ -180,7 +175,6 @@ class ConfiguracionPermisos extends Controller
 
     public function modalUsuariosPermisos()
     {
-        
         $mostrarUsuariosPermiso = new conf_roles_permisos();
         $menuPermisoId = $this->request->getPost('menuPermisoId');
         $menu = $this->request->getPost('menu');
@@ -194,7 +188,6 @@ class ConfiguracionPermisos extends Controller
 
     public function tablaPermisosUsuarios()
     {
-
         $mostrarUsuariosPermiso = new conf_roles_permisos();
         $menuPermisoId = $this->request->getPost('menuPermisoId');
         

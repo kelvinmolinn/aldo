@@ -1,6 +1,7 @@
 <?php 
 namespace App\Controllers;
 use App\Models\UsuarioLogin;
+use App\Models\conf_usuarios;
 
 class Panel extends BaseController{
     public function index(){        
@@ -8,32 +9,62 @@ class Panel extends BaseController{
         
         if(!$session->get('nombreUsuario')) {
             return view('login');
+        } else {            
+            $usuario = new UsuarioLogin();
+            
+            //$data['usuarios'] = $usuario->obtenerDatos();
+
+            $data['renderVista'] = $this->request->getPost("renderVista");
+
+            if($data['renderVista'] == "") {
+                $data['renderVista'] = "Sí";
+            } else {
+                $data['renderVista'] = "No";
+            }
+
+            $data['route'] = $session->get('route');
+            $data['tituloVentana'] = $session->get('tituloVentana');
+            $data['campos'] = $session->get('camposSession');
+            $data['defaultPass'] = $session->get('defaultPass');
+
+            if($session->get('defaultPass') == "Default") {
+                return view('Panel/defaultPassword', $data);
+            } else {
+                return view('Panel/app', $data);
+            }
         }
-        $usuario = new UsuarioLogin();
-        
-        //$data['usuarios'] = $usuario->obtenerDatos();
+    }
 
-        $data['renderVista'] = $this->request->getPost("renderVista");
+    public function cambiarClave() {
+        $session = session();
+        $modelUsuario = new conf_usuarios();
 
-        if($data['renderVista'] == "") {
-            $data['renderVista'] = "Sí";
+        $usuarioId = $session->get('usuarioId');
+        $nuevaClave = $this->request->getPost("nuevaClave");
+        $confirmarClave = $this->request->getPost("confirmarClave");
+
+        if($nuevaClave == $confirmarClave) {
+            $dataUsuarios = [
+                'clave'             => password_hash($nuevaClave, PASSWORD_DEFAULT)
+            ];
+            $insertUsuario = $modelUsuario->update($usuarioId, $dataUsuarios);
+
+            return $this->response->setJSON([
+                'success' => true,
+                'mensaje' => 'Contraseña actualizada con éxito'
+            ]);
         } else {
-            $data['renderVista'] = "No";
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'Las contraseñas no coinciden'
+            ]);
         }
 
-        $data['route'] = $session->get('route');
-        $data['tituloVentana'] = $session->get('tituloVentana');
-        $data['campos'] = $session->get('camposSession');
-
-        return view('Panel/app', $data);
     }
 
     public function escritorio(){        
         $session = session();
-        
-        if(!$session->get('nombreUsuario')) {
-            return view('login');
-        }
+    
         $usuario = new UsuarioLogin();
 
         $camposSession = [

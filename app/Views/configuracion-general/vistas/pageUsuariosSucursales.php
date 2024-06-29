@@ -3,13 +3,13 @@
 <div class="row mb-4">
     <div class="col-md-6">
         <button type= "button" id="btnRegresarUsuarios" class="btn btn-secondary">
-        <i class="fas fa-backspace "></i>
+            <i class="fas fa-chevron-left"></i>
             Volver a usuarios
         </button>
     </div>
     <div class="col-md-6 text-right">
         <button type= "button" id="btnAsignarSucursal" class="btn btn-primary">
-            <i class="fas fa-plus"></i>
+            <i class="fas fa-plus-circle"></i>
             Asignar sucursal
         </button>
     </div>
@@ -24,23 +24,6 @@
             </tr>
         </thead>
         <tbody>
-            <?php 
-                $n = 0;
-                foreach($sucursalUsuario as $sucursalUsuario){ 
-                    $n++;
-            ?>
-                <tr>
-                    <td><?php echo $n; ?></td>
-                    
-                    <td><b>Sucursal: </b><?= $sucursalUsuario['sucursal']?></td>
-                    
-                    <td>
-                        <button class="btn btn-danger" onclick="eliminarSucursal(`<?= $sucursalUsuario['sucursalUsuarioId']; ?>`);" data-toggle="tooltip" data-placement="top" title="Eliminar">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </td>
-                </tr>
-            <?php } ?>
         </tbody>
     </table>
 </div>
@@ -73,8 +56,7 @@
                                         title: '¡Sucursal eliminada con Éxito!',
                                         text: response.mensaje
                                     }).then((result) => {
-                                        // Recargar la DataTable después del insert
-                                        window.location.href = "<?= site_url('conf-general/admin-usuarios/vista/usuario/sucursal/' . $empleadoId . '/' . $nombreCompleto); ?>";
+                                        $("#tblSucursales").DataTable().ajax.reload(null, false);
                                     });
                                 } else {
                                     // Insert fallido, mostrar mensaje de error
@@ -130,6 +112,13 @@
         });
 
         $('#tblSucursales').DataTable({
+            "ajax": {
+                "method": "POST",
+                "url": '<?php echo base_url('conf-general/admin-usuarios/tabla/usuarios-sucursales'); ?>',
+                "data": {
+                    empleadoId: '<?= $empleadoId; ?>'
+                }
+            },
             "language": {
                 "url": "../assets/plugins/datatables/js/spanish.json"
             },

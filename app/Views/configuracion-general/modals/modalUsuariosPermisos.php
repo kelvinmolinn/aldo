@@ -47,7 +47,7 @@
                 { "width": "35%", "targets": 2 } 
             ],
             "language": {
-                "url": "../../../../../assets/plugins/datatables/js/spanish.json"
+                "url": "../assets/plugins/datatables/js/spanish.json"
             },
                 "drawCallback": function(settings) {
                 // Inicializar tooltips de Bootstrap después de cada dibujo de la tabla

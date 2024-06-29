@@ -133,7 +133,6 @@
                 type: $(this).attr('method'),
                 data: $(this).serialize(),
                 success: function(response) {
-                    console.log(response);
                     if (response.success) {
                         // Insert exitoso, ocultar modal y mostrar mensaje
                         $('#modalUsuario').modal('hide');
@@ -142,10 +141,8 @@
                             title: '¡Usuario agregado con Éxito!',
                             text: response.mensaje
                         }).then((result) => {
-                            // Recargar la DataTable después del insert
-                            
+                            $("#tblEmpleados").DataTable().ajax.reload(null, false);
                         });
-                        console.log("Último ID insertado:", response.empleadoId);
                     } else {
                         // Insert fallido, mostrar mensaje de error
                         Swal.fire({

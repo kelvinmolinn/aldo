@@ -58,8 +58,7 @@
                             title: 'Sucursal agregada con Éxito!',
                             text: response.mensaje
                         }).then((result) => {
-                              // Recargar la DataTable después del insert
-                              window.location.href = "<?= site_url('conf-general/admin-usuarios/vista/usuario/sucursal/' . $empleadoId . '/' . $nombreCompleto); ?>";
+                            $("#tblSucursales").DataTable().ajax.reload(null, false);
                         });
                     } else {
                         // Insert fallido, mostrar mensaje de error

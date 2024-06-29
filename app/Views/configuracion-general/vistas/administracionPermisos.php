@@ -3,13 +3,13 @@
 <div class="row mb-4">
     <div class="col-md-6">
         <button type= "button" id="btnRegresar" class="btn btn-secondary estilo-btn">
-            <i class="fas fa-angle-double-left"> </i>
+            <i class="fas fa-chevron-left"> </i>
             Volver a menús
         </button>
     </div>
     <div class="col-md-12 text-right">
         <button type= "button" class="btn btn-primary ttip" onclick="modalPermisos(0,'insertar');">
-            <i class="fas fa-user-plus"></i>
+            <i class="fas fa-plus-circle"></i>
             Nuevo permiso
         </button>
     </div>
@@ -126,6 +126,7 @@
     }
 
     $(document).ready(function() {
+        tituloVentana('Menús - Permisos');
         $('#btnRegresar').on('click', function() {
             cambiarInterfaz('conf-general/admin-modulos/vista/modulos/menus', {renderVista: 'No', moduloId: '<?= $modulo["moduloId"]; ?>', modulo: '<?= $modulo["modulo"]; ?>'});
         });

@@ -3,13 +3,13 @@
 <div class="row mb-4">
     <div class="col-md-6">
         <button type= "button" id="btnRegresarRol" class="btn btn-secondary estilo-btn">
-        <i class="fas fa-backspace "></i>
+            <i class="fas fa-chevron-left"> </i>
             Volver a Roles
         </button>
     </div>
     <div class="col-md-6 text-right">
         <button type= "button" id="btnNuevoPermiso" class="btn btn-primary estilo-btn">
-            <i class="fas fa-save"></i>
+            <i class="fas fa-plus-circle"></i>
             Nuevo permiso
         </button>
     </div>
@@ -46,6 +46,7 @@
         });
     }
     $(document).ready(function() {
+        tituloVentana('Roles - Permisos');
         $('#btnRegresarRol').on('click', function() {
             cambiarInterfaz('conf-general/admin-roles/index', {renderVista: 'No'});
         });

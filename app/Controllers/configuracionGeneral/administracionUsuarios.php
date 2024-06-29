@@ -13,42 +13,168 @@ class AdministracionUsuarios extends Controller
     public function index()
     {        
         $session = session();
-        
-        if(!$session->get('nombreUsuario')) {
-            return view('login');
-        } else {
-            $mostrarUsuario = new conf_empleados();
 
-            $data['empleados'] = $mostrarUsuario
-            ->select('conf_empleados.*,conf_usuarios.usuarioId, conf_usuarios.correo, conf_roles.rol')
-            ->join('conf_usuarios', 'conf_usuarios.empleadoId = conf_empleados.empleadoId', 'left')
-            ->join('conf_roles', 'conf_roles.rolId = conf_usuarios.rolId', 'left')
-            ->where('conf_empleados.flgElimina', 0)
-            ->findAll();
-    
-            $sucursalesUsuarios = new conf_sucursales_empleados();
-            // Obtener el conteo de sucursales para cada empleado
-            foreach ($data['empleados'] as &$empleado) {
-                $conteo = $sucursalesUsuarios->where('flgElimina', 0)
-                                        ->where('empleadoId', $empleado['empleadoId'])
-                                        ->countAllResults();
-                $empleado['conteo_sucursales'] = $conteo;
-            }
+        $mostrarUsuario = new conf_empleados();
 
-            $camposSession = [
-                'renderVista' => 'No'
-            ];
-            $session->set([
-                'route'             => 'conf-general/admin-usuarios/index',
-                'camposSession'     => json_encode($camposSession)
-            ]);
+        $camposSession = [
+            'renderVista' => 'No'
+        ];
+        $session->set([
+            'route'             => 'conf-general/admin-usuarios/index',
+            'camposSession'     => json_encode($camposSession)
+        ]);
 
-            return view('configuracion-general/vistas/administracionUsuarios', $data);
-        }
+        return view('configuracion-general/vistas/administracionUsuarios');
     }
 
-    public function mensaje() {
-        return "Hola mundo";
+    public function tablaUsuarios() {
+        $mostrarUsuario = new conf_empleados();
+        $sucursalesUsuarios = new conf_sucursales_empleados();
+
+        $datos = $mostrarUsuario
+        ->select('conf_empleados.*,conf_usuarios.usuarioId, conf_usuarios.correo, conf_roles.rol, conf_usuarios.flgEnLinea, conf_usuarios.fhUltimoIngreso, conf_usuarios.estadoUsuario')
+        ->join('conf_usuarios', 'conf_usuarios.empleadoId = conf_empleados.empleadoId', 'left')
+        ->join('conf_roles', 'conf_roles.rolId = conf_usuarios.rolId', 'left')
+        ->where('conf_empleados.flgElimina', 0)
+        ->findAll();
+
+        // Construye el array de salida
+        $output['data'] = array();
+        $n = 1; // Variable para contar las filas
+        foreach($datos as $campos) {
+            $nombreCompleto = $campos['primerNombre'].' '.$campos['segundoNombre'].' '.$campos['primerApellido'].' '.$campos['segundoApellido'];
+            $empleadoId = $campos['empleadoId'];
+            $estadoUsuario = $campos['estadoEmpleado'] ;
+
+            if(!($campos['usuarioId'] == "")) {
+                $usuarioId = $campos['usuarioId'];
+
+                if($campos["flgEnLinea"] == 1) {
+                    $columnaEnlinea = "
+                        <b>En línea: </b> <span class='font-weight-bold text-success'>Conectado</span><br>
+                        <b>Hora de conexión: </b> ".date("d/m/Y H:i:s", strtotime($campos['fhUltimoIngreso']))."
+                    ";
+                } else {
+                    $columnaEnlinea = "
+                        <b>En línea: </b> <span class='font-weight-bold text-secondary'>Desconectado</span><br>
+                        <b>Última conexión: </b> ".date("d/m/Y H:i:s", strtotime($campos['fhUltimoIngreso']))."
+                    ";
+                }
+
+                $columnaUsuario = "
+                    <b>Correo: </b> ".$campos['correo']."  <br>
+                    <b>Rol: </b> ".$campos['rol']. " <br>
+                    $columnaEnlinea
+                ";
+            } else {
+                // No tiene usuario
+                $usuarioId = "0";
+                $columnaUsuario = "<b>Usuario no creado</b>";
+            }
+
+            if($campos["estadoEmpleado"] == "Activo") {
+                if($usuarioId == "0") {              
+                    $tituloMensaje = "¿Está seguro que desea desactivar el usuario?";
+                    $cuerpoMensaje = "Se bloquearán sus credenciales y no podrá realizar ninguna operación";
+                    $classBoton = "danger";
+                    $iconoBoton = '<i class="fas fa-ban"></i>';
+
+                    $estadoUsuario = "<p class='font-weight-bold text-success'>Activo</p>";
+                } else {
+                    if($campos["estadoUsuario"] == "Activo") {
+                        $tituloMensaje = "¿Está seguro que desea desactivar el usuario?";
+                        $cuerpoMensaje = "Se bloquearán sus credenciales y no podrá realizar ninguna operación";
+                        $classBoton = "danger";
+                        $iconoBoton = '<i class="fas fa-ban"></i>';
+                        $estadoUsuario = "<p class='font-weight-bold text-success'>Activo</p>";
+                    } else {
+                        $tituloMensaje = "¿Está seguro que desea activar el usuario?";
+                        $cuerpoMensaje = "Se habilitarán sus credenciales y establecerá la contraseña predeterminada";
+                        $classBoton = "success";
+                        $iconoBoton = '<i class="fas fa-check"></i>';
+                        $estadoUsuario = "<p class='font-weight-bold text-danger'>Bloqueado</p>";
+                    }
+                }
+            } else {
+                $tituloMensaje = "¿Está seguro que desea activar el usuario?";
+                $cuerpoMensaje = "Se habilitarán sus credenciales y establecerá la contraseña predeterminada";
+                $classBoton = "success";
+                $iconoBoton = '<i class="fas fa-check"></i>';
+
+                $estadoUsuario = "<p class='font-weight-bold text-danger'>Inactivo</p>";
+            }
+
+            $columna1 = $n;
+            $columna2 = '
+                <b>Nombre completo: </b> '.$nombreCompleto.'<br>
+                <b>DUI: </b> '.$campos["dui"].'
+            ';
+            $columna3 = $columnaUsuario;
+            $columna4 = $estadoUsuario;
+
+            $jsonUsuario = [
+                "operacion"             => "editar",
+                "usuarioId"             => $usuarioId,
+                "empleadoId"            => $empleadoId
+            ];
+
+            $columna5 = '
+                <button type="button" class="btn btn-primary mb-1" data-toggle="tooltip" data-placement="top" title="Editar" onclick="modalUsuario('.htmlspecialchars(json_encode($jsonUsuario)).');">
+                    <i class="fas fa-pencil-alt"></i>
+                </button>
+            ';
+
+            $jsonSucursales = [
+                "empleadoId"            => $empleadoId,
+                "nombreCompleto"        => $nombreCompleto
+            ];
+
+            $conteoSucursalesEmpleado = $sucursalesUsuarios->where('flgElimina', 0)
+                                    ->where('empleadoId', $campos['empleadoId'])
+                                    ->countAllResults();
+            $columna5 .= '
+                <button type="button" class="btn btn-primary mb-1" data-toggle="tooltip" data-placement="top" title="Sucursales" onclick="cambiarInterfaz(`conf-general/admin-usuarios/vista/usuario/sucursal`, '.htmlspecialchars(json_encode($jsonSucursales)).');">
+                    <span>'.$conteoSucursalesEmpleado.'</span>
+                    <i class="fas fa-store"></i>
+                </button>
+            ';
+
+            if($usuarioId == "0") {
+                $estadoUpdate = $campos["estadoEmpleado"];
+            } else {
+                $estadoUpdate = $campos["estadoUsuario"];
+            }
+
+            $jsonEstado = [
+                "usuarioId"             => $usuarioId,
+                "estadoUsuario"         => $estadoUpdate,
+                "empleadoId"            => $empleadoId,
+                "mensaje"               => $tituloMensaje,
+                "mensaje2"              => $cuerpoMensaje
+            ];
+
+            $columna5 .= '
+                <button type="button" class="btn btn-'.$classBoton.' mb-1" onclick="ActivarDesactivarUsuario('.htmlspecialchars(json_encode($jsonEstado)).');">
+                    '.$iconoBoton.'
+                </button>
+            ';
+
+            $output['data'][] = array(
+                $columna1,
+                $columna2,
+                $columna3,
+                $columna4,
+                $columna5
+            );
+    
+            $n++;
+        }
+        // Verifica si hay datos
+        if ($n > 1) {
+            return $this->response->setJSON($output);
+        } else {
+            return $this->response->setJSON(array('data' => '')); // No hay datos, devuelve un array vacío
+        }
     }
 
     public function modalAdministracionUsuarios()
@@ -115,7 +241,7 @@ class AdministracionUsuarios extends Controller
                 'fechaNacimiento'   => $this->request->getPost('fechaUsuario'),
                 'sexoEmpleado'      => $this->request->getPost('selectGenero'),
                 'estadoEmpleado'    => "Activo"
-                //'clave' => password_hash('aldo'.date('Y').'$', PASSWORD_DEFAULT) // Encriptar contraseña
+                //'contrasena' => password_hash('aldo'.date('Y').'$', PASSWORD_DEFAULT) // Encriptar contraseña
             ];
             // Insertar datos en la base de datos
             
@@ -173,15 +299,6 @@ class AdministracionUsuarios extends Controller
         $data['empleadoId'] = $this->request->getPost('empleadoId');
         $data['nombreCompleto'] = $this->request->getPost('nombreCompleto');
 
-        $mostrarSucursalUsuario = new conf_sucursales_empleados();
-
-            $data['sucursalUsuario'] = $mostrarSucursalUsuario
-            ->select('conf_sucursales.sucursal, conf_sucursales_empleados.sucursalUsuarioId')
-            ->join('conf_sucursales', 'conf_sucursales.sucursalId = conf_sucursales_empleados.sucursalId')
-            ->where('conf_sucursales_empleados.flgElimina', 0)
-            ->where('conf_sucursales_empleados.empleadoId',$data['empleadoId'])
-            ->findAll(); 
-
         $camposSession = [
             'renderVista'       => 'No',
             'empleadoId'        => $data['empleadoId'],
@@ -193,6 +310,47 @@ class AdministracionUsuarios extends Controller
         ]);
 
         return view('configuracion-general/vistas/pageUsuariosSucursales', $data);
+    }
+
+    public function tablaUsuariosSucursales() {
+        $empleadoId = $this->request->getPost('empleadoId');
+
+        $mostrarSucursalUsuario = new conf_sucursales_empleados();
+
+        $datos = $mostrarSucursalUsuario
+            ->select('conf_sucursales.sucursal, conf_sucursales_empleados.sucursalUsuarioId')
+            ->join('conf_sucursales', 'conf_sucursales.sucursalId = conf_sucursales_empleados.sucursalId')
+            ->where('conf_sucursales_empleados.flgElimina', 0)
+            ->where('conf_sucursales_empleados.empleadoId',$empleadoId)
+            ->findAll(); 
+
+        // Construye el array de salida
+        $output['data'] = array();
+        $n = 1; // Variable para contar las filas
+        foreach($datos as $campos) {
+            $columna1 = $n;
+            $columna2 = "<b>Sucursal </b>: " . $campos['sucursal'];
+
+            $columna3 = '
+                <button type="button" class="btn btn-danger" onclick="eliminarSucursal(`'.$campos["sucursalUsuarioId"].'`);" data-toggle="tooltip" data-placement="top" title="Eliminar">
+                    <i class="fas fa-trash"></i>
+                </button>
+            ';
+
+            $output['data'][] = array(
+                $columna1,
+                $columna2,
+                $columna3
+            );
+    
+            $n++;
+        }
+        // Verifica si hay datos
+        if ($n > 1) {
+            return $this->response->setJSON($output);
+        } else {
+            return $this->response->setJSON(array('data' => '')); // No hay datos, devuelve un array vacío
+        }
     }
 
     public function modalUsuariosSucursales(){
@@ -274,10 +432,10 @@ class AdministracionUsuarios extends Controller
 
         if($estadoUsuario == 'Activo'){
             $data = ['estadoEmpleado' => 'Inactivo'];
-            $dataUsuario = ['estadoUsuario' => 'Inactivo', 'clave' => 'random_para_impedir_acceso'];
+            $dataUsuario = ['estadoUsuario' => 'Inactivo', 'clave' => password_hash("CLAVE_TEMPORAL_ACCESO_RESTRINGIDO1234$", PASSWORD_DEFAULT)];
         }else{
             $data = ['estadoEmpleado' => 'Activo'];
-            $dataUsuario = ['estadoUsuario' => 'Activo', 'clave' => '123456'];
+            $dataUsuario = ['estadoUsuario' => 'Activo', 'clave' => password_hash('aldo'.date('Y').'$', PASSWORD_DEFAULT)];
         }
 
         $desactivarActivarEmpleado->update($empleadoId, $data);

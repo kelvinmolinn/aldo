@@ -3,7 +3,7 @@
 <div class="row mb-4">
     <div class="col-md-12 text-right">
         <button type= "button" class="btn btn-primary ttip" onclick="modalModulo(0, 'insertar');">
-            <i class="fas fa-user-plus"></i>
+            <i class="fas fa-plus-circle"></i>
             Nuevo módulo
         </button>
     </div>
@@ -14,7 +14,6 @@
             <tr>
                 <th>#</th>
                 <th>Módulo</th>
-                <th>Url</th>
                 <th>Acciones</th>
             </tr>
         </thead>
@@ -27,7 +26,7 @@
         //alert("Vamos a eliminar " + id);
             Swal.fire({
                 title: '¿Estás seguro que desea eliminar el módulo?',
-                text: "Se eiminara el módulo seleccionado.",
+                text: "Se eliminará el módulo seleccionado.",
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
@@ -95,6 +94,8 @@
         });
     }
      $(document).ready(function() {
+        tituloVentana('Módulos');
+        
         $('#miTabla').DataTable({
             "ajax": {
                 "method": "POST",
@@ -105,9 +106,8 @@
             },
             "columnDefs": [
                 { "width": "10%", "targets": 0 }, 
-                { "width": "40%", "targets": 1 }, 
-                { "width": "35%", "targets": 2 }, 
-                { "width": "15%", "targets": 3 }  
+                { "width": null, "targets": 1 }, 
+                { "width": "15%", "targets": 2 }  
             ],
             "language": {
                 "url": "../assets/plugins/datatables/js/spanish.json"

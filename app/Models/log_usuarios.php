@@ -50,6 +50,16 @@ class log_usuarios extends Model
    
            return $data;
        }
-   
-
+    public function registrarLogInterfaces($columna, $texto, $logUsuarioId)
+    {
+        $logActual = $this->find($logUsuarioId);
+        
+        if ($logActual) {
+            $concatenarLog = $logActual[$columna] . $texto;
+            return $this->update($logUsuarioId, [$columna => $concatenarLog]);
+        } else {
+            // Para prevenir error por si no se creo la session
+            return false;
+        }
+    }
 }

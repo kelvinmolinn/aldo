@@ -26,15 +26,6 @@
                                 <input type="text" class="form-control " id="iconoModulo" name="iconoModulo" placeholder="Icono" value="<?= ($operacion == 'editar' ? $campos["iconoModulo"] : 'fas fa-'); ?>" required>
                             </div>
                         </div>
-                        <div class="col-md-12 mt-4">
-                            <div class="form-select-control">
-                                <select name="urlModulo" id="urlModulo" style="width: 100%;">
-                                    <?php foreach ($carpetas as $carpeta) { ?>
-                                        <option value="<?= esc($carpeta) ?>"><?= esc($carpeta) ?></option>
-                                    <?php } ?>
-                                </select>
-                            </div>
-                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -54,9 +45,6 @@
 
 <script>
     $(document).ready(function() {
-        $("#urlModulo").select2({
-            placeholder: 'Ruta'
-        })
         $('#btnguardarUsuario').on('click', function() {
             // Realizar una petición AJAX para obtener el contenido de la modal
             $.ajax({
@@ -91,6 +79,5 @@
                 }
             });
         });
-        $("#urlModulo").val('<?= $campos['urlModulo']; ?>').trigger("change");
     });
 </script>

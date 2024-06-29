@@ -3,13 +3,13 @@
 <div class="row mb-4">
     <div class="col-md-6">
         <button type= "button" id="btnRegresarModulo" class="btn btn-secondary estilo-btn">
-        <i class="fas fa-backspace "></i>
+            <i class="fas fa-chevron-left"> </i>
             Volver a Módulos
         </button>
     </div>
     <div class="col-md-6 text-right">
         <button type= "button" id="btnAbrirModal" class="btn btn-primary estilo-btn" onclick="modalMenu(<?= $moduloId; ?>, 0, 'insertar');">
-            <i class="fas fa-save"></i>
+            <i class="fas fa-plus-circle"></i>
             Nuevo menú
         </button>
     </div>
@@ -20,7 +20,7 @@
             <tr>
                 <th>#</th>
                 <th>Menú</th>
-                <th>Url</th>
+                <th>Ruta</th>
                 <th>Acciones</th>
             </tr>
         </thead>
@@ -101,6 +101,7 @@ function eliminarMenu(id) {
         });
     }
     $(document).ready(function() {
+        tituloVentana('Módulos - Menús');
         $('#btnRegresarModulo').on('click', function() {
             cambiarInterfaz('conf-general/admin-modulos/index', {renderVista: 'No'});
         });

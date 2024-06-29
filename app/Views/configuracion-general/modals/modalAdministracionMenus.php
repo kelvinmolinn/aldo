@@ -21,12 +21,8 @@
                             </div>
                         </div>
                         <div class="col-md-12 mt-4">
-                            <div class="form-select-control">
-                                <select name="urlMenu" id="urlMenu" style="width: 100%;">
-                                    <?php foreach ($archivos as $archivos) { ?>
-                                        <option value="<?= esc($archivos) ?>"><?= esc($archivos) ?></option>
-                                    <?php } ?>
-                                </select>
+                            <div class="form-outline">
+                                <input type="text" class="form-control " id="urlMenu" name="urlMenu" placeholder="Ruta del menú" value="<?= ($operacion == 'editar' ? $campos["urlMenu"] : ''); ?>" required>
                             </div>
                         </div>
                     </div>
@@ -45,13 +41,8 @@
         </div>
     </div>
 </form>
-
 <script>
  $(document).ready(function() {
-    $("#urlMenu").select2({
-        placeholder: 'Ruta'
-    });
-
     $('#btnMenus').on('click', function() {
         // Realizar una petición AJAX para obtener el contenido de la modal
         $.ajax({
@@ -89,8 +80,6 @@
             }
         });
     });
-
-    $("#urlMenu").val('<?= $campos["urlMenu"]; ?>').trigger("change");
 });
 
 </script>

@@ -40,6 +40,7 @@ $routes->get('cerrarSession', 'Login::cerrarSession'); // 'cerrarSesion' corregi
 
 // Rutas para Panel
 $routes->post('escritorio/dashboard', 'Panel::escritorio');
+$routes->post('escritorio/operacion/cambiarClave', 'Panel::cambiarClave');
 
 // Rutas para no usar parametros por URL
 $routes->get('app', 'Panel::index');
@@ -47,6 +48,8 @@ $routes->get('app', 'Panel::index');
 $routes->group('conf-general/admin-usuarios', function($routes) {
     // Definir las rutas específicas para el grupo 'admin'
     $routes->post('index', 'configuracionGeneral\AdministracionUsuarios::index');
+    $routes->post('tabla/usuarios',  'configuracionGeneral\AdministracionUsuarios::tablaUsuarios');
+    $routes->post('tabla/usuarios-sucursales',  'configuracionGeneral\AdministracionUsuarios::tablaUsuariosSucursales');
     $routes->post('form/empleados/usuarios', 'configuracionGeneral\AdministracionUsuarios::modalAdministracionUsuarios');
     $routes->post('operacion/usuarios', 'configuracionGeneral\AdministracionUsuarios::insertarNuevoUsuario');
     //$routes->get('vista/usuario/sucursal/(:any)', 'configuracionGeneral\AdministracionUsuarios::usuarioSucursal/$1'); 
@@ -97,6 +100,7 @@ $routes->group('conf-general/admin-permisos', function($routes) {
     $routes->post('tabla/usuarios/permiso', 'configuracionGeneral\ConfiguracionPermisos::modalUsuariosPermisos');
     $routes->post('tabla/modulos/permiso/usuarios',  'configuracionGeneral\ConfiguracionPermisos::tablaPermisosUsuarios');
 });
+
 $routes->group('inventario/admin-unidades', function($routes) {
     // Definir las rutas específicas para el grupo 'admin-unidades'
     $routes->post('index', 'inventario\AdministracionUnidades::index');

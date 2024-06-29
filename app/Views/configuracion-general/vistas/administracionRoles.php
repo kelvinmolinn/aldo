@@ -3,7 +3,7 @@
 <div class="row mb-4">
     <div class="col-md-12 text-right">
         <button type= "button" class="btn btn-primary ttip" onclick="modalRoles(0,'insertar');">
-            <i class="fas fa-user-plus"></i>
+            <i class="fas fa-plus-circle"></i>
             Nuevo rol
         </button>
     </div>
@@ -88,6 +88,7 @@
         });
     }
     $(document).ready(function() {
+        tituloVentana('Roles');
         $('#tablaRoles').DataTable({
             "ajax": {
                 "method": "POST",

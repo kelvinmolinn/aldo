@@ -12,21 +12,18 @@ class AdministracionPermisos extends Controller
     public function configuracionModulos()
     {
         $session = session();
-        if(!$session->get('nombreUsuario')) {
-            return view('login');
-        } else {
-            $data['variable'] = 0;
 
-            $camposSession = [
-                'renderVista' => 'No'
-            ];
-            $session->set([
-                'route'             => 'conf-general/admin-modulos/index',
-                'camposSession'     => json_encode($camposSession)
-            ]);
+        $data['variable'] = 0;
 
-            return view('configuracion-general/vistas/administracionModulos', $data);
-        }
+        $camposSession = [
+            'renderVista' => 'No'
+        ];
+        $session->set([
+            'route'             => 'conf-general/admin-modulos/index',
+            'camposSession'     => json_encode($camposSession)
+        ]);
+
+        return view('configuracion-general/vistas/administracionModulos', $data);
     }
 
     public function configuracionMenus()
@@ -149,10 +146,8 @@ class AdministracionPermisos extends Controller
 
         $data = [
             'modulo'            => $this->request->getPost('modulo'),
-            'iconoModulo'       => $this->request->getPost('iconoModulo'),
-            'urlModulo'         => $this->request->getPost('urlModulo')
-            
-            //'contrasena' => password_hash($this->request->getPost('contrasena'), PASSWORD_DEFAULT) // Encriptar contraseña
+            'iconoModulo'       => $this->request->getPost('iconoModulo')
+            //'urlModulo'         => $this->request->getPost('urlModulo')
         ];
 
         if($operacion == 'editar') {
@@ -188,8 +183,6 @@ class AdministracionPermisos extends Controller
             'menu'            => $this->request->getPost('menu'),
             'iconoMenu'       => $this->request->getPost('iconoMenu'),
             'urlMenu'         => $this->request->getPost('urlMenu')
-            
-            //'contrasena' => password_hash($this->request->getPost('contrasena'), PASSWORD_DEFAULT) // Encriptar contraseña
         ];
 
         if($operacion == 'editar') {
@@ -314,37 +307,38 @@ class AdministracionPermisos extends Controller
         foreach ($datos as $columna) {
             // Aquí construye tus columnas
             $columna1 = $n;
-            $columna2 = "<b>Módulo: </b>" . $columna['modulo'];
-            $columna3 = "<b>Url: </b>" . $columna['urlModulo'];
+            $columna2 = "<b>Módulo: </b>" . $columna['modulo'] . "<br><b>Icono: </b> <i class='".$columna["iconoModulo"]."'></i>";
+            //$columna3 = "<b>Url: </b>" . $columna['urlModulo'];
             // Aquí puedes construir tus botones en la última columna
-            $columna4 = '
-                <button class="btn btn-primary mb-1" onclick="modalModulo(`'.$columna['moduloId'].'`, `editar`);" data-toggle="tooltip" data-placement="top" title="Editar">
-                    <i class="fas fa-pencil-alt"></i>
-                </button>
-            ';
-
             $jsonMenusModulo = [
                 "moduloId"          => $columna['moduloId'],
                 "modulo"            => $columna['modulo']
             ];
 
-            $columna4 .= '
+            $columna4 = '
                 <button type="button" class="btn btn-secondary mb-1" onclick="cambiarInterfaz(`conf-general/admin-modulos/vista/modulos/menus`, '.htmlspecialchars(json_encode($jsonMenusModulo)).');" data-toggle="tooltip" data-placement="top" title="Menús">
                     <i class="fas fa-bars nav-icon"></i>
                 </button>
             ';
+            $columna4 .= '
+                <button class="btn btn-primary mb-1" onclick="modalModulo(`'.$columna['moduloId'].'`, `editar`);" data-toggle="tooltip" data-placement="top" title="Editar">
+                    <i class="fas fa-pencil-alt"></i>
+                </button>
+            ';
 
+            /*
             $columna4 .= '
                 <button class="btn btn-danger mb-1" onclick="eliminarModulo(`'.$columna['moduloId'].'`);" data-toggle="tooltip" data-placement="top" title="Eliminar">
                     <i class="fas fa-trash"></i>
                 </button>
             ';
+            */
 
             // Agrega la fila al array de salida
             $output['data'][] = array(
                 $columna1,
                 $columna2,
-                $columna3,
+                //$columna3,
                 $columna4
             );
     
@@ -383,38 +377,32 @@ class AdministracionPermisos extends Controller
 
             // Aquí construye tus columnas
             $columna1 = $n;
-            $columna2 = "<b>Menu: </b>" . $columna['menu'];
-            $columna3 = "<b>Url: </b>" . $columna['urlMenu'];
+            $columna2 = "<b>Menu: </b>" . $columna['menu'] . "<br><b>Icono: </b> <i class='".$columna["iconoMenu"]."'></i>";
+            $columna3 = "<b>Ruta: </b>" . $columna['urlMenu'];
             // Aquí puedes construir tus botones en la última columna
-            $columna4 = '
-                <button class="btn btn-primary mb-1" onclick="modalMenu(`'.$columna['moduloId'].'`, `'.$columna['menuId'].'`, `editar`);" data-toggle="tooltip" data-placement="top" title="Editar">
-                    <i class="fas fa-pencil-alt"></i>
-                </button>
-            ';
-            /*
-            $columna4 .= '
-                <a href="'.site_url('conf-general/admin-permisos/index/' . $columna['menu'] . '/' . $columna['menuId']).'" class="btn btn-secondary mb-1" data-toggle="tooltip" data-placement="top" title="Permisos del menú">
-                    <i class="fas fa-bars nav-icon"></i>
-                </a>
-            ';
-            */
             $jsonPermisosMenu = [
                 "menuId"        => $columna["menuId"],
                 "menu"          => $columna["menu"]
             ];
 
-            $columna4 .= '
+            $columna4 = '
                 <button type="button" class="btn btn-secondary mb-1" onclick="cambiarInterfaz(`conf-general/admin-permisos/index`, '.htmlspecialchars(json_encode($jsonPermisosMenu)).');" data-toggle="tooltip" data-placement="top" title="Permisos del menú">
                     <i class="fas fa-bars nav-icon"></i>
                 </button>
             ';
+            $columna4 .= '
+                <button class="btn btn-primary mb-1" onclick="modalMenu(`'.$columna['moduloId'].'`, `'.$columna['menuId'].'`, `editar`);" data-toggle="tooltip" data-placement="top" title="Editar">
+                    <i class="fas fa-pencil-alt"></i>
+                </button>
+            ';
 
+            /*
             $columna4 .= '
                 <button class="btn btn-danger mb-1" onclick="eliminarMenu(`'.$columna['menuId'].'`);" data-toggle="tooltip" data-placement="top" title="Eliminar">
                     <i class="fas fa-trash"></i>
                 </button>
             ';
-
+            */
             // Agrega la fila al array de salida
             $output['data'][] = array(
                 $columna1,

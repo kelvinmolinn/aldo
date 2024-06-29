@@ -14,25 +14,21 @@ class AdministracionRoles extends Controller
     public function index()
     {
         $session = session();
-        if(!$session->get('nombreUsuario')) {
-            return view('login');
-        } else {
-            $data['variable'] = 0;
 
-            $camposSession = [
-                'renderVista' => 'No'
-            ];
-            $session->set([
-                'route'             => 'conf-general/admin-roles/index',
-                'camposSession'     => json_encode($camposSession)
-            ]);
+        $data['variable'] = 0;
 
-            return view('configuracion-general/vistas/administracionRoles', $data);
-        }
+        $camposSession = [
+            'renderVista' => 'No'
+        ];
+        $session->set([
+            'route'             => 'conf-general/admin-roles/index',
+            'camposSession'     => json_encode($camposSession)
+        ]);
+
+        return view('configuracion-general/vistas/administracionRoles', $data);
     }
     public function tablaRoles()
     {
-
         $mostrarRoles = new conf_roles();
         $rolId = $this->request->getPost('rolId');
 
@@ -64,12 +60,13 @@ class AdministracionRoles extends Controller
                     <i class="fas fa-pencil-alt"></i>
                 </button>
             '; 
-
+            /*
             $columna3 .= '
                 <button  type="button" class="btn btn-danger mb-1" onclick="eliminarRol(`'.$campos['rolId'].'`);" data-toggle="tooltip" data-placement="top" title="Eliminar">
                     <i class="fas fa-trash"></i>
                 </button>
             '; 
+            */
             // Agrega la fila al array de salida
             $output['data'][] = array(
                 $columna1,

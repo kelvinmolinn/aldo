@@ -55,8 +55,15 @@ class Login extends BaseController
                     'ipIngreso'                 => $ipIngreso = $this->request->getIPAddress(), 
                     'infoNavegador'             => $infoNavegador
                 ];
-
                 $logUsuarioId = $logUsuariosModel->insert($dataBitacora);
+
+                $updateUsuario = [
+                    'flgEnLinea'            => 1,
+                    'numIngresos'           => $dataUsuario['numIngresos'] + 1,
+                    'fhUltimoIngreso'       => date('Y-m-d H:i:s'),
+                    'intentosIngreso'       => 0
+                ];
+                $usuarioUpdate = $usuarioModel->update($dataUsuario['usuarioId'], $updateUsuario);
 
                 if($clave == $defaultPass) {
                     $flgDefaultPassword = "Default";
@@ -114,6 +121,34 @@ class Login extends BaseController
 
     public function cerrarSession()
     {
+        $session = session();
+        $usuarioModel = new UsuarioLogin();
+        $logUsuariosModel = new log_usuarios();
+
+        $updateUsuario = [
+            'flgEnLinea'        => 0
+        ];
+        $usuarioUpdate = $usuarioModel->update($session->get('usuarioId'), $updateUsuario);
+
+        $textoLog = "(" . date('d-m-Y H:i:s') . ") Cerró sesión.";
+        $updateLog = $logUsuariosModel->registrarLogInterfaces("logInterfaces", $textoLog, $session->get('logUsuarioId'));
+
+        $updateLogSalida = [
+            'fhSalida'      => date('Y-m-d H:i:s')
+        ];
+        $logUpdate = $logUsuariosModel->update($session->get('logUsuarioId'), $updateLogSalida);
+        
+        /*
+            $session->set([
+                'usuarioId'     => $dataUsuario['usuarioId'],
+                'nombreUsuario' => $dataUsuario['primerNombre'] . " " . $dataUsuario['primerApellido'],
+                'logUsuarioId'  => $logUsuarioId,
+                'defaultPass'   => $flgDefaultPassword,
+                'route'         => 'escritorio/dashboard'
+                // 'nombreUsuario' => $dataUsuario['primerNombre'] . ' ' . $dataUsuario['primerApellido']
+            ]);
+        */
+
         // Cerrar la sesión y redirigir al inicio de sesión
         session()->destroy();
         return redirect()->to(base_url('login'));

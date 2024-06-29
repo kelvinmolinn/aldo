@@ -16,7 +16,7 @@
                         <div class="col-md-3">
                             <button type="button" id="btnguardar" class="btn btn-primary">
                                 <i class="fas fa-save"></i>
-                                Guardar
+                                Agregar permisos
                             </button>
                         </div>
                     </div>
