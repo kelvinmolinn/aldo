@@ -422,7 +422,7 @@ class administracionCompras extends Controller
                     );
                 }else{
                     $columna1 = $n;
-                    $columna2 = '('.$columna['codigoProducto'].') ' . $columna['producto'];;
+                    $columna2 = '('.$columna['codigoProducto'].') ' . $columna['producto'];
                     $columna3 = '<b>Costo Unitario: </b>$ ' .  number_format($columna['precioUnitario'], 2, '.', ',');
                     $columna4 = $columna['cantidadProducto'] . ' ('.$columna['abreviaturaUnidadMedida'].')';
                     $columna5 = '<b>Costo total: </b>$ ' . number_format($columna['totalCompraDetalle'], 2, '.', ',');

@@ -230,10 +230,16 @@ $routes->group('ventas/admin-reservas', function($routes) {
     $routes->post('form/nueva/reserva', 'ventas\administracionReservas::modalNuevaReserva');
     $routes->post('form/anular/reserva', 'ventas\administracionReservas::modalAnularReserva');
     $routes->post('vista/continuar/reserva', 'ventas\administracionReservas::vistaContinuarReserva');
+    $routes->post('tabla/continuar/reserva', 'ventas\administracionReservas::tablaContinuarReserva');
+    $routes->post('form/pago/reserva', 'ventas\administracionReservas::modalPagoReserva');
+    $routes->post('tabla/pago/ventas', 'ventas\administracionReservas::tablePagoReserva');
+    $routes->post('modal/nuevo/reserva', 'ventas\administracionReservas::modalNuevoProductoReserva');
+    
 });
 
 $routes->group('ventas/admin-facturacion', function($routes) {
     $routes->post('index', 'ventas\administracionFacturacion::index');
+    $routes->post('tabla/facturacion', 'ventas\administracionFacturacion::tablaFacturacion');
 
 });
 // Rutas de errores

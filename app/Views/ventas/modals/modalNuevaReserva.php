@@ -27,7 +27,7 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-outline">
-                                <input type="tedatet" id="fechaReserva" name="fechaReserva" class="form-control numero" value="" required>
+                                <input type="date" id="fechaReserva" name="fechaReserva" class="form-control numero" value="" required>
                                 <label class="form-label" for="fechaReserva">Fecha de la reserva</label>
                             </div>
                         </div>

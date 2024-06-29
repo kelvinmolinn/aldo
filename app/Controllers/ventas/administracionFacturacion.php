@@ -23,4 +23,7 @@ class administracionFacturacion extends Controller
         ]);
         return view('ventas/vistas/facturacion', $data);
     }
+    public function tablaFacturacion(){
+        
+    }
 }

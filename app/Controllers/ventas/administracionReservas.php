@@ -32,16 +32,16 @@ class administracionReservas extends Controller
         // Aquí construye tus columnas
         $columna1 = $n;
 
-        $columna2 = "<b>Sucursal: </b> " . "<br>" . "<b>Num. Reserva:</b> " . "<br>" . "<b>Cliente:</b> " . "<br>" . "<b>Comentario:</b> ";
+        $columna2 = "<b>Sucursal: </b> Aldo Games Store (Principal)" . "<br>" . "<b>Num. Reserva:</b> 1" . "<br>" . "<b>Cliente:</b> Cliente prueba" . "<br>" . "<b>Comentario:</b> Reserva de juego de mario kart";
 
-        $columna3 = "<b>fecha de la reserva: </b>";
+        $columna3 = "<b>fecha de la reserva: </b> 29/06/2024";
 
         $columna4 = "<b>Reservado </b>";
 
-        $columna5 = "<b>Total de la reserva: </b>" . "<br>" . "<b>Total pagado:</b> ";
+        $columna5 = "<b>Total de la reserva: </b> $ 35.00" . "<br>" . "<b>Total pagado:</b> $ 15.00";
         
         $columna6 = '
-                        <button type= "button" class="btn btn-primary mb-1" onclick="cambiarInterfaz(`ventas/admin-reservas/vista/continuar/reserva`);" data-toggle="tooltip" data-placement="top" title="Continuar reserva">
+                        <button type= "button" class="btn btn-primary mb-1" onclick="cambiarInterfaz(`ventas/admin-reservas/vista/continuar/reserva`, {renderVista: `No`});" data-toggle="tooltip" data-placement="top" title="Continuar reserva">
                             <i class="fas fa-sync-alt"></i>
                         </button>';
         $columna6 .= '
@@ -78,9 +78,7 @@ class administracionReservas extends Controller
     }
 
     public function vistaContinuarReserva(){
-        $n = 0;
 
-        $n++;
         $session = session();
         $camposSession = [
             'renderVista' => 'No'
@@ -89,54 +87,125 @@ class administracionReservas extends Controller
             'route'             => 'ventas/admin-reservas/vista/continuar/reserva',
             'camposSession'     => json_encode($camposSession)
         ]);
-        $data['variable'] = 0;
-        return view('ventas/vistas/pageContinuarReserva', $data);
+        $data['reservaId'] = 0;
+        return view('ventas/vistas/pageContinuarReserva', $data);       
+        
+    }
 
+    public function tablaContinuarReserva(){
+        $n = 0;
+        $n++;
+        $output['data'] = array();
+
+        $columna1 = $n;
+        $columna2 = '(PD-001) MARIO KART';
+        $columna3 = '$ 35.00' ;
+        $columna4 = '1';
+        $columna5 = '$ 35.00 ';
+        $columna6 = '
+            <button type= "button" class="btn btn-primary mb-1" onclick="" data-toggle="tooltip" data-placement="top" title="Editar">
+                <i class="fas fa-pencil-alt"></i>
+            </button>
+        ';
+
+        $columna6 .= '
+            <button type= "button" class="btn btn-danger mb-1" onclick="" data-toggle="tooltip" data-placement="top" title="Eliminar">
+                <i class="fas fa-trash"></i>
+            </button>
+        ';
+        // Agrega la fila al array de salida
+        $output['data'][] = array(
+            $columna1,
+            $columna2,
+            $columna3,
+            $columna4,
+            $columna5,
+            $columna6
+        );
 
         if ($n > 0) {
-            $output['footer'] = array(
-                '<div class="text-right"><b>Total</b></div>'
-             );
+                $output['footer'] = array(
+                    '',
+                    '' ,
+                    ''
+                );
+
+                $output['footerTotales'] = '
+                    <b>
+                        <div class="row text-right">
+                            <div class="col-8">
+                                Total a pagar:
+                            </div>
+                            <div class="col-4">
+                                $ 35.00
+                            </div>
+                        </div>
+                        <div class="row text-right">
+                            <div class="col-8">
+                                Total pagado:
+                            </div>
+                            <div class="col-4">
+                                $ 15.00
+                            </div>
+                        </div>
+                        <div class="row text-right">
+                            <div class="col-12">
+                                <button type= "button" class="btn btn-primary mb-1" onclick="modalPagoReserva()" data-toggle="tooltip" data-placement="top" title="Pagos">
+                                    <i class="fas fa-hand-holding-usd"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </b>
+
+                ';
             return $this->response->setJSON($output);
         } else {
             return $this->response->setJSON(array('data' => '', 'footer'=>'')); // No hay datos, devuelve un array vacío
         }
+    }
 
-        $output['footerTotales'] = '
-        <b>
-        <div class="row text-right">
-            <div class="col-8">
-                Subtotal
-            </div>
-            <div class="col-4">
-                $ 
-            </div>
-        </div>
-        <div class="row text-right">
-            <div class="col-8">
-                IVA 13%
-            </div>
-            <div class="col-4">
-                $ 
-            </div>
-        </div>
-        <div class="row text-right">
-            <div class="col-8">
-                (+) IVA Percibido
-            </div>
-            <div class="col-4">
-                $ 
-            </div>
-        </div>
-        <div class="row text-right">
-            <div class="col-8">
-                Total a pagar
-            </div>
-            <div class="col-4">
-                $ 
-            </div>
-        </div>                    
-        </b>
-    ';
+    public function modalPagoReserva(){
+        $data['variable'] = 0;
+        return view('ventas/modals/modalPagosReservas', $data);
+    }
+
+    public function tablePagoReserva(){
+        $output['data'] = array();
+        $n = 0;
+
+        $n++;
+        // Aquí construye tus columnas
+        $columna1 = $n;
+
+        $columna2 = "<b>Forma pago: </b> Efectivo" . "<br>" . "<b>Comprobante:</b> 1" . "<br>" . "<b>Comentarios:</b> Abonó 15 dolares ";
+
+        $columna3 = "24/06/2024";
+
+        $columna4 = "$ 15.00";
+        
+        $columna5 = '
+                        <button type= "button" class="btn btn-danger mb-1" onclick="" data-toggle="tooltip" data-placement="top" title="Eliminar">
+                            <i class="fas fa-trash"></i>
+                        </button>';
+                        
+        $output['data'][] = array(
+            $columna1,
+            $columna2,
+            $columna3,
+            $columna4,
+            $columna5
+        );
+
+        // Verifica si hay datos
+        if ($n > 0) {
+            return $this->response->setJSON($output);
+        } else {
+            return $this->response->setJSON(array('data' => '')); // No hay datos, devuelve un array vacío
+        }
+    }
+
+    public function modalNuevoProductoReserva(){
+        $data['variable'] = 0;
+        return view('ventas/modals/modalProductoReserva', $data);
     }
 }
