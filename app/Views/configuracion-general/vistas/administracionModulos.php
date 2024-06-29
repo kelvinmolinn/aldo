@@ -1,12 +1,12 @@
 <h2>Gestión de Módulos</h2>
 <hr>
-<div class="row mb-4">
+<!--<div class="row mb-4">
     <div class="col-md-12 text-right">
         <button type= "button" class="btn btn-primary ttip" onclick="modalModulo(0, 'insertar');">
             <i class="fas fa-plus-circle"></i>
             Nuevo módulo
         </button>
-    </div>
+    </div> -->
 </div>
 <div class="table-responsive">
     <table class="table table-hover" id="miTabla" style="width: 100%;">
