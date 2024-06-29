@@ -33,7 +33,7 @@
         </div>
 </form>
 <hr>
-<form id="frmContinuarRetaceo" method="post" action="">
+<form id="frmContinuarReserva" method="post" action="">
         
     <div class="text-right mb-4">
         <button type= "button" id="btnNuevoProveedor" class="btn btn-primary estilo-btn" onclick="">
@@ -42,7 +42,7 @@
         </button>
     </div>
     <div class="table-responsive">
-        <table class="table table-hover" id="tablaContinuarRetaceo" style="width: 100%;">
+        <table class="table table-hover" id="tablaContinuarReserva" style="width: 100%;">
             <thead>
                 <tr>
                     <th>#</th>
@@ -75,14 +75,14 @@
         <div class="col-md-6">
             <div class="form-outline">
                 <textarea name="observacionFinalizarCompra" id="observacionFinalizarCompra" class="form-control" style="width: 100%;" required></textarea>
-                <label class="form-label" for="">Observación de la compra</label>
+                <label class="form-label" for="">Observación de la reserva</label>
             </div>
         </div>
         <div class="col-md-6">
             <div class="text-right">
                 <button type="submit" id="btnFinalizarCompra" class="btn btn-primary">
                     <i class="fas fa-save"></i>
-                    Finalizar compra
+                    Finalizar reserva
                 </button>
             </div>
         </div>
@@ -91,16 +91,16 @@
 <script>
     $(document).ready(function(){
         
-        tituloVentana("Continuar retaceo");
+        tituloVentana("Continuar reserva");
 
-        $('#btnRegresarRetaceo').on('click', function() {
-            cambiarInterfaz('compras/admin-retaceo/index', {renderVista: 'No'});
+        $('#btnRegresarReserva').on('click', function() {
+            cambiarInterfaz('ventas/admin-reserva/index', {renderVista: 'No'});
         });
 
-        $('#tablaContinuarRetaceo').DataTable({
+        $('#tablaContinuarReserva').DataTable({
             "ajax": {
                 "method": "POST",
-                "url": '<?php echo base_url('compras/admin-retaceo/tabla/continuar/retaceo'); ?>',
+                "url": '<?php echo base_url('ventas/admin-reservas/tabla/continuar/reservas'); ?>',
                 "data": {
                         x:''
 
@@ -116,12 +116,10 @@
                     $("#tdFooterTotales").html(response["footerTotales"]);
                 } else {
                     var td = $(tfoot).find('td');
-                    td.eq(1).html('<b>Sumas</b>');
-                    td.eq(2).html('<div class="text-right"><b>35</b></div>');
-                    td.eq(3).html('<div class="text-right"><b>$ 50.50</b></div>');
-                    td.eq(5).html('<div class="text-right"><b>$ 9.54</b></div>');
-                    td.eq(6).html('<div class="text-right"><b>$ 7.95</b></div>');
-                    td.eq(9).html('<div class="text-right"><b>$ 918.99</b></div>');
+                    td.eq(1).html('<b></b>');
+                    td.eq(2).html('<div class="text-right"><b></b></div>');
+                    td.eq(3).html('<div class="text-right"><b></b></div>');
+                    td.eq(5).html('<div class="text-right"><b></b></div>');
                     $("#tdFooterTotales").html(``);
                 }
             },
@@ -131,12 +129,7 @@
                 { "width": "9%", "targets": 2,  "className": "text-left" }, 
                 { "width": "9%", "targets": 3,  "className": "text-left" },
                 { "width": "9%", "targets": 4,  "className": "text-left" },
-                { "width": "9%", "targets": 5,  "className": "text-left" },
-                { "width": "9%", "targets": 6,  "className": "text-left" }, 
-                { "width": "9%", "targets": 7,  "className": "text-left" }, 
-                { "width": "9%", "targets": 8,  "className": "text-left" }, 
-                { "width": "9%", "targets": 9,  "className": "text-left" },
-                { "width": "14%", "targets": 10, "className": "text-left" }
+                { "width": "9%", "targets": 5,  "className": "text-left" }
             ],
             "language": {
                 "url": "../assets/plugins/datatables/js/spanish.json"

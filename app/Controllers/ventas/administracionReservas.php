@@ -41,7 +41,7 @@ class administracionReservas extends Controller
         $columna5 = "<b>Total de la reserva: </b>" . "<br>" . "<b>Total pagado:</b> ";
         
         $columna6 = '
-                        <button type= "button" class="btn btn-primary mb-1" onclick="cambiarInterfaz(`compras/admin-compras/vista/actualizar/compra`);" data-toggle="tooltip" data-placement="top" title="Continuar reserva">
+                        <button type= "button" class="btn btn-primary mb-1" onclick="cambiarInterfaz(`ventas/admin-reservas/vista/continuar/reserva`);" data-toggle="tooltip" data-placement="top" title="Continuar reserva">
                             <i class="fas fa-sync-alt"></i>
                         </button>';
         $columna6 .= '
@@ -75,5 +75,68 @@ class administracionReservas extends Controller
     public function modalAnularReserva(){
         $data['variable'] = 0;
         return view('ventas/modals/modalAnularReserva', $data);
+    }
+
+    public function vistaContinuarReserva(){
+        $n = 0;
+
+        $n++;
+        $session = session();
+        $camposSession = [
+            'renderVista' => 'No'
+        ];
+        $session->set([
+            'route'             => 'ventas/admin-reservas/vista/continuar/reserva',
+            'camposSession'     => json_encode($camposSession)
+        ]);
+        $data['variable'] = 0;
+        return view('ventas/vistas/pageContinuarReserva', $data);
+
+
+        if ($n > 0) {
+            $output['footer'] = array(
+                '<div class="text-right"><b>Total</b></div>'
+             );
+            return $this->response->setJSON($output);
+        } else {
+            return $this->response->setJSON(array('data' => '', 'footer'=>'')); // No hay datos, devuelve un array vacío
+        }
+
+        $output['footerTotales'] = '
+        <b>
+        <div class="row text-right">
+            <div class="col-8">
+                Subtotal
+            </div>
+            <div class="col-4">
+                $ 
+            </div>
+        </div>
+        <div class="row text-right">
+            <div class="col-8">
+                IVA 13%
+            </div>
+            <div class="col-4">
+                $ 
+            </div>
+        </div>
+        <div class="row text-right">
+            <div class="col-8">
+                (+) IVA Percibido
+            </div>
+            <div class="col-4">
+                $ 
+            </div>
+        </div>
+        <div class="row text-right">
+            <div class="col-8">
+                Total a pagar
+            </div>
+            <div class="col-4">
+                $ 
+            </div>
+        </div>                    
+        </b>
+    ';
     }
 }
