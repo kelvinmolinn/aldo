@@ -100,19 +100,19 @@
             <tbody>
             </tbody>
             <tfoot>
-                    <tr>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td id="tdFooterTotales" colspan="5"></td>
-                        <td></td>
-                    </tr>
-                </tfoot>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td id="tdFooterTotales" colspan="5"></td>
+                    <td></td>
+                </tr>
+            </tfoot>
         </table>
     </div>
 

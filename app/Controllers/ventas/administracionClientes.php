@@ -30,9 +30,9 @@ class administracionClientes extends Controller
         $n++;
         // Aquí construye tus columnas
         $columna1 = $n;
-        $columna2 = "<b>Tipo de persona: </b>" . "<br>" . "<b>Cliente:</b> " . "<br>" . "<b>Giro:</b>" . "<br>" . "<b>Dirección:</b> ";
+        $columna2 = "<b>Tipo de persona: </b> Natural" . "<br>" . "<b>Cliente:</b> Test " . "<br>" . "<b>Giro:</b> otros servicios de información n.c.p" . "<br>" . "<b>Dirección:</b> Col. San salvador";
 
-        $columna3 = "<b>Categoría: </b>" . "<br>" . "<b>NRC:</b> " . "<br>" . "<b>DUI:</b>";
+        $columna3 = "<b>Categoría: </b>" . "<br>" . "<b>NRC:</b> 55555 " . "<br>" . "<b>DUI:</b> 123456789";
         
         $columna4 = '
                         <button type= "button" class="btn btn-primary mb-1" onclick="" data-toggle="tooltip" data-placement="top" title="Editar">
@@ -115,9 +115,9 @@ class administracionClientes extends Controller
             $n = 0;
             $n++;
             
-            $columna1 = "<b>Sucursal: </b> " . "<br>" . "<b>Tipo de DTE: </b> ";
+            $columna1 = "<b>Sucursal: </b> Aldo Games Store (Principal)" . "<br>" . "<b>Tipo de DTE: </b> Factura ";
             
-            $columna2 = "<b>Cód. Generación: </b> " . "<br>" . "<b>Núm. control: </b> ";
+            $columna2 = "<b>Cód. Generación: </b> C6A9868C-028D-421B-A9A0-36274CECC2C7" . "<br>" . "<b>Núm. control: </b> DTE-03-12345678-000000000000001";
             $columna3 = "<b>Fecha: </b> 05/05/2024" . "<br>" . "<b>Hora: </b>05:25:01 ";
 
             $columna4 = "$ 200.00";
@@ -125,10 +125,6 @@ class administracionClientes extends Controller
             $columna5 = '
                             <button type= "button" class="btn btn-primary mb-1" onclick="" data-toggle="tooltip" data-placement="top" title="Ver factura">
                                 <i class="fas fa-eye"></i>
-                            </button>';
-            $columna5 .= '
-                            <button type= "button" class="btn btn-danger mb-1" onclick="" data-toggle="tooltip" data-placement="top" title="Anular">
-                                <i class="fas fa-ban"></i>
                             </button>';
 
             $output['data'][] = array(

@@ -222,7 +222,9 @@ $routes->group('ventas/admin-clientes', function($routes) {
 
 $routes->group('ventas/admin-reservas', function($routes) {
     $routes->post('index', 'ventas\administracionReservas::index');
-
+    $routes->post('tabla/reserva', 'ventas\administracionReservas::tablaReservas');
+    $routes->post('form/nueva/reserva', 'ventas\administracionReservas::modalNuevaReserva');
+    $routes->post('form/anular/reserva', 'ventas\administracionReservas::modalAnularReserva');
 });
 
 $routes->group('ventas/admin-facturacion', function($routes) {

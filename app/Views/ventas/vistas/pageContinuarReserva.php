@@ -1,43 +1,34 @@
 <form id="frmActualizarRetaceo" method="post" action="<?php echo base_url(''); ?>">
-    <h2>Continuar retaceo - Número de retaceo: 1</h2>
+    <h2>Continuar reserva - Número de reserva: 1</h2>
     <hr>
-    <button type= "button" id="btnRegresarRetaceo" class="btn btn-secondary estilo-btn mb-4">
+    <button type= "button" id="btnRegresarReserva" class="btn btn-secondary estilo-btn mb-4">
         <i class="fas fa-backspace"></i>
-            Volver a retaceo
+            Volver a reserva
     </button>
         <div class="row mb-2">
-            <div class="col-md-6">
+            <div class="col-md-4">
                 <div class="form-outline">
-                    <input type="text" id="numeroRetaceo" name="numeroRetaceo" class="form-control active" required>
-                    <label class="form-label" for="numeroRetaceo">Numero de retaceo</label>
+                    <input type="text" id="sucursalReserva" name="sucursalReserva" class="form-control active" required>
+                    <label class="form-label" for="sucursalReserva">Sucursal</label>
                 </div>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-4">
                 <div class="form-outline">
-                    <input type="date" id="fechaRetaceo" name="fechaRetaceo" class="form-control active" required>
-                    <label class="form-label" for="fechaRetaceo">Fecha de retaceo</label>
+                    <input type="text" id="clienteReserva" name="clienteReserva" class="form-control active" required>
+                    <label class="form-label" for="clienteReserva">Cliente</label>
                 </div>
             </div>
-        </div>
-
-        <div class="row mb-2">
-            <div class="col-md-6">
+            <div class="col-md-4">
                 <div class="form-outline">
-                    <input type="number" id="fleteContinuarRetaceo" name="fleteContinuarRetaceo" class="form-control active" required>
-                    <label class="form-label" for="fleteContinuarRetaceo">Flete</label>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="form-outline">
-                    <input type="number" id="GastosContinuarRetaceo" name="GastosContinuarRetaceo" class="form-control active" required>
-                    <label class="form-label" for="GastosContinuarRetaceo">Gastos</label>
+                    <input type="date" id="fechaReserva" name="fechaReserva" class="form-control active" required>
+                    <label class="form-label" for="fechaReserva">Fecha de la reserva</label>
                 </div>
             </div>
         </div>
         <div class="text-right">
-            <button type="submit" id="btnguardarRetaceo" class="btn btn-primary">
+            <button type="submit" id="btnguardarReserva" class="btn btn-primary">
                 <i class="fas fa-pencil-alt"></i>
-                Actualizar compra
+                Actualizar reserva
             </button>
         </div>
 </form>
@@ -47,7 +38,7 @@
     <div class="text-right mb-4">
         <button type= "button" id="btnNuevoProveedor" class="btn btn-primary estilo-btn" onclick="">
             <i class="fas fa-save"></i>
-            Agregar compra
+            Agregar reserva
         </button>
     </div>
     <div class="table-responsive">
@@ -56,16 +47,10 @@
                 <tr>
                     <th>#</th>
                     <th>Producto</th>
+                    <th>Precio venta</th>
                     <th>Cantidad</th>
-                    <th>Precio FOB unitario</th>
-                    <th>Importe</th>
-                    <th>Flete</th>
-                    <th>Gastos</th>
-                    <th>DAI</th>
-                    <th>Costo unitario</th>
-                    <th>Costo total</th>
-                    <th>Precio de venta actual</th>
-                </tr>
+                    <th>Total</th>
+                    <th>Acciones</th>
             </thead>
             <tbody>
             </tbody>
@@ -77,14 +62,9 @@
                     <td></td>
                     <td></td>
                     <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
                 </tr>
                 <tr>
-                    <td id="tdFooterTotales" colspan="10"></td>
+                    <td id="tdFooterTotales" colspan="5"></td>
                     <td></td>
                 </tr>
             </tfoot>

@@ -56,7 +56,7 @@
                             <div class="form-select-control">
                                 <select name="actividadEconomicaCliente" id="actividadEconomicaCliente" style="width: 100%;" required>
                                     <option value=""></option>
-                                    <option value="Actividad">actividad</option>
+                                    <option value="Actividad">Otros servicios de información n.c.p.</option>
                                 </select>
                             </div>
                         </div>
