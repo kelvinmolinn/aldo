@@ -240,7 +240,16 @@ $routes->group('ventas/admin-reservas', function($routes) {
 $routes->group('ventas/admin-facturacion', function($routes) {
     $routes->post('index', 'ventas\administracionFacturacion::index');
     $routes->post('tabla/facturacion', 'ventas\administracionFacturacion::tablaFacturacion');
-
+    $routes->post('form/emitir/dte', 'ventas\administracionFacturacion::modalEmitirDTE');
+    $routes->post('form/anular/dte', 'ventas\administracionFacturacion::modalAnularDTE');
+    $routes->post('vista/continuar/dte', 'ventas\administracionFacturacion::vistaContinuarDTE');
+    $routes->post('tabla/continuar/dte', 'ventas\administracionFacturacion::tablaContinuarDTE');
+    $routes->post('form/pago/dte', 'ventas\administracionFacturacion::modalPagoDTE');
+    $routes->post('tabla/pago/dte', 'ventas\administracionFacturacion::tablaPagoDTE');
+    $routes->post('form/complemento/dte', 'ventas\administracionFacturacion::modalComplementoDTE');
+    $routes->post('tabla/complemento/dte', 'ventas\administracionFacturacion::tablaComplementoDTE');
+    $routes->post('form/error/dte', 'ventas\administracionFacturacion::tablaErrorDTE');
+    $routes->post('form/imprimir/dte', 'ventas\administracionFacturacion::imprimirDTE');
 });
 // Rutas de errores
 $routes->get('404', 'Errores::error404');

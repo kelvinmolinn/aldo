@@ -36,14 +36,15 @@ class administracionReservas extends Controller
 
         $columna3 = "<b>fecha de la reserva: </b> 29/06/2024";
 
-        $columna4 = "<b>Reservado </b>";
+        $columna4 = "<b>Facturado </b>";
 
-        $columna5 = "<b>Total de la reserva: </b> $ 35.00" . "<br>" . "<b>Total pagado:</b> $ 15.00";
+        $columna5 = "<b>Total de la reserva: </b> $ 35.00" . "<br>" . "<b>Total pagado:</b> $ 35.00";
         
         $columna6 = '
                         <button type= "button" class="btn btn-primary mb-1" onclick="cambiarInterfaz(`ventas/admin-reservas/vista/continuar/reserva`, {renderVista: `No`});" data-toggle="tooltip" data-placement="top" title="Continuar reserva">
-                            <i class="fas fa-sync-alt"></i>
+                            <i class="fas fa-eye"></i>
                         </button>';
+                        
         $columna6 .= '
                         <button type= "button" class="btn btn-danger mb-1" onclick="modalAnularReserva()" data-toggle="tooltip" data-placement="top" title="Anular reserva">
                             <i class="fas fa-ban"></i>

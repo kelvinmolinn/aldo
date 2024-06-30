@@ -1,4 +1,4 @@
-<form id="frmActualizarRetaceo" method="post" action="<?php echo base_url(''); ?>">
+<form id="frmContinuarReserva" method="post" action="<?php echo base_url(''); ?>">
     <h2>Continuar reserva - Número de reserva: 1</h2>
     <hr>
     <button type= "button" id="btnRegresarReserva" class="btn btn-secondary estilo-btn mb-4">
