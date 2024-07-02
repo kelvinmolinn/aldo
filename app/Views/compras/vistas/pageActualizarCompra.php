@@ -1,3 +1,4 @@
+
 <form id="frmActualizarCompra" method="post" action="<?php echo base_url('compras/admin-compras/operacion/actualizar/compra'); ?>">
     <input type="hidden" id="compraId" name="compraId" value="<?= $compraId; ?>">
     <h2>Continuar compra - Número de documento: <?php echo $camposEncabezado["numFactura"];?></h2>
@@ -203,7 +204,7 @@
 
     $(document).ready(function(){
         
-        tituloVentana("Continuar compra");
+        tituloVentana("Compra");
 
         $('#btnRegresarCompra').on('click', function() {
             cambiarInterfaz('compras/admin-compras/index', {renderVista: 'No'});

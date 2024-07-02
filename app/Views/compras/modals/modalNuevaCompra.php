@@ -84,6 +84,7 @@
                             <div class="form-select-control">
                                 <select name="selectPais" id="selectPais" style="width: 100%;" required>
                                     <option value=""></option>
+                                    <option value="61">El Salvador</option>
                                     <?php foreach ($selectPais as $selectPais){ ?>
                                         <option value="<?php echo $selectPais['paisId']; ?>"><?php echo $selectPais['pais']; ?></option>
                                     <?php } ?>
