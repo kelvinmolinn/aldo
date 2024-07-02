@@ -1,47 +1,51 @@
 <?php
-    /*if($operacion == "editar") {
-        $mensajeAlerta = "Proveedor actualizado con éxito";
+    if($operacion == "editar") {
+        $mensajeAlerta = "cliente actualizado con éxito";
     } else {
-        $mensajeAlerta = "Proveedor creado con éxito";
-    }*/
+        $mensajeAlerta = "cliente creado con éxito";
+    }
 ?>
-<form id="frmModal" method="post" action="<?php echo base_url(''); ?>">
+<form id="frmModal" method="post" action="<?php echo base_url('ventas/admin-clientes/operacion/guardar/clientes'); ?>">
     <div id="modalClientes" class="modal" tabindex="-1" data-backdrop="static" data-keyboard="false">
         <div class="modal-dialog  modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title"> Nuevo Cliente 
-                        <?php //echo ($operacion == 'editar' ? 'Editar Proveedor' : 'Nuevo Proveedor');?></h5>
+                    <h5 class="modal-title"><?php echo ($operacion == 'editar' ? 'Editar cliente' : 'Nuevo cliente');?></h5>
                 </div>
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-md-4">
-                            <div class="form-select-control">
+                        <div class="form-select-control">
                                 <select name="selectTipoPersona" id="selectTipoPersona" style="width: 100%;" required>
                                     <option value=""></option>
-                                    <option value="Juridica">Juridica</option>
-                                    <option value="Natural">Natural</option>
+                                    <?php foreach ($tipoPersona as $tipoPersona){ ?>
+                                        <option value="<?php echo $tipoPersona['tipoPersonaId']; ?>"><?php echo $tipoPersona['tipoPersona']; ?></option>
+                                    <?php } ?>
                                 </select>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-outline">
-                                <input type="text" id="nombreCliente" name="nombreCliente" class="form-control" value="" required>
-                                <label class="form-label" for="nombreCliente">Nombre del cliente</label>
+                                <input type="text" id="cliente" name="cliente" class="form-control" value="" required>
+                                <label class="form-label" for="cliente">Nombre del cliente</label>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-outline">
-                                <input type="text" id="nombreComercialCliente" name="nombreComercialCliente" class="form-control numero" value="" required>
-                                <label class="form-label" for="nombreComercialCliente">Nombre comercial</label>
+                                <input type="text" id="clienteComercial" name="clienteComercial" class="form-control numero" value="" required>
+                                <label class="form-label" for="clienteComercial">Nombre comercial</label>
                             </div>
                         </div>
                     </div>
                     <div class="row mt-4">
                         <div class="col-md-6">
-                            <div class="form-outline">
-                                <input type="text" id="categoriaCliente" name="categoriaCliente" class="form-control" value="">
-                                <label class="form-label" for="categoriaCliente">Categoria del cliente</label>
+                        <div class="form-select-control">
+                                <select name="selectTipoContribuyente" id="selectTipoContribuyente" style="width: 100%;" required>
+                                    <option value=""></option>
+                                    <?php foreach ($tipoContribuyente as $tipoContribuyente){ ?>
+                                        <option value="<?php echo $tipoContribuyente['tipoContribuyenteId']; ?>"><?php echo $tipoContribuyente['tipoContribuyente']; ?></option>
+                                    <?php } ?>
+                                </select>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -53,22 +57,24 @@
                     </div>
                     <div class="row mt-4">
                         <div class="col-md-12">
-                            <div class="form-select-control">
-                                <select name="actividadEconomicaCliente" id="actividadEconomicaCliente" style="width: 100%;" required>
+                        <div class="form-select-control">
+                                <select name="selectActividadEconomica" id="selectActividadEconomica" style="width: 100%;" required>
                                     <option value=""></option>
-                                    <option value="Actividad">Otros servicios de información n.c.p.</option>
+                                    <?php foreach ($actividadEconomica as $actividadEconomica){ ?>
+                                        <option value="<?php echo $actividadEconomica['actividadEconomicaId']; ?>"><?php echo $actividadEconomica['actividadEconomica']; ?></option>
+                                    <?php } ?>
                                 </select>
                             </div>
                         </div>
                     </div>
                     <div class="row mt-4">
                         <div class="col-md-6">
-                            <div class="form-select-control">
+                        <div class="form-select-control">
                                 <select name="selectTipoDocumento" id="selectTipoDocumento" style="width: 100%;" required>
                                     <option value=""></option>
-                                    <option value="1">DUI</option>
-                                    <option value="2">NIT</option>
-                                    <option value="3">OTRO</option>
+                                    <?php foreach ($documentoIdentificacion as $documentoIdentificacion){ ?>
+                                        <option value="<?php echo $documentoIdentificacion['documentoIdentificacionId']; ?>"><?php echo $documentoIdentificacion['documentoIdentificacion']; ?></option>
+                                    <?php } ?>
                                 </select>
                             </div>
                         </div>
@@ -80,27 +86,34 @@
                         </div>
                     </div>
                     <div class="row mt-4">
-                        <div class="col-md-4">
-                            <div class="form-select-control">
-                                <select name="selectPaisCliente" id="selectPaisCliente" style="width: 100%;" required>
-                                    <option value=""></option>
-                                    <option value="1">El Salvador</option>
-                                </select>
-                            </div>
+                    <div class="col-md-4">
+                        <div class="form-select-control">
+                            <select name="selectPaisCliente" id="selectPaisCliente" style="width: 100%;" required>
+                                <option value="1">El Salvador</option>
+                                <?php foreach ($pais as $pais) { ?>
+                                    <option value="<?php echo $pais['paisId']; ?>"><?php echo $pais['pais']; ?></option>
+                                <?php } ?>
+                            </select>
                         </div>
-                        <div class="col-md-4">
-                            <div class="form-select-control">
-                                <select name="selectDepartamentoCliente" id="selectDepartamentoCliente" style="width: 100%;" required>
-                                    <option value=""></option>
-                                    <option value="1">San Salvador</option>
-                                </select>
-                            </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-select-control">
+                            <select name="selectDepartamentoCliente" id="selectDepartamentoCliente" style="width: 100%;" required>
+                                <option value=""></option>
+                                <?php foreach ($paisCiudad as $paisCiudad) { ?>
+                                    <option value="<?php echo $paisCiudad['paisCiudadId']; ?>"><?php echo $paisCiudad['paisCiudad']; ?></option>
+                                <?php } ?>
+                            </select>
                         </div>
+                    </div>
+
                         <div class="col-md-4">
                             <div class="form-select-control">
                                 <select name="selectMunicipioCliente" id="selectMunicipioCliente" style="width: 100%;" required>
-                                    <option value=""></option>
-                                    <option value="1">San Salvador</option>
+                                <option value=""></option>
+                                <?php foreach ($paisEstado as $paisEstado) { ?>
+                                    <option value="<?php echo $paisEstado['paisEstadoId']; ?>"><?php echo $paisEstado['paisEstado']; ?></option>
+                                <?php } ?>
                                 </select>
                             </div>
                         </div>
@@ -108,7 +121,7 @@
                     <div class="row mt-4">
                         <div class="col-md-12">
                             <div class="form-outline">
-                                <input type="text" id="selectDireccionCliente" name="selectDireccionCliente" class="form-control" min ="0" value="">
+                                <input type="text" id="direccionCliente" name="direccionCliente" class="form-control" min ="0" value="">
                                 <label class="form-label" for="selectDireccionCliente">Dirección del cliente</label>
                             </div>
                         </div>
@@ -116,7 +129,7 @@
                     <div class="row mt-4">
                         <div class="col-md-12">
                             <div class="form-outline">
-                                <input type="text" id="selectCorreoElectronico" name="selectCorreoElectronico" class="form-control" min ="0" value="">
+                                <input type="text" id="correoElectronico" name="correoElectronico" class="form-control" min ="0" value="">
                                 <label class="form-label" for="selectCorreoElectronico">Correo electronico</label>
                             </div>
                         </div>
@@ -154,6 +167,10 @@
             placeholder: 'Tipo documento',
             dropdownParent: $('#modalClientes')
         });
+        $("#selectTipoContribuyente").select2({
+            placeholder: 'Tipo contribuyente',
+            dropdownParent: $('#modalClientes')
+        });
 
         $("#selectPaisCliente").select2({
             placeholder: 'Pais',
@@ -168,7 +185,7 @@
             dropdownParent: $('#modalClientes')
         });
 
-        $("#actividadEconomicaCliente").select2({
+        $("#selectActividadEconomica").select2({
             placeholder: 'Actividad economica',
             dropdownParent: $('#modalClientes')
         });
@@ -207,6 +224,45 @@
                 $('#numeroDocumento').inputmask('remove');
             }
         });
+        $("#frmModal").submit(function(event) {
+            event.preventDefault();
+            $.ajax({
+                url: $(this).attr('action'), 
+                type: $(this).attr('method'),
+                data: $(this).serialize(),
+                success: function(response) {
+                    console.log(response);
+                    if (response.success) {
+                        // Insert exitoso, ocultar modal y mostrar mensaje
+                        $('#modalClientes').modal('hide');
+                        Swal.fire({
+                            icon: 'success',
+                            title: '<?php echo $mensajeAlerta; ?>',
+                            text: response.mensaje
+                        }).then((result) => {
+                            $("#tablaClientes").DataTable().ajax.reload(null, false);
+                            
+                        });
+                        console.log("Último ID insertado:", response.clienteId);
+                    } else {
+                        // Insert fallido, mostrar mensaje de error
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.mensaje
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    // Manejar errores si los hay
+                    console.error(xhr.responseText);
+                }
+            });
+        });
+            $("#selectTipoPersona").val('<?= $campos["tipoPersonaId"]; ?>').trigger("change");
+            $("#selectTipoContribuyente").val('<?= $campos["tipoContribuyenteId"]; ?>').trigger("change");
+            $("#selectTipoDocumento").val('<?= $campos["documentoIdentificacionId"]; ?>').trigger("change");
+            $("#selectActividadEconomica").val('<?= $campos["actividadEconomicaId"]; ?>').trigger("change");
 
     });
 </script>

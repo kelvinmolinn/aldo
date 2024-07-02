@@ -2,9 +2,17 @@
 
 namespace App\Controllers\ventas;
 use CodeIgniter\Controller;
+use App\Models\fel_clientes;
+use App\Models\fel_cliente_contacto;
+use App\Models\cat_29_tipo_persona;
+use App\Models\cat_19_actividad_economica;
+use App\Models\cat_tipo_contacto;
+use App\Models\cat_22_documentos_identificacion;
+use App\Models\cat_tipo_contribuyente;
+use App\Models\cat_20_paises;
+use App\Models\cat_12_paises_ciudades;
+use App\Models\cat_13_paises_estados;
 
-
-use App\Models\comp_proveedores;
 
 class administracionClientes extends Controller
 {
@@ -23,7 +31,151 @@ class administracionClientes extends Controller
         ]);
         return view('ventas/vistas/clientes', $data);
     }
-    public function tablaClientes(){
+
+    public function obtenerContactoCliente(){
+        $contacto = new cat_tipo_contacto();
+
+        $tipoContacto = $contacto
+            ->select('tipoContactoId, tipoContacto')
+            ->where('flgElimina', 0)
+            ->findAll();
+        $opcionesSelect = array();
+
+        $n = 0;
+        foreach($tipoContacto as $tipoContacto){
+            $n += 1;
+            $opcionesSelect[] = array("valor" => $tipoContacto['tipoContactoId'], "texto" => $tipoContacto['tipoContacto']);
+        }
+        
+        if ($n > 0) {
+            echo json_encode($opcionesSelect);
+        }else{
+            echo json_encode(array('data'=>''));
+        }
+    }
+
+    public function modalNuevoCliente(){
+
+        $operacion = $this->request->getPost('operacion');
+
+        $catTipoPersona = new cat_29_tipo_persona;
+        $data['tipoPersona'] = $catTipoPersona
+            ->select('tipoPersonaId,tipoPersona')
+            ->where('flgElimina', 0)
+            ->findAll();
+
+        $catDocumentoIdentificacion = new cat_22_documentos_identificacion;
+        $data['documentoIdentificacion'] = $catDocumentoIdentificacion
+            ->select('documentoIdentificacionId,documentoIdentificacion')
+            ->where('flgElimina', 0)
+            ->findAll();
+
+        $catActividadEconomica = new cat_19_actividad_economica;
+        $data['actividadEconomica'] = $catActividadEconomica
+            ->select('actividadEconomicaId,actividadEconomica')
+            ->where('flgElimina', 0)
+            ->findAll();
+
+        $catTipoContribuyente = new cat_tipo_contribuyente;
+        $data['tipoContribuyente'] = $catTipoContribuyente
+            ->select('tipoContribuyenteId,tipoContribuyente')
+            ->where('flgElimina', 0)
+            ->findAll();
+
+        $catPaises = new cat_20_paises;
+        $data['pais'] = $catPaises
+            ->select('paisId,pais')
+            ->where('flgElimina', 0)
+            ->findAll();
+
+        $catPaisCiudad = new cat_12_paises_ciudades;
+        $data['paisCiudad'] = $catPaisCiudad
+            ->select('paisCiudadId,paisCiudad')
+            ->where('flgElimina', 0)
+            ->findAll();
+
+        $catPaisEstado = new cat_13_paises_estados;
+        $data['paisEstado'] = $catPaisEstado
+            ->select('paisEstadoId,paisEstado')
+            ->where('flgElimina', 0)
+            ->findAll();
+
+        if($operacion == 'editar') {
+            $clienteId = $this->request->getPost('clienteId');
+
+            $cliente = new fel_clientes();
+            $data['campos'] = $fel_clientes
+            ->select('clienteId, tipoPersonaId, nrcCliente, documentoIdentificacionId, numDocumentoIdentificacion, cliente, clienteComercial, actividadEconomicaId, tipoContribuyenteId, direccionCliente, porcentajeDescuentoMaximo, paisId, paisCiudadId, paisEstadoId, estadoCliente')
+            ->where('flgElimina', 0)
+            ->where('clienteId', $clienteId)
+            ->first();
+        } else {
+            $data['campos'] = [
+                'clienteId'                 => 0,
+                'tipoPersonaId'             => '',
+                'nrcCliente'                => '',
+                'documentoIdentificacionId' => '',
+                'numDocumentoIdentificacion'=> '',
+                'cliente'                   => '',
+                'clienteComercial'          => '',
+                'actividadEconomicaId'      => '',
+                'tipoContribuyenteId'       => '',
+                'paisId'                    => '',
+                'paisCiudadId'              => '',
+                'paisEstadoId'              => '',
+                'direccionCliente'          => ''
+            ];
+        }
+        $data['operacion'] = $operacion;
+        return view('ventas/modals/modalNuevoCliente', $data);
+    }
+
+    public function modalClienteOperacion(){
+        $operacion      = $this->request->getPost('operacion');
+        $clienteId    = $this->request->getPost('clienteId');
+        
+        $cliente = new fel_clientes();
+
+
+        $data = [
+            'tipoPersonaId'                 => $this->request->getPost('selectTipoPersona'),
+            'documentoIdentificacionId'     => $this->request->getPost('selectTipoDocumento'),
+            'nrcCliente'                    => $this->request->getPost('nrcCliente'),
+            'numDocumentoIdentificacion'    => $this->request->getPost('numeroDocumento'),
+            'cliente'                       => $this->request->getPost('cliente'),
+            'clienteComercial'              => $this->request->getPost('clienteComercial'),
+            'actividadEconomicaId'          => $this->request->getPost('selectActividadEconomica'),
+            'tipoContribuyenteId'           => $this->request->getPost('selectTipoContribuyente'),
+            'paisId'                        => $this->request->getPost('selectPaisCliente'),
+            'paisCiudadId'                  => $this->request->getPost('selectDepartamentoCliente'),
+            'paisEstadoId'                  => $this->request->getPost('selectMunicipioCliente'),
+            'direccionCliente'              => $this->request->getPost('direccionCliente'),
+            'estadoCliente'                 => "Activo"
+        ];
+
+        if($operacion == 'editar') {
+            $operacionCliente = $cliente->update($this->request->getPost('clienteId'), $data);
+        } else {
+            // Insertar datos en la base de datos
+            $operacionCliente = $cliente->insert($data);
+        }
+        if ($operacionCliente) {
+            // Si el insert fue exitoso, devuelve el último ID insertado
+            return $this->response->setJSON([
+                'success' => true,
+                'mensaje' => 'Proveedor '.($operacion == 'editar' ? 'actualizado' : 'agregado').' correctamente',
+                'clienteId' => ($operacion == 'editar' ? $this->request->getPost('clienteId') : $cliente->insertID())
+            ]);
+        } else {
+            // Si el insert falló, devuelve un mensaje de error
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'No se pudo insertar el Proveedor'
+            ]);
+        }
+    }
+
+   /* public function tablaClientes(){
         $output['data'] = array();
         $n = 0;
 
@@ -63,19 +215,17 @@ class administracionClientes extends Controller
             return $this->response->setJSON(array('data' => '')); // No hay datos, devuelve un array vacío
         }
     }
+        */
 
-    public function modalNuevoCliente(){
 
-        $data['variable'] = 0;
-        return view('ventas/modals/modalNuevoCliente', $data);
-    }
 
-    public function modalContactoCliente(){
+ /*   public function modalContactoCliente(){
         $data['variable'] = 0;
         return view('ventas/modals/modalContactoCliente', $data);
     }
+        */
 
-    public function tablaContactoClientes(){
+  /*  public function tablaContactoClientes(){
         $output['data'] = array();
         $n = 0;
 
@@ -109,8 +259,9 @@ class administracionClientes extends Controller
         $data['variable'] = 0;
         return view('ventas/modals/modalHistorialVentas', $data);
     }
+        */
 
-    public function tablaHistorialVentas(){
+  /*  public function tablaHistorialVentas(){
             $output['data'] = array();
             $n = 0;
             $n++;
@@ -142,4 +293,5 @@ class administracionClientes extends Controller
                 return $this->response->setJSON(array('data' => '')); // No hay datos, devuelve un array vacío
             }       
     }
+            */
 }

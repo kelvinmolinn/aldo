@@ -7,7 +7,7 @@ use CodeIgniter\Model;
 class cat_tipo_contribuyente extends Model
 {
     protected $table = 'cat_tipo_contribuyente';
-    protected $primaryKey = 'actividadEconomicaId'; // si el nombre de la clave primaria es diferente
+    protected $primaryKey = 'tipoContribuyenteId'; // si el nombre de la clave primaria es diferente
 
     protected $allowedFields = ['tipoContribuyenteId','tipoContribuyente','flgElimina','fhAgrega','fhEdita','usuarioIdAgrega','usuarioIdEdita','fhElimina','usuarioIdElimina'];
 
