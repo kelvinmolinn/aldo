@@ -13,6 +13,8 @@
                     <h5 class="modal-title"><?php echo ($operacion == 'editar' ? 'Editar cliente' : 'Nuevo cliente');?></h5>
                 </div>
                 <div class="modal-body">
+                    <input type="hidden" id="clienteId" name="clienteId" value="<?= $campos['clienteId'] ?>">
+                    <input type="hidden" id="operacion" name="operacion" value="<?= $operacion; ?>">
                     <div class="row">
                         <div class="col-md-4">
                         <div class="form-select-control">
@@ -26,13 +28,13 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-outline">
-                                <input type="text" id="cliente" name="cliente" class="form-control" value="" required>
+                                <input type="text" id="cliente" name="cliente" class="form-control" value="<?= $campos['cliente']; ?>" required>
                                 <label class="form-label" for="cliente">Nombre del cliente</label>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-outline">
-                                <input type="text" id="clienteComercial" name="clienteComercial" class="form-control numero" value="" required>
+                                <input type="text" id="clienteComercial" name="clienteComercial" class="form-control numero"  value="<?= $campos['clienteComercial']; ?>" required>
                                 <label class="form-label" for="clienteComercial">Nombre comercial</label>
                             </div>
                         </div>
@@ -50,7 +52,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-outline">
-                                <input type="text" id="nrcCliente" name="nrcCliente" class="form-control" min ="0" value="">
+                                <input type="text" id="nrcCliente" name="nrcCliente" class="form-control" min ="0" value="<?= $campos['nrcCliente']; ?>">
                                 <label class="form-label" for="nrcCliente">NRC</label>
                             </div>
                         </div>
@@ -80,7 +82,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-outline">
-                                <input type="text" id="numeroDocumento" name="numeroDocumento" class="form-control" value="" min ="0" required>
+                                <input type="text" id="numeroDocumento" name="numeroDocumento" class="form-control" value="<?= $campos['numDocumentoIdentificacion']; ?>" min ="0" required>
                                 <label class="form-label" for="numeroDocumento">Numero del documento</label>
                             </div>
                         </div>
@@ -95,8 +97,8 @@
                                 <?php } ?>
                             </select>
                         </div>
-                    </div>
-                    <div class="col-md-4">
+                        </div>
+                        <div class="col-md-4">
                         <div class="form-select-control">
                             <select name="selectDepartamentoCliente" id="selectDepartamentoCliente" style="width: 100%;" required>
                                 <option value=""></option>
@@ -105,15 +107,11 @@
                                 <?php } ?>
                             </select>
                         </div>
-                    </div>
+                        </div>
 
                         <div class="col-md-4">
                             <div class="form-select-control">
                                 <select name="selectMunicipioCliente" id="selectMunicipioCliente" style="width: 100%;" required>
-                                <option value=""></option>
-                                <?php foreach ($paisEstado as $paisEstado) { ?>
-                                    <option value="<?php echo $paisEstado['paisEstadoId']; ?>"><?php echo $paisEstado['paisEstado']; ?></option>
-                                <?php } ?>
                                 </select>
                             </div>
                         </div>
@@ -121,7 +119,7 @@
                     <div class="row mt-4">
                         <div class="col-md-12">
                             <div class="form-outline">
-                                <input type="text" id="direccionCliente" name="direccionCliente" class="form-control" min ="0" value="">
+                                <input type="text" id="direccionCliente" name="direccionCliente" class="form-control" min ="0" value="<?= $campos['direccionCliente']; ?>" >
                                 <label class="form-label" for="selectDireccionCliente">Dirección del cliente</label>
                             </div>
                         </div>
@@ -180,9 +178,33 @@
             placeholder: 'Departamento',
             dropdownParent: $('#modalClientes')
         });
-        $("#selectMunicipioCliente").select2({
+     /*   $("#selectMunicipioCliente").select2({
             placeholder: 'Municipio',
-            dropdownParent: $('#modalClientes')
+            dropdownParent: $('#modalClientes'
+        });*/
+
+        $("#selectMunicipioCliente").select2({
+            dropdownParent: $('#modalClientes'),
+            placeholder: 'Digite el municipio a buscar',
+            ajax: {
+                type: "POST",
+                url: 'ventas/admin-clientes/form/nuevo/cliente',
+                dataType: 'json',
+                delay: 250,
+                data: function(params) {
+                    // Aquí se pueden agregar valores adicionales o variables
+                    return {
+                        txtBuscar: params.term,
+                        paisEstadoId: 'paisEstadoId'
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data
+                    };
+                },
+                cache: true
+            }
         });
 
         $("#selectActividadEconomica").select2({
@@ -263,6 +285,9 @@
             $("#selectTipoContribuyente").val('<?= $campos["tipoContribuyenteId"]; ?>').trigger("change");
             $("#selectTipoDocumento").val('<?= $campos["documentoIdentificacionId"]; ?>').trigger("change");
             $("#selectActividadEconomica").val('<?= $campos["actividadEconomicaId"]; ?>').trigger("change");
+            $("#selectPaisCliente").val('<?= $campos["paisId"]; ?>').trigger("change");
+            $("#selectMunicipioCliente").val('<?= $campos["paisEstadoId"]; ?>').trigger("change");
+            $("#selectDepartamentoCliente").val('<?= $campos["paisCiudadId"]; ?>').trigger("change");
 
     });
 </script>

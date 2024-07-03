@@ -2,7 +2,7 @@
 <hr>
 <div class="row mb-4">
     <div class="col-md-12 text-right">
-        <button type= "button" id="btnNuevoProveedor" class="btn btn-primary estilo-btn" onclick="modalClientes();">
+        <button type= "button" id="btnNuevoProveedor" class="btn btn-primary estilo-btn" onclick="modalClientes(0,'insertar');">
             <i class="fas fa-save"></i>
             Nuevo Cliente
         </button>
@@ -23,12 +23,12 @@
     </table>
 </div>
 <script>
-    function modalClientes() {
+    function modalClientes(clienteId,operacion) {
         // Realizar una petición AJAX para obtener los datos del módulo por su ID
         $.ajax({
                 url: '<?php echo base_url('ventas/admin-clientes/form/nuevo/cliente'); ?>',
                 type: 'POST',
-                data: {}, // Pasar el ID del módulo como parámetro
+                data: {clienteId: clienteId, operacion: operacion}, // Pasar el ID del módulo como parámetro
                 success: function(response) {
                     // Insertar el contenido de la modal en el cuerpo de la modal
                     $('#divModalContent').html(response);
@@ -43,12 +43,14 @@
         });
     }
 
-    function modalContactoClientes() {
+    function modalContactoClientes(clienteId,cliente) {
         // Realizar una petición AJAX para obtener los datos del módulo por su ID
         $.ajax({
                 url: '<?php echo base_url('ventas/admin-clientes/form/nuevo/contacto/cliente'); ?>',
                 type: 'POST',
                 data: { 
+                    clienteId: clienteId, 
+                        cliente: cliente
                       }, // Pasar el ID del módulo como parámetro
                 success: function(response) {
                     // Insertar el contenido de la modal en el cuerpo de la modal
