@@ -225,6 +225,9 @@ $routes->group('ventas/admin-clientes', function($routes) {
     $routes->post('form/historial/ventas', 'ventas\administracionClientes::modalHistorialVentas');
     $routes->post('tabla/historial/ventas', 'ventas\administracionClientes::tablaHistorialVentas');
     $routes->post('operacion/guardar/clientes', 'ventas\administracionClientes::modalClienteOperacion');
+    $routes->post('operacion/guardar/contacto', 'ventas\administracionClientes::agregarContacto');
+    $routes->post('obtener/contacto/cliente', 'ventas\administracionClientes::obtenerContactoCliente');
+    $routes->post('eliminar/contacto/cliente', 'ventas\administracionClientes::eliminarContacto');
 });
 
 $routes->group('ventas/admin-reservas', function($routes) {
