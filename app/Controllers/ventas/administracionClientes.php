@@ -183,14 +183,14 @@ class administracionClientes extends Controller
             // Si el insert fue exitoso, devuelve el último ID insertado
             return $this->response->setJSON([
                 'success' => true,
-                'mensaje' => 'Proveedor '.($operacion == 'editar' ? 'actualizado' : 'agregado').' correctamente',
+                'mensaje' => 'Cliente '.($operacion == 'editar' ? 'actualizado' : 'agregado').' correctamente',
                 'clienteId' => ($operacion == 'editar' ? $this->request->getPost('clienteId') : $cliente->insertID())
             ]);
         } else {
             // Si el insert falló, devuelve un mensaje de error
             return $this->response->setJSON([
                 'success' => false,
-                'mensaje' => 'No se pudo insertar el Proveedor'
+                'mensaje' => 'No se pudo insertar el Cliente'
             ]);
         }
     }
