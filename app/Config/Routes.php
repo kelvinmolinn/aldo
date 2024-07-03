@@ -203,7 +203,9 @@ $routes->group('compras/admin-compras', function($routes) {
     $routes->post('operacion/guardar/productos', 'compras\administracionCompras::modalProductosOperacion');
     $routes->post('eliminar/producto/compra', 'compras\administracionCompras::eliminarProductoCompra');
     $routes->post('finalizar/compra', 'compras\administracionCompras::finalizarCompra');
-
+    $routes->post('vista/ver/compra', 'compras\administracionCompras::vistaVerCompra');
+    $routes->post('tabla/ver/compra', 'compras\administracionCompras::tablaVerCompras');
+    
 });
 
 $routes->group('compras/admin-retaceo', function($routes) {

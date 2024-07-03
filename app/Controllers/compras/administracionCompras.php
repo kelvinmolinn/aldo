@@ -98,7 +98,7 @@ class administracionCompras extends Controller
 
                 if($columna['estadoCompra'] == "Finalizada"){
                     $columna5 = '
-                        <button class="btn btn-primary mb-1" onclick="" data-toggle="tooltip" data-placement="top" title="Ver compra">
+                        <button class="btn btn-primary mb-1" onclick="cambiarInterfaz(`compras/admin-compras/vista/ver/compra`, '.htmlspecialchars(json_encode($jsonActualizarCompra)).');" data-toggle="tooltip" data-placement="top" title="Ver compra">
                             <i class="fas fa-eye"></i>
                         </button>
                     ';
@@ -282,7 +282,7 @@ class administracionCompras extends Controller
         $proveedor = new comp_proveedores;
         $pais = new cat_20_paises;
         $compras = new comp_compras;
-
+        
         $data['tipoDTE'] = $tipoDte
                         ->select("tipoDTEId,tipoDocumentoDTE")
                         ->where("flgElimina", 0)
@@ -1052,5 +1052,81 @@ class administracionCompras extends Controller
                 ]);
             }
         } // Cierre else flgAplicaRetaceo
+    }
+    public function vistaVerCompra(){
+        $session = session();
+
+        $compraId = $this->request->getPost('compraId');
+        $tipoContribuyenteId = $this->request->getPost('tipoContribuyenteId');
+        
+        $tipoDte = new cat_02_tipo_dte;
+        $proveedor = new comp_proveedores;
+        $pais = new cat_20_paises;
+        $compras = new comp_compras;
+
+        $data['tipoDTE'] = $tipoDte
+                        ->select("tipoDTEId,tipoDocumentoDTE")
+                        ->where("flgElimina", 0)
+                        ->findAll();
+        $data['selectProveedor'] = $proveedor
+                        ->select("proveedorId,proveedor")
+                        ->where("flgElimina", 0)
+                        ->findAll();
+        $data['selectPais'] = $pais
+                        ->select("paisId,pais")
+                        ->where("flgElimina", 0)
+                        ->findAll();     
+        /*$data['estadoCompra']= $comp_compras 
+                        ->select("estadoCompra")
+                        ->where("flgElimina", 0)
+                        ->findAll();*/
+                        
+        $data['compraId'] = $compraId;
+        $data['tipoContribuyenteId'] = $tipoContribuyenteId;
+
+        // Consulta para traer los valores de los input que se pueden actualizar
+        $consultaCompra = $compras
+                ->select("proveedorId,tipoDTEId,numFactura,fechaDocumento,paisId,flgRetaceo")
+                ->where("flgElimina", 0)
+                ->where("compraId", $compraId)
+                ->first();   
+
+        $data['camposEncabezado'] = [
+            'proveedorId'       => $consultaCompra['proveedorId'],
+            'tipoDTEId'         => $consultaCompra['tipoDTEId'],
+            'fechaDocumento'    => $consultaCompra['fechaDocumento'],
+            'numFactura'        => $consultaCompra['numFactura'],
+            'paisId'            => $consultaCompra['paisId'],
+            'flgRetaceo'        => $consultaCompra['flgRetaceo']
+            // Sacar estos valores de la consulta
+        ];
+        
+        
+        $porcentajeIva = new conf_parametrizaciones;
+
+        $IVAPercibido = $porcentajeIva 
+        ->select("valorParametrizacion")
+        ->where("flgElimina", 0)
+        ->where("parametrizacionId", 3)
+        ->first(); 
+        $percepcionIVA = ($IVAPercibido['valorParametrizacion'] / 100);
+        $data['ivaPercibido'] = $percepcionIVA;
+
+        $camposSession = [
+            'renderVista' => 'No',
+            'compraId'    => $compraId,
+            'tipoContribuyenteId' => $tipoContribuyenteId,
+            'ivaPercibido' => $percepcionIVA
+        ];
+        $session->set([
+            'route'             => 'compras/admin-compras/vista/ver/compra',
+            'camposSession'     => json_encode($camposSession)
+        ]);
+
+        return view('compras/vistas/pageVerCompra', $data);
+    }
+
+    public function tablaVerCompra(){
+
     }
 }
