@@ -112,10 +112,6 @@
                         <div class="col-md-4">
                             <div class="form-select-control">
                             <select name="selectMunicipioCliente" id="selectMunicipioCliente" style="width: 100%;" required>
-                                <option value=""></option>
-                                <?php foreach ($paisEstado as $paisEstado) { ?>
-                                    <option value="<?php echo $paisEstado['paisEstadoId']; ?>"><?php echo $paisEstado['paisEstado']; ?></option>
-                                <?php } ?>
                             </select>
                             </div>
                         </div>
@@ -182,12 +178,13 @@
             placeholder: 'Departamento',
             dropdownParent: $('#modalClientes')
         });
-       $("#selectMunicipioCliente").select2({
+        
+    /*   $("#selectMunicipioCliente").select2({
             placeholder: 'Municipio',
             dropdownParent: $('#modalClientes')
-        });
+        });*/
 
-      /*  $("#selectMunicipioCliente").select2({
+       $("#selectMunicipioCliente").select2({
             dropdownParent: $('#modalClientes'),
             placeholder: 'Digite el municipio a buscar',
             ajax: {
@@ -210,7 +207,7 @@
                 cache: true
             }
         });
-*/
+
         $("#selectActividadEconomica").select2({
             placeholder: 'Actividad economica',
             dropdownParent: $('#modalClientes')

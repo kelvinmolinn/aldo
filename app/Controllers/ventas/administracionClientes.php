@@ -93,17 +93,20 @@ class administracionClientes extends Controller
             ->where('flgElimina', 0)
             ->findAll();
 
-            $catPaisEstado = new cat_13_paises_estados();
-            $data['paisEstado'] = $catPaisEstado
+
+
+
+
+            if(isset($_POST["txtBuscar"])) {
+                // Misma logica que el select dependiente, una consulta, foreach y un json con la diferencia que en vez de valor se pone "text"
+                // 
+                
+                $catPaisEstado = new cat_13_paises_estados();
+                $data['paisEstado'] = $catPaisEstado
                 ->select('paisEstadoId,paisEstado')
                 ->where('flgElimina', 0)
                 ->findAll();
 
-
-/*
-            if(isset($_POST["txtBuscar"])) {
-                // Misma logica que el select dependiente, una consulta, foreach y un json con la diferencia que en vez de valor se pone "text"
- 
                     $n = 0;
                    foreach($data as $consulta ) {
                        $n += 1;
@@ -120,7 +123,7 @@ class administracionClientes extends Controller
                          $json[] = ['id'=>'', 'text'=>'Digite el valor a buscar'];
                          echo json_encode($json);
                }
-*/
+
         if($operacion == 'editar') {
             $clienteId = $this->request->getPost('clienteId');
 
