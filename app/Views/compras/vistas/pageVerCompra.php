@@ -108,7 +108,7 @@
 
     $(document).ready(function(){
         
-        tituloVentana("Compra");
+        tituloVentana("Compras");
 
         $('#btnRegresarCompra').on('click', function() {
             cambiarInterfaz('compras/admin-compras/index', {renderVista: 'No'});

@@ -96,7 +96,7 @@
             $(this).removeClass('active');
         }
     });
-        tituloVentana("Nueva Compra");
+        tituloVentana("Compras");
 
         $('#tablaCompras').DataTable({
             "ajax": {

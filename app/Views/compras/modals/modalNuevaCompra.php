@@ -196,10 +196,12 @@
                             title: 'Compra realizada con éxito',
                             text: response.mensaje
                         }).then((result) => {
-                            $("#tablaCompras").DataTable().ajax.reload(null, false);
-                            // Actualizar tabla de contactos
-                            // Limpiar inputs con .val(null) o .val('')
-                            
+                            cambiarInterfaz(`compras/admin-compras/vista/actualizar/compra`, 
+                                {
+                                    compraId: response.compraId,
+                                    tipoContribuyenteId: response.tipoContribuyenteId
+                                }
+                            );
                         });
                     } else {
                         // Insert fallido, mostrar mensaje de error

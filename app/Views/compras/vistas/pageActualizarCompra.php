@@ -1,7 +1,7 @@
 
 <form id="frmActualizarCompra" method="post" action="<?php echo base_url('compras/admin-compras/operacion/actualizar/compra'); ?>">
     <input type="hidden" id="compraId" name="compraId" value="<?= $compraId; ?>">
-    <h2>Continuar compra - Número de documento: <?php echo $camposEncabezado["numFactura"];?></h2>
+    <h2 id="tituloEncabezadoCompra">Continuar compra - Número de documento: <?php echo $camposEncabezado["numFactura"];?></h2>
     <hr>
     <button type= "button" id="btnRegresarCompra" class="btn btn-secondary estilo-btn mb-4">
         <i class="fas fa-backspace"></i>
@@ -204,7 +204,7 @@
 
     $(document).ready(function(){
         
-        tituloVentana("Compra");
+        tituloVentana("Compras");
 
         $('#btnRegresarCompra').on('click', function() {
             cambiarInterfaz('compras/admin-compras/index', {renderVista: 'No'});
@@ -239,6 +239,7 @@
                             title: 'Compra actualizada con éxito',
                             text: response.mensaje
                         }).then((result) => {
+                            $("#tituloEncabezadoCompra").html("Continuar compra - Número de documento: " + $("#numeroFactura").val());
                             $("#tablaCompras").DataTable().ajax.reload(null, false);
                             $("#tablaContinuarCompra ").DataTable().ajax.reload(null, false);
                             // Actualizar tabla de contactos

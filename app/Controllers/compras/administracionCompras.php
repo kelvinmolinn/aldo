@@ -218,23 +218,8 @@ class administracionCompras extends Controller
                     'porcentajeIva'     => $IvaCalcular
                 ];
         
-                    // Insertar datos en la base de datos
-                    $operacionCompra = $compras->insert($data);
-        
-                if ($operacionCompra) {
-                    // Si el insert fue exitoso, devuelve el último ID insertado
-                    return $this->response->setJSON([
-                        'success' => true,
-                        'mensaje' => 'Compra agregada correctamente',
-                        'compraId' =>  $compras->insertID()
-                    ]);
-                } else {
-                    // Si el insert falló, devuelve un mensaje de error
-                    return $this->response->setJSON([
-                        'success' => false,
-                        'mensaje' => 'No se pudo insertar la compra'
-                    ]);
-                }
+                // Insertar datos en la base de datos
+                $operacionCompra = $compras->insert($data);
             }else{
                 $data = [
                     'proveedorId'       => $proveedorInternacional,
@@ -248,28 +233,26 @@ class administracionCompras extends Controller
                     'estadoCompra'      => 'Pendiente',
                     'porcentajeIva'     => $IvaCalcular
                 ];
-        
-                    // Insertar datos en la base de datos
-                    $operacionCompra = $compras->insert($data);
-        
-                if ($operacionCompra) {
-                    // Si el insert fue exitoso, devuelve el último ID insertado
-                    return $this->response->setJSON([
-                        'success' => true,
-                        'mensaje' => 'Compra agregada correctamente',
-                        'compraId' =>  $compras->insertID()
-                    ]);
-                } else {
-                    // Si el insert falló, devuelve un mensaje de error
-                    return $this->response->setJSON([
-                        'success' => false,
-                        'mensaje' => 'No se pudo insertar la compra'
-                    ]);
-                }
+                // Insertar datos en la base de datos
+                $operacionCompra = $compras->insert($data);
             }
 
+            if ($operacionCompra) {
+                // Si el insert fue exitoso, devuelve el último ID insertado
+                return $this->response->setJSON([
+                    'success' => true,
+                    'mensaje' => 'Compra agregada correctamente',
+                    'compraId' =>  $compras->insertID(),
+                    'tipoContribuyenteId' => 1 // Pendiente
+                ]);
+            } else {
+                // Si el insert falló, devuelve un mensaje de error
+                return $this->response->setJSON([
+                    'success' => false,
+                    'mensaje' => 'No se pudo insertar la compra'
+                ]);
+            }
         }
-
     }
 
     public function vistaContinuarCompra(){
