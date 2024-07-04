@@ -95,13 +95,18 @@ class administracionClientes extends Controller
 
 
 
+
+
             if(isset($_POST["txtBuscar"])) {
                 // Misma logica que el select dependiente, una consulta, foreach y un json con la diferencia que en vez de valor se pone "text"
+                // 
+                
                 $catPaisEstado = new cat_13_paises_estados();
                 $data['paisEstado'] = $catPaisEstado
-                    ->select('paisEstadoId,paisEstado')
-                    ->where('flgElimina', 0)
-                    ->findAll();
+                ->select('paisEstadoId,paisEstado')
+                ->where('flgElimina', 0)
+                ->findAll();
+
                     $n = 0;
                    foreach($data as $consulta ) {
                        $n += 1;
@@ -181,14 +186,14 @@ class administracionClientes extends Controller
             // Si el insert fue exitoso, devuelve el último ID insertado
             return $this->response->setJSON([
                 'success' => true,
-                'mensaje' => 'Proveedor '.($operacion == 'editar' ? 'actualizado' : 'agregado').' correctamente',
+                'mensaje' => 'Cliente '.($operacion == 'editar' ? 'actualizado' : 'agregado').' correctamente',
                 'clienteId' => ($operacion == 'editar' ? $this->request->getPost('clienteId') : $cliente->insertID())
             ]);
         } else {
             // Si el insert falló, devuelve un mensaje de error
             return $this->response->setJSON([
                 'success' => false,
-                'mensaje' => 'No se pudo insertar el Proveedor'
+                'mensaje' => 'No se pudo insertar el Cliente'
             ]);
         }
     }
