@@ -295,10 +295,10 @@ class administracionCompras extends Controller
                         ->select("paisId,pais")
                         ->where("flgElimina", 0)
                         ->findAll();     
-        $data['estadoCompra']= $comp_compras 
+        /*$data['estadoCompra']= $comp_compras 
                         ->select("estadoCompra")
                         ->where("flgElimina", 0)
-                        ->findAll();
+                        ->findAll();*/
                         
         $data['compraId'] = $compraId;
         $data['tipoContribuyenteId'] = $tipoContribuyenteId;
@@ -1101,7 +1101,6 @@ class administracionCompras extends Controller
             // Sacar estos valores de la consulta
         ];
         
-        
         $porcentajeIva = new conf_parametrizaciones;
 
         $IVAPercibido = $porcentajeIva 
@@ -1127,6 +1126,196 @@ class administracionCompras extends Controller
     }
 
     public function tablaVerCompra(){
+        $comprasDetalle = new comp_compras_detalle;
+        $compras = new comp_compras;
+        $compraId = $this->request->getPost('compraId');
+        $tipoContribuyenteId = $this->request->getPost('tipoContribuyenteId');
+        $IVAPercibido = $this->request->getPost('ivaPercibido');
 
+        $datos = $comprasDetalle
+            ->select('comp_compras.paisId,inv_productos.codigoProducto,inv_productos.producto,cat_14_unidades_medida.abreviaturaUnidadMedida,comp_compras_detalle.compraDetalleId,comp_compras_detalle.compraId,comp_compras_detalle.productoId,comp_compras_detalle.cantidadProducto,comp_compras_detalle.precioUnitario,comp_compras_detalle.precioUnitarioIVA,comp_compras_detalle.ivaUnitario,comp_compras_detalle.ivaTotal,comp_compras_detalle.totalCompraDetalle,comp_compras_detalle.totalCompraDetalleIVA')
+            ->join('comp_compras','comp_compras.compraId = comp_compras_detalle.compraId')
+            ->join('inv_productos','inv_productos.productoId = comp_compras_detalle.productoId')
+            ->join('cat_14_unidades_medida','cat_14_unidades_medida.unidadMedidaId = inv_productos.unidadMedidaId')
+            ->where('comp_compras_detalle.flgElimina', 0)
+            ->where('comp_compras_detalle.compraId', $compraId)
+            ->findAll();
+
+        $output['data'] = array();
+        $n = 0; // Variable para contar las filas
+        $totalCantidad = 0;
+        $totalConIVA = 0;
+        $totalSinIVA = 0;
+        $totalIVA = 0;
+           foreach ($datos as $columna) {
+                $paisId = $columna['paisId'];
+                $n++;
+                // Aquí construye tus columnas
+                if ($columna['paisId'] == 61) {
+                    
+                    $columna1 = $n;
+                    $columna2 = '('.$columna['codigoProducto'].') ' . $columna['producto'];
+                    $columna3 = '<b>Con IVA: </b>$ '. number_format($columna['precioUnitarioIVA'], 2, '.', ',') . '<br>' . '<b>Sin IVA: </b>$ ' .  number_format($columna['precioUnitario'], 2, '.', ',');
+                    $columna4 = $columna['cantidadProducto'] . ' ('.$columna['abreviaturaUnidadMedida'].')';
+                    $columna5 = '<b>Con IVA: </b>$ '. number_format($columna['totalCompraDetalleIVA'], 2, '.', ',') . '<br>' . '<b>Sin IVA: </b>$ ' . number_format($columna['totalCompraDetalle'], 2, '.', ',');
+                    $columna6 = '';
+                    // Agrega la fila al array de salida
+                    $output['data'][] = array(
+                        $columna1,
+                        $columna2,
+                        $columna3,
+                        $columna4,
+                        $columna5,
+                        $columna6
+                    );
+                }else{
+                    $columna1 = $n;
+                    $columna2 = '('.$columna['codigoProducto'].') ' . $columna['producto'];
+                    $columna3 = '<b>Costo Unitario: </b>$ ' .  number_format($columna['precioUnitario'], 2, '.', ',');
+                    $columna4 = $columna['cantidadProducto'] . ' ('.$columna['abreviaturaUnidadMedida'].')';
+                    $columna5 = '<b>Costo total: </b>$ ' . number_format($columna['totalCompraDetalle'], 2, '.', ',');
+                    $columna6 = '';
+                    // Agrega la fila al array de salida
+                    $output['data'][] = array(
+                        $columna1,
+                        $columna2,
+                        $columna3,
+                        $columna4,
+                        $columna5,
+                        $columna6
+                    );
+                }
+
+            $totalCantidad += $columna['cantidadProducto'];
+            $UDM = $columna['abreviaturaUnidadMedida'];
+            $totalConIVA += $columna['totalCompraDetalleIVA'];
+            $totalSinIVA += $columna['totalCompraDetalle'];
+            $totalIVA += $columna['ivaTotal'];
+           }
+           $Percibido = $totalSinIVA * $IVAPercibido;
+
+           $totalPagar = $totalSinIVA + $totalIVA + $Percibido;
+           $totalPagarSinPercepcion = $totalSinIVA + $totalIVA;
+           $totalPagarInternacional = $totalSinIVA;
+        // Verifica si hay datos
+        if ($n > 0) {
+            if($paisId == 61) {
+                $output['footer'] = array(
+                    '<b>Totales</b>',
+                    $totalCantidad . ' ('. $UDM .')',
+                    '<b>Total con IVA:</b> $ ' . number_format($totalConIVA, 2, '.', ',') . '<br>' . '<b>Total Sin IVA:</b> $ ' . number_format($totalSinIVA, 2, '.', ',')
+                );
+                if($tipoContribuyenteId == 3){
+                    $output['footerTotales'] = '
+                        <b>
+                        <div class="row text-right">
+                            <div class="col-8">
+                                Subtotal
+                            </div>
+                            <div class="col-4">
+                                $ '.number_format($totalSinIVA, 2, '.', ',').'
+                            </div>
+                        </div>
+                        <div class="row text-right">
+                            <div class="col-8">
+                                IVA 13%
+                            </div>
+                            <div class="col-4">
+                                $ '.number_format($totalIVA, 2, '.', ',').'
+                            </div>
+                        </div>
+                        <div class="row text-right">
+                            <div class="col-8">
+                                (+) IVA Percibido
+                            </div>
+                            <div class="col-4">
+                                $ '.number_format($Percibido, 2, '.', ',').'
+                            </div>
+                        </div>
+                        <div class="row text-right">
+                            <div class="col-8">
+                                Total a pagar
+                            </div>
+                            <div class="col-4">
+                                $ '.number_format($totalPagar, 2, '.', ',').'
+                            </div>
+                        </div>                    
+                        </b>
+                    ';
+                } else {
+                    if($totalSinIVA >= 100.00){
+                        $output['footerTotales'] = '
+                            <b>
+                            <div class="row text-right">
+                                <div class="col-8">
+                                    Subtotal
+                                </div>
+                                <div class="col-4">
+                                    $ '.number_format($totalSinIVA, 2, '.', ',').'
+                                </div>
+                            </div>
+                            <div class="row text-right">
+                                <div class="col-8">
+                                    IVA 13%
+                                </div>
+                                <div class="col-4">
+                                    $ '.number_format($totalIVA, 2, '.', ',').'
+                                </div>
+                            </div>
+                            <div class="row text-right">
+                                <div class="col-8">
+                                    Total a pagar
+                                </div>
+                                <div class="col-4">
+                                    $ '.number_format($totalPagarSinPercepcion, 2, '.', ',').'
+                                </div>
+                            </div>                 
+                            </b>
+                            <div class="alert alert-warning " role="alert">
+                                EL TOTAL A PAGAR NETO ES MAYOR O IGUAL A $100.00, PERO EL PROVEEDOR NO FUE REGISTRADO COMO GRAN CONTRIBUYENTE, POR FAVOR ACTUALICE LA INFORMACIÓN DEL PROVEEDOR PARA PODER APLICAR LA PERCEPCIÓN.
+                            </div>  
+                        ';
+
+                    } else {
+
+                    }
+                    // IMPORTANTE: EL TOTAL A PAGAR NETO ES MAYOR O IGUAL A $100.00, PERO EL PROVEEDOR NO FUE REGISTRADO COMO GRAN CONTRIBUYENTE, POR FAVOR ACTUALICE LA INFORMACIÓN DEL PROVEEDOR PARA PODER APLICAR LA PERCEPCIÓN.
+
+
+                }
+
+            }  else {
+                $output['footer'] = array(
+                    '<b>Totales</b>',
+                    $totalCantidad . ' ('. $UDM .')',
+                    '<b>Total:</b> $ '. number_format($totalSinIVA, 2, '.', ',')
+                );
+
+                $output['footerTotales'] = '
+                    <b>
+                    <div class="row text-right">
+                        <div class="col-8">
+                            Subtotal
+                        </div>
+                        <div class="col-4">
+                            $ '.number_format($totalPagarInternacional, 2, '.', ',').'
+                        </div>
+                    </div>
+                    <div class="row text-right">
+                        <div class="col-8">
+                            Total a pagar
+                        </div>
+                        <div class="col-4">
+                            $ '.number_format($totalPagarInternacional, 2, '.', ',').'
+                        </div>
+                    </div>
+                    </b>
+
+                ';
+            }
+            return $this->response->setJSON($output);
+        } else {
+            return $this->response->setJSON(array('data' => '', 'footer'=>'')); // No hay datos, devuelve un array vacío
+        }
     }
 }
