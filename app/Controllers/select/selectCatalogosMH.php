@@ -66,4 +66,29 @@ class selectCatalogosMH extends Controller
             return $this->response->setJSON($jsonRespuesta);
         }
 	}
+
+		public function selectPaisMunicipio() {
+		$paisCiudadId = $this->request->getPost('paisCiudadId');
+
+        $catPaisEstado = new cat_13_paises_estados();
+        $consultaPaisMunicipio = $catPaisEstado
+            ->select('paisEstadoId,paisEstado')
+            ->where('flgElimina', 0)
+            ->where('paisCiudadId', $paisCiudadId)
+            ->findAll();
+        $n = 0;
+        foreach($consultaPaisMunicipio as $paisMunicipio) {
+        	$n++;
+        	$jsonSelect[] = array("id" => $paisMunicipio['paisEstadoId'], "text" => $paisMunicipio["paisEstado"]);
+        }
+
+        if($n > 0) {
+        	$jsonRespuesta = json_encode($jsonSelect);
+        	return $this->response->setJSON($jsonSelect);
+        } else {
+	  		$jsonSelect[] = ['id'=>'', 'text'=>'Digite el departamento del país'];
+	  		$jsonRespuesta = json_encode($jsonSelect);
+            return $this->response->setJSON($jsonRespuesta);
+        }
+	}
 }

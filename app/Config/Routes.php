@@ -261,6 +261,7 @@ $routes->group('ventas/admin-facturacion', function($routes) {
 $routes->group("select", function($routes) {
     $routes->post('catalogos-hacienda/actividad-economica', 'select\selectCatalogosMH::selectActividadEconomica');
     $routes->post('catalogos-hacienda/paises-departamentos', 'select\selectCatalogosMH::selectPaisDepartamento');
+    $routes->post('catalogos-hacienda/paises-municipios', 'select\selectCatalogosMH::selectPaisMunicipio');
 });
 // Rutas de errores
 $routes->get('404', 'Errores::error404');

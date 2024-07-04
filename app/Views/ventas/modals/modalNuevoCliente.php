@@ -105,6 +105,7 @@
                         <div class="col-md-4">
                             <div class="form-select-control">
                             <select name="selectMunicipioCliente" id="selectMunicipioCliente" style="width: 100%;" required>
+                                 <option></option>
                             </select>
                             </div>
                         </div>
@@ -172,35 +173,14 @@
             placeholder: 'Departamento',
             dropdownParent: $('#modalClientes')
         });
+
         
-    /*   $("#selectMunicipioCliente").select2({
+      $("#selectMunicipioCliente").select2({
             placeholder: 'Municipio',
             dropdownParent: $('#modalClientes')
-        });*/
-
-       $("#selectMunicipioCliente").select2({
-            dropdownParent: $('#modalClientes'),
-            placeholder: 'Digite el municipio a buscar',
-            ajax: {
-                type: "POST",
-                url: 'ventas/admin-clientes/form/nuevo/cliente',
-                dataType: 'json',
-                delay: 250,
-                data: function(params) {
-                    // Aquí se pueden agregar valores adicionales o variables
-                    return {
-                        txtBuscar: params.term,
-                        paisEstadoId: 'paisEstadoId'
-                    };
-                },
-                processResults: function(data) {
-                    return {
-                        results: data
-                    };
-                },
-                cache: true
-            }
         });
+
+
 
         $("#selectActividadEconomica").select2({
             dropdownParent: $('#modalClientes'),
@@ -245,6 +225,25 @@
             });
         });
 
+        $("#selectDepartamentoCliente").change(function(e) {
+            $.ajax({
+                url: 'select/catalogos-hacienda/paises-municipios',
+                type: "POST",
+                dataType: "json",
+                data: {
+                    paisCiudadId: $(this).val()
+                }
+            }).done(function(data){
+                $('#selectMunicipioCliente').empty();
+                $('#selectMunicipioCliente').append("<option></option>");
+                for (let i = 0; i < data.length; i++){
+                    $('#selectMunicipioCliente').append($('<option>', {
+                        value: data[i]['id'],
+                        text: data[i]['text']
+                    }));
+                }
+            });
+        });
 
         document.querySelectorAll('#nrc').forEach(function(input) {
             input.addEventListener('keydown', function(event) {

@@ -87,30 +87,14 @@ class administracionClientes extends Controller
             ->where('flgElimina', 0)
             ->findAll();
 
-            if(isset($_POST["txtBuscar"])) {
                 
-                $catPaisEstado = new cat_13_paises_estados();
-                $data['paisEstado'] = $catPaisEstado
-                ->select('paisEstadoId,paisEstado')
-                ->where('flgElimina', 0)
-                ->findAll();
+        $catPaisEstado = new cat_13_paises_estados();
+        $data['paisEstado'] = $catPaisEstado
+            ->select('paisEstadoId,paisEstado')
+            ->where('flgElimina', 0)
+            ->findAll();
 
-                    $n = 0;
-                   foreach($data as $consulta ) {
-                       $n += 1;
-               
-                       $jsonSelect[] = array("id" => $consulta->paisEstadoId, "text" => $consulta->paisEstado);
-                   }
-                   if($n > 0) {
-                       echo json_encode($jsonSelect);
-                   }else{
-                         $json[] = ['id'=>'', 'text'=>'Digite el valor a buscar'];
-                         echo json_encode($json);
-                   }
-               } else {
-                         $json[] = ['id'=>'', 'text'=>'Digite el valor a buscar'];
-                         echo json_encode($json);
-               }
+
 
         if($operacion == 'editar') {
             $clienteId = $this->request->getPost('clienteId');
