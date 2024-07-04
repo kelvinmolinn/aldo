@@ -61,10 +61,6 @@
                         <div class="col-md-12">
                         <div class="form-select-control">
                                 <select name="selectActividadEconomica" id="selectActividadEconomica" style="width: 100%;" required>
-                                    <option value=""></option>
-                                    <?php foreach ($actividadEconomica as $actividadEconomica){ ?>
-                                        <option value="<?php echo $actividadEconomica['actividadEconomicaId']; ?>"><?php echo $actividadEconomica['actividadEconomica']; ?></option>
-                                    <?php } ?>
                                 </select>
                             </div>
                         </div>
@@ -91,7 +87,7 @@
                     <div class="col-md-4">
                         <div class="form-select-control">
                             <select name="selectPaisCliente" id="selectPaisCliente" style="width: 100%;" required>
-                                <option value="1">El Salvador</option>
+                                <option value="61">El Salvador</option>
                                 <?php foreach ($pais as $pais) { ?>
                                     <option value="<?php echo $pais['paisId']; ?>"><?php echo $pais['pais']; ?></option>
                                 <?php } ?>
@@ -101,10 +97,7 @@
                         <div class="col-md-4">
                         <div class="form-select-control">
                             <select name="selectDepartamentoCliente" id="selectDepartamentoCliente" style="width: 100%;" required>
-                                <option value=""></option>
-                                <?php foreach ($paisCiudad as $paisCiudad) { ?>
-                                    <option value="<?php echo $paisCiudad['paisCiudadId']; ?>"><?php echo $paisCiudad['paisCiudad']; ?></option>
-                                <?php } ?>
+                                <option></option>
                             </select>
                         </div>
                         </div>
@@ -149,6 +142,7 @@
 </form>
 
 <script>
+    //catalogos-hacienda/actividad-economica
     $(document).ready(function() {
 
         $("#selectTipoProveedor").select2({
@@ -209,9 +203,49 @@
         });
 
         $("#selectActividadEconomica").select2({
-            placeholder: 'Actividad economica',
-            dropdownParent: $('#modalClientes')
+            dropdownParent: $('#modalClientes'),
+            placeholder: 'Digite código o actividad económica',
+            ajax: {
+                type: "POST",
+                url: 'select/catalogos-hacienda/actividad-economica',
+                dataType: 'json',
+                delay: 250,
+                data: function(params) {
+                    // Aquí se pueden agregar valores adicionales o variables
+                    return {
+                        txtBuscar: params.term
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data
+                    };
+                },
+                cache: true
+            }
         });
+
+        $("#selectPaisCliente").change(function(e) {
+            $.ajax({
+                url: 'select/catalogos-hacienda/paises-departamentos',
+                type: "POST",
+                dataType: "json",
+                data: {
+                    paisId: $(this).val()
+                }
+            }).done(function(data){
+                $('#selectDepartamentoCliente').empty();
+                $('#selectDepartamentoCliente').append("<option></option>");
+                for (let i = 0; i < data.length; i++){
+                    $('#selectDepartamentoCliente').append($('<option>', {
+                        value: data[i]['id'],
+                        text: data[i]['text']
+                    }));
+                }
+            });
+        });
+
+
         document.querySelectorAll('#nrc').forEach(function(input) {
             input.addEventListener('keydown', function(event) {
                 if (event.key === 'e' || event.key === 'E' || event.key === '+' || event.key === '.') {

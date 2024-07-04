@@ -69,12 +69,6 @@ class administracionClientes extends Controller
             ->where('flgElimina', 0)
             ->findAll();
 
-        $catActividadEconomica = new cat_19_actividad_economica();
-        $data['actividadEconomica'] = $catActividadEconomica
-            ->select('actividadEconomicaId,actividadEconomica')
-            ->where('flgElimina', 0)
-            ->findAll();
-
         $catTipoContribuyente = new cat_tipo_contribuyente();
         $data['tipoContribuyente'] = $catTipoContribuyente
             ->select('tipoContribuyenteId,tipoContribuyente')
@@ -93,13 +87,7 @@ class administracionClientes extends Controller
             ->where('flgElimina', 0)
             ->findAll();
 
-
-
-
-
             if(isset($_POST["txtBuscar"])) {
-                // Misma logica que el select dependiente, una consulta, foreach y un json con la diferencia que en vez de valor se pone "text"
-                // 
                 
                 $catPaisEstado = new cat_13_paises_estados();
                 $data['paisEstado'] = $catPaisEstado
