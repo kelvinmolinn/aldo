@@ -129,8 +129,15 @@ class administracionClientes extends Controller
     public function modalClienteOperacion(){
         $operacion      = $this->request->getPost('operacion');
         $clienteId    = $this->request->getPost('clienteId');
-        
+        $clientes    = $this->request->getPost('cliente');
         $cliente = new fel_clientes();
+
+        if ($cliente->existeCliente($clientes, $clienteId)) {
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'El cliente ya está registrado en la base de datos'
+            ]);
+        } else {
 
         $data = [
             'tipoPersonaId'                 => $this->request->getPost('selectTipoPersona'),
@@ -169,6 +176,7 @@ class administracionClientes extends Controller
             ]);
         }
     }
+}
 
     public function tablaClientes(){
         $mostrarClientes = new fel_clientes();

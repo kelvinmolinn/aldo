@@ -96,7 +96,7 @@
                         </div>
                         <div class="col-md-4">
                         <div class="form-select-control">
-                            <select name="selectDepartamentoCliente" id="selectDepartamentoCliente" style="width: 100%;" required>
+                            <select name="selectDepartamentoCliente" id="selectDepartamentoCliente" style="width: 100%;">
                                 <option></option>
                             </select>
                         </div>
@@ -104,7 +104,7 @@
 
                         <div class="col-md-4">
                             <div class="form-select-control">
-                            <select name="selectMunicipioCliente" id="selectMunicipioCliente" style="width: 100%;" required>
+                            <select name="selectMunicipioCliente" id="selectMunicipioCliente" style="width: 100%;">
                                  <option></option>
                             </select>
                             </div>
