@@ -3,15 +3,15 @@
         <div class="modal-dialog  modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Nueva compra - Retaceo</h5>
+                    <h5 class="modal-title">Compra - Retaceo</h5>
                 </div>
                 <div class="modal-body">
                     <div class="row mb-2">
                         <div class="col-md-6">
                             <div class="form-select-control">
-                                <select name="selectCompra" id="selectCompra" style="width: 100%;" required>
+                                <select name="selectCompraRetaceo" id="selectCompraRetaceo" style="width: 100%;" required>
                                     <option value=""></option>
-                                    <option value="">12 - $600</option>
+                                    <option value="1">C0012 - $ 125.00</option>
                                 </select>
                             </div>
                         </div>
@@ -50,6 +50,10 @@
 </form>
 <script>
     $(document).ready(function(){
+        $("#selectCompraRetaceo").select2({
+            placeholder: 'Compras',
+            dropdownParent: $('#modalNuevoRetaceo')
+        });    
 
     })
 </script>

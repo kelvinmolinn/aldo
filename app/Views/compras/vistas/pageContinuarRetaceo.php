@@ -65,6 +65,7 @@
                     <th>Costo unitario</th>
                     <th>Costo total</th>
                     <th>Precio de venta actual</th>
+                    <th>Acciones</th>
                 </tr>
             </thead>
             <tbody>
@@ -82,9 +83,10 @@
                     <td></td>
                     <td></td>
                     <td></td>
+                    <td></td>
                 </tr>
                 <tr>
-                    <td id="tdFooterTotales" colspan="10"></td>
+                    <td id="tdFooterTotales" colspan="11"></td>
                     <td></td>
                 </tr>
             </tfoot>
@@ -175,7 +177,8 @@
                 { "width": "9%", "targets": 7,  "className": "text-left" }, 
                 { "width": "9%", "targets": 8,  "className": "text-left" }, 
                 { "width": "9%", "targets": 9,  "className": "text-left" },
-                { "width": "14%", "targets": 10, "className": "text-left" }
+                { "width": "5%", "targets": 10, "className": "text-left" },
+                { "width": "9%", "targets": 11, "className": "text-left" }
             ],
             "language": {
                 "url": "../assets/plugins/datatables/js/spanish.json"

@@ -102,13 +102,18 @@ class administracionRetaceo extends Controller
 
         $columna7 = "$ 0.4458" . "<br><br>" . "$ 7.5033";
 
-        $columna8 = "<input type='number' id='DAI' name='DAI' class='form-control active' required>". "<br>" . "<input type='number' id='DAI' name='DAI' class='form-control active' required>";
+        $columna8 = "10". "<br><br>" . "0";
 
         $columna9 = "$ 30.46" . "<br><br>" . "$ 26.00";
 
         $columna10 = "$ 60.98" . "<br><br>" . "$ 858.01";
 
         $columna11 = "$ 35.00" . "<br><br>" . "$ 32.00";
+
+        $columna12 = '  
+                        <button class="btn btn-primary mb-1" onclick="" data-toggle="tooltip" data-placement="top" title="DAI">
+                            <i class="fas fa-address-book"></i> DAI
+                        </button>';
 
         /*$columna4 = '
                         <button type= "button" class="btn btn-primary mb-1" onclick="cambiarInterfaz(`compras/admin-retaceo/vista/continuar/retaceo`);" data-toggle="tooltip" data-placement="top" title="Continuar retaceo">
@@ -132,7 +137,8 @@ class administracionRetaceo extends Controller
             $columna8,
             $columna9,
             $columna10,
-            $columna11
+            $columna11,
+            $columna12
         );
 
         // Verifica si hay datos
