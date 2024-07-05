@@ -145,4 +145,9 @@ class administracionRetaceo extends Controller
             return $this->response->setJSON(array('data' => '', 'footer'=>'')); // No hay datos, devuelve un array vacío
         }
     }
+
+    public function modalnuevaCompraRetaceo(){
+        $data['variable'] = 0;
+    return view('compras/modals/modalAgregarCompraRetaceo', $data);
+    }
 }

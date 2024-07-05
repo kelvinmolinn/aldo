@@ -45,7 +45,7 @@
 <form id="frmContinuarRetaceo" method="post" action="">
         
     <div class="text-right mb-4">
-        <button type= "button" id="btnNuevoProveedor" class="btn btn-primary estilo-btn" onclick="">
+        <button type= "button" id="btnNuevoProveedor" class="btn btn-primary estilo-btn" onclick="modalAgregarCompraRetaceo();">
             <i class="fas fa-save"></i>
             Agregar compra
         </button>
@@ -109,6 +109,25 @@
     </div>
 </form>
 <script>
+    function modalAgregarCompraRetaceo(){
+        $.ajax({
+            url: '<?php echo base_url('compras/admin-retaceo/form/nueva/compra/retaceo'); ?>',
+            type: 'POST',
+            data: {}, // Pasar el ID del módulo como parámetro
+            success: function(response) {
+                // Insertar el contenido de la modal en el cuerpo de la modal
+                $('#divModalContent').html(response);
+                // Mostrar la modal
+                $('#modalNuevoRetaceo').modal('show');
+
+                
+            },
+            error: function(xhr, status, error) {
+                // Manejar errores si los hay
+                console.error(xhr.responseText);
+            }
+        });
+    }
     $(document).ready(function(){
         
         tituloVentana("Continuar retaceo");
