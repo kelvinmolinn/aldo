@@ -73,7 +73,8 @@ $routes->group('conf-general/admin-roles', function($routes) {
     $routes->post('form/nuevo/permiso/rol', 'configuracionGeneral\AdministracionRoles::modalNuevoPermiso');
     $routes->post('operacion/insert/permisos/menus', 'configuracionGeneral\AdministracionRoles::permisosMenusOperacion');
     $routes->post('form/permisos/rol/menu', 'configuracionGeneral\AdministracionRoles::modalPermisosRolMenu');
-
+    $routes->post('tabla/permisos-rol-menu', 'configuracionGeneral\AdministracionRoles::tablaPermisosRolMenu');
+    $routes->post('operacion/eliminar/permisos-rol-menu', 'configuracionGeneral\AdministracionRoles::eliminarPermisoRolMenu');
 });
 
 $routes->group('conf-general/admin-modulos', function($routes) {

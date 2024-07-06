@@ -47,6 +47,7 @@
         $("#menu").select2({
             placeholder: 'Menus'
         });
+
         $("#menuPermiso").select2({
             placeholder: 'Permisos'
         });
@@ -59,7 +60,7 @@
                     url: '<?php echo base_url('conf-general/admin-roles/obtener/permisos/select'); ?>',
                     type: "POST",
                     dataType: "json",
-                    data: {menuId: menuId, existePermisos: 'No'}
+                    data: {menuId: menuId, rolId: '<?= $rolId; ?>'}
                 }).done(function(data){
                     $(`#menuPermiso`).empty();
                     $(`#menuPermiso`).append("<option></option>");
@@ -89,7 +90,7 @@
                         $('#modalNuevoPermisos').modal('hide');
                         Swal.fire({
                             icon: 'success',
-                            title: 'Agregado con éxito',
+                            title: 'Permisos asignados al rol con éxito',
                             text: response.mensaje
                         }).then((result) => {
                             $("#tblPermisosMenus").DataTable().ajax.reload(null, false);
@@ -97,13 +98,12 @@
                     } else {
                         // Insert fallido, mostrar mensaje de error con Sweet Alert
                         Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
+                            icon: 'warning',
+                            title: 'Aviso:',
                             text: response.mensaje
                         });
                     }
                 },
-
                 error: function(xhr, status, error) {
                     // Manejar errores si los hay
                     console.error(xhr.responseText);

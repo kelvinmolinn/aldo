@@ -32,7 +32,7 @@
         //alert("Vamos a eliminar " + id);
             Swal.fire({
                 title: '¿Estás seguro que desea eliminar la sucursal?',
-                text: "Se eiminara la sucursal del usuario seleccionado.",
+                text: "Se eliminará la sucursal del usuario seleccionado.",
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',

@@ -134,7 +134,7 @@ class AdministracionUsuarios extends Controller
                                     ->countAllResults();
             $columna5 .= '
                 <button type="button" class="btn btn-primary mb-1" data-toggle="tooltip" data-placement="top" title="Sucursales" onclick="cambiarInterfaz(`conf-general/admin-usuarios/vista/usuario/sucursal`, '.htmlspecialchars(json_encode($jsonSucursales)).');">
-                    <span>'.$conteoSucursalesEmpleado.'</span>
+                    <span class="badge badge-light">'.$conteoSucursalesEmpleado.'</span>
                     <i class="fas fa-store"></i>
                 </button>
             ';

@@ -28,11 +28,11 @@
     </table>
 </div>
 <script>
-    function modalPermisosRolMenu(menuId) {
+    function modalPermisosRolMenu(menuId, menu, rolId, rol) {
         $.ajax({
             url: '<?php echo base_url('conf-general/admin-roles/form/permisos/rol/menu'); ?>',
             type: 'POST',
-            data: {menuId: menuId},
+            data: {menuId: menuId, menu: menu, rolId: rolId, rol: rol},
             success: function(response) {
                 
                 $('#divModalContent').html(response);
