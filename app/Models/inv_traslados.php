@@ -8,7 +8,7 @@ class inv_traslados extends Model
 {
     protected $table = 'inv_traslados';
     protected $primaryKey = 'trasladosId'; // si el nombre de la clave primaria es diferente
-    protected $allowedFields = ['usuarioIdSalida','usuarioIdEntrada','sucursalIdSalida','sucursalIdEntrada','fhSolicitud','fhTraslado','obsSolicitud','obsTraslado','estadoTraslado','flgElimina','fhAgrega','fhEdita','usuarioIdAgrega','usuarioIdEdita','fhElimina','usuarioIdElimina'];
+    protected $allowedFields = ['empleadoIdSalida','empleadoIdEntrada','sucursalIdSalida','sucursalIdEntrada','fechaTraslado','fhTraslado','obsSolicitud','obsTraslado','estadoTraslado','flgElimina','fhAgrega','fhEdita','usuarioIdAgrega','usuarioIdEdita','fhElimina','usuarioIdElimina'];
 
             //Agregar desde aqui
 

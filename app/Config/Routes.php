@@ -178,6 +178,8 @@ $routes->group('inventario/admin-traslados', function($routes) {
     $routes->post('vista/actualizar/traslados', 'inventario\AdministracionTraslados::vistaContinuarTraslados');
     $routes->post('form2/Nuevasalida', 'inventario\AdministracionTraslados::modalAdministracionNuevoTraslado');
     $routes->post('operacion/guardar/NuevoTraslado', 'inventario\AdministracionTraslados::modalNuevoTrasladoOperacion');
+    $routes->post('operacion/eliminar/traslado', 'inventario\AdministracionTraslados::eliminarTraslado');
+    $routes->post('tabla/ContinuarTraslado',  'inventario\AdministracionTraslados::tablaContinuarTraslado');
 
     //
 });

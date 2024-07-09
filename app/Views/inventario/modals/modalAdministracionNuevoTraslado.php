@@ -11,12 +11,12 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title"><?= ($operacion == 'editar' ? 'Editar Producto' : 'Agregar productos a la salida'); ?></h5>
+                    <h5 class="modal-title"><?= ($operacion == 'editar' ? 'Editar Producto' : 'Agregar productos al traslado'); ?></h5>
                 </div>
                 <div class="modal-body">
-                    <input type="hidden" id="descargoDetalleId" name="descargoDetalleId" value="<?= $campos['descargoDetalleId'] ?>">
+                    <input type="hidden" id="trasladoDetalleId" name="trasladoDetalleId" value="<?= $campos['trasladoDetalleId'] ?>">
                     <input type="hidden" id="operacion" name="operacion" value="<?= $operacion; ?>">
-                    <input type="hidden" id="descargosId" name="descargosId" value="<?= $campos['descargosId']; ?>">
+                    <input type="hidden" id="trasladosId" name="trasladosId" value="<?= $campos['trasladosId']; ?>">
                     <div class="row">
                         <div class="col-md-6 mb-4">
                             <div class="form-select-control">
@@ -30,16 +30,16 @@
                         </div>
                         <div class="col-md-6 mb-4">
                             <div class="form-outline">
-                                <input type="number" id="cantidadDescargo" name="cantidadDescargo" class="form-control number-input" min="1"  value="<?= $campos['cantidadDescargo']; ?>" required>
-                                <label class="form-label" for="cantidadDescargo">Cantidad de descargo</label>
+                                <input type="number" id="cantidadTraslado" name="cantidadTraslado" class="form-control number-input" min="1"  value="<?= $campos['cantidadTraslado']; ?>" required>
+                                <label class="form-label" for="cantidadTraslado">Cantidad a trasladar</label>
                             </div>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-12 mb-4">
                             <div class="form-outline">
-                                <input type="text" id="obsDescargoDetalle" name="obsDescargoDetalle" class="form-control"  value="<?= $campos['obsDescargoDetalle']; ?>" required>
-                                <label class="form-label" for="obsDescargoDetalle">Observación de la salida/descargo</label>
+                                <input type="text" id="obsTrasladoSolicitudDetalle" name="obsTrasladoSolicitudDetalle" class="form-control"  value="<?= $campos['obsTrasladoSolicitudDetalle']; ?>" required>
+                                <label class="form-label" for="obsTrasladoSolicitudDetalle">Observación del traslado</label>
                             </div>
                         </div>
                     </div>
@@ -90,10 +90,10 @@ $(document).ready(function() {
                             title: '<?php echo $mensajeAlerta; ?>',
                             text: response.mensaje
                         }).then((result) => {
-                            $("#tblContinuarSalida").DataTable().ajax.reload(null, false);
+                            $("#tblContinuarTraslados").DataTable().ajax.reload(null, false);
                             
                         });
-                        console.log("Último ID insertado:", response.descargoDetalleId);
+                        console.log("Último ID insertado:", response.trasladoDetalleId);
                     } else {
                         // Insert fallido, mostrar mensaje de error con Sweet Alert
                         Swal.fire({

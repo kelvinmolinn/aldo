@@ -3,7 +3,7 @@
 <hr>
 <div class="row mb-4">
     <div class="col-md-6">
-        <button type= "button" id="btnRegresarDescargo" class="btn btn-secondary estilo-btn">
+        <button type= "button" id="btnRegresarTraslado" class="btn btn-secondary estilo-btn">
         <i class="fas fa-backspace "></i>
             Volver 
         </button>
@@ -41,19 +41,66 @@
 </div>
 
 <script>
+      function eliminarTraslado(id) {
+        //alert("Vamos a eliminar " + id);
+            Swal.fire({
+                title: '¿Estás seguro que desea eliminar el traslado de producto?',
+                text: "Se eiminara el producto del traslado seleccionado.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Si el usuario confirma, enviar la solicitud AJAX para eliminar el usuario de la sucursal
+                        $.ajax({
+                            url: '<?php echo base_url('inventario/admin-traslados/operacion/eliminar/traslado'); ?>',
+                            type: 'POST',
+                            data: {
+                                trasladoDetalleId: id
+                            },
+                            success: function(response) {
+                                console.log(response);
+                                if (response.success) {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Salida/descargo eliminada con Éxito!',
+                                        text: response.mensaje
+                                    }).then((result) => {
+                                        $("#tblContinuarTraslados").DataTable().ajax.reload(null, false);
+                                    });
+                                } else {
+                                    // Insert fallido, mostrar mensaje de error
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Error',
+                                        text: response.mensaje
+                                    });
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                // Manejar errores si los hay
+                                console.error(xhr.responseText);
+                            }
+                        });
+                }
+            });
+    }
 
             //pendiente
-            function modalAdministracionNuevoTraslado(descargoDetalleId, operacion) {
+            function modalAdministracionNuevoTraslado(trasladoDetalleId, operacion) {
         // Realizar una petición AJAX para obtener los datos del módulo por su ID
         $.ajax({
                 url: '<?php echo base_url('inventario/admin-traslados/form2/Nuevasalida'); ?>',
                 type: 'POST',
-                data: { descargoDetalleId: descargoDetalleId, operacion: operacion, descargosId: <?= $descargosId; ?>}, // Pasar el ID del módulo como parámetro
+                data: { trasladoDetalleId: trasladoDetalleId, operacion: operacion, trasladosId: <?= $trasladosId; ?>}, // Pasar el ID del módulo como parámetro
                 success: function(response) {
                     // Insertar el contenido de la modal en el cuerpo de la modal
                     $('#divModalContent').html(response);
                     // Mostrar la modal
-                    $('#modalNuevaSalida').modal('show');
+                    $('#modalNuevoTraslado').modal('show');
                 },
             error: function(xhr, status, error) {
                 // Manejar errores si los hay
@@ -63,13 +110,13 @@
     }
     $(document).ready(function() {
         tituloVentana("Traslados");
-        $('#btnRegresarDescargo').on('click', function() {
+        $('#btnRegresarTraslado').on('click', function() {
             cambiarInterfaz('inventario/admin-traslados/index', {renderVista: 'No'});
         });
-        $('#tblContinuarSalida').DataTable({
+        $('#tblContinuarTraslados').DataTable({
                 "ajax": {
                     "method": "POST",
-                    "url": '<?php echo base_url('inventario/admin-salida/tabla/ContinuarSalida'); ?>',
+                    "url": '<?php echo base_url('inventario/admin-traslados/tabla/ContinuarTraslado'); ?>',
                     "data": {
                         trasladosId: <?php echo $trasladosId ;?>
                     }
