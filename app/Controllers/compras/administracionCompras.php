@@ -89,7 +89,7 @@ class administracionCompras extends Controller
                 $columna2 = "<b>Numero de factura: </b>" . $columna['numFactura'] ."<br>" . "<b>País: </b>" . $columna['pais'] ."<br>" . "<b>Fecha de la compra: </b>" . $columna['fechaDocumento'] . "<br>" . "<b>Estado de la compra: </b> ". $estadoCompra;
 
                 $columna3 = "<b>proveedor: </b>". $columna['proveedor'] ."<br>" . "<b>Nombre comercial: </b>". $columna['proveedorComercial'] ."<br>" ."<b>Tipo proveedor: </b>" . $columna['tipoProveedorOrigen'] ."<br>" . "<b>Tipo factura: </b>" . $columna['tipoDocumentoDTE'];
-                $columna4 = "<b>Monto: </b>";
+                $columna4 = "<b>Monto: </b>$ 125.00";
                 
                 $jsonActualizarCompra = [
                     "compraId"              => $columna['compraId'],

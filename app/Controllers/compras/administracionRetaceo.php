@@ -5,6 +5,7 @@ use CodeIgniter\Controller;
 
 
 use App\Models\comp_proveedores;
+use App\Models\comp_retaceo;
 
 class administracionRetaceo extends Controller
 {
@@ -25,46 +26,87 @@ class administracionRetaceo extends Controller
     }
 
     public function tablaRetaceo(){
+        $comp_retaceo = new comp_retaceo;
+
+        $consultaRetaceo = $comp_retaceo
+                ->select('numRetaceo,totalFlete,totalGastos,estadoRetaceo')
+                ->where('flgElimina', 0)
+                ->findAll();
+
+
         $output['data'] = array();
         $n = 0;
-
-        $n++;
-        // Aquí construye tus columnas
-        $columna1 = $n;
-        $columna2 = "<b>N° de retaceo: </b> 1" . "<br>" . "<b>Factura(s): </b> 1 " . "<br>" . "<b>Estado: </b> Pendiente" . "<br>" . "<b>Total de productos: </b> 2";
-
-        $columna3 = "<b>Flete: </b> $ 9.54" . "<br>" . "<b>Gastos: </b> $ 7.95" . "<br>" . "<b>Costo total: </b> $ 918.99 ";
-
-        $columna4 = '
-                        <button type= "button" class="btn btn-primary mb-1" onclick="cambiarInterfaz(`compras/admin-retaceo/vista/continuar/retaceo`);" data-toggle="tooltip" data-placement="top" title="Continuar retaceo">
-                            <i class="fas fa-sync-alt"></i>
-                        </button>';
-
-        $columna4 .= '
-                         <button type= "button" class="btn btn-danger mb-1" onclick="" data-toggle="tooltip" data-placement="top" title="Anular">
-                            <i class="fas fa-ban"></i>
-                        </button>
-                    ';
-
-        $output['data'][] = array(
-            $columna1,
-            $columna2,
-            $columna3,
-            $columna4
-        );
-
-        // Verifica si hay datos
-        if ($n > 0) {
-            return $this->response->setJSON($output);
-        } else {
-            return $this->response->setJSON(array('data' => '')); // No hay datos, devuelve un array vacío
+        foreach($consultaRetaceo as $consultaRetaceo){
+            $n++;
+            // Aquí construye tus columnas
+            $columna1 = $n;
+            $columna2 = "<b>N° de retaceo: </b> ".$consultaRetaceo['numRetaceo'] . "<br>" . "<b>Factura(s): </b> " . "<br>" . "<b>Estado: </b> ".$consultaRetaceo ['estadoRetaceo'] . "<br>" . "<b>Total de productos: </b> ";
+    
+            $columna3 = "<b>Flete: </b> ".$consultaRetaceo['totalFlete'] . "<br>" . "<b>Gastos: </b> ".$consultaRetaceo['totalGastos'] . "<br>" . "<b>Costo total: </b> ";
+    
+            $columna4 = '
+                            <button type= "button" class="btn btn-primary mb-1" onclick="cambiarInterfaz(`compras/admin-retaceo/vista/continuar/retaceo`);" data-toggle="tooltip" data-placement="top" title="Continuar retaceo">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>';
+    
+            $columna4 .= '
+                             <button type= "button" class="btn btn-danger mb-1" onclick="" data-toggle="tooltip" data-placement="top" title="Anular">
+                                <i class="fas fa-ban"></i>
+                            </button>
+                        ';
+    
+            $output['data'][] = array(
+                $columna1,
+                $columna2,
+                $columna3,
+                $columna4
+            );
+    
+            // Verifica si hay datos
+            if ($n > 0) {
+                return $this->response->setJSON($output);
+            } else {
+                return $this->response->setJSON(array('data' => '')); // No hay datos, devuelve un array vacío
+            }
         }
+
     }
 
     public function modalNuevoRetaceo(){
         
         $data['variable'] = 0;
     return view('compras/modals/modalNuevoRetaceo', $data);
+    }
+
+    public function modalRetaceoOperacion(){
+        $comp_retaceo = new comp_retaceo;
+        
+        $data = [
+            "numRetaceo"       => $this->request->getPost('numeroFactura'),
+            "fechaRetaceo"     => $this->request->getPost('fechaRetaceo'),
+            "totalFlete"       => $this->request->getPost('fleteRetaceo'),
+            "totalGastos"      => $this->request->getPost('GastosRetaceo'),
+            "obsRetaceo"       => $this->request->getPost('observacionRetaceo'),
+            "estadoRetaceo"    => "Pendiente"
+        ];
+
+        // Insertar datos en la base de datos
+        $nuevoRetaceo = $comp_retaceo->insert($data);
+
+        if ($nuevoRetaceo) {
+            // Si el insert fue exitoso, devuelve el último ID insertado
+            return $this->response->setJSON([
+                'success' => true,
+                'mensaje' => 'El retaceo de la compra agregado correctamente',
+                'retaceoId' =>  $comp_retaceo->insertID() 
+            ]);
+        } else {
+            // Si el insert falló, devuelve un mensaje de error
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'No se pudo insertar el retaceo'
+            ]);
+        }
     }
 
     public function vistaContinuarRetaceo(){
@@ -111,7 +153,9 @@ class administracionRetaceo extends Controller
         $columna11 = "$ 35.00" . "<br><br>" . "$ 32.00";
 
         $columna12 = '  
-                        <button class="btn btn-primary mb-1" onclick="" data-toggle="tooltip" data-placement="top" title="DAI">
+                        <button class="btn btn-primary mb-1" onclick="modalAgregarDAI()" data-toggle="tooltip" data-placement="top" title="DAI">
+                            <i class="fas fa-address-book"></i> DAI
+                        </button>' . '<br>' . '<button class="btn btn-primary mb-1" onclick="" data-toggle="tooltip" data-placement="top" title="DAI">
                             <i class="fas fa-address-book"></i> DAI
                         </button>';
 
@@ -155,5 +199,10 @@ class administracionRetaceo extends Controller
     public function modalnuevaCompraRetaceo(){
         $data['variable'] = 0;
     return view('compras/modals/modalAgregarCompraRetaceo', $data);
+    }
+
+    public function modalAgregarDAI(){
+        $data['variable'] = 0;
+        return view('compras/modals/modalAgregarDAI', $data);
     }
 }

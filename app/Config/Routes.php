@@ -218,6 +218,12 @@ $routes->group('compras/admin-retaceo', function($routes) {
     $routes->post('vista/continuar/retaceo', 'compras\administracionRetaceo::vistaContinuarRetaceo');
     $routes->post('tabla/continuar/retaceo', 'compras\administracionRetaceo::tablaContinuarRetaceo');
     $routes->post('form/nueva/compra/retaceo', 'compras\administracionRetaceo::modalnuevaCompraRetaceo');
+    $routes->post('form/agregar/dai', 'compras\administracionRetaceo::modalAgregarDAI');
+
+    //operaciones 
+
+    $routes->post('operacion/guardar/retaceo', 'compras\administracionRetaceo::modalRetaceoOperacion');
+    
     
 });
 

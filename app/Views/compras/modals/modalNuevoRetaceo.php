@@ -1,4 +1,4 @@
-<form id="frmModal" method="post" action="<?php echo base_url(''); ?>">
+<form id="frmModal" method="post" action="<?php echo base_url('compras/admin-retaceo/operacion/guardar/retaceo'); ?>">
     <div id="modalNuevoRetaceo" class="modal" tabindex="-1" data-backdrop="static" data-keyboard="false">
         <div class="modal-dialog  modal-lg">
             <div class="modal-content">
@@ -26,15 +26,15 @@
                     <div class="row mb-2">
                             <div class="col-md-6">
                                 <div class="form-outline">
-                                    <input type="number" id="flete" name="flete" class="form-control" required>
-                                    <label class="form-label" for="flete">Flete</label>
+                                    <input type="number" id="fleteRetaceo" name="fleteRetaceo" class="form-control" required>
+                                    <label class="form-label" for="fleteRetaceo">Flete</label>
 
                                 </div>
                             </div>
                             <div class="col-md-6">
                                     <div class="form-outline">
-                                        <input type="number" id="Gastos" name="flete" class="form-control" required>
-                                        <label class="form-label" for="flete">Gastos</label>
+                                        <input type="number" id="GastosRetaceo" name="GastosRetaceo" class="form-control" required>
+                                        <label class="form-label" for="GastosRetaceo">Gastos</label>
                                     </div>
                             </div>
                     </div>
@@ -48,7 +48,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" id="btnguardarProveedor" class="btn btn-primary">
+                    <button type="submit" id="btnguardarRetaceo" class="btn btn-primary">
                         <i class="fas fa-save"></i>
                         Generar retaceo
                     </button>
@@ -75,7 +75,7 @@
                     console.log(response);
                     if (response.success) {
                         // Insert exitoso, ocultar modal y mostrar mensaje
-                        $('#modalNuevaCompra').modal('hide');
+                        $('#modalNuevoRetaceo').modal('hide');
                         Swal.fire({
                             icon: 'success',
                             title: 'Compra realizada con éxito',

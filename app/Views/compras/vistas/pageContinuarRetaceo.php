@@ -130,6 +130,25 @@
             }
         });
     }
+    function modalAgregarDAI(){
+        $.ajax({
+            url: '<?php echo base_url('compras/admin-retaceo/form/agregar/dai'); ?>',
+            type: 'POST',
+            data: {}, // Pasar el ID del módulo como parámetro
+            success: function(response) {
+                // Insertar el contenido de la modal en el cuerpo de la modal
+                $('#divModalContent').html(response);
+                // Mostrar la modal
+                $('#modalAgregarDAI').modal('show');
+
+                
+            },
+            error: function(xhr, status, error) {
+                // Manejar errores si los hay
+                console.error(xhr.responseText);
+            }
+        });
+    }
     $(document).ready(function(){
         
         tituloVentana("Continuar retaceo");

@@ -1,36 +1,28 @@
 <form id="frmModal" method="post" action="<?php echo base_url(''); ?>">
-    <div id="modalNuevoRetaceo" class="modal" tabindex="-1" data-backdrop="static" data-keyboard="false">
+    <div id="modalAgregarDAI" class="modal" tabindex="-1" data-backdrop="static" data-keyboard="false">
         <div class="modal-dialog  modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Compra - Retaceo</h5>
+                    <h5 class="modal-title">DAI</h5>
                 </div>
                 <div class="modal-body">
                     <div class="row mb-2">
                         <div class="col-md-6">
-                            <div class="form-select-control">
-                                <select name="selectCompraRetaceo" id="selectCompraRetaceo" style="width: 100%;" required>
-                                    <option value=""></option>
-                                    <option value="1">1234 - $ 150.60</option>
-                                </select>
-                            </div>
-                        </div>
-                        
-                        <div class="col-md-6">
-                            
+                            <b><span>Número de documento: </span></b>1234
                         </div>
                     </div>
 
                     <div class="row mb-2">
                         <div class="col-md-6">
-                            
-                        </div>
-                        <div class="col-md-6">
-                            
+                        <b><span>Producto: </span></b>(PD-001) MARIO KART
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-12">
+                        <div class="col-md-6">
+                            <div class="form-outline">
+                                <input type="number" id="DAI" name="DAI" class="form-control active" required>
+                                <label class="form-label" for="DAI">DAI</label>
+                            </div>
                         </div>    
                     </div>
                 </div>
