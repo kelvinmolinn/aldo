@@ -35,7 +35,7 @@
     <div class="col-md-12 text-right">
         <button type= "submit" id="btnFinalizar" class="btn btn-primary" onclick="finalizarDescargo();">
         <i class="fas fa-save nav-icon "></i>
-            Enviar Solicitud
+            Finalizar traslado
         </button>
     </div>
 </div>
