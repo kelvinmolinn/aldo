@@ -18,7 +18,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-select-control">
-                                <select name="sucursalIdSalida" id="sucursalIdSalida" class="form-control" style="width: 100%;">
+                                <select name="sucursalIdSalida" id="sucursalIdSalida" class="form-control" style="width: 100%;" required>
                                     <option></option>
                                     <?php foreach ($sucursales as $sucursal) : ?>
                                         <option value="<?php echo $sucursal['sucursalId']; ?>"><?php echo $sucursal['sucursal']; ?></option>
@@ -28,7 +28,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-select-control">
-                                <select name="sucursalIdEntrada" id="sucursalIdEntrada" class="form-control" style="width: 100%;">
+                                <select name="sucursalIdEntrada" id="sucursalIdEntrada" class="form-control" style="width: 100%;" required>
                                     <option></option>
                                     <?php foreach ($sucursales as $sucursal) : ?>
                                         <option value="<?php echo $sucursal['sucursalId']; ?>"><?php echo $sucursal['sucursal']; ?></option>
@@ -38,10 +38,38 @@
                         </div>
                     </div>
                     <div class="row mt-4">
-                        <div class="col-md-12">
+                        <div class="col-md-6">
+                            <div class="form-select-control">
+                                <select name="empleadoIdSalida" id="empleadoIdSalida" class="form-control" style="width: 100%;" required>
+                                    <option></option>
+                                    <?php foreach ($empleados as $empleado) : ?>
+                                        <option value="<?php echo $empleado['empleadoId']; ?>"><?php echo $empleado['primerNombre']; ?> <?php echo $empleado['primerApellido']; ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-select-control">
+                                <select name="empleadoIdEntrada" id="empleadoIdEntrada" class="form-control" style="width: 100%;" required>
+                                    <option></option>
+                                    <?php foreach ($empleados as $empleado) : ?>
+                                        <option value="<?php echo $empleado['empleadoId']; ?>"><?php echo $empleado['primerNombre']; ?> <?php echo $empleado['primerApellido']; ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col-md-6">
                             <div class="form-outline">
                                 <input type="text" id="obsSolicitud" name="obsSolicitud" class="form-control"  value="<?= $campos['obsSolicitud']; ?>" required>
                                 <label class="form-label" for="obsSolicitud">Observación de la solicitud del traslado</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-outline">
+                                <input type="date" id="fechaTraslado" name="fechaTraslado" class="form-control"  value="<?= $campos['fechaTraslado']; ?>" required>
+                                <label class="form-label" for="fechaTraslado">Fecha de traslado</label>
                             </div>
                         </div>
                     </div>
@@ -65,8 +93,11 @@
 <script>
 $(document).ready(function() {
     // Inicializar Select2
-    $("#sucursalIdSalida").select2({ placeholder: 'Sucursal Salida' });
-    $("#sucursalIdEntrada").select2({ placeholder: 'Sucursal Entrada' });
+    $("#sucursalIdSalida").select2({ placeholder: 'Sucursal Envía' });
+    $("#sucursalIdEntrada").select2({ placeholder: 'Sucursal Recibe' });
+    $("#empleadoIdSalida").select2({ placeholder: 'empleado Envía' });
+    $("#empleadoIdEntrada").select2({ placeholder: 'empleado Recibe' });
+   
    
     // Evitar la entrada de 'e', 'E', '+', y '-' en los campos de número
     document.querySelectorAll('.number-input').forEach(function(input) {

@@ -15,6 +15,7 @@ use App\Models\conf_parametrizaciones;
 use App\Models\inv_traslados;
 use App\Models\inv_traslados_detalle;
 use App\Models\vista_usuarios_empleados;
+use App\Models\conf_empleados;
 
 
 class AdministracionTraslados extends Controller
@@ -43,17 +44,22 @@ class AdministracionTraslados extends Controller
     { 
                // Cargar el modelos
             $sucursalesModel = new conf_sucursales();
+            $empleadosModel = new conf_empleados();
+            $data['empleados'] = $empleadosModel->where('flgElimina', 0)->findAll();
             $data['sucursales'] = $sucursalesModel->where('flgElimina', 0)->findAll();
             $operacion = $this->request->getPost('operacion');
+            $data['empleadoId'] = $this->request->getPost('empleadoId');
             $data['sucursalId'] = $this->request->getPost('sucursalId');
+           
     
             if($operacion == 'editar') {
                 $trasladosId = $this->request->getPost('trasladosId');
                 $salidaProducto = new inv_traslados();
     
                  // seleccionar solo los campos que estan en la modal (solo los input y select)
-                $data['campos'] = $producto->select('inv_traslados.trasladosId,inv_traslados.sucursalIdSalida,inv_traslados.sucursalIdEntrada,inv_traslados.obsSolicitud,inv_traslados.estadoTraslado,conf_sucursales.sucursalId,conf_sucursales.sucursal')
+                $data['campos'] = $producto->select('inv_traslados.trasladosId,inv_traslados.sucursalIdSalida,inv_traslados.sucursalIdEntrada,inv_traslados.empleadoIdSalida,inv_traslados.empleadoIdEntrada,inv_traslados.obsSolicitud,inv_traslados.fechaTraslado,inv_traslados.estadoTraslado,conf_sucursales.sucursalId,conf_sucursales.sucursal,conf_empleados.empleadoId,conf_empleados.primerNombre,conf_empleados.primerApellido')
                 ->join('conf_sucursales', 'conf_sucursales.sucursalId = inv_traslados.sucursalId')
+                ->join('conf_empleados', 'conf_empleados.empleadoId = inv_traslados.empleadoId')
                 ->where('inv_traslados.flgElimina', 0)
                 ->where('inv_traslados.trasladosId', $trasladosId)->first();
             } else {
@@ -63,7 +69,10 @@ class AdministracionTraslados extends Controller
                     'trasladosId'             => 0,
                     'sucursalIdSalida'        => '',
                     'sucursalIdEntrada'       => '',
-                    'obsSolicitud'             => ''
+                    'empleadoIdSalida'        => '',
+                    'empleadoIdEntrada'       => '',
+                    'fechaTraslado'           => '',
+                    'obsSolicitud'            => ''
     
                 ];
             }
@@ -78,16 +87,16 @@ class AdministracionTraslados extends Controller
             $operacion = $this->request->getPost('operacion');
             $trasladosId = $this->request->getPost('trasladosId');
             $model = new inv_traslados();
-            $session = session();
-            $usuarioIdAgrega = $session->get("usuarioId");
+
     
             $data = [
                 'sucursalIdSalida'        => $this->request->getPost('sucursalIdSalida'),
                 'sucursalIdEntrada'       => $this->request->getPost('sucursalIdEntrada'),
-                'fhSolicitud'              => date('Y-m-d H:i:s'),
-                'obsSolicitud'             => $this->request->getPost('obsSolicitud'),
-                'estadoTraslado'          => "Pendiente",
-                'usuarioIdSalida'         => $usuarioIdAgrega
+                'empleadoIdSalida'        => $this->request->getPost('empleadoIdSalida'),
+                'empleadoIdEntrada'       => $this->request->getPost('empleadoIdEntrada'),
+                'fechaTraslado'           => $this->request->getPost('fechaTraslado'),
+                'obsSolicitud'            => $this->request->getPost('obsSolicitud'),
+                'estadoTraslado'          => "Pendiente"
             ];
         
             if ($operacion == 'editar') {
@@ -219,5 +228,149 @@ class AdministracionTraslados extends Controller
         
         return view('inventario/vistas/pageContinuarTraslados', $data);
     }
+  /*  public function modalAdministracionNuevoTraslado()
+    { 
+               // Cargar el modelos
+            $productosModel = new inv_productos();
+            $data['producto'] = $productosModel->where('flgElimina', 0)->findAll();
+            $operacion = $this->request->getPost('operacion');
+            $data['productoId'] = $this->request->getPost('productoId');
+            $trasladosId = $this->request->getPost('trasladosId');
+    
+            if($operacion == 'editar') {
+                $trasladoDetalleId = $this->request->getPost('trasladoDetalleId');
+                $salidaProducto = new inv_traslados_detalles();
+    
+                 // seleccionar solo los campos que estan en la modal (solo los input y select)
+                $data['campos'] = $salidaProducto->select('inv_traslados_detalles.trasladoDetalleId,inv_traslados_detalles.trasladosId,inv_traslados_detalles.cantidadSolicitud,inv_traslados_detalles.obsTrasladoSolicitudDetalle,inv_productos.productoId')
+                ->join('inv_productos', 'inv_productos.productoId = inv_traslados_detalles.productoId')
+                ->where('inv_traslados_detalles.flgElimina', 0)
+                ->where('inv_traslados_detalles.trasladoDetalleId', $trasladoDetalleId)
+                ->first();
+            } else {
+    
+                 // formar los campos que estan en la modal (input y select) con el nombre equivalente en la BD
+                $data['campos'] = [
+                    'trasladoDetalleId'                => 0,
+                    'trasladosId'                      => $trasladosId,
+                    'productoId'                       => '',
+                    'cantidadSolicitud'                => '',
+                    'obsTrasladoSolicitudDetalle'      => ''
+    
+                ];
+            }
+            $data['operacion'] = $operacion;
+    
+            return view('inventario/modals/modalAdministracionNuevoTraslado', $data);
+    }
+
+    public function modalNuevaSalidaOperacion()
+{
+    $operacion = $this->request->getPost('operacion');
+    $descargoDetalleId = $this->request->getPost('descargoDetalleId');
+    $model = new inv_descargos_detalle();
+    $sucursalModel = new inv_descargos();  // Renombrado para mayor claridad
+    $descargosId = $this->request->getPost('descargosId');
+    $productoId = $this->request->getPost('productoId');
+    $cantidadDescargo = $this->request->getPost('cantidadDescargo');
+    
+    //Necesito Traer sucursalId de inv_descargos 
+    $descargoData = $sucursalModel->find($descargosId);
+    $sucursalId = $descargoData['sucursalId'];  // Asegúrate de que el campo se llama sucursalId en la base de datos
+   // $sucursalId = 1;
+
+    // Obtener la existencia actual del producto en la sucursal
+    $productosModel = new inv_productos_existencias();
+
+    $producto = $productosModel->select('existenciaProducto')
+                ->where('flgElimina', 0)
+                ->where('sucursalId', $sucursalId)
+                ->where('productoId', $productoId)
+                ->first();
+
+    if (!$producto) {
+        return $this->response->setJSON([
+            'success' => false,
+            'mensaje' => 'Producto no encontrado'
+        ]);
+    }
+
+    $existenciaActual = $producto['existenciaProducto'];
+
+    $cantidadDetalleActual = $model->where('flgElimina', 0)
+                                ->where('descargosId', $descargosId)
+                                ->where('productoId', $productoId)
+                                ->countAllResults();
+
+    if ($descargoDetalleId || $cantidadDetalleActual > 0) {
+        if($descargoDetalleId) {
+            // Es update-editar
+            $detalleActual = $model->selectSum('cantidadDescargo')
+                                    ->where('flgElimina', 0)
+                                    ->where('descargosId', $descargosId)
+                                    ->where('productoId', $productoId)
+                                    ->where('descargoDetalleId <>', $descargoDetalleId)
+                                    ->first();
+        } else {
+            $detalleActual = $model->selectSum('cantidadDescargo')
+                                ->where('flgElimina', 0)
+                                ->where('descargosId', $descargosId)
+                                ->where('productoId', $productoId)
+                                ->first();
+        }
+
+        if (!$detalleActual) {
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'Detalle de descargo no encontrado'
+            ]);
+        }
+
+        if (($cantidadDescargo + $detalleActual['cantidadDescargo']) > $existenciaActual) {
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'No hay existencias suficientes para realizar la salida'
+            ]);
+        }
+    } else {
+        // Validar si la existencia es suficiente para una nueva inserción
+        if ($cantidadDescargo > $existenciaActual) {
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'No hay existencias suficientes para realizar la salida'
+            ]);
+        }
+    }
+
+    $data = [
+        'productoId'            => $productoId,
+        'cantidadDescargo'      => $cantidadDescargo,
+        'obsDescargoDetalle'    => $this->request->getPost('obsDescargoDetalle'),
+        'descargosId'           => $descargosId
+    ];
+
+    if ($operacion == 'editar' && $descargoDetalleId) {
+        $operacionSalida = $model->update($descargoDetalleId, $data);
+    } else {
+        // Insertar datos en la base de datos
+        $operacionSalida = $model->insert($data);
+    }
+
+    if ($operacionSalida) {
+        // Si el insert fue exitoso, devuelve el último ID insertado
+        return $this->response->setJSON([
+            'success' => true,
+            'mensaje' => 'Salida ' . ($operacion == 'editar' ? 'actualizada' : 'agregada') . ' correctamente',
+            'descargoDetalleId' => ($operacion == 'editar' ? $descargoDetalleId : $model->insertID())
+        ]);
+    } else {
+        // Si el insert falló, devuelve un mensaje de error
+        return $this->response->setJSON([
+            'success' => false,
+            'mensaje' => 'No se pudo insertar la salida o descargo'
+        ]);
+    }
+}
+*/
 
 }
