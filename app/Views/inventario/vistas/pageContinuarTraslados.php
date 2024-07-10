@@ -1,5 +1,6 @@
+<form id="frmActualizarTraslado" method="post" action="<?php echo base_url('inventario/admin-traslados/operacion/actualizar/traslado'); ?>">
 <input type="hidden" id="trasladosId" name="trasladosId" value="<?= $trasladosId; ?>">
-<h2>Continuar traslado N°: <?php echo $trasladosId;?></h2>
+<h2>Continuar traslado N°: <?php echo $trasladosId;?> </h2>
 <hr>
 <div class="row mb-4">
     <div class="col-md-6">
@@ -8,13 +9,78 @@
             Volver 
         </button>
     </div>
-    <div class="col-md-6 text-right">
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="form-select-control">
+                <select name="sucursalIdSalida" id="sucursalIdSalida" class="form-control" style="width: 100%;" required>
+                    <option></option>
+                    <?php foreach ($sucursales as $sucursal) : ?>
+                        <option value="<?php echo $sucursal['sucursalId']; ?>"><?php echo $sucursal['sucursal']; ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-select-control">
+                <select name="sucursalIdEntrada" id="sucursalIdEntrada" class="form-control" style="width: 100%;" required>
+                    <option></option>
+                    <?php foreach ($sucursales as $sucursal) : ?>
+                        <option value="<?php echo $sucursal['sucursalId']; ?>"><?php echo $sucursal['sucursal']; ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-outline">
+                <input type="text" id="obsSolicitud" name="obsSolicitud" class="form-control active"  value="<?= $camposEncabezado['obsSolicitud']; ?>" required>
+                <label class="form-label" for="obsSolicitud">Observación de la solicitud del traslado</label>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="col-md-4">
+            <div class="form-select-control">
+                <select name="empleadoIdSalida" id="empleadoIdSalida" class="form-control active" style="width: 100%;" required>
+                    <option></option>
+                    <?php foreach ($empleados as $empleado) : ?>
+                        <option value="<?php echo $empleado['empleadoId']; ?>"><?php echo $empleado['primerNombre']; ?> <?php echo $empleado['primerApellido']; ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-select-control">
+                <select name="empleadoIdEntrada" id="empleadoIdEntrada" class="form-control active" style="width: 100%;" required>
+                    <option></option>
+                    <?php foreach ($empleados as $empleado) : ?>
+                        <option value="<?php echo $empleado['empleadoId']; ?>"><?php echo $empleado['primerNombre']; ?> <?php echo $empleado['primerApellido']; ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-outline">
+                <input type="date" id="fechaTraslado" name="fechaTraslado" class="form-control active"  value="<?= $camposEncabezado['fechaTraslado']; ?>" required>
+                <label class="form-label" for="fechaTraslado">Fecha de traslado</label>
+            </div>
+        </div>
+    </div>
+    <br>
+    <div class="text-right">
+            <button type="submit" id="btnguardarTraslado" class="btn btn-primary">
+                <i class="fas fa-pencil-alt"></i>
+                Actualizar compra
+            </button>
+        </div>
+</form>
+    <hr>
+    <div class="col-md-12 text-right">
         <button type= "button" id="btnAbrirModalProducto" class="btn btn-primary" onclick="modalAdministracionNuevoTraslado(0, 'insertar');">
         <i class="fas fa-save nav-icon "></i>
-            Solicitar producto
+            Agregar producto
         </button>
     </div>
-</div>
 <div class= "table-responsive" style="max-height: 400px; overflow-y: auto;">
     <table id="tblContinuarTraslados" name = "tblContinuarTraslados" class="table table-hover" style="width: 100%;">
         <thead>
@@ -31,7 +97,8 @@
     </table>
 <hr>
 </div>
-    <div class="row mb-4">
+<form id="frmContinuarTraslado" method="post" action="<?php echo base_url('inventario/admin-traslados/finalizar/traslado'); ?>">
+<div class="row mb-4">
     <div class="col-md-12 text-right">
         <button type= "submit" id="btnFinalizar" class="btn btn-primary" onclick="finalizarDescargo();">
         <i class="fas fa-save nav-icon "></i>
@@ -39,7 +106,7 @@
         </button>
     </div>
 </div>
-
+</form>
 <script>
       function eliminarTraslado(id) {
         //alert("Vamos a eliminar " + id);
@@ -66,7 +133,7 @@
                                 if (response.success) {
                                     Swal.fire({
                                         icon: 'success',
-                                        title: 'Salida/descargo eliminada con Éxito!',
+                                        title: 'Traslado Eliminado con Éxito!',
                                         text: response.mensaje
                                     }).then((result) => {
                                         $("#tblContinuarTraslados").DataTable().ajax.reload(null, false);
@@ -113,6 +180,99 @@
         $('#btnRegresarTraslado').on('click', function() {
             cambiarInterfaz('inventario/admin-traslados/index', {renderVista: 'No'});
         });
+
+
+            // Inicializar Select2
+        $("#sucursalIdSalida").select2({ placeholder: 'Sucursal Envía' });
+        $("#sucursalIdEntrada").select2({ placeholder: 'Sucursal Recibe' });
+        $("#empleadoIdSalida").select2({ placeholder: 'empleado Envía' });
+        $("#empleadoIdEntrada").select2({ placeholder: 'empleado Recibe' });
+
+        $("#frmActualizarTraslado").submit(function(event) {
+            event.preventDefault();
+            $.ajax({
+                url: $(this).attr('action'), 
+                type: $(this).attr('method'),
+                data: $(this).serialize(),
+                success: function(response) {
+                    console.log(response);
+                    if (response.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Traslado actualizado con éxito',
+                            text: response.mensaje
+                        }).then((result) => {
+                            $("#tblTraslado").DataTable().ajax.reload(null, false);
+                            $("#tblContinuarTraslados ").DataTable().ajax.reload(null, false);
+                            // Actualizar tabla de contactos
+                            // Limpiar inputs con .val(null) o .val('')
+                            
+                        });
+                    } else {
+                        // Insert fallido, mostrar mensaje de error
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.mensaje
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    // Manejar errores si los hay
+                    console.error(xhr.responseText);
+                }
+            });
+        });
+
+        $("#frmContinuarTraslado").submit(function(event) {
+            event.preventDefault();
+            Swal.fire({
+                title: '¿Estás seguro que desea finalizar el traslado?',
+                text: "Se finalizara el traslado seleccionado.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: $(this).attr('action'), 
+                        type: $(this).attr('method'),
+                        data: $(this).serialize(),
+                        success: function(response) {
+                            console.log(response);
+                            if (response.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Traslado finalizado con éxito',
+                                    text: response.mensaje
+                                }).then((result) => {
+
+                                    cambiarInterfaz(`inventario/admin-traslados/index`);
+                                    // Actualizar tabla de contactos
+                                    // Limpiar inputs con .val(null) o .val('')
+                                    
+                                });
+                            } else {
+                                // Insert fallido, mostrar mensaje de error
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: response.mensaje
+                                });
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            // Manejar errores si los hay
+                            console.error(xhr.responseText);
+                        }
+                    });
+                }
+            });
+        });
+
         $('#tblContinuarTraslados').DataTable({
                 "ajax": {
                     "method": "POST",
@@ -136,5 +296,10 @@
                     $('[data-toggle="tooltip"]').tooltip();
                 },
             });
+            
+            $("#sucursalIdSalida").val(<?= $camposEncabezado["sucursalIdSalida"]; ?>).trigger('change');    
+            $("#sucursalIdEntrada").val(<?= $camposEncabezado["sucursalIdEntrada"]; ?>).trigger('change');
+            $("#empleadoIdSalida").val(<?= $camposEncabezado["empleadoIdSalida"]; ?>).trigger('change');    
+            $("#empleadoIdEntrada").val(<?= $camposEncabezado["empleadoIdEntrada"]; ?>).trigger('change');
     });
 </script>

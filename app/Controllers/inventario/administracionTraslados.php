@@ -153,8 +153,8 @@ class AdministracionTraslados extends Controller
 
         // Aquí construye tus columnas
         $columna1 = $n;
-        $columna2 = "<b>Solicitado por:</b> " . $columna['empleadoIdEntrada'] . " " . $columna['empleadoIdEntrada2'] . " (" . $columna['sucursalEntrada'] . ")"."<br>"."<b>Autorizado por: </b>". $columna['empleadoIdSalida'] . " " . $columna['empleadoIdSalida2'] . " (" . $columna['sucursalSalida'] . ")";
-        $columna3 = "<b>Solicitud:</b> " . $columna['fechaTraslado']. "<br>" ;
+        $columna2 = "<b>Recibe :</b> " . $columna['empleadoIdEntrada'] . " " . $columna['empleadoIdEntrada2'] . " (" . $columna['sucursalEntrada'] . ")"."<br>"."<b>Envía: </b>". $columna['empleadoIdSalida'] . " " . $columna['empleadoIdSalida2'] . " (" . $columna['sucursalSalida'] . ")";
+        $columna3 = "<b>Fecha:</b> " . $columna['fechaTraslado']. "<br>" ;
         $columna4 = "<b>Motivo/Justificación:</b> " . $columna['obsSolicitud'] . "<br>" . "<b>Estado:</b> <span class='" . $estadoClase . "'>" . $columna['estadoTraslado'] . "</span>";
         
         // Construir botones basado en estadoTraslado
@@ -203,7 +203,6 @@ class AdministracionTraslados extends Controller
 
     public function vistaContinuarTraslados(){
         $session = session();
-
         $trasladosId = $this->request->getPost('trasladosId');
 
 
@@ -215,17 +214,43 @@ class AdministracionTraslados extends Controller
             'route'             => 'inventario/admin-traslados/vista/actualizar/traslados',
             'camposSession'     => json_encode($camposSession)
         ]);
+
         $data['trasladosId'] = $trasladosId;
         $mostrarSalida = new inv_traslados();
     
-                // Consulta para traer los valores de los input que se pueden actualizar
-                $data['dataSucursal'] = $mostrarSalida
-                ->select("conf_sucursales.sucursal")
-                ->join('conf_sucursales', 'conf_sucursales.sucursalId = inv_traslados.empleadoIdSalida')
-                ->where("inv_traslados.flgElimina", 0)
-                ->where("inv_traslados.trasladosId", $trasladosId)
-                ->first(); 
+                $sucursales = new conf_sucursales;
+                $empleados = new conf_empleados;
 
+                $data['sucursales'] = $sucursales
+                ->select("sucursalId,sucursal")
+                ->where("flgElimina", 0)
+                ->findAll();
+
+                $data['empleados'] = $empleados
+                ->select("empleadoId,primerNombre,primerApellido")
+                ->where("flgElimina", 0)
+                ->findAll();
+
+        // Consulta para traer los valores de los input que se pueden actualizar
+        $consultaTraslados = $mostrarSalida
+        ->select('inv_traslados.empleadoIdSalida,inv_traslados.empleadoIdEntrada,inv_traslados.sucursalIdSalida,inv_traslados.sucursalIdEntrada,inv_traslados.fechaTraslado, inv_traslados.obsSolicitud')
+        ->join('conf_sucursales AS s', 's.sucursalId = inv_traslados.sucursalIdSalida')
+        ->join('conf_sucursales AS cs', 'cs.sucursalId = inv_traslados.sucursalIdEntrada','left')
+        ->join('conf_empleados AS e', 'e.empleadoId = inv_traslados.empleadoIdSalida')
+        ->join('conf_empleados AS ce', 'ce.empleadoId = inv_traslados.empleadoIdEntrada','left')
+        ->where("inv_traslados.flgElimina", 0)
+        ->where("inv_traslados.trasladosId", $trasladosId)
+        ->first(); 
+
+        $data['camposEncabezado'] = [
+        'sucursalIdSalida'        => $consultaTraslados['sucursalIdSalida'],
+        'sucursalIdEntrada'       => $consultaTraslados['sucursalIdEntrada'],
+        'empleadoIdSalida'        => $consultaTraslados['empleadoIdSalida'],
+        'empleadoIdEntrada'       => $consultaTraslados['empleadoIdEntrada'],
+        'fechaTraslado'           => $consultaTraslados['fechaTraslado'],
+        'obsSolicitud'            => $consultaTraslados['obsSolicitud']
+        // Sacar estos valores de la consulta
+        ]; 
         
         return view('inventario/vistas/pageContinuarTraslados', $data);
     }
@@ -278,7 +303,6 @@ class AdministracionTraslados extends Controller
         //Necesito Traer sucursalId de inv_traslados 
         $trasladoData = $sucursalModel->find($trasladosId);
         $sucursalId = $trasladoData['sucursalIdSalida'];  // Asegúrate de que el campo se llama sucursalId en la base de datos
-       // $sucursalId = 1;
 
         // Obtener la existencia actual del producto en la sucursal
         $productosModel = new inv_productos_existencias();
@@ -452,5 +476,51 @@ class AdministracionTraslados extends Controller
             return $this->response->setJSON(array('data' => '')); // No hay datos, devuelve un array vacío
         }
     }  
+
+    function vistaActualizarTrasladoOperacion(){
+        $traslados = new inv_traslados;
+        $trasladosId = $this->request->getPost('trasladosId');
+            // Verificar si hay productos agregados al traslado
+            $productosModel = new inv_traslados_detalles();
+            $productosAgregados = $productosModel->where('trasladosId', $trasladosId)
+                                                ->where('flgElimina', 0)
+                                                ->countAllResults();
+        
+        if ($productosAgregados > 0) {
+            // Mostrar mensaje de error si hay productos agregados
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'No se puede actualizar las sucursales porque ya se han agregado productos al traslado.'
+            ]);
+        }
+
+        $data = [
+            'sucursalIdSalida'        => $this->request->getPost('sucursalIdSalida'),
+            'sucursalIdEntrada'       => $this->request->getPost('sucursalIdEntrada'),
+            'empleadoIdSalida'        => $this->request->getPost('empleadoIdSalida'),
+            'empleadoIdEntrada'       => $this->request->getPost('empleadoIdEntrada'),
+            'fechaTraslado'           => $this->request->getPost('fechaTraslado'),
+            'obsSolicitud'            => $this->request->getPost('obsSolicitud')
+        ];
+
+            // Insertar datos en la base de datos
+            $operacionCompra = $traslados->update($this->request->getPost('trasladosId'), $data);
+
+        if ($operacionCompra) {
+            // Si el insert fue exitoso, devuelve el último ID insertado
+            return $this->response->setJSON([
+                'success' => true,
+                'mensaje' => 'Traslado actualizado correctamente',
+                'trasladosId' => $this->request->getPost('trasladosId')
+            ]);
+        } else {
+            // Si el insert falló, devuelve un mensaje de error
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'No se pudo actualizar el traslado'
+            ]);
+        }
+    }
+
 
 }
