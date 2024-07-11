@@ -182,6 +182,8 @@ $routes->group('inventario/admin-traslados', function($routes) {
     $routes->post('tabla/ContinuarTraslado',  'inventario\AdministracionTraslados::tablaContinuarTraslado');
     $routes->post('operacion/actualizar/traslado', 'inventario\AdministracionTraslados::vistaActualizarTrasladoOperacion');
     $routes->post('operacion/finalizar/traslado', 'inventario\AdministracionTraslados::finalizarTraslado');
+    $routes->post('tabla/verTraslado',  'inventario\AdministracionTraslados::tablaVerTraslado');
+     $routes->post('form4/verTraslado', 'inventario\AdministracionTraslados::modalAdministracionVerTraslado');
 
     //
 });

@@ -171,14 +171,14 @@ class AdministracionTraslados extends Controller
             ';
         } elseif ($columna['estadoTraslado'] === 'Finalizado') {
             $columna5 = '
-                <button class="btn btn-info mb-1" onclick="modalAdministracionVerDescargo(`'.$columna['trasladosId'].'`);" data-toggle="tooltip" data-placement="top" title="Ver ">
+                <button class="btn btn-info mb-1" onclick="modalAdministracionVerTraslado(`'.$columna['trasladosId'].'`);" data-toggle="tooltip" data-placement="top" title="Ver traslado">
                     </i><span> Ver Traslado</span>
                 </button>
             ';
         } else {
             $columna5 = '
-                   <button class="btn btn-info mb-1" onclick="modalAdministracionVerDescargo(`'.$columna['trasladosId'].'`);" data-toggle="tooltip" data-placement="top" title="Ver descargo">
-        <span> Ver Traslado</span>
+                   <button class="btn btn-info mb-1" onclick="modalAdministracionVerTraslado(`'.$columna['trasladosId'].'`);" data-toggle="tooltip" data-placement="top" title="Ver traslado">
+                        <span> Ver Traslado</span>
                 </button>'; // No buttons if the status is neither 'Pendiente' nor 'Finalizado'
         }
 
@@ -831,5 +831,55 @@ class AdministracionTraslados extends Controller
             'mensaje' => 'Todos los productos tienen suficiente existencia para el traslado.',
             'trasladosId' => $this->request->getPost('trasladosId')
         ]);
+    }
+
+     public function modalAdministracionVerTraslado()
+    { 
+        $data["trasladosId"] = $this->request->getPost('trasladosId');
+    
+        return view('inventario/modals/modalAdministracionVerTraslado', $data);
+    }
+    public function tablaVerTraslado()
+    {
+
+       $trasladosId = $this->request->getPost('trasladosId');
+        $mostrarTraslado = new inv_traslados_detalles();
+        $datos = $mostrarTraslado
+            ->select('inv_traslados_detalles.trasladoDetalleId,inv_traslados_detalles.trasladosId,inv_traslados_detalles.cantidadTraslado,inv_traslados_detalles.obsTrasladoSolicitudDetalle,inv_productos.productoId, inv_productos.producto,inv_productos.codigoProducto,cat_14_unidades_medida.unidadMedida')
+            ->join('inv_productos', 'inv_productos.productoId = inv_traslados_detalles.productoId')
+            ->join('cat_14_unidades_medida', 'cat_14_unidades_medida.unidadMedidaId = inv_productos.unidadMedidaId')
+            ->join('inv_traslados', 'inv_traslados.trasladosId = inv_traslados_detalles.trasladosId')
+            ->where('inv_traslados_detalles.flgElimina', 0)
+            ->where('inv_traslados_detalles.trasladosId', $trasladosId)
+            ->findAll();
+
+        $output['data'] = array();
+        $n = 1; // Variable para contar las filas
+        foreach ($datos as $columna) {
+        
+            // Aquí construye tus columnas
+            $columna1 = $n;
+            $columna2 = "<b>Producto:</b> " . $columna['producto']. "<br>" ."<b>Código :</b> " . $columna['codigoProducto'];
+            $columna3 = "<b>Cantidad: </b> ". $columna['cantidadTraslado'] ." (". $columna['unidadMedida'] .")" ;
+            $columna4 = "<b>Motivo/Justificación:</b> " . $columna['obsTrasladoSolicitudDetalle'] ;
+    
+    
+            // Agrega la fila al array de salida
+            $output['data'][] = array(
+                $columna1,
+                $columna2,
+                $columna3,
+                $columna4
+            );
+    
+            $n++;
+        }
+    
+        // Verifica si hay datos
+        if ($n > 1) {
+            return $this->response->setJSON($output);
+        } else {
+            return $this->response->setJSON(array('data' => '')); // No hay datos, devuelve un array vacío
+        }
     }
 }
