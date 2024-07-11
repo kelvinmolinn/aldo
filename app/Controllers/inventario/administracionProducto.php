@@ -300,14 +300,13 @@ class AdministracionProducto extends Controller
             $columna1 = $n;
             $columna2 = "<b>Sucursal:</b> " . $columna['sucursal'];
             $columna3 = "<b>Existencia:</b> " . $columna['existenciaProducto'].' '.'('.$columna['abreviaturaUnidadMedida'].')';
-            $columna4 = "<b>Existencia Reservada:</b> " . $columna['existenciaReservada'];
+           
 
             // Agrega la fila al array de salida
             $output['data'][] = array(
                 $columna1,
                 $columna2,
-                $columna3,
-                $columna4
+                $columna3
             );
     
             $n++;

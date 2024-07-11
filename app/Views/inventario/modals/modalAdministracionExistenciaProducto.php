@@ -14,7 +14,6 @@
                                 <th>#</th>
                                 <th>Sucursal</th>
                                 <th>Existencia</th>
-                                <th>Existencia reservada</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -44,9 +43,8 @@
             },
             "columnDefs": [
                 { "width": "10%"}, 
-                { "width": "30%"}, 
-                { "width": "30%"},
-                { "width": "30%"} 
+                { "width": "45%"}, 
+                { "width": "45%"}
             ],
             "language": {
                 "url": "../assets/plugins/datatables/js/spanish.json"
