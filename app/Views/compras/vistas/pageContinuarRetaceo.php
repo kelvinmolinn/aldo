@@ -157,6 +157,8 @@
             cambiarInterfaz('compras/admin-retaceo/index', {renderVista: 'No'});
         });
 
+        $("#fechaRetaceo").val('<?= $camposEncabezado["fechaRetaceo"]; ?>');
+
         $('#tablaContinuarRetaceo').DataTable({
             "ajax": {
                 "method": "POST",
@@ -207,5 +209,9 @@
                 $('[data-toggle="tooltip"]').tooltip();
             },
         });   
+
+        $("#numeroRetaceo").val(<?= $camposEncabezado["numRetaceo"]; ?>).trigger('change');      
+        $("#fleteContinuarRetaceo").val(<?= $camposEncabezado["totalFlete"]; ?>).trigger('change');    
+        $("#GastosContinuarRetaceo").val('<?= $camposEncabezado["totalGastos"]; ?>').trigger('change'); 
     })
 </script>

@@ -43,9 +43,13 @@ class administracionRetaceo extends Controller
             $columna2 = "<b>N° de retaceo: </b> ".$consultaRetaceo['numRetaceo'] . "<br>" . "<b>Factura(s): </b> " . "<br>" . "<b>Estado: </b> ".$consultaRetaceo ['estadoRetaceo'] . "<br>" . "<b>Total de productos: </b> ";
     
             $columna3 = "<b>Flete: </b> ".$consultaRetaceo['totalFlete'] . "<br>" . "<b>Gastos: </b> ".$consultaRetaceo['totalGastos'] . "<br>" . "<b>Costo total: </b> ";
-    
+
+            $jsonContinuarRetaceo = [
+                "retaceoId"      => $consultaRetaceo['retaceoId']
+            ];
+
             $columna4 = '
-                            <button type= "button" class="btn btn-primary mb-1" onclick="cambiarInterfaz(`compras/admin-retaceo/vista/continuar/retaceo`);" data-toggle="tooltip" data-placement="top" title="Continuar retaceo">
+                            <button type= "button" class="btn btn-primary mb-1" onclick="cambiarInterfaz(`compras/admin-retaceo/vista/continuar/retaceo`,'.htmlspecialchars(json_encode($jsonContinuarRetaceo)).');" data-toggle="tooltip" data-placement="top" title="Continuar retaceo">
                                 <i class="fas fa-sync-alt"></i>
                             </button>';
         
@@ -153,6 +157,25 @@ class administracionRetaceo extends Controller
 
     public function vistaContinuarRetaceo(){
         $session = session();
+
+        $comp_retaceo = new comp_retaceo();
+
+        $retaceoId = $this->request->getPost('retaceoId');
+
+        $consultaRetaceo = $comp_retaceo
+                ->select("numRetaceo,fechaRetaceo,totalFlete,totalGastos")
+                ->where("flgElimina", 0)
+                ->where("retaceoId", $retaceoId)
+                ->first();   
+
+        $data['camposEncabezado'] = [
+            'numRetaceo'         => $consultaRetaceo['numRetaceo'],
+            'fechaRetaceo'       => $consultaRetaceo['fechaRetaceo'],
+            'totalFlete'         => $consultaRetaceo['totalFlete'],
+            'totalGastos'        => $consultaRetaceo['totalGastos']
+            // Sacar estos valores de la consulta
+        ];
+
 
         $data['variable'] = 0;
 
