@@ -97,17 +97,63 @@
     </table>
 <hr>
 </div>
-<form id="frmContinuarTraslado" method="post" action="<?php echo base_url('inventario/admin-traslados/finalizar/traslado'); ?>">
+
 <div class="row mb-4">
     <div class="col-md-12 text-right">
-        <button type= "submit" id="btnFinalizar" class="btn btn-primary" onclick="finalizarDescargo();">
+        <button type= "submit" id="btnFinalizar" class="btn btn-primary" onclick="finalizarTraslado();">
         <i class="fas fa-save nav-icon "></i>
             Finalizar traslado
         </button>
     </div>
 </div>
-</form>
+
 <script>
+        function finalizarTraslado(trasladosId) {
+        Swal.fire({
+            title: '¿Estás seguro que desea Finlizar el traslado?',
+            text: "Se Finalizará el traslado seleccionado.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, Finalizar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '<?php echo base_url('inventario/admin-traslados/operacion/finalizar/traslado'); ?>',
+                    type: 'POST',
+                    data: {
+                        trasladosId: <?php echo $trasladosId ;?>
+                    },
+                    success: function(response) {
+                        console.log(response);
+                        if (response.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Traslado Finalizado con Éxito!',
+                                text: response.mensaje
+                            }).then((result) => {
+                               // $("#tblContinuarSalida").DataTable().ajax.reload(null, false);
+                               cambiarInterfaz('inventario/admin-traslados/index', {renderVista:'No'});
+                            });
+                        } else {
+                            // Insert fallido, mostrar mensaje de error
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: response.mensaje
+                            });
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        // Manejar errores si los hay
+                        console.error(xhr.responseText);
+                    }
+                });
+            }
+        });
+    }
       function eliminarTraslado(id) {
         //alert("Vamos a eliminar " + id);
             Swal.fire({

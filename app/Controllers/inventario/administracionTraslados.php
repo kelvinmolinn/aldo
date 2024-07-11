@@ -482,9 +482,10 @@ class AdministracionTraslados extends Controller
         $trasladosId = $this->request->getPost('trasladosId');
             // Verificar si hay productos agregados al traslado
             $productosModel = new inv_traslados_detalles();
-            $productosAgregados = $productosModel->where('trasladosId', $trasladosId)
-                                                ->where('flgElimina', 0)
-                                                ->countAllResults();
+            $productosAgregados = $productosModel
+            ->where('trasladosId', $trasladosId)
+            ->where('flgElimina', 0)
+            ->countAllResults();
         
         if ($productosAgregados > 0) {
             // Mostrar mensaje de error si hay productos agregados
@@ -522,5 +523,102 @@ class AdministracionTraslados extends Controller
         }
     }
 
+    function finalizarTraslado(){
+        $operacion = $this->request->getPost('operacion');
+        $trasladosId = $this->request->getPost('trasladosId');
+        $trasladoDetalleId = $this->request->getPost('trasladoDetalleId');
+        $modelTrasladosDetalle = new inv_traslados_detalles();
+        $modelTraslados = new inv_traslados();
+        $productosModel = new Inv_Productos_Existencias();
+        $modelKardex = new Inv_Kardex();
+        $productosInfoModel = new Inv_Productos();
 
+        
+        // Obtener el traslado
+        $traslado = $modelTraslados->find($trasladosId);
+        if (!$traslado) {
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'Traslado no encontrado.',
+                'trasladosId' => $this->request->getPost('trasladosId')
+            ]);
+        }
+
+        // Obtener los detalles del traslado
+        $trasladoDetalles = $modelTrasladosDetalle
+        ->where('flgElimina', 0)
+        ->where('trasladosId', $trasladosId)->findAll();
+        
+        if (empty($trasladoDetalles)) {
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'No hay detalles para este traslado.',
+                'trasladosId' => $this->request->getPost('trasladosId')
+            ]);
+        }
+
+        foreach ($trasladoDetalles as $detalle) {
+            $sucursalIdSalida = $traslado['sucursalIdSalida'];
+            $productoId = $detalle['productoId'];
+            $cantidadTraslado = $detalle['cantidadTraslado'];
+
+            // Obtener la existencia del producto en la sucursal de salida
+            $productoExistencia = $productosModel
+                ->where('sucursalId', $sucursalIdSalida)
+                ->where('productoId', $productoId)
+                ->where('flgElimina', 0)
+                ->first();
+
+            if (!$productoExistencia) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'mensaje' => "No se encontró existencia para el producto ID: $productoId en la sucursal ID: $sucursalIdSalida.",
+                    'trasladosId' => $this->request->getPost('trasladosId')
+                ]);
+            }
+
+            $existenciaProducto = $productoExistencia['existenciaProducto'];
+
+            // Comparar existencia con cantidad a trasladar
+            if ($existenciaProducto < $cantidadTraslado) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'mensaje' => "No hay suficiente existencia para el producto ID: $productoId. Existencia: $existenciaProducto, Cantidad a trasladar: $cantidadTraslado.",
+                    'trasladosId' => $this->request->getPost('trasladosId')
+                ]);
+                
+            }
+             // Obtener datos adicionales del producto
+        $productoInfo = $productosInfoModel->find($productoId);
+
+
+        // Registrar movimiento de salida
+        $existenciaDespuesSalida = $existenciaProducto - $cantidadTraslado;
+        $insertSalida = [
+            'tipoMovimiento' => 'Salida',
+            'descripcionMovimiento' => "Salida registrada desde el traslado: $trasladosId",
+            'productoExistenciaId' => $productoExistencia['productoExistenciaId'],
+            'existenciaAntesMovimiento' => $existenciaProducto,
+            'cantidadMovimiento' => $cantidadTraslado,
+            'existenciaDespuesMovimiento' => $existenciaDespuesSalida,
+            'costoUnitarioFOB' => 0,
+            'costoUnitarioRetaceo' => 0,
+            'costoPromedio' => 0,
+            'precioVentaUnitario' => 0,
+            'fechaDocumento' => $traslado['fechaTraslado'],
+            'fechaMovimiento' => date('Y-m-d'),
+            'tablaMovimiento' => 'inv_traslados_detalle',
+            'tablaMovimientoId' => $detalle['trasladoDetalleId']
+        ];
+        $modelKardex->insert($insertSalida);
+
+
+        }
+        return $this->response->setJSON([
+            'success' => true,
+            'mensaje' => 'Todos los productos tienen suficiente existencia para el traslado.',
+            'trasladosId' => $this->request->getPost('trasladosId')
+        ]);
+
+    }
 }
