@@ -4,7 +4,7 @@
         <div class="col-md-12 text-right">
             <button type= "button" id="btnAbrirModal" class="btn btn-primary" onclick="modalTraslado(0, 'insertar');">
                 <i class="fas fa-save nav-icon"></i>
-                Nueva solicitud
+                Nuevo traslado
             </button>
         </div>
     </div>
