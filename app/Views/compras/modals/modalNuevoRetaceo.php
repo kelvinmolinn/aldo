@@ -64,7 +64,6 @@
 <script>
     $(document).ready(function(){
 
-
         $("#frmModal").submit(function(event) {
             event.preventDefault();
             $.ajax({

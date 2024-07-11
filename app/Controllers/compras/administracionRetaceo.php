@@ -29,7 +29,7 @@ class administracionRetaceo extends Controller
         $comp_retaceo = new comp_retaceo;
 
         $consultaRetaceo = $comp_retaceo
-                ->select('numRetaceo,totalFlete,totalGastos,estadoRetaceo')
+                ->select('retaceoId,numRetaceo,totalFlete,totalGastos,estadoRetaceo')
                 ->where('flgElimina', 0)
                 ->findAll();
 
@@ -48,9 +48,10 @@ class administracionRetaceo extends Controller
                             <button type= "button" class="btn btn-primary mb-1" onclick="cambiarInterfaz(`compras/admin-retaceo/vista/continuar/retaceo`);" data-toggle="tooltip" data-placement="top" title="Continuar retaceo">
                                 <i class="fas fa-sync-alt"></i>
                             </button>';
+        
     
             $columna4 .= '
-                             <button type= "button" class="btn btn-danger mb-1" onclick="" data-toggle="tooltip" data-placement="top" title="Anular">
+                             <button type= "button" class="btn btn-danger mb-1" onclick="modalAnularRetaceo('.$consultaRetaceo["retaceoId"].')" data-toggle="tooltip" data-placement="top" title="Anular">
                                 <i class="fas fa-ban"></i>
                             </button>
                         ';
@@ -107,6 +108,47 @@ class administracionRetaceo extends Controller
                 'mensaje' => 'No se pudo insertar el retaceo'
             ]);
         }
+    }
+
+    public function modalAnularRetaceo(){
+        $comp_retaceo = new comp_retaceo();
+
+        $retaceoId = $this->request->getPost('retaceoId');
+
+        $data['campos'] = $comp_retaceo
+        ->select('retaceoId,numRetaceo,totalFlete,totalGastos,estadoRetaceo')
+        ->where('flgElimina', 0)
+        ->where('retaceoId', $retaceoId)
+        ->first();
+        $data['variable'] = 0;
+        return view('compras/modals/modalAnularRetaceo', $data);
+    }
+
+    public function operacionAnularRetaceo(){
+        $anularRetaceo = new comp_retaceo();
+        
+            $retaceoId = $this->request->getPost('retaceoId');
+            $observacionAnulacion = $this->request->getPost('observacionAnulacion');
+
+            $data = [
+                'flgElimina'    => 1,
+                'estadoRetaceo' => "Anulado",
+                'obsAnulacion'  =>  $observacionAnulacion
+            ];
+            
+            $anularRetaceo->update($retaceoId, $data);
+
+            if($anularRetaceo) {
+                return $this->response->setJSON([
+                    'success' => true,
+                    'mensaje' => 'Retaceo Anulado correctamente'
+                ]);
+            } else {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'mensaje' => 'No se pudo anular el retaceo'
+                ]);
+            }
     }
 
     public function vistaContinuarRetaceo(){

@@ -9,7 +9,7 @@ class comp_retaceo extends Model
     protected $table = 'comp_retaceo';
     protected $primaryKey = 'retaceoId'; // si el nombre de la clave primaria es diferente
 
-    protected $allowedFields = ['retaceoId', 'numRetaceo', 'fechaRetaceo', 'totalFlete', 'totalGastos', 'obsRetaceo', 'estadoRetaceo', 'flgElimina','fhAgrega','fhEdita','usuarioIdAgrega','usuarioIdEdita','fhElimina','usuarioIdElimina'];
+    protected $allowedFields = ['retaceoId', 'numRetaceo', 'fechaRetaceo', 'totalFlete', 'totalGastos', 'obsRetaceo', 'estadoRetaceo','obsAnulacion', 'flgElimina','fhAgrega','fhEdita','usuarioIdAgrega','usuarioIdEdita','fhElimina','usuarioIdElimina'];
 
         //Agregar desde aqui
 
