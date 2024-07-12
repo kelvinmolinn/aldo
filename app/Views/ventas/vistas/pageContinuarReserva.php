@@ -1,34 +1,48 @@
-<form id="frmContinuarReserva" method="post" action="<?php echo base_url(''); ?>">
-    <h2>Continuar reserva - Número de reserva: 1</h2>
+<form id="frmContinuarReserva" method="post" action="<?php echo base_url('ventas/admin-reservas/operacion/actualizar/reserva'); ?>">
+    <input type="hidden" id="reservaId" name="reservaId" value="<?= $reservaId; ?>">
+    <h2>Continuar reserva - Número de reserva: <?php echo $reservaId;?> </h2>
     <hr>
     <button type= "button" id="btnRegresarReserva" class="btn btn-secondary estilo-btn mb-4">
         <i class="fas fa-backspace"></i>
             Volver a reserva
     </button>
-        <div class="row mb-2">
+        <div class="row ">
             <div class="col-md-4">
-                <div class="form-select-control">
-                    <select name="selectSucursalReserva" id="selectSucursalReserva" style="width: 100%;" required>
-                        <option value=""></option>
-                        <option value="1">Aldo Games Store (Principal)</option>
-                    </select>
-                </div>
+            <div class="form-select-control">
+                <select name="sucursalId" id="sucursalId" class="form-control" style="width: 100%;" required>
+                    <option></option>
+                    <?php foreach ($sucursales as $sucursal) : ?>
+                        <option value="<?php echo $sucursal['sucursalId']; ?>"><?php echo $sucursal['sucursal']; ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
             </div>
             <div class="col-md-4">
                 <div class="form-select-control">
-                    <select name="selectNombreClienteReserva" id="selectNombreClienteReserva" style="width: 100%;" required>
-                        <option value=""></option>
-                        <option value="1">Cliente Prueba</option>
+                    <select name="clienteId" id="clienteId" class="form-control" style="width: 100%;" required>
+                        <option></option>
+                        <?php foreach ($clientes as $cliente) : ?>
+                            <option value="<?php echo $cliente['clienteId']; ?>"><?php echo $cliente['cliente']; ?></option>
+                        <?php endforeach; ?>
                     </select>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="form-outline">
-                    <input type="date" id="fechaReserva" name="fechaReserva" class="form-control active" required>
+                    <input type="date" id="fechaReserva" name="fechaReserva" class="form-control active" value="<?= $campos['fechaReserva']; ?>" required>
                     <label class="form-label" for="fechaReserva">Fecha de la reserva</label>
                 </div>
             </div>
         </div>
+        <div class="row mt-4">
+            <div class="col-md-12 md-4">
+                <div class="form-outline">
+                    <input type="text" id="comentarioReserva" name="comentarioReserva" class="form-control active" value="<?= $campos['comentarioReserva']; ?>" required>
+                    <label class="form-label" for="comentarioReserva">Comentarios</label>
+                </div>
+            </div>
+        </div>
+        <br>
         <div class="text-right">
             <button type="submit" id="btnguardarReserva" class="btn btn-primary">
                 <i class="fas fa-pencil-alt"></i>
@@ -133,18 +147,55 @@
         });
     }
     $(document).ready(function(){
-        $("#selectSucursalReserva").select2({
+        $("#sucursalId").select2({
             placeholder: 'Sucursal'
         });
 
-        $("#selectNombreClienteReserva").select2({
+        $("#clienteId").select2({
             placeholder: 'Cliente'
         });
 
         tituloVentana("Continuar reserva");
 
         $('#btnRegresarReserva').on('click', function() {
-            cambiarInterfaz('ventas/admin-reserva/index', {renderVista: 'No'});
+            cambiarInterfaz('ventas/admin-reservas/index', {renderVista: 'No'});
+        });
+
+
+        $("#frmContinuarReserva").submit(function(event) {
+            event.preventDefault();
+            $.ajax({
+                url: $(this).attr('action'), 
+                type: $(this).attr('method'),
+                data: $(this).serialize(),
+                success: function(response) {
+                    console.log(response);
+                    if (response.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Reserva actualizada con éxito',
+                            text: response.mensaje
+                        }).then((result) => {
+                            $("#tablaReserva").DataTable().ajax.reload(null, false);
+                            $("#tablaContinuarReserva ").DataTable().ajax.reload(null, false);
+                            // Actualizar tabla de contactos
+                            // Limpiar inputs con .val(null) o .val('')
+                            
+                        });
+                    } else {
+                        // Insert fallido, mostrar mensaje de error
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.mensaje
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    // Manejar errores si los hay
+                    console.error(xhr.responseText);
+                }
+            });
         });
 
         $('#tablaContinuarReserva').DataTable({
@@ -187,6 +238,9 @@
                 // Inicializar tooltips de Bootstrap después de cada dibujo de la tabla
                 $('[data-toggle="tooltip"]').tooltip();
             },
-        });   
+        }); 
+        
+        $("#sucursalId").val(<?= $campos["sucursalId"]; ?>).trigger('change');       
+        $("#clienteId").val(<?= $campos["clienteId"]; ?>).trigger('change');
     })
 </script>
