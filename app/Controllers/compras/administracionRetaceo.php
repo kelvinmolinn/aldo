@@ -176,6 +176,7 @@ class administracionRetaceo extends Controller
             // Sacar estos valores de la consulta
         ];
 
+        $data['retaceoId'] = $retaceoId;
 
         $data['variable'] = 0;
 
@@ -190,6 +191,36 @@ class administracionRetaceo extends Controller
         return view('compras/vistas/pageContinuarRetaceo', $data);
     }
 
+    public function vistaActualizarRetaceo(){
+        $comp_retaceo = new comp_retaceo();
+
+        $data = [
+            'numRetaceo'        => $this->request->getPost('numeroRetaceo'),
+            'fechaRetaceo'      => $this->request->getPost('fechaRetaceo'),
+            'totalFlete'        => $this->request->getPost('fleteContinuarRetaceo'),
+            'totalGastos'       => $this->request->getPost('GastosContinuarRetaceo')
+
+        ];
+
+            // Insertar datos en la base de datos
+            $operacionRetaceo = $comp_retaceo->update($this->request->getPost('retaceoId'), $data);
+
+        if ($operacionRetaceo) {
+            // Si el insert fue exitoso, devuelve el último ID insertado
+            return $this->response->setJSON([
+                'success' => true,
+                'mensaje' => 'Retaceo actualizado correctamente',
+                'retaceoId' => $this->request->getPost('retaceoId')
+            ]);
+        } else {
+            // Si el insert falló, devuelve un mensaje de error
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'No se pudo actualizar el retaceo'
+            ]);
+        }
+    }
+    
     public function tablaContinuarRetaceo(){
         $output['data'] = array();
         $n = 0;

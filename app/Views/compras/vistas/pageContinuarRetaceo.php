@@ -1,11 +1,13 @@
-<form id="frmActualizarRetaceo" method="post" action="<?php echo base_url(''); ?>">
-    <h2>Continuar retaceo - Número de retaceo: 1</h2>
+<form id="frmActualizarRetaceo" method="post" action="<?php echo base_url('compras/admin-retaceo/operacion/actualizar/retaceo'); ?>">
+    <h2>Continuar retaceo - Número de retaceo: <?= $camposEncabezado["numRetaceo"]; ?></h2>
     <hr>
     <button type= "button" id="btnRegresarRetaceo" class="btn btn-secondary estilo-btn mb-4">
         <i class="fas fa-backspace"></i>
             Volver a retaceo
     </button>
-        <div class="row mb-2">
+    <input type="hidden" id="retaceoId" name="retaceoId" value="<?= $retaceoId; ?>">
+
+         <div class="row mb-2">
             <div class="col-md-6">
                 <div class="form-outline">
                     <input type="text" id="numeroRetaceo" name="numeroRetaceo" class="form-control active" required>
@@ -158,6 +160,43 @@
         });
 
         $("#fechaRetaceo").val('<?= $camposEncabezado["fechaRetaceo"]; ?>');
+
+        $("#frmActualizarRetaceo").submit(function(event) {
+            event.preventDefault();
+            $.ajax({
+                url: $(this).attr('action'), 
+                type: $(this).attr('method'),
+                data: $(this).serialize(),
+                success: function(response) {
+                    console.log(response);
+                    if (response.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Retaceo actualizado con éxito',
+                            text: response.mensaje
+                        }).then((result) => {
+                            //$("#tituloEncabezadoCompra").html("Continuar compra - Número de documento: " + $("#numeroFactura").val());
+                            $("#tablaRetaceo").DataTable().ajax.reload(null, false);
+                            $("#tablaContinuarRetaceo ").DataTable().ajax.reload(null, false);
+                            // Actualizar tabla de contactos
+                            // Limpiar inputs con .val(null) o .val('')
+                            
+                        });
+                    } else {
+                        // Insert fallido, mostrar mensaje de error
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.mensaje
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    // Manejar errores si los hay
+                    console.error(xhr.responseText);
+                }
+            });
+        });
 
         $('#tablaContinuarRetaceo').DataTable({
             "ajax": {
