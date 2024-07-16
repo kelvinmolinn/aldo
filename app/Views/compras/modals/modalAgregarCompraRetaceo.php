@@ -9,7 +9,7 @@
                     <div class="row mb-2">
                         <div class="col-md-6">
                             <div class="form-select-control">
-                                <select name="selectCompraRetaceo" id="selectCompraRetaceo" style="width: 100%;" required>
+                                <select name="selectCompraRetaceo[]" id="selectCompraRetaceo" multiple style="width: 100%;" required>
                                     <option value=""></option>
                                     <option value="1">1234 - $ 150.60</option>
                                 </select>
@@ -54,6 +54,16 @@
             placeholder: 'Compras',
             dropdownParent: $('#modalNuevoRetaceo')
         });    
+        /*
+            Va a programar el submit de Guardar para hacer INSERT a retaceo detalle con los campos en el Controller:
+            En el controller hará un foreach de la compraId que se quiere agregar (POST selectCompraRetaceo) para traer los campos de compras_detalle
+            retaceoId = POST, 
+            compraDetalleId = compras_detalle compraDetalleId, 
+            cantidadProducto = compras_detalle cantidadProducto, 
+            precioFOBUnitario = compras_detalle precioUnitario
+            importe = compras_detalle totalCompraDetalle (precioUnitario x Cantidad)
 
+            Luego el Ajax de acá, debe mandar a llamar la function calcularRetaceo (que está en la pageContinuarRetaceo y la podemos utilizar aquí)
+        */
     })
 </script>

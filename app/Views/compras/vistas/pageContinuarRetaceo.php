@@ -151,6 +151,23 @@
             }
         });
     }
+    function calcularRetaceo() {
+        // Ajax hacia un controller que aplique el calculo o recalculo de retaceo
+        $.ajax({
+            url: '<?php echo base_url('compras/admin-retaceo/calcular/retaceo'); ?>',
+            type: 'POST',
+            data: {
+                retaceoId: '<?= $retaceoId; ?>'
+            }, // Pasar el ID del módulo como parámetro
+            success: function(response) {
+                $("#tablaContinuarRetaceo ").DataTable().ajax.reload(null, false);
+            },
+            error: function(xhr, status, error) {
+                // Manejar errores si los hay
+                console.error(xhr.responseText);
+            }
+        });
+    }
     $(document).ready(function(){
         
         tituloVentana("Continuar retaceo");
@@ -175,12 +192,7 @@
                             title: 'Retaceo actualizado con éxito',
                             text: response.mensaje
                         }).then((result) => {
-                            //$("#tituloEncabezadoCompra").html("Continuar compra - Número de documento: " + $("#numeroFactura").val());
-                            $("#tablaRetaceo").DataTable().ajax.reload(null, false);
-                            $("#tablaContinuarRetaceo ").DataTable().ajax.reload(null, false);
-                            // Actualizar tabla de contactos
-                            // Limpiar inputs con .val(null) o .val('')
-                            
+                            calcularRetaceo();
                         });
                     } else {
                         // Insert fallido, mostrar mensaje de error

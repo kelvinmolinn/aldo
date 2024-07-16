@@ -66,15 +66,13 @@ class administracionRetaceo extends Controller
                 $columna3,
                 $columna4
             );
-    
-            // Verifica si hay datos
-            if ($n > 0) {
-                return $this->response->setJSON($output);
-            } else {
-                return $this->response->setJSON(array('data' => '')); // No hay datos, devuelve un array vacío
-            }
         }
-
+        // Verifica si hay datos
+        if ($n > 0) {
+            return $this->response->setJSON($output);
+        } else {
+            return $this->response->setJSON(array('data' => '')); // No hay datos, devuelve un array vacío
+        }
     }
 
     public function modalNuevoRetaceo(){
