@@ -262,6 +262,7 @@ $routes->group('ventas/admin-reservas', function($routes) {
     $routes->post('form/pago/reserva', 'ventas\administracionReservas::modalPagoReserva');
     $routes->post('tabla/pago/ventas', 'ventas\administracionReservas::tablePagoReserva');
     $routes->post('modal/nuevo/reserva', 'ventas\administracionReservas::modalNuevoProductoReserva');
+    $routes->post('operacion/guardar/NuevaReserva', 'ventas\administracionReservas::modalNuevaReservaOperacion');
     
 });
 

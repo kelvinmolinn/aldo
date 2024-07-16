@@ -54,7 +54,7 @@
 <form id="frmContinuarReserva" method="post" action="">
         
     <div class="text-right mb-4">
-        <button type= "button" id="btnNuevoProveedor" class="btn btn-primary estilo-btn" onclick="modalProductoReserva()">
+        <button type= "button" id="btnNuevoProveedor" class="btn btn-primary estilo-btn" onclick="modalProductoReserva(0, 'insertar')">
             <i class="fas fa-save"></i>
             Agregar producto
         </button>
@@ -127,12 +127,12 @@
             }
         });
     }
-    function modalProductoReserva() {
+    function modalProductoReserva(reservaDetalleId, operacion) {
         // Realizar una petición AJAX para obtener los datos del módulo por su ID
         $.ajax({
                 url: '<?php echo base_url('ventas/admin-reservas/modal/nuevo/reserva'); ?>',
                 type: 'POST',
-                data: {}, // Pasar el ID del módulo como parámetro
+                data: { reservaDetalleId: reservaDetalleId, operacion: operacion, reservaId: <?= $reservaId; ?>}, // Pasar el ID del módulo como parámetro
                 success: function(response) {
                     // Insertar el contenido de la modal en el cuerpo de la modal
                     $('#divModalContent').html(response);

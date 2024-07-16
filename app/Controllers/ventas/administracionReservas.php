@@ -298,13 +298,151 @@ class administracionReservas extends Controller
         }
     }
 
+    public function modalNuevoProductoReserva()
+    {
 
+        // Cargar el modelos
+        $productosModel = new inv_productos();
+        $data['producto'] = $productosModel->where('flgElimina', 0)->findAll();
+        $operacion = $this->request->getPost('operacion');
+        $data['productoId'] = $this->request->getPost('productoId');
+        $reservaId = $this->request->getPost('reservaId');
 
-    public function modalAnularReserva(){
-        $data['variable'] = 0;
-        return view('ventas/modals/modalAnularReserva', $data);
+        if($operacion == 'editar') {
+            $reservaDetalleId = $this->request->getPost('reservaDetalleId');
+            $salidaProducto = new fel_reservas_detalle();
+
+            // seleccionar solo los campos que estan en la modal (solo los input y select)
+            $data['campos'] = $salidaProducto->select('fel_reservas_detalle.reservaDetalleId,fel_reservas_detalle.reservaId,fel_reservas_detalle.cantidadProducto,fel_reservas_detalle.precioUnitario,inv_productos.productoId')
+            ->join('inv_productos', 'inv_productos.productoId = fel_reservas_detalle.productoId')
+            ->where('fel_reservas_detalle.flgElimina', 0)
+            ->where('fel_reservas_detalle.reservaDetalleId', $reservaDetalleId)
+            ->first();
+        } else {
+
+            // formar los campos que estan en la modal (input y select) con el nombre equivalente en la BD
+            $data['campos'] = [
+                'reservaDetalleId'    => 0,
+                'reservaId'           => $reservaId,
+                'productoId'          => '',
+                'cantidadProducto'    => '',
+                'precioUnitario'      => ''
+
+            ];
+        }
+        $data['operacion'] = $operacion;
+
+        return view('ventas/modals/modalProductoReserva', $data);
+ 
     }
 
+    public function modalNuevaReservaOperacion()
+{
+    $operacion = $this->request->getPost('operacion');
+    $reservaDetalleId = $this->request->getPost('reservaDetalleId');
+    $model = new fel_reservas_detalle();
+    $sucursalModel = new fel_reservas();  // Renombrado para mayor claridad
+    $reservaId = $this->request->getPost('reservaId');
+    $productoId = $this->request->getPost('productoId');
+    $cantidadProducto = $this->request->getPost('cantidadProducto');
+    
+    //Necesito Traer sucursalId de fel_reservas 
+    $reservaData = $sucursalModel->find($reservaId);
+    $sucursalId = $reservaData['sucursalId'];  
+
+    // Obtener la existencia actual del producto en la sucursal
+    $productosModel = new inv_productos_existencias();
+
+    $producto = $productosModel->select('existenciaProducto')
+                ->where('flgElimina', 0)
+                ->where('sucursalId', $sucursalId)
+                ->where('productoId', $productoId)
+                ->first();
+
+    if (!$producto) {
+        return $this->response->setJSON([
+            'success' => false,
+            'mensaje' => 'Producto no encontrado'
+            
+        ]);
+    }
+
+    $existenciaActual = $producto['existenciaProducto'];
+
+    $cantidadDetalleActual = $model->where('flgElimina', 0)
+                                ->where('reservaId', $reservaId)
+                                ->where('productoId', $productoId)
+                                ->countAllResults();
+
+    if ($reservaDetalleId || $cantidadDetalleActual > 0) {
+        if($reservaDetalleId) {
+            // Es update-editar
+            $detalleActual = $model->selectSum('cantidadProducto')
+                                    ->where('flgElimina', 0)
+                                    ->where('reservaId', $reservaId)
+                                    ->where('productoId', $productoId)
+                                    ->where('reservaDetalleId <>', $reservaDetalleId)
+                                    ->first();
+        } else {
+            $detalleActual = $model->selectSum('cantidadProducto')
+                                ->where('flgElimina', 0)
+                                ->where('reservaId', $reservaId)
+                                ->where('productoId', $productoId)
+                                ->first();
+        }
+
+        if (!$detalleActual) {
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'Detalle de reserva no encontrado'
+            ]);
+        }
+
+        if (($cantidadProducto + $detalleActual['cantidadProducto']) > $existenciaActual) {
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'No hay existencias suficientes para realizar la reserva'
+            ]);
+        }
+    } else {
+        // Validar si la existencia es suficiente para una nueva inserción
+        if ($cantidadProducto > $existenciaActual) {
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'No hay existencias suficientes para realizar la reserva'
+            ]);
+        }
+    }
+
+    $data = [
+        'productoId'            => $productoId,
+        'cantidadProducto'      => $cantidadProducto,
+        'precioUnitario'    => $this->request->getPost('precioUnitario'),
+        'reservaId'           => $reservaId
+    ];
+
+    if ($operacion == 'editar' && $reservaDetalleId) {
+        $operacionReserva = $model->update($reservaDetalleId, $data);
+    } else {
+        // Insertar datos en la base de datos
+        $operacionReserva = $model->insert($data);
+    }
+
+    if ($operacionReserva) {
+        // Si el insert fue exitoso, devuelve el último ID insertado
+        return $this->response->setJSON([
+            'success' => true,
+            'mensaje' => 'Reserva ' . ($operacion == 'editar' ? 'actualizada' : 'agregada') . ' correctamente',
+            'reservaDetalleId' => ($operacion == 'editar' ? $reservaDetalleId : $model->insertID())
+        ]);
+    } else {
+        // Si el insert falló, devuelve un mensaje de error
+        return $this->response->setJSON([
+            'success' => false,
+            'mensaje' => 'No se pudo insertar la reserva'
+        ]);
+    }
+}
 
     public function tablaContinuarReserva(){
         $n = 0;
@@ -378,6 +516,11 @@ class administracionReservas extends Controller
         }
     }
 
+    public function modalAnularReserva(){
+        $data['variable'] = 0;
+        return view('ventas/modals/modalAnularReserva', $data);
+    }
+
     public function modalPagoReserva(){
         $data['variable'] = 0;
         return view('ventas/modals/modalPagosReservas', $data);
@@ -418,8 +561,5 @@ class administracionReservas extends Controller
         }
     }
 
-    public function modalNuevoProductoReserva(){
-        $data['variable'] = 0;
-        return view('ventas/modals/modalProductoReserva', $data);
-    }
+
 }
