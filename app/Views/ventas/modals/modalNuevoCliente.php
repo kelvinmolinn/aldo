@@ -118,14 +118,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row mt-4">
-                        <div class="col-md-12">
-                            <div class="form-outline">
-                                <input type="text" id="correoElectronico" name="correoElectronico" class="form-control" min ="0" value="">
-                                <label class="form-label" for="selectCorreoElectronico">Correo electronico</label>
-                            </div>
-                        </div>
-                    </div>
+
                 </div>
                 <div class="modal-footer">
                     <button type="submit" id="btnguardarCliente" class="btn btn-primary">

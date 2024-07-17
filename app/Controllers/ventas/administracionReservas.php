@@ -16,6 +16,7 @@ use App\Models\fel_reservas_detalle;
 use App\Models\fel_reservas_pago;
 use App\Models\fel_clientes;
 use App\Models\vista_usuarios_empleados;
+use App\Models\comp_compras_detalle;
 
 
 use App\Models\comp_proveedores;
@@ -307,13 +308,15 @@ class administracionReservas extends Controller
         $operacion = $this->request->getPost('operacion');
         $data['productoId'] = $this->request->getPost('productoId');
         $reservaId = $this->request->getPost('reservaId');
+     
+ 
 
         if($operacion == 'editar') {
             $reservaDetalleId = $this->request->getPost('reservaDetalleId');
             $salidaProducto = new fel_reservas_detalle();
 
             // seleccionar solo los campos que estan en la modal (solo los input y select)
-            $data['campos'] = $salidaProducto->select('fel_reservas_detalle.reservaDetalleId,fel_reservas_detalle.reservaId,fel_reservas_detalle.cantidadProducto,fel_reservas_detalle.precioUnitario,inv_productos.productoId')
+            $data['campos'] = $salidaProducto->select('fel_reservas_detalle.reservaDetalleId,fel_reservas_detalle.reservaId,fel_reservas_detalle.cantidadProducto,fel_reservas_detalle.precioUnitario,fel_reservas_detalle.porcentajeDescuento,inv_productos.productoId')
             ->join('inv_productos', 'inv_productos.productoId = fel_reservas_detalle.productoId')
             ->where('fel_reservas_detalle.flgElimina', 0)
             ->where('fel_reservas_detalle.reservaDetalleId', $reservaDetalleId)
@@ -326,7 +329,8 @@ class administracionReservas extends Controller
                 'reservaId'           => $reservaId,
                 'productoId'          => '',
                 'cantidadProducto'    => '',
-                'precioUnitario'      => ''
+                'precioUnitario'      => '',
+                'porcentajeDescuento' => ''
 
             ];
         }
@@ -341,10 +345,23 @@ class administracionReservas extends Controller
     $operacion = $this->request->getPost('operacion');
     $reservaDetalleId = $this->request->getPost('reservaDetalleId');
     $model = new fel_reservas_detalle();
-    $sucursalModel = new fel_reservas();  // Renombrado para mayor claridad
+    $sucursalModel = new fel_reservas();  
     $reservaId = $this->request->getPost('reservaId');
     $productoId = $this->request->getPost('productoId');
+    $precioUnitario = $this->request->getPost('precioUnitario');
     $cantidadProducto = $this->request->getPost('cantidadProducto');
+    $porcentajeDescuento = $this->request->getPost('porcentajeDescuento');
+
+
+    // Consulta para traer el 13% de la parametrizacion
+    $porcentajeIva = new conf_parametrizaciones;
+    $IVA = $porcentajeIva 
+    ->select("valorParametrizacion")
+    ->where("flgElimina", 0)
+    ->where("parametrizacionId", 1)
+    ->first(); 
+    $IvaCalcular = ($precioUnitario * $IVA['valorParametrizacion']) /100;
+    $precioUnitarioIVA = $precioUnitario + $IvaCalcular;
     
     //Necesito Traer sucursalId de fel_reservas 
     $reservaData = $sucursalModel->find($reservaId);
@@ -358,6 +375,7 @@ class administracionReservas extends Controller
                 ->where('sucursalId', $sucursalId)
                 ->where('productoId', $productoId)
                 ->first();
+    
 
     if (!$producto) {
         return $this->response->setJSON([
@@ -417,8 +435,10 @@ class administracionReservas extends Controller
     $data = [
         'productoId'            => $productoId,
         'cantidadProducto'      => $cantidadProducto,
-        'precioUnitario'    => $this->request->getPost('precioUnitario'),
-        'reservaId'           => $reservaId
+        'precioUnitario'        => $precioUnitario,
+        'reservaId'             => $reservaId,
+        'porcentajeDescuento'   => $porcentajeDescuento,
+        'precioUnitarioIVA'     =>  $precioUnitarioIVA
     ];
 
     if ($operacion == 'editar' && $reservaDetalleId) {

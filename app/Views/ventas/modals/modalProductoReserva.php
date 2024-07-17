@@ -24,21 +24,40 @@
                                     <option value="<?php echo $producto['productoId']; ?>"><?php echo $producto['producto']; ?></option>
                                 <?php endforeach; ?>
                             </select>
-                            
                         </div>
                         <div class="col-md-4">
                             <div class="form-outline">
-                                <input type="number" id="cantidadProducto" name="cantidadProducto" class="form-control active number-input" min="1" required>
+                                <input type="number" id="cantidadProducto" name="cantidadProducto" class="form-control active number-input" min="1" step="1" required >
                                 <label class="form-label" for="cantidadProducto">Cantidad</label>
                             </div>
                         </div>
+   
                         <div class="col-md-4">
-                            <div class="form-outline">
-                                <input type="number" id="precioUnitario" name="precioUnitario" class="form-control active" required>
-                                <label class="form-label" for="precioUnitario">Precio</label>
+                            <select name="precioUnitario" id="precioUnitario" class="form-control " style="width: 100%;" required>
+                                <option></option>
+                            </select>
+                            <div class="text-right">
+                                <small>Con IVA: $ <span id="precioUnitarioIVA"></span></small>
                             </div>
                         </div>
-                    </div>                                  
+                    </div>
+                    <div class="row mb-4"> 
+                        <div class="col-md-6">
+                            <div class="form-outline">
+                                <input type="number" id="porcentajeDescuento" name="porcentajeDescuento" class="form-control active number-input" min="0" max="25" value="0.00"  required >
+                                <label class="form-label" for="porcentajeDescuento">Porcentaje de descuento</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-outline">
+                                <input type="number" id="totalReservaDetalle" name="totalReservaDetalle" class="form-control"  required readonly>
+                                <label class="form-label" for="totalReservaDetalle">Precio total</label>
+                            </div>
+                            <div class="text-right">
+                                <small>Con IVA: $ <span id="totalReservaDetalleIVA"></span></small>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="submit" id="btnguardarprodutos" class="btn btn-primary">
@@ -56,20 +75,44 @@
 </form>
 
 <script>
-    $(document).ready(function() {
-    // Inicializar Select2
-    $("#productoId").select2({ placeholder: 'Producto' });
-    });
-
-        // Evitar la entrada de 'e', 'E', '+', y '-' en los campos de número
-        document.querySelectorAll('.number-input').forEach(function(input) {
+    
+    // Evitar la entrada de 'e', 'E', '+', y '-' en los campos de número
+    document.querySelectorAll('.number-input').forEach(function(input) {
         input.addEventListener('keydown', function(event) {
             if (event.key === 'e' || event.key === 'E' || event.key === '-' || event.key === '+') {
                 event.preventDefault();
             }
         });
+    });
+    $(document).ready(function() {
+        // Inicializar Select2
+        $("#productoId").select2({ 
+            placeholder: 'Producto'});
 
-    $("#frmModal").submit(function(event) {
+        $("#precioUnitario").select2({ 
+            placeholder: 'Precio unitario'});
+
+            $("#productoId").change(function(e) {
+                $.ajax({
+                    url: 'select/catalogos-hacienda/producto-precio',
+                    type: "POST",
+                    dataType: "json",
+                    data: {
+                        productoId: $(this).val()
+                    }
+                }).done(function(data){
+                    $('#precioUnitario').empty();
+                    $('#precioUnitario').append("<option></option>");
+                    for (let i = 0; i < data.length; i++){
+                        $('#precioUnitario').append($('<option>', {
+                            value: data[i]['id'],
+                            text: data[i]['text']
+                        }));
+                    }
+                });
+            });
+
+        $("#frmModal").submit(function(event) {
             event.preventDefault();
             $.ajax({
                 url: $(this).attr('action'), 
@@ -105,5 +148,5 @@
         });
     });
     $("#productoId").val('<?= $campos["productoId"]; ?>').trigger("change");
-    });
+});
 </script>

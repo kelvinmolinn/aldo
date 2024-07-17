@@ -5,6 +5,7 @@ use CodeIgniter\Controller;
 use App\Models\cat_19_actividad_economica;
 use App\Models\cat_12_paises_ciudades;
 use App\Models\cat_13_paises_estados;
+use App\Models\comp_compras_detalle;
 
 class selectCatalogosMH extends Controller
 {
@@ -87,6 +88,34 @@ class selectCatalogosMH extends Controller
         	return $this->response->setJSON($jsonSelect);
         } else {
 	  		$jsonSelect[] = ['id'=>'', 'text'=>'Digite el departamento del país'];
+	  		$jsonRespuesta = json_encode($jsonSelect);
+            return $this->response->setJSON($jsonRespuesta);
+        }
+	}
+
+	public function selectProductoPrecioUnitario() {
+		$productoId = $this->request->getPost('productoId');
+
+		$precioUnitario = new comp_compras_detalle();
+        $consultaProductoPrecio = $precioUnitario
+        ->select('compraDetalleId, precioUnitario')
+        ->where('flgElimina', 0)
+        ->where('productoId', $productoId)
+		->orderBy('compraDetalleId', 'DESC')
+		->limit(1)
+        ->findAll();
+
+        $n = 0;
+        foreach($consultaProductoPrecio as $precioU) {
+        	$n++;
+        	$jsonSelect[] = array("id" => $precioU['compraDetalleId'], "text" => $precioU["precioUnitario"]);
+        }
+
+        if($n > 0) {
+        	$jsonRespuesta = json_encode($jsonSelect);
+        	return $this->response->setJSON($jsonSelect);
+        } else {
+	  		$jsonSelect[] = ['id'=>'', 'text'=>'Digite '];
 	  		$jsonRespuesta = json_encode($jsonSelect);
             return $this->response->setJSON($jsonRespuesta);
         }
