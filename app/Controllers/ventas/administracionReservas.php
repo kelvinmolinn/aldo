@@ -905,7 +905,7 @@ public function eliminarReserva(){
                     <b>Total a pagar (=) :</b>
                 </div>
                 <div class="col-4">
-                    $ ' . number_format($totalAPagar, 2, '.', ',') . '
+                  <b>  $ ' . number_format($totalAPagar, 2, '.', ',') . ' </b>
                 </div>
             </div>
             <div class="row text-right">
