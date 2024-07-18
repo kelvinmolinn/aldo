@@ -308,8 +308,21 @@ class administracionReservas extends Controller
         $operacion = $this->request->getPost('operacion');
         $data['productoId'] = $this->request->getPost('productoId');
         $reservaId = $this->request->getPost('reservaId');
+        $productoId = $this->request->getPost('productoId');
+
+        // Consulta para traer el 13% de la parametrizacion
+        $porcentajeIva = new conf_parametrizaciones;
+        $IVA = $porcentajeIva 
+        ->select("valorParametrizacion")
+        ->where("flgElimina", 0)
+        ->where("parametrizacionId", 1)
+        ->first();
      
- 
+        $consultaCompra = $productosModel
+        ->select("productoId, precioVenta")
+        ->where("flgElimina", 0)
+        ->where("productoId", $productoId)
+        ->first();
 
         if($operacion == 'editar') {
             $reservaDetalleId = $this->request->getPost('reservaDetalleId');
@@ -335,6 +348,7 @@ class administracionReservas extends Controller
             ];
         }
         $data['operacion'] = $operacion;
+        $data['precioUnitarioIVA'] = ($IVA['valorParametrizacion'] / 100) + 1;
 
         return view('ventas/modals/modalProductoReserva', $data);
  
@@ -348,9 +362,10 @@ class administracionReservas extends Controller
     $sucursalModel = new fel_reservas();  
     $reservaId = $this->request->getPost('reservaId');
     $productoId = $this->request->getPost('productoId');
-    $precioUnitario = $this->request->getPost('precioUnitario');
+    $precioUnitario = $this->request->getPost('hiddenPrecioUnitario');
     $cantidadProducto = $this->request->getPost('cantidadProducto');
     $porcentajeDescuento = $this->request->getPost('porcentajeDescuento');
+
 
 
     // Consulta para traer el 13% de la parametrizacion
@@ -362,6 +377,11 @@ class administracionReservas extends Controller
     ->first(); 
     $IvaCalcular = ($precioUnitario * $IVA['valorParametrizacion']) /100;
     $precioUnitarioIVA = $precioUnitario + $IvaCalcular;
+    $ivaTotal = $IvaCalcular * $cantidadProducto;
+    $precioUnitarioVenta = $precioUnitario * (1 -($porcentajeDescuento/100));
+    $precioUnitarioVentaIVA = $precioUnitarioVenta + $IvaCalcular;
+    $totalReservaDetalle = $precioUnitarioVenta * $cantidadProducto;
+    $totalReservaDetalleIVA =  $precioUnitarioVentaIVA * $cantidadProducto;
     
     //Necesito Traer sucursalId de fel_reservas 
     $reservaData = $sucursalModel->find($reservaId);
@@ -433,12 +453,18 @@ class administracionReservas extends Controller
     }
 
     $data = [
-        'productoId'            => $productoId,
-        'cantidadProducto'      => $cantidadProducto,
-        'precioUnitario'        => $precioUnitario,
-        'reservaId'             => $reservaId,
-        'porcentajeDescuento'   => $porcentajeDescuento,
-        'precioUnitarioIVA'     =>  $precioUnitarioIVA
+        'productoId'                => $productoId,
+        'cantidadProducto'          => $cantidadProducto,
+        'precioUnitario'            => $precioUnitario,
+        'reservaId'                 => $reservaId,
+        'porcentajeDescuento'       => $porcentajeDescuento,
+        'precioUnitarioIVA'         => $precioUnitarioIVA,
+        'ivaUnitario'               => $IvaCalcular,
+        'ivaTotal'                  => $ivaTotal,
+        'precioUnitarioVenta'       => $precioUnitarioVenta,
+        'precioUnitarioVentaIVA'    => $precioUnitarioVentaIVA,
+        'totalReservaDetalle'       => $totalReservaDetalle,
+        'totalReservaDetalleIVA'    => $totalReservaDetalleIVA
     ];
 
     if ($operacion == 'editar' && $reservaDetalleId) {
@@ -464,28 +490,67 @@ class administracionReservas extends Controller
     }
 }
 
-    public function tablaContinuarReserva(){
-        $n = 0;
-        $n++;
-        $output['data'] = array();
 
+public function eliminarReserva(){
+        
+    $eliminarReserva = new fel_reservas_detalle();
+    
+    $reservaDetalleId = $this->request->getPost('reservaDetalleId');
+    $data = ['flgElimina' => 1];
+    
+    $eliminarReserva->update($reservaDetalleId, $data);
+
+    if($eliminarReserva) {
+        return $this->response->setJSON([
+            'success' => true,
+            'mensaje' => 'Reserva de producto eliminado correctamente'
+        ]);
+    } else {
+        return $this->response->setJSON([
+            'success' => false,
+            'mensaje' => 'No se pudo eliminar la reserva de producto'
+        ]);
+    }
+}
+
+
+public function tablaContinuarReserva()
+{
+    $reservaId = $this->request->getPost('reservaId');
+    $mostrarReserva = new fel_reservas_detalle();
+    $datos = $mostrarReserva
+        ->select('fel_reservas_detalle.reservaDetalleId,fel_reservas_detalle.reservaId,fel_reservas_detalle.cantidadProducto,fel_reservas_detalle.productoId,fel_reservas_detalle.precioUnitario,fel_reservas_detalle.precioUnitarioIVA,fel_reservas_detalle.porcentajeDescuento,fel_reservas_detalle.precioUnitarioVenta,fel_reservas_detalle.precioUnitarioVentaIVA,fel_reservas_detalle.ivaUnitario,fel_reservas_detalle.ivaTotal,fel_reservas_detalle.totalReservaDetalle,fel_reservas_detalle.totalReservaDetalleIVA,inv_productos.productoId, inv_productos.producto,inv_productos.codigoProducto,cat_14_unidades_medida.unidadMedida')
+        ->join('inv_productos', 'inv_productos.productoId = fel_reservas_detalle.productoId')
+        ->join('cat_14_unidades_medida', 'cat_14_unidades_medida.unidadMedidaId = inv_productos.unidadMedidaId')
+        ->join('fel_reservas', 'fel_reservas.reservaId = fel_reservas_detalle.reservaId')
+        ->where('fel_reservas_detalle.flgElimina', 0)
+        ->where('fel_reservas_detalle.reservaId', $reservaId)
+        ->findAll();
+
+    $output['data'] = array();
+    $n = 1; // Variable para contar las filas
+    foreach ($datos as $columna) {
+        
+        // Construir columnas
         $columna1 = $n;
-        $columna2 = '(PD-001) MARIO KART';
-        $columna3 = '$ 35.00' ;
-        $columna4 = '1';
-        $columna5 = '$ 35.00 ';
-        $columna6 = '
-            <button type= "button" class="btn btn-primary mb-1" onclick="" data-toggle="tooltip" data-placement="top" title="Editar">
-                <i class="fas fa-pencil-alt"></i>
-            </button>
+        $columna2 = "<b>Producto:</b> " . $columna['producto'] . "<br><b>Código :</b> " . $columna['codigoProducto'];
+        $columna3 = "<b>Cantidad: </b> " . $columna['cantidadProducto'] . " (" . $columna['unidadMedida'] . ")";
+        $columna4 = "<b>Precio unitario:</b> " . $columna['precioUnitario'];
+        
+        $columna5 = '
+            
         ';
+        $columna6 = '
 
-        $columna6 .= '
-            <button type= "button" class="btn btn-danger mb-1" onclick="" data-toggle="tooltip" data-placement="top" title="Eliminar">
+            <button class="btn btn-primary mb-1" onclick="modalNuevoProductoReserva(`' . $columna['reservaDetalleId'] . '`, `editar`);" data-toggle="tooltip" data-placement="top" title="Editar">
+                <i class="fas fa-pen"></i>
+            </button>
+            <button class="btn btn-danger mb-1" onclick="eliminarReserva(`' . $columna['reservaDetalleId'] . '`);" data-toggle="tooltip" data-placement="top" title="Eliminar">
                 <i class="fas fa-trash"></i>
             </button>
         ';
-        // Agrega la fila al array de salida
+
+        // Agregar la fila al array de salida
         $output['data'][] = array(
             $columna1,
             $columna2,
@@ -495,46 +560,49 @@ class administracionReservas extends Controller
             $columna6
         );
 
-        if ($n > 0) {
-                $output['footer'] = array(
-                    '',
-                    '' ,
-                    ''
-                );
-
-                $output['footerTotales'] = '
-                    <b>
-                        <div class="row text-right">
-                            <div class="col-8">
-                                Total a pagar:
-                            </div>
-                            <div class="col-4">
-                                $ 35.00
-                            </div>
-                        </div>
-                        <div class="row text-right">
-                            <div class="col-8">
-                                Total pagado:
-                            </div>
-                            <div class="col-4">
-                                $ 15.00
-                            </div>
-                        </div>
-                        <div class="row text-right">
-                            <div class="col-12">
-                                <button type= "button" class="btn btn-primary mb-1" onclick="modalPagoReserva()" data-toggle="tooltip" data-placement="top" title="Pagos">
-                                    <i class="fas fa-hand-holding-usd"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </b>
-
-                ';
-            return $this->response->setJSON($output);
-        } else {
-            return $this->response->setJSON(array('data' => '', 'footer'=>'')); // No hay datos, devuelve un array vacío
-        }
+        $n++;
     }
+
+    if ($n > 1) {
+        $output['footer'] = array(
+            '',
+            '',
+            ''
+        );
+
+        $output['footerTotales'] = '
+            <b>
+                <div class="row text-right">
+                    <div class="col-8">
+                        Total a pagar:
+                    </div>
+                    <div class="col-4">
+                        $ 35.00
+                    </div>
+                </div>
+                <div class="row text-right">
+                    <div class="col-8">
+                        Total pagado:
+                    </div>
+                    <div class="col-4">
+                        $ 15.00
+                    </div>
+                </div>
+                <div class="row text-right">
+                    <div class="col-12">
+                        <button type="button" class="btn btn-primary mb-1" onclick="modalPagoReserva()" data-toggle="tooltip" data-placement="top" title="Pagos">
+                            <i class="fas fa-hand-holding-usd"></i>
+                        </button>
+                    </div>
+                </div>
+            </b>
+        ';
+        return $this->response->setJSON($output);
+    } else {
+        return $this->response->setJSON(array('data' => '', 'footer' => '')); // No hay datos, devuelve un array vacío
+    }
+}
+
 
     public function modalAnularReserva(){
         $data['variable'] = 0;

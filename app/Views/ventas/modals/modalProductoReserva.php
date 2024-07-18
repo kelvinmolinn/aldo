@@ -16,6 +16,7 @@
                     <input type="hidden" id="reservaDetalleId" name="reservaDetalleId" value="<?= $campos['reservaDetalleId'] ?>">
                     <input type="hidden" id="operacion" name="operacion" value="<?= $operacion; ?>">
                     <input type="hidden" id="reservaId" name="reservaId" value="<?= $campos['reservaId']; ?>">
+                    <input type="hidden" id="precioUnitarioIVA" name="precioUnitarioIVA" value="<?php echo $precioUnitarioIVA;?>">
                     <div class="row mb-4">
                         <div class="col-md-4">
                             <select name="productoId" id="productoId" class="form-control " style="width: 100%;" required>
@@ -33,18 +34,19 @@
                         </div>
    
                         <div class="col-md-4">
-                            <select name="precioUnitario" id="precioUnitario" class="form-control " style="width: 100%;" required>
+                            <select name="precioUnitario" id="precioUnitario" class="form-control " style="width: 100%;" value="<?= $campos['precioUnitario']; ?>"  required>
                                 <option></option>
                             </select>
+                            <input type="hidden" name="hiddenPrecioUnitario" id="hiddenPrecioUnitario">
                             <div class="text-right">
-                                <small>Con IVA: $ <span id="precioUnitarioIVA"></span></small>
+                                <small>Con IVA: $ <span id="precioUnitarioIVA"><?php echo $precioUnitarioIVA;?></span></small>
                             </div>
                         </div>
                     </div>
                     <div class="row mb-4"> 
                         <div class="col-md-6">
                             <div class="form-outline">
-                                <input type="number" id="porcentajeDescuento" name="porcentajeDescuento" class="form-control active number-input" min="0" max="25" value="0.00"  required >
+                                <input type="number" id="porcentajeDescuento" name="porcentajeDescuento" class="form-control active number-input" min="0" max="25" value="0.00" value="<?= $campos['porcentajeDescuento']; ?>"  required >
                                 <label class="form-label" for="porcentajeDescuento">Porcentaje de descuento</label>
                             </div>
                         </div>
@@ -89,29 +91,43 @@
         $("#productoId").select2({ 
             placeholder: 'Producto'});
 
-        $("#precioUnitario").select2({ 
-            placeholder: 'Precio unitario'});
+            $("#precioUnitario").select2({
+        placeholder: 'Precio unitario'
+    });
 
-            $("#productoId").change(function(e) {
-                $.ajax({
-                    url: 'select/catalogos-hacienda/producto-precio',
-                    type: "POST",
-                    dataType: "json",
-                    data: {
-                        productoId: $(this).val()
-                    }
-                }).done(function(data){
-                    $('#precioUnitario').empty();
-                    $('#precioUnitario').append("<option></option>");
-                    for (let i = 0; i < data.length; i++){
-                        $('#precioUnitario').append($('<option>', {
-                            value: data[i]['id'],
-                            text: data[i]['text']
-                        }));
-                    }
-                });
-            });
+    $("#productoId").change(function(e) {
+        $.ajax({
+            url: 'select/catalogos-hacienda/producto-precio',
+            type: "POST",
+            dataType: "json",
+            data: {
+                productoId: $(this).val()
+            }
+        }).done(function(data) {
+            $('#precioUnitario').empty();
+            $('#precioUnitario').append("<option></option>");
+            for (let i = 0; i < data.length; i++) {
+                $('#precioUnitario').append($('<option>', {
+                    value: data[i]['id'],
+                    text: data[i]['text']
+                }));
+            }
+            // Seleccionar el primer valor por defecto
+            if (data.length > 0) {
+                $('#precioUnitario').val(data[0]['id']).trigger('change');
+                $('#hiddenPrecioUnitario').val(data[0]['text']); // Actualizar el campo oculto con el texto
+            }
+            // Hacer el select readonly (disabled)
+            $('#precioUnitario').prop('disabled', true);
+        });
+    });
 
+    // Actualizar el campo oculto cuando cambie el valor del select
+    $('#precioUnitario').change(function() {
+        // Obtener el texto del option seleccionado
+        var selectedText = $("#precioUnitario option:selected").text();
+        $('#hiddenPrecioUnitario').val(selectedText);
+    });
         $("#frmModal").submit(function(event) {
             event.preventDefault();
             $.ajax({
@@ -147,6 +163,19 @@
             }
         });
     });
+    
+    $("#precioUnitario").keyup(function(e) {
+            if($(this).val() == "") {
+                $("#precioUnitarioIVA").html('0.00');
+            } else if($(this).val() < 0) {
+                $("#precioUnitarioIVA").html('0.00');
+            } else {
+                let precioUnitario = parseFloat($(this).val());
+                let precioUnitarioIVA = precioUnitario * (1 + <?= $precioUnitarioIVA; ?>);
+                $("#precioUnitarioIVA").html(precioUnitarioIVA.toFixed(2));
+            }
+        });
+
     $("#productoId").val('<?= $campos["productoId"]; ?>').trigger("change");
 });
 </script>

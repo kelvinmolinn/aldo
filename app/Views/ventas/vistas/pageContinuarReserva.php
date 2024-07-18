@@ -90,13 +90,8 @@
     </div>
 
     <div class="row mb-4 mt-4">
-        <div class="col-md-6">
-            <div class="form-outline">
-                <textarea name="observacionFinalizarReserva" id="observacionFinalizarReserva" class="form-control" style="width: 100%;" required></textarea>
-                <label class="form-label" for="">Observación de la reserva</label>
-            </div>
-        </div>
-        <div class="col-md-6">
+
+        <div class="col-md-12">
             <div class="text-right">
                 <button type="submit" id="btnFinalizarReserva" class="btn btn-primary">
                     <i class="fas fa-save"></i>
@@ -107,6 +102,54 @@
     </div>
 </form>
 <script>
+
+function eliminarReserva(id) {
+        //alert("Vamos a eliminar " + id);
+            Swal.fire({
+                title: '¿Estás seguro que desea eliminar la reserva de producto?',
+                text: "Se eiminara el producto de la reserva seleccionada.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Si el usuario confirma, enviar la solicitud AJAX para eliminar el usuario de la sucursal
+                        $.ajax({
+                            url: '<?php echo base_url('ventas/admin-reservas/operacion/eliminar/reserva'); ?>',
+                            type: 'POST',
+                            data: {
+                                reservaDetalleId: id
+                            },
+                            success: function(response) {
+                                console.log(response);
+                                if (response.success) {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Reserva Eliminada con Éxito!',
+                                        text: response.mensaje
+                                    }).then((result) => {
+                                        $("#tablaContinuarReserva").DataTable().ajax.reload(null, false);
+                                    });
+                                } else {
+                                    // Insert fallido, mostrar mensaje de error
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Error',
+                                        text: response.mensaje
+                                    });
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                // Manejar errores si los hay
+                                console.error(xhr.responseText);
+                            }
+                        });
+                }
+            });
+    }
     
     function modalPagoReserva() {
         // Realizar una petición AJAX para obtener los datos del módulo por su ID
@@ -147,6 +190,11 @@
         });
     }
     $(document).ready(function(){
+        tituloVentana("Continuar reserva");
+        $('#btnRegresarReserva').on('click', function() {
+            cambiarInterfaz('ventas/admin-reservas/index', {renderVista: 'No'});
+        });
+
         $("#sucursalId").select2({
             placeholder: 'Sucursal'
         });
@@ -154,13 +202,6 @@
         $("#clienteId").select2({
             placeholder: 'Cliente'
         });
-
-        tituloVentana("Continuar reserva");
-
-        $('#btnRegresarReserva').on('click', function() {
-            cambiarInterfaz('ventas/admin-reservas/index', {renderVista: 'No'});
-        });
-
 
         $("#frmContinuarReserva").submit(function(event) {
             event.preventDefault();
@@ -203,7 +244,7 @@
                 "method": "POST",
                 "url": '<?php echo base_url('ventas/admin-reservas/tabla/continuar/reserva'); ?>',
                 "data": {
-                        x:''
+                    reservaId: '<?= $reservaId; ?>'
 
                 }
             },

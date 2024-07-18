@@ -5,7 +5,8 @@ use CodeIgniter\Controller;
 use App\Models\cat_19_actividad_economica;
 use App\Models\cat_12_paises_ciudades;
 use App\Models\cat_13_paises_estados;
-use App\Models\comp_compras_detalle;
+use App\Models\comp_compras_detalle; 
+use App\Models\inv_productos;
 
 class selectCatalogosMH extends Controller
 {
@@ -96,19 +97,19 @@ class selectCatalogosMH extends Controller
 	public function selectProductoPrecioUnitario() {
 		$productoId = $this->request->getPost('productoId');
 
-		$precioUnitario = new comp_compras_detalle();
+		$precioUnitario = new inv_productos();
         $consultaProductoPrecio = $precioUnitario
-        ->select('compraDetalleId, precioUnitario')
+        ->select('productoId, precioVenta')
         ->where('flgElimina', 0)
         ->where('productoId', $productoId)
-		->orderBy('compraDetalleId', 'DESC')
+		->orderBy('productoId', 'DESC')
 		->limit(1)
         ->findAll();
 
         $n = 0;
         foreach($consultaProductoPrecio as $precioU) {
         	$n++;
-        	$jsonSelect[] = array("id" => $precioU['compraDetalleId'], "text" => $precioU["precioUnitario"]);
+        	$jsonSelect[] = array("id" => $precioU['productoId'], "text" => $precioU["precioVenta"]);
         }
 
         if($n > 0) {
