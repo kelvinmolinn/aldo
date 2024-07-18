@@ -6,12 +6,15 @@
                     <h5 class="modal-title">Compra - Retaceo</h5>
                 </div>
                 <div class="modal-body">
+                    <input type="hidden" name="retaceoId" id="retaceoId" value="<?= $retaceoId?>">
                     <div class="row mb-2">
                         <div class="col-md-6">
                             <div class="form-select-control">
                                 <select name="selectCompraRetaceo[]" id="selectCompraRetaceo" multiple style="width: 100%;" required>
                                     <option value=""></option>
-                                    <option value="1">1234 - $ 150.60</option>
+                                    <?php foreach ($campos as $campos){ ?>
+                                        <option value="<?php echo $campos['compraId']; ?>"><?php echo $campos['numFactura']; ?> - $<?php echo $campos['totalCompraDetalle']; ?></option>
+                                    <?php } ?>
                                 </select>
                             </div>
                         </div>
@@ -35,7 +38,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" id="btnguardarProveedor" class="btn btn-primary">
+                    <button type="submit" id="btnguardarCompraRetaceo" class="btn btn-primary">
                         <i class="fas fa-save"></i>
                         Guardar
                     </button>

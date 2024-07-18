@@ -117,7 +117,7 @@
         $.ajax({
             url: '<?php echo base_url('compras/admin-retaceo/form/nueva/compra/retaceo'); ?>',
             type: 'POST',
-            data: {}, // Pasar el ID del módulo como parámetro
+            data: {retaceoId : <?= $retaceoId; ?>}, // Pasar el ID del módulo como parámetro
             success: function(response) {
                 // Insertar el contenido de la modal en el cuerpo de la modal
                 $('#divModalContent').html(response);

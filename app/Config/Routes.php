@@ -223,7 +223,7 @@ $routes->group('compras/admin-retaceo', function($routes) {
     $routes->post('form/nuevo/retaceo', 'compras\administracionRetaceo::modalNuevoRetaceo');
     $routes->post('vista/continuar/retaceo', 'compras\administracionRetaceo::vistaContinuarRetaceo');
     $routes->post('tabla/continuar/retaceo', 'compras\administracionRetaceo::tablaContinuarRetaceo');
-    $routes->post('form/nueva/compra/retaceo', 'compras\administracionRetaceo::modalnuevaCompraRetaceo');
+    $routes->post('form/nueva/compra/retaceo', 'compras\administracionRetaceo::modalNuevaCompraRetaceo');
     $routes->post('form/agregar/dai', 'compras\administracionRetaceo::modalAgregarDAI');
     $routes->post('form/anular/retaceo', 'compras\administracionRetaceo::modalAnularRetaceo');
     $routes->post('anular/retaceo', 'compras\administracionRetaceo::operacionAnularRetaceo');

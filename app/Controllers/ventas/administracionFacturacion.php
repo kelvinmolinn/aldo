@@ -32,7 +32,7 @@ class administracionFacturacion extends Controller
             // Aquí construye tus columnas
 
             
-            $v = 2;
+            $v = 1;
            switch($v){
             case 1:
                 $columna1 = $n;

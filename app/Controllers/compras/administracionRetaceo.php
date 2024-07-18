@@ -6,10 +6,12 @@ use CodeIgniter\Controller;
 
 use App\Models\comp_proveedores;
 use App\Models\comp_retaceo;
+use App\Models\comp_compras;
+use App\Models\comp_compras_detalle;
 
 class administracionRetaceo extends Controller
 {
-    //ESTE CONTROLLERS ES DE PERMISOS 
+    //ESTE CONTROLLERS ES DE PERMISOS
     public function index(){
         $session = session();
 
@@ -290,9 +292,25 @@ class administracionRetaceo extends Controller
         }
     }
 
-    public function modalnuevaCompraRetaceo(){
-        $data['variable'] = 0;
+    public function modalNuevaCompraRetaceo(){
+        $comp_compras = new comp_compras();
+        $comp_compras_detalle = new comp_compras_detalle();
+
+        $data['campos'] = $comp_compras_detalle
+            ->select('comp_compras.compraId,comp_compras.numFactura,comp_compras.flgRetaceo,comp_compras_detalle.totalCompraDetalle')
+            ->join('comp_compras','comp_compras.compraId = comp_compras_detalle.compraId')
+            ->where('comp_compras_detalle.flgElimina', 0)
+            ->where('comp_compras.flgRetaceo', 'Si')
+            ->where('comp_compras.estadoCompra', 'Finalizada')
+            ->findAll();
+
+        $retaceoId = $this->request->getPost('retaceoId');
+
+        $data['retaceoId'] = $retaceoId;
+        
+    $data['variable'] = 0;
     return view('compras/modals/modalAgregarCompraRetaceo', $data);
+    
     }
 
     public function modalAgregarDAI(){
