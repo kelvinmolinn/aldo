@@ -167,20 +167,23 @@ class administracionReservas extends Controller
             ];
             $columna5 = '
                 <button class="btn btn-primary mb-1" onclick="cambiarInterfaz(`ventas/admin-reservas/vista/actualizar/reserva`, '.htmlspecialchars(json_encode($jsonActualizarReserva)).');" data-toggle="tooltip" data-placement="top" title="Continuar reserva">
-                    <i class="fas fa-sync-alt"></i> <span> Continuar</span>
+                    <i class="fas fa-sync-alt"></i> <span> </span>
+                </button>
+                <button class="btn btn-danger mb-1" onclick="cambiarInterfaz(`ventas/admin-reservas/vista/anular/reserva`, '.htmlspecialchars(json_encode($jsonActualizarReserva)).');"  data-toggle="tooltip" data-placement="top" title="Anular">
+                    <i class="fas fa-ban"></i>
                 </button>
 
             ';
         } elseif ($columna['estadoReserva'] === 'Finalizado') {
             $columna5 = '
                 <button class="btn btn-info mb-1" onclick="modalAdministracionVerDescargo(`'.$columna['reservaId'].'`);" data-toggle="tooltip" data-placement="top" title="Ver descargo">
-                    <i class="fas fa-eye"></i><span> Ver Descargo</span>
+                    <i class="fas fa-eye"></i><span> </span>
                 </button>
             ';
         } else {
             $columna5 = '
                    <button class="btn btn-info mb-1" onclick="modalAdministracionVerDescargo(`'.$columna['reservaId'].'`);" data-toggle="tooltip" data-placement="top" title="Ver descargo">
-        <i class="fas fa-eye"></i><span> Ver</span>
+        <i class="fas fa-eye"></i><span> </span>
                 </button>'; // No buttons if the status is neither 'Pendiente' nor 'Finalizado'
         }
 

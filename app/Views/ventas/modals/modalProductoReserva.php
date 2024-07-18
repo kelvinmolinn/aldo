@@ -27,13 +27,13 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-outline">
-                                <input type="number" id="cantidadProducto" name="cantidadProducto" class="form-control active number-input" min="1" step="1" required >
+                                <input type="number" id="cantidadProducto" name="cantidadProducto" class="form-control active number-input" min="1" step="1" value="<?= $campos['cantidadProducto']; ?>" required >
                                 <label class="form-label" for="cantidadProducto">Cantidad</label>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-outline">
-                                <input type="text" id="precioUnitario" name="precioUnitario" class="form-control number-input active " placeholder="Precio Unitario" value="0.00" readonly required>
+                                <input type="text" id="precioUnitario" name="precioUnitario" class="form-control number-input active " placeholder="Precio Unitario"  value="<?= $campos['precioUnitario']; ?>"  readonly required>
                                 <label class="form-label" for="precioUnitario">Precio Unitario</label>
                                 <input type="hidden" name="hiddenPrecioUnitario" id="hiddenPrecioUnitario">
                             </div>
@@ -45,13 +45,13 @@
                     <div class="row mb-4"> 
                         <div class="col-md-4">
                             <div class="form-outline">
-                                <input type="number" id="porcentajeDescuento" name="porcentajeDescuento" class="form-control active number-input" min="0" max="25" value="0.00" required >
+                                <input type="number" id="porcentajeDescuento" name="porcentajeDescuento" class="form-control active number-input" min="0" max="25"  value="<?= $campos['porcentajeDescuento']; ?>" required >
                                 <label class="form-label" for="porcentajeDescuento">Porcentaje de descuento</label>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-outline">
-                                <input type="number" id="precioUnitarioVenta" name="precioUnitarioVenta" class="form-control active number-input" min="0" value="0.00" readonly required >
+                                <input type="number" id="precioUnitarioVenta" name="precioUnitarioVenta" class="form-control active number-input" min="0" value="<?= $campos['precioUnitario']; ?>" readonly required >
                                 <label class="form-label" for="precioUnitarioVenta">Precio de venta</label>
                             </div>
                             <div class="text-right">
