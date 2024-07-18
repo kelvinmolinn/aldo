@@ -16,10 +16,9 @@
                     <input type="hidden" id="reservaDetalleId" name="reservaDetalleId" value="<?= $campos['reservaDetalleId'] ?>">
                     <input type="hidden" id="operacion" name="operacion" value="<?= $operacion; ?>">
                     <input type="hidden" id="reservaId" name="reservaId" value="<?= $campos['reservaId']; ?>">
-                    <input type="hidden" id="precioUnitarioIVA" name="precioUnitarioIVA" value="<?php echo $precioUnitarioIVA;?>">
                     <div class="row mb-4">
                         <div class="col-md-4">
-                            <select name="productoId" id="productoId" class="form-control " style="width: 100%;" required>
+                            <select name="productoId" id="productoId" class="form-control" style="width: 100%;" required>
                                 <option></option>
                                 <?php foreach ($producto as $producto) : ?>
                                     <option value="<?php echo $producto['productoId']; ?>"><?php echo $producto['producto']; ?></option>
@@ -32,27 +31,36 @@
                                 <label class="form-label" for="cantidadProducto">Cantidad</label>
                             </div>
                         </div>
-   
                         <div class="col-md-4">
-                            <select name="precioUnitario" id="precioUnitario" class="form-control " style="width: 100%;" value="<?= $campos['precioUnitario']; ?>"  required>
-                                <option></option>
-                            </select>
-                            <input type="hidden" name="hiddenPrecioUnitario" id="hiddenPrecioUnitario">
+                            <div class="form-outline">
+                                <input type="text" id="precioUnitario" name="precioUnitario" class="form-control number-input active " placeholder="Precio Unitario" value="0.00" readonly required>
+                                <label class="form-label" for="precioUnitario">Precio Unitario</label>
+                                <input type="hidden" name="hiddenPrecioUnitario" id="hiddenPrecioUnitario">
+                            </div>
                             <div class="text-right">
-                                <small>Con IVA: $ <span id="precioUnitarioIVA"><?php echo $precioUnitarioIVA;?></span></small>
+                                <small>Con IVA: $ <span id="precioUnitarioIVA"></span></small>
                             </div>
                         </div>
                     </div>
                     <div class="row mb-4"> 
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="form-outline">
-                                <input type="number" id="porcentajeDescuento" name="porcentajeDescuento" class="form-control active number-input" min="0" max="25" value="0.00" value="<?= $campos['porcentajeDescuento']; ?>"  required >
+                                <input type="number" id="porcentajeDescuento" name="porcentajeDescuento" class="form-control active number-input" min="0" max="25" value="0.00" required >
                                 <label class="form-label" for="porcentajeDescuento">Porcentaje de descuento</label>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="form-outline">
-                                <input type="number" id="totalReservaDetalle" name="totalReservaDetalle" class="form-control"  required readonly>
+                                <input type="number" id="precioUnitarioVenta" name="precioUnitarioVenta" class="form-control active number-input" min="0" value="0.00" readonly required >
+                                <label class="form-label" for="precioUnitarioVenta">Precio de venta</label>
+                            </div>
+                            <div class="text-right">
+                                <small>Con IVA: $ <span id="precioUnitarioVentaIVA"></span></small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-outline">
+                                <input type="number" id="totalReservaDetalle" name="totalReservaDetalle" class="form-control active number-input" value="0.00" required readonly>
                                 <label class="form-label" for="totalReservaDetalle">Precio total</label>
                             </div>
                             <div class="text-right">
@@ -77,7 +85,6 @@
 </form>
 
 <script>
-    
     // Evitar la entrada de 'e', 'E', '+', y '-' en los campos de número
     document.querySelectorAll('.number-input').forEach(function(input) {
         input.addEventListener('keydown', function(event) {
@@ -86,48 +93,62 @@
             }
         });
     });
+
     $(document).ready(function() {
         // Inicializar Select2
         $("#productoId").select2({ 
-            placeholder: 'Producto'});
-
-            $("#precioUnitario").select2({
-        placeholder: 'Precio unitario'
-    });
-
-    $("#productoId").change(function(e) {
-        $.ajax({
-            url: 'select/catalogos-hacienda/producto-precio',
-            type: "POST",
-            dataType: "json",
-            data: {
-                productoId: $(this).val()
-            }
-        }).done(function(data) {
-            $('#precioUnitario').empty();
-            $('#precioUnitario').append("<option></option>");
-            for (let i = 0; i < data.length; i++) {
-                $('#precioUnitario').append($('<option>', {
-                    value: data[i]['id'],
-                    text: data[i]['text']
-                }));
-            }
-            // Seleccionar el primer valor por defecto
-            if (data.length > 0) {
-                $('#precioUnitario').val(data[0]['id']).trigger('change');
-                $('#hiddenPrecioUnitario').val(data[0]['text']); // Actualizar el campo oculto con el texto
-            }
-            // Hacer el select readonly (disabled)
-            $('#precioUnitario').prop('disabled', true);
+            placeholder: 'Producto'
         });
-    });
 
-    // Actualizar el campo oculto cuando cambie el valor del select
-    $('#precioUnitario').change(function() {
-        // Obtener el texto del option seleccionado
-        var selectedText = $("#precioUnitario option:selected").text();
-        $('#hiddenPrecioUnitario').val(selectedText);
-    });
+        $("#productoId").change(function() {
+            $.ajax({
+                url: 'select/catalogos-hacienda/producto-precio',
+                type: "POST",
+                dataType: "json",
+                data: {
+                    productoId: $(this).val()
+                }
+            }).done(function(data) {
+                if (data.length > 0) {
+                    var precioUnitario = data[0]['text'];
+                    $('#precioUnitario').val(precioUnitario).trigger('change');
+                    $('#hiddenPrecioUnitario').val(precioUnitario);
+                    actualizarPrecios(); // Actualizar precios al seleccionar producto
+                }
+            });
+        });
+
+        // Calcular precios cuando cambie el valor de cantidadProducto, porcentajeDescuento, o precioUnitario
+        $('#cantidadProducto, #porcentajeDescuento, #precioUnitario').on('input change', actualizarPrecios);
+
+        function actualizarPrecios() {
+            var precioUnitario = parseFloat($('#precioUnitario').val()) || 0;
+            var porcentajeDescuento = parseFloat($('#porcentajeDescuento').val()) || 0;
+            var cantidadProducto = parseFloat($('#cantidadProducto').val()) || 0;
+
+            // Calcular el precio unitario de venta
+            var precioUnitarioVenta = precioUnitario * (1 - (porcentajeDescuento / 100));
+            $('#precioUnitarioVenta').val(precioUnitarioVenta.toFixed(2));
+
+            // Calcular el precio unitario de venta con IVA
+            var ivaPorcentaje = 13; // Suponiendo un IVA del 13%
+            var ivaPrecioUnitario = (precioUnitario * ivaPorcentaje) / 100;
+            var precioUnitarioIVA = precioUnitario + ivaPrecioUnitario;
+            $('#precioUnitarioIVA').text(precioUnitarioIVA.toFixed(2));
+
+            var ivaVenta = (precioUnitarioVenta * ivaPorcentaje) / 100;
+            var precioUnitarioVentaIVA = precioUnitarioVenta + ivaVenta;
+            $('#precioUnitarioVentaIVA').text(precioUnitarioVentaIVA.toFixed(2));
+
+            // Calcular el total de la reserva
+            var totalReservaDetalle = precioUnitarioVenta * cantidadProducto;
+            $('#totalReservaDetalle').val(totalReservaDetalle.toFixed(2));
+
+            // Calcular el total de la reserva con IVA
+            var totalReservaDetalleIVA = precioUnitarioVentaIVA * cantidadProducto;
+            $('#totalReservaDetalleIVA').text(totalReservaDetalleIVA.toFixed(2));
+        }
+
         $("#frmModal").submit(function(event) {
             event.preventDefault();
             $.ajax({
@@ -135,9 +156,7 @@
                 type: $(this).attr('method'),
                 data: $(this).serialize(),
                 success: function(response) {
-                    console.log(response);
                     if (response.success) {
-                        // Insert exitoso, ocultar modal y mostrar mensaje
                         $('#modalProductosReserva').modal('hide');
                         Swal.fire({
                             icon: 'success',
@@ -145,37 +164,22 @@
                             text: response.mensaje
                         }).then((result) => {
                             $("#tablaContinuarReserva").DataTable().ajax.reload(null, false);
-                            
                         });
-                        console.log("Último ID insertado:", response.reservaDetalleId);
                     } else {
-                        // Insert fallido, mostrar mensaje de error con Sweet Alert
                         Swal.fire({
                             icon: 'error',
                             title: 'No se completó la operación',
                             text: response.mensaje
                         });
                     }
-            },
-            error: function(xhr, status, error) {
-                // Manejar errores si los hay
-                console.error(xhr.responseText);
-            }
-        });
-    });
-    
-    $("#precioUnitario").keyup(function(e) {
-            if($(this).val() == "") {
-                $("#precioUnitarioIVA").html('0.00');
-            } else if($(this).val() < 0) {
-                $("#precioUnitarioIVA").html('0.00');
-            } else {
-                let precioUnitario = parseFloat($(this).val());
-                let precioUnitarioIVA = precioUnitario * (1 + <?= $precioUnitarioIVA; ?>);
-                $("#precioUnitarioIVA").html(precioUnitarioIVA.toFixed(2));
-            }
+                },
+                error: function(xhr, status, error) {
+                    console.error(xhr.responseText);
+                }
+            });
         });
 
-    $("#productoId").val('<?= $campos["productoId"]; ?>').trigger("change");
-});
+        // Inicializar precios al cargar el formulario
+        actualizarPrecios();
+    });
 </script>
