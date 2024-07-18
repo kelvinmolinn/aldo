@@ -51,7 +51,6 @@
         </div>
 </form>
 <hr>
-<form id="frmContinuarReserva" method="post" action="">
         
     <div class="text-right mb-4">
         <button type= "button" id="btnNuevoProveedor" class="btn btn-primary estilo-btn" onclick="modalProductoReserva(0, 'insertar')">
@@ -65,9 +64,9 @@
                 <tr>
                     <th>#</th>
                     <th>Producto</th>
-                    <th>Precio venta</th>
                     <th>Cantidad</th>
-                    <th>Total</th>
+                    <th>Precio unitario</th>
+                    <th>Precio total</th>
                     <th>Acciones</th>
             </thead>
             <tbody>
@@ -100,7 +99,6 @@
             </div>
         </div>
     </div>
-</form>
 <script>
 
 function eliminarReserva(id) {
