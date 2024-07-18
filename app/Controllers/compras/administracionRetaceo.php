@@ -6,6 +6,7 @@ use CodeIgniter\Controller;
 
 use App\Models\comp_proveedores;
 use App\Models\comp_retaceo;
+use App\Models\comp_retaceo_detalle;
 use App\Models\comp_compras;
 use App\Models\comp_compras_detalle;
 
@@ -316,5 +317,52 @@ class administracionRetaceo extends Controller
     public function modalAgregarDAI(){
         $data['variable'] = 0;
         return view('compras/modals/modalAgregarDAI', $data);
+    }
+
+    public function modalCompraRetaceoOperacion(){
+        
+        $compraDetalle = new comp_compras_detalle();
+
+        $compraRetaceo = $this->request->getPost('selectCompraRetaceo');
+        $retaceoId = $this->request->getPost('retaceoId');
+
+
+        $compDetalle = $compraDetalle
+        ->select("compraDetalleId,compraId,cantidadProducto,precioUnitario")
+        ->where("flgElimina",0)
+        ->where("compraId",$compraRetaceo)
+        ->findAll();
+
+        foreach($compDetalle as $compDetalle){
+           $retaceoDetalle = new comp_retaceo_detalle();
+
+            $totalCompraDetalle =  ($compDetalle['precioUnitario'] * $compDetalle['cantidadProducto']);
+
+            $data = [
+                "retaceoId"            => $retaceoId,
+                "compraDetalleId"      => $compDetalle['compraDetalleId'],
+                "cantidadProducto"     => $compDetalle['cantidadProducto'],
+                "precioFOBUnitario"    => $compDetalle['precioUnitario'],
+                "importe"              => $totalCompraDetalle
+            ];
+
+            // Insertar datos en la base de datos
+            $nuevoRetaceoCompra = $retaceoDetalle->insert($data);
+
+            if ($nuevoRetaceoCompra) {
+                // Si el insert fue exitoso, devuelve el último ID insertado
+                return $this->response->setJSON([
+                    'success' => true,
+                    'mensaje' => 'La compra se ha agregado al retaceo correctamente',
+                    'retaceoDetalleId' =>  $retaceoDetalle->insertID() 
+                ]);
+            } else {
+                // Si el insert falló, devuelve un mensaje de error
+                return $this->response->setJSON([
+                    'success' => false,
+                    'mensaje' => 'No se pudo insertar la compra al retaceo'
+                ]);
+            }
+        }
     }
 }

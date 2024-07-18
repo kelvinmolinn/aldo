@@ -122,7 +122,7 @@
                 // Insertar el contenido de la modal en el cuerpo de la modal
                 $('#divModalContent').html(response);
                 // Mostrar la modal
-                $('#modalNuevoRetaceo').modal('show');
+                $('#modalNuevoRetaceoCompra').modal('show');
 
                 
             },
