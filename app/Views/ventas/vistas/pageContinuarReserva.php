@@ -253,12 +253,14 @@ function eliminarReserva(id) {
                     td.eq(1).html(response["footer"][0]);
                     td.eq(3).html(response["footer"][1]);
                     td.eq(4).html(response["footer"][2]);
+                    td.eq(5).html(response["footer"][3]);
                     $("#tdFooterTotales").html(response["footerTotales"]);
                 } else {
                     var td = $(tfoot).find('td');
                     td.eq(1).html('<b>Sumas</b>');
                     td.eq(2).html('<div class="text-right"><b></b></div>');
                     td.eq(3).html('<div class="text-right"><b></b></div>');
+                    td.eq(4).html('<div class="text-right"><b></b></div>');
                     $("#tdFooterTotales").html(``);
                 }
             },

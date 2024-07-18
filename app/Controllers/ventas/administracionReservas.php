@@ -706,8 +706,7 @@ public function eliminarReserva(){
     }
 }
 
-
-public function tablaContinuarReserva()
+/*public function tablaContinuarReserva()
 {
     $reservaId = $this->request->getPost('reservaId');
     $mostrarReserva = new fel_reservas_detalle();
@@ -763,10 +762,10 @@ public function tablaContinuarReserva()
         );
 
         $output['footerTotales'] = '
-            <b>
+            
                 <div class="row text-right">
                     <div class="col-8">
-                        Total a pagar:
+                       <b> Subtotal (=) :</b>
                     </div>
                     <div class="col-4">
                         $ 35.00
@@ -774,7 +773,23 @@ public function tablaContinuarReserva()
                 </div>
                 <div class="row text-right">
                     <div class="col-8">
-                        Total pagado:
+                        <b>Descuentos (-) :</b>
+                    </div>
+                    <div class="col-4">
+                        $ 15.00
+                    </div>
+                </div>
+                                <div class="row text-right">
+                    <div class="col-8">
+                        <b>IVA (+) :</b>
+                    </div>
+                    <div class="col-4">
+                        $ 35.00
+                    </div>
+                </div>
+                <div class="row text-right">
+                    <div class="col-8">
+                        <b>Total a pagar (=) :</b>
                     </div>
                     <div class="col-4">
                         $ 15.00
@@ -787,7 +802,119 @@ public function tablaContinuarReserva()
                         </button>
                     </div>
                 </div>
-            </b>
+            
+        ';
+        return $this->response->setJSON($output);
+    } else {
+        return $this->response->setJSON(array('data' => '', 'footer' => '')); // No hay datos, devuelve un array vacío
+    }
+}*/
+    public function tablaContinuarReserva()
+{
+    $reservaId = $this->request->getPost('reservaId');
+    $mostrarReserva = new fel_reservas_detalle();
+    $datos = $mostrarReserva
+        ->select('fel_reservas_detalle.reservaDetalleId,fel_reservas_detalle.reservaId,fel_reservas_detalle.cantidadProducto,fel_reservas_detalle.productoId,fel_reservas_detalle.precioUnitario,fel_reservas_detalle.precioUnitarioIVA,fel_reservas_detalle.porcentajeDescuento,fel_reservas_detalle.precioUnitarioVenta,fel_reservas_detalle.precioUnitarioVentaIVA,fel_reservas_detalle.ivaUnitario,fel_reservas_detalle.ivaTotal,fel_reservas_detalle.totalReservaDetalle,fel_reservas_detalle.totalReservaDetalleIVA,inv_productos.productoId, inv_productos.producto,inv_productos.codigoProducto,cat_14_unidades_medida.unidadMedida')
+        ->join('inv_productos', 'inv_productos.productoId = fel_reservas_detalle.productoId')
+        ->join('cat_14_unidades_medida', 'cat_14_unidades_medida.unidadMedidaId = inv_productos.unidadMedidaId')
+        ->join('fel_reservas', 'fel_reservas.reservaId = fel_reservas_detalle.reservaId')
+        ->where('fel_reservas_detalle.flgElimina', 0)
+        ->where('fel_reservas_detalle.reservaId', $reservaId)
+        ->findAll();
+
+    $output['data'] = array();
+    $n = 1; // Variable para contar las filas
+
+    // Variables para sumar los totales
+    $subtotal = 0;
+    $ivaTotal = 0;
+    $totalAPagar = 0;
+    $descuentos = 0;
+
+    foreach ($datos as $columna) {
+        // Construir columnas
+        $columna1 = $n;
+        $columna2 = "<b>Producto:</b> " . $columna['producto'] . "<br><b>Código :</b> " . $columna['codigoProducto'];
+        $columna3 = "<b>Cantidad: </b> " . $columna['cantidadProducto'] . " (" . $columna['unidadMedida'] . ")";
+        $columna4 = "<b>Precio sin IVA: </b> $" . number_format($columna['precioUnitarioVenta'], 2, '.', ',') . "<br><b>Precio con IVA: </b> $" . number_format($columna['precioUnitarioVentaIVA'], 2, '.', ',');
+
+        $columna5 = "<b>Precio sin IVA: </b> $" . number_format($columna['totalReservaDetalle'], 2, '.', ',') . "<br><b>Precio con IVA: </b> $" . number_format($columna['totalReservaDetalleIVA'], 2, '.', ',');
+
+        $columna6 = '
+            <button class="btn btn-primary mb-1" onclick="modalProductoReserva(' . $columna['reservaDetalleId'] . ', `editar`);" data-toggle="tooltip" data-placement="top" title="Editar">
+                <i class="fas fa-pen"></i>
+            </button>
+            <button class="btn btn-danger mb-1" onclick="eliminarReserva(' . $columna['reservaDetalleId'] . ');" data-toggle="tooltip" data-placement="top" title="Eliminar">
+                <i class="fas fa-trash"></i>
+            </button>
+        ';
+
+        // Agregar la fila al array de salida
+        $output['data'][] = array(
+            $columna1,
+            $columna2,
+            $columna3,
+            $columna4,
+            $columna5,
+            $columna6
+        );
+
+        // Sumar los valores de cada columna
+        $subtotal += $columna['totalReservaDetalle'];
+        $ivaTotal += $columna['ivaTotal'];
+        $totalAPagar += $columna['totalReservaDetalleIVA'];
+        $descuentos += ($columna['precioUnitario'] - $columna['precioUnitarioVenta']) * $columna['cantidadProducto'];
+
+        $n++;
+    }
+
+    if ($n > 1) {
+        $output['footer'] = array(
+            '',
+            '',
+            ''
+        );
+
+        $output['footerTotales'] = '
+            <div class="row text-right">
+                <div class="col-8">
+                    <b> Subtotal (=) :</b>
+                </div>
+                <div class="col-4">
+                    $ ' . number_format($subtotal, 2, '.', ',') . '
+                </div>
+            </div>
+            <div class="row text-right">
+                <div class="col-8">
+                    <b>Descuentos (-) :</b>
+                </div>
+                <div class="col-4">
+                    $ ' . number_format($descuentos, 2, '.', ',') . '
+                </div>
+            </div>
+            <div class="row text-right">
+                <div class="col-8">
+                    <b>IVA (+) :</b>
+                </div>
+                <div class="col-4">
+                    $ ' . number_format($ivaTotal, 2, '.', ',') . '
+                </div>
+            </div>
+            <div class="row text-right">
+                <div class="col-8">
+                    <b>Total a pagar (=) :</b>
+                </div>
+                <div class="col-4">
+                    $ ' . number_format($totalAPagar, 2, '.', ',') . '
+                </div>
+            </div>
+            <div class="row text-right">
+                <div class="col-12">
+                    <button type="button" class="btn btn-primary mb-1" onclick="modalPagoReserva()" data-toggle="tooltip" data-placement="top" title="Pagos">
+                        <i class="fas fa-hand-holding-usd"></i>
+                    </button>
+                </div>
+            </div>
         ';
         return $this->response->setJSON($output);
     } else {
