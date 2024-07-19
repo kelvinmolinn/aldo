@@ -7,8 +7,8 @@
                        
                 </div>
                 <div class="modal-body">
-                     <input type="hidden" id="reservaId" name="reservaId" Value="<?php echo $campos['reservaId']?>">
-                    <div class="row mt-4">
+                <input type="hidden" id="reservaId" name="reservaId" Value="<?php echo $campos['reservaId']?>">
+                    <div class="row">
                         <div class="col-md-12">
                             <div class="form-outline">
                                 <input type="text" id="obsAnulacionReserva" name="obsAnulacionReserva" class="form-control" value="">
