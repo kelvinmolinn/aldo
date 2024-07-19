@@ -184,6 +184,9 @@ public function tablaReservas()
                 <button class="btn btn-danger mb-1" onclick="modalAnularReserva(' . $columna['reservaId'] . ')" data-toggle="tooltip" data-placement="top" title="Anular">
                     <i class="fas fa-ban"></i>
                 </button>
+                <button class="btn btn-info mb-1" onclick="modalVerReserva(`' . $columna['reservaId'] . '`);" data-toggle="tooltip" data-placement="top" title="Ver reserva">
+                    <i class="fas fa-eye"></i><span> </span>
+                </button>
             ';
         } elseif ($columna['estadoReserva'] === 'Finalizado') {
             $columna5 = '
