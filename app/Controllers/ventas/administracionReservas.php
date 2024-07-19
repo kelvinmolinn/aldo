@@ -1025,42 +1025,42 @@ public function tablaContinuarReserva()
 
         $output['footerTotales'] = '
             <div class="row text-right">
-                <div class="col-8">
+                <div class="col-9">
                     <b> Subtotal (=) :</b>
                 </div>
-                <div class="col-4">
+                <div class="col-3">
                     $ ' . number_format($subtotal, 2, '.', ',') . '
                 </div>
             </div>
             <div class="row text-right">
-                <div class="col-8">
+                <div class="col-9">
                     <b>Descuentos (-) :</b>
                 </div>
-                <div class="col-4">
+                <div class="col-3">
                     $ ' . number_format($descuentos, 2, '.', ',') . '
                 </div>
             </div>
             <div class="row text-right">
-                <div class="col-8">
+                <div class="col-9">
                     <b>IVA (+) :</b>
                 </div>
-                <div class="col-4">
+                <div class="col-3">
                     $ ' . number_format($ivaTotal, 2, '.', ',') . '
                 </div>
             </div>
             <div class="row text-right">
-                <div class="col-8">
+                <div class="col-9">
                     <b>Total a pagar (=) :</b>
                 </div>
-                <div class="col-4">
+                <div class="col-3">
                     <b>$ ' . number_format($totalAPagar, 2, '.', ',') . ' </b>
                 </div>
             </div>
             <div class="row text-right">
-                <div class="col-8">
+                <div class="col-9">
                     <b>Total pagado:</b>
                 </div>
-                <div class="col-4">
+                <div class="col-3">
                     <b class="' . $totalPagadoClass . '">$ ' . number_format($totalPagado, 2, '.', ',') . ' </b>
                 </div>
             </div>
