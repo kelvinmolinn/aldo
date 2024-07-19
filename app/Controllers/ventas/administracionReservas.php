@@ -17,6 +17,7 @@ use App\Models\fel_reservas_pago;
 use App\Models\fel_clientes;
 use App\Models\vista_usuarios_empleados;
 use App\Models\comp_compras_detalle;
+use App\Models\cat_17_forma_pago;
 
 
 use App\Models\comp_proveedores;
@@ -357,141 +358,6 @@ class administracionReservas extends Controller
  
     }
 
- /*   public function modalNuevaReservaOperacion()
-{
-    $operacion = $this->request->getPost('operacion');
-    $reservaDetalleId = $this->request->getPost('reservaDetalleId');
-    $model = new fel_reservas_detalle();
-    $sucursalModel = new fel_reservas();  
-    $reservaId = $this->request->getPost('reservaId');
-    $productoId = $this->request->getPost('productoId');
-    $precioUnitario = $this->request->getPost('hiddenPrecioUnitario');
-    $cantidadProducto = $this->request->getPost('cantidadProducto');
-    $porcentajeDescuento = $this->request->getPost('porcentajeDescuento');
-
-
-
-    // Consulta para traer el 13% de la parametrizacion
-    $porcentajeIva = new conf_parametrizaciones;
-    $IVA = $porcentajeIva 
-    ->select("valorParametrizacion")
-    ->where("flgElimina", 0)
-    ->where("parametrizacionId", 1)
-    ->first(); 
-    $IvaCalcular = ($precioUnitario * $IVA['valorParametrizacion']) /100;
-    $precioUnitarioIVA = $precioUnitario + $IvaCalcular;
-    $ivaTotal = $IvaCalcular * $cantidadProducto;
-    $precioUnitarioVenta = $precioUnitario * (1 -($porcentajeDescuento/100));
-    $precioUnitarioVentaIVA = $precioUnitarioVenta + $IvaCalcular;
-    $totalReservaDetalle = $precioUnitarioVenta * $cantidadProducto;
-    $totalReservaDetalleIVA =  $precioUnitarioVentaIVA * $cantidadProducto;
-    
-    //Necesito Traer sucursalId de fel_reservas 
-    $reservaData = $sucursalModel->find($reservaId);
-    $sucursalId = $reservaData['sucursalId'];  
-
-    // Obtener la existencia actual del producto en la sucursal
-    $productosModel = new inv_productos_existencias();
-
-    $producto = $productosModel->select('existenciaProducto')
-                ->where('flgElimina', 0)
-                ->where('sucursalId', $sucursalId)
-                ->where('productoId', $productoId)
-                ->first();
-    
-
-    if (!$producto) {
-        return $this->response->setJSON([
-            'success' => false,
-            'mensaje' => 'Producto no encontrado'
-            
-        ]);
-    }
-
-    $existenciaActual = $producto['existenciaProducto'];
-
-    $cantidadDetalleActual = $model->where('flgElimina', 0)
-                                ->where('reservaId', $reservaId)
-                                ->where('productoId', $productoId)
-                                ->countAllResults();
-
-    if ($reservaDetalleId || $cantidadDetalleActual > 0) {
-        if($reservaDetalleId) {
-            // Es update-editar
-            $detalleActual = $model->selectSum('cantidadProducto')
-                                    ->where('flgElimina', 0)
-                                    ->where('reservaId', $reservaId)
-                                    ->where('productoId', $productoId)
-                                    ->where('reservaDetalleId <>', $reservaDetalleId)
-                                    ->first();
-        } else {
-            $detalleActual = $model->selectSum('cantidadProducto')
-                                ->where('flgElimina', 0)
-                                ->where('reservaId', $reservaId)
-                                ->where('productoId', $productoId)
-                                ->first();
-        }
-
-        if (!$detalleActual) {
-            return $this->response->setJSON([
-                'success' => false,
-                'mensaje' => 'Detalle de reserva no encontrado'
-            ]);
-        }
-
-        if (($cantidadProducto + $detalleActual['cantidadProducto']) > $existenciaActual) {
-            return $this->response->setJSON([
-                'success' => false,
-                'mensaje' => 'No hay existencias suficientes para realizar la reserva'
-            ]);
-        }
-    } else {
-        // Validar si la existencia es suficiente para una nueva inserción
-        if ($cantidadProducto > $existenciaActual) {
-            return $this->response->setJSON([
-                'success' => false,
-                'mensaje' => 'No hay existencias suficientes para realizar la reserva'
-            ]);
-        }
-    }
-
-    $data = [
-        'productoId'                => $productoId,
-        'cantidadProducto'          => $cantidadProducto,
-        'precioUnitario'            => $precioUnitario,
-        'reservaId'                 => $reservaId,
-        'porcentajeDescuento'       => $porcentajeDescuento,
-        'precioUnitarioIVA'         => $precioUnitarioIVA,
-        'ivaUnitario'               => $IvaCalcular,
-        'ivaTotal'                  => $ivaTotal,
-        'precioUnitarioVenta'       => $precioUnitarioVenta,
-        'precioUnitarioVentaIVA'    => $precioUnitarioVentaIVA,
-        'totalReservaDetalle'       => $totalReservaDetalle,
-        'totalReservaDetalleIVA'    => $totalReservaDetalleIVA
-    ];
-
-    if ($operacion == 'editar' && $reservaDetalleId) {
-        $operacionReserva = $model->update($reservaDetalleId, $data);
-    } else {
-        // Insertar datos en la base de datos
-        $operacionReserva = $model->insert($data);
-    }
-
-    if ($operacionReserva) {
-        // Si el insert fue exitoso, devuelve el último ID insertado
-        return $this->response->setJSON([
-            'success' => true,
-            'mensaje' => 'Reserva ' . ($operacion == 'editar' ? 'actualizada' : 'agregada') . ' correctamente',
-            'reservaDetalleId' => ($operacion == 'editar' ? $reservaDetalleId : $model->insertID())
-        ]);
-    } else {
-        // Si el insert falló, devuelve un mensaje de error
-        return $this->response->setJSON([
-            'success' => false,
-            'mensaje' => 'No se pudo insertar la reserva'
-        ]);
-    }
-} */
 
 public function modalNuevaReservaOperacion()
 {
@@ -709,109 +575,7 @@ public function eliminarReserva(){
     }
 }
 
-/*public function tablaContinuarReserva()
-{
-    $reservaId = $this->request->getPost('reservaId');
-    $mostrarReserva = new fel_reservas_detalle();
-    $datos = $mostrarReserva
-        ->select('fel_reservas_detalle.reservaDetalleId,fel_reservas_detalle.reservaId,fel_reservas_detalle.cantidadProducto,fel_reservas_detalle.productoId,fel_reservas_detalle.precioUnitario,fel_reservas_detalle.precioUnitarioIVA,fel_reservas_detalle.porcentajeDescuento,fel_reservas_detalle.precioUnitarioVenta,fel_reservas_detalle.precioUnitarioVentaIVA,fel_reservas_detalle.ivaUnitario,fel_reservas_detalle.ivaTotal,fel_reservas_detalle.totalReservaDetalle,fel_reservas_detalle.totalReservaDetalleIVA,inv_productos.productoId, inv_productos.producto,inv_productos.codigoProducto,cat_14_unidades_medida.unidadMedida')
-        ->join('inv_productos', 'inv_productos.productoId = fel_reservas_detalle.productoId')
-        ->join('cat_14_unidades_medida', 'cat_14_unidades_medida.unidadMedidaId = inv_productos.unidadMedidaId')
-        ->join('fel_reservas', 'fel_reservas.reservaId = fel_reservas_detalle.reservaId')
-        ->where('fel_reservas_detalle.flgElimina', 0)
-        ->where('fel_reservas_detalle.reservaId', $reservaId)
-        ->findAll();
 
-    $output['data'] = array();
-    $n = 1; // Variable para contar las filas
-    foreach ($datos as $columna) {
-        
-        // Construir columnas
-        $columna1 = $n;
-        $columna2 = "<b>Producto:</b> " . $columna['producto'] . "<br><b>Código :</b> " . $columna['codigoProducto'];
-        $columna3 = "<b>Cantidad: </b> " . $columna['cantidadProducto'] . " (" . $columna['unidadMedida'] . ")";
-        $columna4 = "<b>Precio sin IVA: </b> $" . number_format($columna['precioUnitarioVenta'], 2, '.', ','). "<br>"."<b>Precio con IVA: </b> $" . number_format($columna['precioUnitarioVentaIVA'], 2, '.', ',');
-
-        $columna5 = "<b>Precio sin IVA: </b> $" . number_format($columna['totalReservaDetalle'], 2, '.', ','). "<br>"."<b>Precio con IVA: </b> $" . number_format($columna['totalReservaDetalleIVA'], 2, '.', ',');
-        
-        $columna6 = '
-
-            <button class="btn btn-primary mb-1" onclick="modalProductoReserva(`' . $columna['reservaDetalleId'] . '`, `editar`);" data-toggle="tooltip" data-placement="top" title="Editar">
-                <i class="fas fa-pen"></i>
-            </button>
-            <button class="btn btn-danger mb-1" onclick="eliminarReserva(`' . $columna['reservaDetalleId'] . '`);" data-toggle="tooltip" data-placement="top" title="Eliminar">
-                <i class="fas fa-trash"></i>
-            </button>
-        ';
-
-        // Agregar la fila al array de salida
-        $output['data'][] = array(
-            $columna1,
-            $columna2,
-            $columna3,
-            $columna4,
-            $columna5,
-            $columna6
-        );
-
-        $n++;
-    }
-
-    if ($n > 1) {
-        $output['footer'] = array(
-            '',
-            '',
-            ''
-        );
-
-        $output['footerTotales'] = '
-            
-                <div class="row text-right">
-                    <div class="col-8">
-                       <b> Subtotal (=) :</b>
-                    </div>
-                    <div class="col-4">
-                        $ 35.00
-                    </div>
-                </div>
-                <div class="row text-right">
-                    <div class="col-8">
-                        <b>Descuentos (-) :</b>
-                    </div>
-                    <div class="col-4">
-                        $ 15.00
-                    </div>
-                </div>
-                                <div class="row text-right">
-                    <div class="col-8">
-                        <b>IVA (+) :</b>
-                    </div>
-                    <div class="col-4">
-                        $ 35.00
-                    </div>
-                </div>
-                <div class="row text-right">
-                    <div class="col-8">
-                        <b>Total a pagar (=) :</b>
-                    </div>
-                    <div class="col-4">
-                        $ 15.00
-                    </div>
-                </div>
-                <div class="row text-right">
-                    <div class="col-12">
-                        <button type="button" class="btn btn-primary mb-1" onclick="modalPagoReserva()" data-toggle="tooltip" data-placement="top" title="Pagos">
-                            <i class="fas fa-hand-holding-usd"></i>
-                        </button>
-                    </div>
-                </div>
-            
-        ';
-        return $this->response->setJSON($output);
-    } else {
-        return $this->response->setJSON(array('data' => '', 'footer' => '')); // No hay datos, devuelve un array vacío
-    }
-}*/
     public function tablaContinuarReserva()
 {
     $reservaId = $this->request->getPost('reservaId');
@@ -913,7 +677,7 @@ public function eliminarReserva(){
             </div>
             <div class="row text-right">
                 <div class="col-12">
-                    <button type="button" class="btn btn-primary mb-1" onclick="modalPagoReserva()" data-toggle="tooltip" data-placement="top" title="Pagos">
+                    <button type="button" class="btn btn-primary mb-1" onclick="modalPagoReserva(`'.$columna['reservaId'].'`, `editar`)" data-toggle="tooltip" data-placement="top" title="Pagos">
                         <i class="fas fa-hand-holding-usd"></i>
                     </button>
                 </div>
@@ -931,45 +695,163 @@ public function eliminarReserva(){
         return view('ventas/modals/modalAnularReserva', $data);
     }
 
+
+
     public function modalPagoReserva(){
-        $data['variable'] = 0;
+        $data['reservaId'] = $this->request->getPost('reservaId');
+        $formaPagoModel = new cat_17_forma_pago();
+        // Obtener las formas de pago
+        $data['formaPago'] = $formaPagoModel
+            ->select("formaPagoMHId, formaPago")
+            ->where("flgElimina", 0)
+            ->findAll();
         return view('ventas/modals/modalPagosReservas', $data);
     }
 
-    public function tablePagoReserva(){
-        $output['data'] = array();
-        $n = 0;
 
-        $n++;
-        // Aquí construye tus columnas
-        $columna1 = $n;
-
-        $columna2 = "<b>Forma pago: </b> Efectivo" . "<br>" . "<b>Comprobante:</b> 1" . "<br>" . "<b>Comentarios:</b> Abonó 15 dolares ";
-
-        $columna3 = "24/06/2024";
-
-        $columna4 = "$ 15.00";
+    public function modalPagoReservaOperacion() {
+        $reservaId = $this->request->getPost('reservaId');
+        $montoPago = $this->request->getPost('montoPago');
+        $numComprobantePago = $this->request->getPost('numComprobantePago');
+    
+        // Obtener la suma de totalReservaDetalle para la reservaId proporcionada
+        $detalleReserva = new fel_reservas_detalle();
+        $totalReserva = $detalleReserva
+            ->select('SUM(totalReservaDetalleIVA) as total')
+            ->where('reservaId', $reservaId)
+            ->first();
+    
+        // Obtener la suma de todos los pagos realizados para la reservaId proporcionada
+        $reservaPago = new fel_reservas_pago();
+        $totalPagosRealizados = $reservaPago
+            ->select('SUM(montoPago) as total')
+            ->where('reservaId', $reservaId)
+            ->first();
+    
+        // Verificar si el numComprobantePago ya existe
+        $comprobanteExistente = $reservaPago
+            ->where('numComprobantePago', $numComprobantePago)
+            ->first();
+    
+        // Mensajes de error
+        $errores = [];
+    
+        // Verificar que el montoPago no exceda el total de la reserva menos los pagos realizados
+        $totalPagosRealizados = $totalPagosRealizados['total'] ?? 0; // Si no hay pagos previos, se considera 0
+        if ($totalReserva && ($montoPago + $totalPagosRealizados) > $totalReserva['total']) {
+            $errores[] = 'El monto del pago excede el total de la reserva.';
+        }
+    
+        if ($comprobanteExistente) {
+            $errores[] = 'El número de comprobante ya existe.';
+        }
+    
+        if (!empty($errores)) {
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => implode(' ', $errores)
+            ]);
+        }
+    
+        // Datos a insertar
+        $dataInsert = [
+            'reservaId' => $reservaId,
+            'fechaReservaPago' => $this->request->getPost('fechaReservaPago'),
+            'formaPagoMHId' => $this->request->getPost('formaPagoMHId'),
+            'numComprobantePago' => $numComprobantePago,
+            'montoPago' => $montoPago,
+            'comentarioPago' => $this->request->getPost('comentarioPago')
+        ];
+    
+        // Insertar datos en la base de datos
+        $operacionReservaPago = $reservaPago->insert($dataInsert);
         
-        $columna5 = '
-                        <button type= "button" class="btn btn-danger mb-1" onclick="" data-toggle="tooltip" data-placement="top" title="Eliminar">
-                            <i class="fas fa-trash"></i>
-                        </button>';
-                        
-        $output['data'][] = array(
-            $columna1,
-            $columna2,
-            $columna3,
-            $columna4,
-            $columna5
-        );
+        if ($operacionReservaPago) {
+            // Si el insert fue exitoso, devuelve el último ID insertado
+            return $this->response->setJSON([
+                'success' => true,
+                'mensaje' => 'Pago agregado correctamente',
+                'reservaPagoId' => $reservaPago->insertID()
+            ]);
+        } else {
+            // Si el insert falló, devuelve un mensaje de error
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'No se pudo insertar el pago'
+            ]);
+        }
+    }
+    
 
+
+    public function tablePagoReserva(){
+        $reservaId    = $this->request->getPost('reservaId');
+        $contactoCliente = new fel_reservas_pago();
+
+        $datos = $contactoCliente
+          ->select('fel_reservas_pago.reservaPagoId,fel_reservas_pago.fechaReservaPago,cat_17_forma_pago.formaPago, fel_reservas_pago.numComprobantePago, fel_reservas_pago.montoPago, fel_reservas_pago.comentarioPago')
+          ->join('cat_17_forma_pago' , 'cat_17_forma_pago.formaPagoMHId = fel_reservas_pago.formaPagoMHId')
+          ->where('fel_reservas_pago.flgElimina', 0)
+          ->where('fel_reservas_pago.reservaId',$reservaId)
+          ->findAll();
+        $output['data'] = array();
+        $n = 1; // Variable para contar las filas
+        foreach ($datos as $columna) {
+            // Aquí construye tus columnas
+            $columna1 = $n;
+            $columna2 = "<b>Forma pago:</b> " . $columna['formaPago'] . "<br><b>Comprobante :</b> " . $columna['numComprobantePago']. "<br><b>Comentario :</b> " . $columna['comentarioPago'];
+
+            $columna3 = "<b>Fecha pago:</b> " . $columna['fechaReservaPago'] ;
+            $columna4 = "<b>Monto:</b> " . number_format($columna['montoPago'], 2);
+
+
+            $columna5 = '
+                <button type="button" class="btn btn-danger mb-1" onclick="eliminarReservaPago(`'.$columna["reservaPagoId"].'`)" data-toggle="tooltip" data-placement="top" title="Eliminar">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            ';
+            // Agrega la fila al array de salida
+            $output['data'][] = array(
+                $columna1,
+                $columna2,
+                $columna3,
+                $columna4,
+                $columna5
+            );
+    
+            $n++;
+        }
         // Verifica si hay datos
-        if ($n > 0) {
+        if ($n > 1) {
             return $this->response->setJSON($output);
         } else {
             return $this->response->setJSON(array('data' => '')); // No hay datos, devuelve un array vacío
         }
     }
 
+    public function eliminarReservaPago(){
+        
+        $eliminarReservaPago = new fel_reservas_pago();
+        
+        $reservaPagoId = $this->request->getPost('reservaPagoId');
+        $data = ['flgElimina' => 1];
+        
+        $eliminarReservaPago->update($reservaPagoId, $data);
+    
+        if($eliminarReservaPago) {
+            return $this->response->setJSON([
+                'success' => true,
+                'mensaje' => 'Pago eliminado correctamente'
+            ]);
+        } else {
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'No se pudo eliminar el pago de la reserva'
+            ]);
+        }
+    }
+    
+
+    
 
 }

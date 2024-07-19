@@ -149,12 +149,12 @@ function eliminarReserva(id) {
             });
     }
     
-    function modalPagoReserva() {
+    function modalPagoReserva(reservaId) {
         // Realizar una petición AJAX para obtener los datos del módulo por su ID
         $.ajax({
                 url: '<?php echo base_url('ventas/admin-reservas/form/pago/reserva'); ?>',
                 type: 'POST',
-                data: {}, // Pasar el ID del módulo como parámetro
+                data: {reservaId : reservaId}, // Pasar el ID del módulo como parámetro
                 success: function(response) {
                     // Insertar el contenido de la modal en el cuerpo de la modal
                     $('#divModalContent').html(response);

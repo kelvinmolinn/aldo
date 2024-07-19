@@ -261,11 +261,13 @@ $routes->group('ventas/admin-reservas', function($routes) {
     $routes->post('vista/actualizar/reserva', 'ventas\administracionReservas::vistaContinuarReserva');
     $routes->post('vista/continuar/reserva', 'ventas\administracionReservas::vistaContinuarReserva');
     $routes->post('tabla/continuar/reserva', 'ventas\administracionReservas::tablaContinuarReserva');
-    $routes->post('form/pago/reserva', 'ventas\administracionReservas::modalPagoReserva');
     $routes->post('tabla/pago/ventas', 'ventas\administracionReservas::tablePagoReserva');
     $routes->post('modal/nuevo/reserva', 'ventas\administracionReservas::modalNuevoProductoReserva');
     $routes->post('operacion/guardar/NuevaReserva', 'ventas\administracionReservas::modalNuevaReservaOperacion');
     $routes->post('operacion/eliminar/reserva', 'ventas\administracionReservas::eliminarReserva');
+    $routes->post('form/pago/reserva', 'ventas\administracionReservas::modalPagoReserva');
+    $routes->post('operacion/guardar/pagoReserva', 'ventas\administracionReservas::modalPagoReservaOperacion');
+    $routes->post('operacion/eliminar/pago', 'ventas\administracionReservas::eliminarReservaPago');
     
 });
 
