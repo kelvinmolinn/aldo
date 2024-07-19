@@ -136,7 +136,7 @@ class administracionRetaceo extends Controller
             $observacionAnulacion = $this->request->getPost('observacionAnulacion');
 
             $data = [
-                'flgElimina'    => 1,
+                'flgElimina'    => 0,
                 'estadoRetaceo' => "Anulado",
                 'obsAnulacion'  =>  $observacionAnulacion
             ];
@@ -297,6 +297,8 @@ class administracionRetaceo extends Controller
         $comp_compras = new comp_compras();
         $comp_compras_detalle = new comp_compras_detalle();
 
+        // Este select debe ser solo a comp_compras y de compras_detalle debe ser un SUM del totalcompradetalle
+        // SELECT c.compraiD, c.numfactura, SUM(SELECT cd.totalcompradetalle FROM comp_compras_detalle WHERE cd.compraId = c.compraId AND cd.flgELimina = 0) FROM comp_compras c WHERE flgElimina, flgRetaceo, estadocompra
         $data['campos'] = $comp_compras_detalle
             ->select('comp_compras.compraId,comp_compras.numFactura,comp_compras.flgRetaceo,comp_compras_detalle.totalCompraDetalle')
             ->join('comp_compras','comp_compras.compraId = comp_compras_detalle.compraId')
@@ -322,6 +324,7 @@ class administracionRetaceo extends Controller
     public function modalCompraRetaceoOperacion(){
         
         $compraDetalle = new comp_compras_detalle();
+        $comp_compras = new comp_compras();
 
         $compraRetaceo = $this->request->getPost('selectCompraRetaceo');
         $retaceoId = $this->request->getPost('retaceoId');
@@ -335,6 +338,7 @@ class administracionRetaceo extends Controller
 
         foreach($compDetalle as $compDetalle){
            $retaceoDetalle = new comp_retaceo_detalle();
+           $compraId = $compDetalle['compraId'];
 
             $totalCompraDetalle =  ($compDetalle['precioUnitario'] * $compDetalle['cantidadProducto']);
 
@@ -343,26 +347,34 @@ class administracionRetaceo extends Controller
                 "compraDetalleId"      => $compDetalle['compraDetalleId'],
                 "cantidadProducto"     => $compDetalle['cantidadProducto'],
                 "precioFOBUnitario"    => $compDetalle['precioUnitario'],
-                "importe"              => $totalCompraDetalle
+                "importe"              => $totalCompraDetalle,
+                'DAI'                   => 0
             ];
 
             // Insertar datos en la base de datos
             $nuevoRetaceoCompra = $retaceoDetalle->insert($data);
+        }
 
-            if ($nuevoRetaceoCompra) {
-                // Si el insert fue exitoso, devuelve el último ID insertado
-                return $this->response->setJSON([
-                    'success' => true,
-                    'mensaje' => 'La compra se ha agregado al retaceo correctamente',
-                    'retaceoDetalleId' =>  $retaceoDetalle->insertID() 
-                ]);
-            } else {
-                // Si el insert falló, devuelve un mensaje de error
-                return $this->response->setJSON([
-                    'success' => false,
-                    'mensaje' => 'No se pudo insertar la compra al retaceo'
-                ]);
-            }
+        $data = [
+            'estadoCompra'   => "Aplicado"
+
+        ];
+            // Insertar datos en la base de datos
+            $operacionEstadoCompra = $comp_compras->update($compraId, $data);
+
+        if ($operacionEstadoCompra) {
+            // Si el insert fue exitoso, devuelve el último ID insertado
+            return $this->response->setJSON([
+                'success' => true,
+                'mensaje' => 'Compra agregada al retaceo con exito correctamente',
+                'compraId' => $compraId
+            ]);
+        } else {
+            // Si el insert falló, devuelve un mensaje de error
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'No se pudo agregar la compra al retaceo'
+            ]);
         }
     }
 
@@ -372,20 +384,70 @@ class administracionRetaceo extends Controller
 
         $retaceoId = $this->request->getPost('retaceoId');
 
+        $totales = $compRetaceo
+            ->select('totalFlete,totalGastos')
+            ->where('flgElimina', 0)
+            ->where('retaceoId', $retaceoId)
+            ->first();
+
+        $totalFlete = $totales['totalFlete'];
+        $totalGastos = $totales['totalGastos'];
+
         $sumRetaceo = $compRetaceo
             ->select('(SELECT SUM(comp_retaceo_detalle.importe) FROM comp_retaceo_detalle WHERE comp_retaceo_detalle.retaceoId = comp_retaceo.retaceoId) AS totalImporte', false)
             ->where('flgElimina', 0)
             ->where('retaceoId', $retaceoId)
             ->first();
-
-        $calcular = $retaceoDetalle 
+        $totalImporte = $sumRetaceo['totalImporte'];
+        $calcularDetalle = $retaceoDetalle 
         ->select('retaceoDetalleId, retaceoId, compraDetalleId, cantidadProducto, precioFOBUnitario, importe, flete, gasto, DAI, costoUnitarioRetaceo, costoTotal')
         ->where('flgElimina', 0)
         ->where('retaceoId', $retaceoId)
-        ->first();
+        ->findAll();
 
-        foreach($calcular as $calcular){
+        foreach($calcularDetalle as $calcular){
+            $dai = $calcular['DAI'];
 
+            $importeDetalle = $calcular['importe'];
+
+            $flete = ($importeDetalle / $totalImporte) * $totalFlete;
+        
+            if($totalGastos > 0 || $totalGastos != "") {
+                $gasto = ($importeDetalle / $totalImporte) * $totalGastos;
+            } else {
+                $gasto = 0;
+            }
+
+            $costoTotal = $importeDetalle + $flete + $gasto + $dai;
+            $costoUnitario = $costoTotal / $calcular['cantidadProducto'];
+
+
+            $data = [
+                'flete'                 => $flete,
+                'gasto'                 => $gasto,
+                'DAI'                   => $dai,
+                'costoUnitarioRetaceo'  => $costoUnitario,
+                'costoTotal'            => $costoTotal
+
+            ];
+
+                // Insertar datos en la base de datos
+                $operacionCalculoRetaceo = $retaceoDetalle->update($calcular['retaceoDetalleId'], $data);
+
+        }
+        if ($operacionCalculoRetaceo) {
+            // Si el insert fue exitoso, devuelve el último ID insertado
+            return $this->response->setJSON([
+                'success' => true,
+                'mensaje' => 'Retaceo calculado correctamente',
+                'retaceoDetalleId' => $calcular['retaceoDetalleId']
+            ]);
+        } else {
+            // Si el insert falló, devuelve un mensaje de error
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'No se pudo calcular el retaceo'
+            ]);
         }
     }
 }

@@ -57,6 +57,7 @@
                             text: response.mensaje
                         }).then((result) => {
                             $("#tablaContinuarRetaceo").DataTable().ajax.reload(null, false);
+                            calcularRetaceo();
                         });
                     } else {
                         // Insert fallido, mostrar mensaje de error

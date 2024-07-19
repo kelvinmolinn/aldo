@@ -167,6 +167,7 @@ class administracionCompras extends Controller
                         ->select("sucursalId,sucursal")
                         ->where("flgElimina", 0)
                         ->findAll();
+                        
         return view('compras/modals/modalNuevaCompra', $data);
     }
 

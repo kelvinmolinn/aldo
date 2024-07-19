@@ -151,6 +151,7 @@
             }
         });
     }
+    
     function calcularRetaceo() {
         // Ajax hacia un controller que aplique el calculo o recalculo de retaceo
         $.ajax({
