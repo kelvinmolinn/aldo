@@ -365,4 +365,27 @@ class administracionRetaceo extends Controller
             }
         }
     }
+
+    public function calcularRetaceo(){
+        $compRetaceo = new comp_retaceo();
+        $retaceoDetalle = new comp_retaceo_detalle();
+
+        $retaceoId = $this->request->getPost('retaceoId');
+
+        $sumRetaceo = $compRetaceo
+            ->select('(SELECT SUM(comp_retaceo_detalle.importe) FROM comp_retaceo_detalle WHERE comp_retaceo_detalle.retaceoId = comp_retaceo.retaceoId) AS totalImporte', false)
+            ->where('flgElimina', 0)
+            ->where('retaceoId', $retaceoId)
+            ->first();
+
+        $calcular = $retaceoDetalle 
+        ->select('retaceoDetalleId, retaceoId, compraDetalleId, cantidadProducto, precioFOBUnitario, importe, flete, gasto, DAI, costoUnitarioRetaceo, costoTotal')
+        ->where('flgElimina', 0)
+        ->where('retaceoId', $retaceoId)
+        ->first();
+
+        foreach($calcular as $calcular){
+
+        }
+    }
 }
