@@ -183,7 +183,7 @@ $routes->group('inventario/admin-traslados', function($routes) {
     $routes->post('operacion/actualizar/traslado', 'inventario\AdministracionTraslados::vistaActualizarTrasladoOperacion');
     $routes->post('operacion/finalizar/traslado', 'inventario\AdministracionTraslados::finalizarTraslado');
     $routes->post('tabla/verTraslado',  'inventario\AdministracionTraslados::tablaVerTraslado');
-     $routes->post('form4/verTraslado', 'inventario\AdministracionTraslados::modalAdministracionVerTraslado');
+    $routes->post('form4/verTraslado', 'inventario\AdministracionTraslados::modalAdministracionVerTraslado');
 
     //
 });
@@ -257,7 +257,6 @@ $routes->group('ventas/admin-reservas', function($routes) {
     $routes->post('form/nueva/reserva', 'ventas\administracionReservas::modalNuevaReserva');
     $routes->post('operacion/guardar/reserva', 'ventas\administracionReservas::modalReservaOperacion');
     $routes->post('operacion/actualizar/reserva', 'ventas\administracionReservas::vistaActualizarReservaOperacion');
-    $routes->post('form/anular/reserva', 'ventas\administracionReservas::modalAnularReserva');
     $routes->post('vista/actualizar/reserva', 'ventas\administracionReservas::vistaContinuarReserva');
     $routes->post('vista/continuar/reserva', 'ventas\administracionReservas::vistaContinuarReserva');
     $routes->post('tabla/continuar/reserva', 'ventas\administracionReservas::tablaContinuarReserva');
@@ -268,6 +267,11 @@ $routes->group('ventas/admin-reservas', function($routes) {
     $routes->post('form/pago/reserva', 'ventas\administracionReservas::modalPagoReserva');
     $routes->post('operacion/guardar/pagoReserva', 'ventas\administracionReservas::modalPagoReservaOperacion');
     $routes->post('operacion/eliminar/pago', 'ventas\administracionReservas::eliminarReservaPago');
+    $routes->post('form/anular/reserva', 'ventas\administracionReservas::modalAnularReserva');
+    $routes->post('anular/reserva', 'ventas\administracionReservas::operacionAnularReserva');
+    $routes->post('form/ver/reserva', 'ventas\administracionReservas::modalVerReserva');
+    $routes->post('tabla/verReserva',  'ventas\administracionReservas::tablaVerReserva');
+
     
 });
 

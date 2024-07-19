@@ -57,7 +57,7 @@
                                 <tr>
                                     <th>#</th>
                                     <th>Pago</th>
-                                    <th>Fecha</th>
+                                    <th>Fecha pago</th>
                                     <th>Monto</th>
                                     <th>Acciones</th>
                                 </tr>
@@ -110,6 +110,7 @@ function eliminarReservaPago(id) {
                                         text: response.mensaje
                                     }).then((result) => {
                                         $("#tblPagoReserva").DataTable().ajax.reload(null, false);
+                                        $("#tablaContinuarReserva").DataTable().ajax.reload(null, false);
                                     });
                                 } else {
                                     // Insert fallido, mostrar mensaje de error
@@ -158,6 +159,7 @@ function eliminarReservaPago(id) {
                             text: response.mensaje
                         }).then((result) => {
                             $("#tblPagoReserva").DataTable().ajax.reload(null, false);
+                            $("#tablaContinuarReserva").DataTable().ajax.reload(null, false);
                             
                         });
                         console.log("Último ID insertado:", response.reservaPagoId);

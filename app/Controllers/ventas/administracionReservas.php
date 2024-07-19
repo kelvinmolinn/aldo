@@ -129,14 +129,14 @@ class administracionReservas extends Controller
         }
 
 
-    public function tablaReservas()
+public function tablaReservas()
 {
     $reservaId = $this->request->getPost('reservaId');
     $mostrarReserva = new fel_reservas();
     $vistaUsuariosEmpleados = new vista_usuarios_empleados();
     $usuarioIdAgrega = $this->request->getPost("usuarioId");
     $datos = $mostrarReserva
-        ->select('fel_reservas.reservaId,fel_reservas.fechaReserva,fel_reservas.comentarioReserva,fel_reservas.estadoReserva,conf_sucursales.sucursalId,conf_sucursales.sucursal,fel_clientes.clienteId,fel_clientes.cliente')
+        ->select('fel_reservas.reservaId,fel_reservas.fechaReserva,fel_reservas.fechaAnulacionReserva,fel_reservas.obsAnulacionReserva,fel_reservas.comentarioReserva,fel_reservas.estadoReserva,conf_sucursales.sucursalId,conf_sucursales.sucursal,fel_clientes.clienteId,fel_clientes.cliente')
         ->join('conf_sucursales', 'conf_sucursales.sucursalId = fel_reservas.sucursalId')
         ->join('fel_clientes', 'fel_clientes.clienteId = fel_reservas.clienteId')
         ->where('fel_reservas.flgElimina', 0)
@@ -155,42 +155,53 @@ class administracionReservas extends Controller
             $estadoClase = 'badge badge-danger';
         }
 
-        // Aquí construye tus columnas
-        $columna1 = $n;
-        $columna2 = "<b>Sucursal:</b> " . $columna['sucursal']. "<br>" ."<b>Cliente:</b> " . $columna['cliente'];
+        // Construir columna 2
+        $columna2 = "<b>Sucursal:</b> " . $columna['sucursal'] . "<br><b>Cliente:</b> " . $columna['cliente'];
+
+        // Construir columna 3
         $columna3 = "<b>Fecha:</b> " . $columna['fechaReserva'];
-        $columna4 = "<b>Motivo/Justificación:</b> " . $columna['comentarioReserva'] . "<br>" . "<b>Estado:</b> <span class='" . $estadoClase . "'>" . $columna['estadoReserva'] . "</span>";
-        
+
+        // Construir columna 4 basada en el estadoReserva
+        if ($columna['estadoReserva'] === 'Anulado') {
+            $columna4 = 
+                        "<b>Fecha de Anulación:</b> " . $columna['fechaAnulacionReserva'] . "<br>" .
+                        "<b>Motivo/Justificación</b> " . $columna['obsAnulacionReserva'] . "<br>" .
+                        "<b>Estado:</b> <span class='" . $estadoClase . "'>" . $columna['estadoReserva'] . "</span>";
+        } else {
+            $columna4 = "<b>Observación:</b> " . $columna['comentarioReserva'] . "<br>" .
+                        "<b>Estado:</b> <span class='" . $estadoClase . "'>" . $columna['estadoReserva'] . "</span>";
+        }
+
         // Construir botones basado en estadoReserva
         if ($columna['estadoReserva'] === 'Pendiente') {
             $jsonActualizarReserva = [
-                "reservaId"          => $columna['reservaId']
+                "reservaId" => $columna['reservaId']
             ];
             $columna5 = '
-                <button class="btn btn-primary mb-1" onclick="cambiarInterfaz(`ventas/admin-reservas/vista/actualizar/reserva`, '.htmlspecialchars(json_encode($jsonActualizarReserva)).');" data-toggle="tooltip" data-placement="top" title="Continuar reserva">
+                <button class="btn btn-primary mb-1" onclick="cambiarInterfaz(`ventas/admin-reservas/vista/actualizar/reserva`, ' . htmlspecialchars(json_encode($jsonActualizarReserva)) . ');" data-toggle="tooltip" data-placement="top" title="Continuar reserva">
                     <i class="fas fa-sync-alt"></i> <span> </span>
                 </button>
-                <button class="btn btn-danger mb-1" onclick="cambiarInterfaz(`ventas/admin-reservas/vista/anular/reserva`, '.htmlspecialchars(json_encode($jsonActualizarReserva)).');"  data-toggle="tooltip" data-placement="top" title="Anular">
+                <button class="btn btn-danger mb-1" onclick="modalAnularReserva(' . $columna['reservaId'] . ')" data-toggle="tooltip" data-placement="top" title="Anular">
                     <i class="fas fa-ban"></i>
                 </button>
-
             ';
         } elseif ($columna['estadoReserva'] === 'Finalizado') {
             $columna5 = '
-                <button class="btn btn-info mb-1" onclick="modalAdministracionVerDescargo(`'.$columna['reservaId'].'`);" data-toggle="tooltip" data-placement="top" title="Ver descargo">
+                <button class="btn btn-info mb-1" onclick="modalVerReserva(`' . $columna['reservaId'] . '`);" data-toggle="tooltip" data-placement="top" title="Ver reserva">
                     <i class="fas fa-eye"></i><span> </span>
                 </button>
             ';
         } else {
             $columna5 = '
-                   <button class="btn btn-info mb-1" onclick="modalAdministracionVerDescargo(`'.$columna['reservaId'].'`);" data-toggle="tooltip" data-placement="top" title="Ver descargo">
-        <i class="fas fa-eye"></i><span> </span>
-                </button>'; // No buttons if the status is neither 'Pendiente' nor 'Finalizado'
+                <button class="btn btn-info mb-1" onclick="modalVerReserva(`' . $columna['reservaId'] . '`);" data-toggle="tooltip" data-placement="top" title="Ver reserva">
+                    <i class="fas fa-eye"></i><span> </span>
+                </button>
+            ';
         }
 
         // Agrega la fila al array de salida
         $output['data'][] = array(
-            $columna1,
+            $n,
             $columna2,
             $columna3,
             $columna4,
@@ -207,6 +218,7 @@ class administracionReservas extends Controller
         return $this->response->setJSON(array('data' => '')); // No hay datos, devuelve un array vacío
     }
 }
+
 
     public function vistaContinuarReserva(){
 
@@ -576,7 +588,7 @@ public function eliminarReserva(){
 }
 
 
-    public function tablaContinuarReserva()
+public function tablaContinuarReserva()
 {
     $reservaId = $this->request->getPost('reservaId');
     $mostrarReserva = new fel_reservas_detalle();
@@ -635,6 +647,25 @@ public function eliminarReserva(){
         $n++;
     }
 
+    // Obtener el número de pagos y la suma total de los pagos para la reservaId
+    $reservaPago = new fel_reservas_pago();
+    $pagosReserva = $reservaPago
+        ->select('COUNT(*) as numeroPagos, SUM(montoPago) as totalPagado')
+        ->where('reservaId', $reservaId)
+        ->where('flgElimina', 0) // Suponiendo que 'flgElimina' marca los pagos eliminados
+        ->first();
+
+    $numeroPagos = $pagosReserva['numeroPagos'];
+    $totalPagado = $pagosReserva['totalPagado'] ?? 0; // Si no hay pagos previos, se considera 0
+
+    // Determinar la clase CSS según la condición
+    $totalPagadoClass = ($totalPagado < $totalAPagar) ? 'text-danger' : 'text-success';
+
+    // Determinar el texto, clase y estado del botón
+    $botonTexto = ($totalPagado < $totalAPagar) ? 'Pagos (' . $numeroPagos . ')' : 'Pagado';
+    $botonClase = ($totalPagado < $totalAPagar) ? 'btn-primary' : 'btn-success';
+    $botonDisabled = ($totalPagado < $totalAPagar) ? '' : 'disabled';
+
     if ($n > 1) {
         $output['footer'] = array(
             '',
@@ -672,13 +703,21 @@ public function eliminarReserva(){
                     <b>Total a pagar (=) :</b>
                 </div>
                 <div class="col-4">
-                  <b>  $ ' . number_format($totalAPagar, 2, '.', ',') . ' </b>
+                    <b>$ ' . number_format($totalAPagar, 2, '.', ',') . ' </b>
+                </div>
+            </div>
+            <div class="row text-right">
+                <div class="col-8">
+                    <b>Total pagado:</b>
+                </div>
+                <div class="col-4">
+                    <b class="' . $totalPagadoClass . '">$ ' . number_format($totalPagado, 2, '.', ',') . ' </b>
                 </div>
             </div>
             <div class="row text-right">
                 <div class="col-12">
-                    <button type="button" class="btn btn-primary mb-1" onclick="modalPagoReserva(`'.$columna['reservaId'].'`, `editar`)" data-toggle="tooltip" data-placement="top" title="Pagos">
-                        <i class="fas fa-hand-holding-usd"></i>
+                    <button type="button" class="btn ' . $botonClase . ' mb-1" onclick="modalPagoReserva(`' . $reservaId . '`, `editar`)" data-toggle="tooltip" data-placement="top" title="Pagos" ' . $botonDisabled . '>
+                        <i class="fas fa-hand-holding-usd"></i> ' . $botonTexto . '
                     </button>
                 </div>
             </div>
@@ -688,13 +727,6 @@ public function eliminarReserva(){
         return $this->response->setJSON(array('data' => '', 'footer' => '')); // No hay datos, devuelve un array vacío
     }
 }
-
-
-    public function modalAnularReserva(){
-        $data['variable'] = 0;
-        return view('ventas/modals/modalAnularReserva', $data);
-    }
-
 
 
     public function modalPagoReserva(){
@@ -719,6 +751,7 @@ public function eliminarReserva(){
         $totalReserva = $detalleReserva
             ->select('SUM(totalReservaDetalleIVA) as total')
             ->where('reservaId', $reservaId)
+            ->where('flgElimina', 0)
             ->first();
     
         // Obtener la suma de todos los pagos realizados para la reservaId proporcionada
@@ -726,11 +759,13 @@ public function eliminarReserva(){
         $totalPagosRealizados = $reservaPago
             ->select('SUM(montoPago) as total')
             ->where('reservaId', $reservaId)
+            ->where('flgElimina', 0)
             ->first();
     
         // Verificar si el numComprobantePago ya existe
         $comprobanteExistente = $reservaPago
             ->where('numComprobantePago', $numComprobantePago)
+            ->where('flgElimina', 0)
             ->first();
     
         // Mensajes de error
@@ -801,7 +836,7 @@ public function eliminarReserva(){
             $columna1 = $n;
             $columna2 = "<b>Forma pago:</b> " . $columna['formaPago'] . "<br><b>Comprobante :</b> " . $columna['numComprobantePago']. "<br><b>Comentario :</b> " . $columna['comentarioPago'];
 
-            $columna3 = "<b>Fecha pago:</b> " . $columna['fechaReservaPago'] ;
+            $columna3 = "<b>Fecha:</b> " . $columna['fechaReservaPago'] ;
             $columna4 = "<b>Monto:</b> " . number_format($columna['montoPago'], 2);
 
 
@@ -850,8 +885,194 @@ public function eliminarReserva(){
             ]);
         }
     }
-    
+
+
+
+    public function modalAnularReserva(){
+        $fel_reservas = new fel_reservas();
+        $reservaId = $this->request->getPost('reservaId');
+
+        $data['campos'] = $fel_reservas
+        ->select('reservaId')
+        ->where('flgElimina', 0)
+        ->where('reservaId', $reservaId)
+        ->first();
+       
+        return view('ventas/modals/modalAnularReserva', $data);
+    }
 
     
+    public function operacionAnularReserva(){
+        $anularReserva = new fel_reservas();
+        
+            $reservaId = $this->request->getPost('reservaId');
+            $obsAnulacionReserva = $this->request->getPost('obsAnulacionReserva');
+
+            $data = [
+                'flgElimina'            => 0,
+                'estadoReserva'         => "Anulado",
+                'obsAnulacionReserva'   =>  $obsAnulacionReserva,
+                'fechaAnulacionReserva' => date('Y-m-d')
+            ];
+            
+            $anularReserva->update($reservaId, $data);
+
+            if($anularReserva) {
+                return $this->response->setJSON([
+                    'success' => true,
+                    'mensaje' => 'Reserva Anulada correctamente'
+                ]);
+            } else {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'mensaje' => 'No se pudo anular la reserva'
+                ]);
+            }
+    }
+
+        public function modalVerReserva(){
+        $data["reservaId"] = $this->request->getPost('reservaId');
+    
+        return view('ventas/modals/modalVerReserva', $data);
+    }
+    
+    public function tablaVerReserva(){
+         $reservaId = $this->request->getPost('reservaId');
+    $mostrarReserva = new fel_reservas_detalle();
+    $datos = $mostrarReserva
+        ->select('fel_reservas_detalle.reservaDetalleId,fel_reservas_detalle.reservaId,fel_reservas_detalle.cantidadProducto,fel_reservas_detalle.productoId,fel_reservas_detalle.precioUnitario,fel_reservas_detalle.precioUnitarioIVA,fel_reservas_detalle.porcentajeDescuento,fel_reservas_detalle.precioUnitarioVenta,fel_reservas_detalle.precioUnitarioVentaIVA,fel_reservas_detalle.ivaUnitario,fel_reservas_detalle.ivaTotal,fel_reservas_detalle.totalReservaDetalle,fel_reservas_detalle.totalReservaDetalleIVA,inv_productos.productoId, inv_productos.producto,inv_productos.codigoProducto,cat_14_unidades_medida.unidadMedida')
+        ->join('inv_productos', 'inv_productos.productoId = fel_reservas_detalle.productoId')
+        ->join('cat_14_unidades_medida', 'cat_14_unidades_medida.unidadMedidaId = inv_productos.unidadMedidaId')
+        ->join('fel_reservas', 'fel_reservas.reservaId = fel_reservas_detalle.reservaId')
+        ->where('fel_reservas_detalle.flgElimina', 0)
+        ->where('fel_reservas_detalle.reservaId', $reservaId)
+        ->findAll();
+
+    $output['data'] = array();
+    $n = 1; // Variable para contar las filas
+
+    // Variables para sumar los totales
+    $subtotal = 0;
+    $ivaTotal = 0;
+    $totalAPagar = 0;
+    $descuentos = 0;
+
+    foreach ($datos as $columna) {
+        // Construir columnas
+        $columna1 = $n;
+        $columna2 = "<b>Producto:</b> " . $columna['producto'] . "<br><b>Código :</b> " . $columna['codigoProducto'];
+        $columna3 = "<b>Cantidad: </b> " . $columna['cantidadProducto'] . " (" . $columna['unidadMedida'] . ")";
+        $columna4 = "<b>Precio sin IVA: </b> $" . number_format($columna['precioUnitarioVenta'], 2, '.', ',') . "<br><b>Precio con IVA: </b> $" . number_format($columna['precioUnitarioVentaIVA'], 2, '.', ',');
+
+        $columna5 = "<b>Precio sin IVA: </b> $" . number_format($columna['totalReservaDetalle'], 2, '.', ',') . "<br><b>Precio con IVA: </b> $" . number_format($columna['totalReservaDetalleIVA'], 2, '.', ',');
+
+        $columna6 = '
+            <button class="btn btn-primary mb-1" onclick="modalProductoReserva(' . $columna['reservaDetalleId'] . ', `editar`);" data-toggle="tooltip" data-placement="top" title="Editar" disabled>
+                <i class="fas fa-pen"></i>
+            </button>
+            <button class="btn btn-danger mb-1" onclick="eliminarReserva(' . $columna['reservaDetalleId'] . ');" data-toggle="tooltip" data-placement="top" title="Eliminar" disabled>
+                <i class="fas fa-trash"></i>
+            </button>
+        ';
+
+        // Agregar la fila al array de salida
+        $output['data'][] = array(
+            $columna1,
+            $columna2,
+            $columna3,
+            $columna4,
+            $columna5,
+            $columna6
+        );
+
+        // Sumar los valores de cada columna
+        $subtotal += $columna['totalReservaDetalle'];
+        $ivaTotal += $columna['ivaTotal'];
+        $totalAPagar += $columna['totalReservaDetalleIVA'];
+        $descuentos += ($columna['precioUnitario'] - $columna['precioUnitarioVenta']) * $columna['cantidadProducto'];
+
+        $n++;
+    }
+
+    // Obtener el número de pagos y la suma total de los pagos para la reservaId
+    $reservaPago = new fel_reservas_pago();
+    $pagosReserva = $reservaPago
+        ->select('COUNT(*) as numeroPagos, SUM(montoPago) as totalPagado')
+        ->where('reservaId', $reservaId)
+        ->where('flgElimina', 0) // Suponiendo que 'flgElimina' marca los pagos eliminados
+        ->first();
+
+    $numeroPagos = $pagosReserva['numeroPagos'];
+    $totalPagado = $pagosReserva['totalPagado'] ?? 0; // Si no hay pagos previos, se considera 0
+
+    // Determinar la clase CSS según la condición
+    $totalPagadoClass = ($totalPagado < $totalAPagar) ? 'text-danger' : 'text-success';
+
+    // Determinar el texto, clase y estado del botón
+    $botonTexto = ($totalPagado < $totalAPagar) ? 'Pagos (' . $numeroPagos . ')' : 'Pagado';
+    $botonClase = ($totalPagado < $totalAPagar) ? 'btn-primary' : 'btn-success';
+    $botonDisabled = ($totalPagado < $totalAPagar) ? '' : 'disabled';
+
+    if ($n > 1) {
+        $output['footer'] = array(
+            '',
+            '',
+            ''
+        );
+
+        $output['footerTotales'] = '
+            <div class="row text-right">
+                <div class="col-8">
+                    <b> Subtotal (=) :</b>
+                </div>
+                <div class="col-4">
+                    $ ' . number_format($subtotal, 2, '.', ',') . '
+                </div>
+            </div>
+            <div class="row text-right">
+                <div class="col-8">
+                    <b>Descuentos (-) :</b>
+                </div>
+                <div class="col-4">
+                    $ ' . number_format($descuentos, 2, '.', ',') . '
+                </div>
+            </div>
+            <div class="row text-right">
+                <div class="col-8">
+                    <b>IVA (+) :</b>
+                </div>
+                <div class="col-4">
+                    $ ' . number_format($ivaTotal, 2, '.', ',') . '
+                </div>
+            </div>
+            <div class="row text-right">
+                <div class="col-8">
+                    <b>Total a pagar (=) :</b>
+                </div>
+                <div class="col-4">
+                    <b>$ ' . number_format($totalAPagar, 2, '.', ',') . ' </b>
+                </div>
+            </div>
+            <div class="row text-right">
+                <div class="col-8">
+                    <b>Total pagado:</b>
+                </div>
+                <div class="col-4">
+                    <b class="' . $totalPagadoClass . '">$ ' . number_format($totalPagado, 2, '.', ',') . ' </b>
+                </div>
+            </div>
+            <div class="row text-right">
+                <div class="col-12">
+                    <button type="button" class="btn ' . $botonClase . ' mb-1" onclick="modalPagoReserva(`' . $reservaId . '`, `editar`)" data-toggle="tooltip" data-placement="top" title="Pagos" ' . $botonDisabled . ' disabled>
+                        <i class="fas fa-hand-holding-usd"></i> ' . $botonTexto . '
+                    </button>
+                </div>
+            </div>
+        ';
+        return $this->response->setJSON($output);
+    } else {
+        return $this->response->setJSON(array('data' => '', 'footer' => '')); // No hay datos, devuelve un array vacío
+    }
+    }
 
 }

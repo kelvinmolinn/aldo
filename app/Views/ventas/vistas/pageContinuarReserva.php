@@ -187,6 +187,8 @@ function eliminarReserva(id) {
             }
         });
     }
+
+
     $(document).ready(function(){
         tituloVentana("Continuar reserva");
         $('#btnRegresarReserva').on('click', function() {
