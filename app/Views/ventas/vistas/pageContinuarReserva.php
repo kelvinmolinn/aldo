@@ -89,10 +89,9 @@
     </div>
 
     <div class="row mb-4 mt-4">
-
         <div class="col-md-12">
             <div class="text-right">
-                <button type="submit" id="btnFinalizarReserva" class="btn btn-primary">
+                <button type="submit" id="btnFinalizarReserva" class="btn btn-primary" onclick="finalizarReserva();">
                     <i class="fas fa-save"></i>
                     Finalizar reserva
                 </button>
@@ -100,6 +99,53 @@
         </div>
     </div>
 <script>
+
+     function finalizarReserva(reservaId) {
+        Swal.fire({
+            title: '¿Estás seguro que desea Finlizar la reserva?',
+            text: "Se Finalizará la reserva seleccionada.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, Finalizar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed){
+                $.ajax({
+                    url: '<?php echo base_url('ventas/admin-reservas/operacion/finalizar/reserva'); ?>',
+                    type: 'POST',
+                    data: {
+                        reservaId: <?php echo $reservaId ;?>
+                    },
+                    success: function(response) {
+                        console.log(response);
+                        if (response.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Reserva Finalizada con Éxito!',
+                                text: response.mensaje
+                            }).then((result) => {
+                               // $("#tblContinuarSalida").DataTable().ajax.reload(null, false);
+                               cambiarInterfaz('ventas/admin-reservas/index', {renderVista:'No'});
+                            });
+                        } else {
+                            // Insert fallido, mostrar mensaje de error
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: response.mensaje
+                            });
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        // Manejar errores si los hay
+                        console.error(xhr.responseText);
+                    }
+                });
+            }
+        });
+    }
 
 function eliminarReserva(id) {
         //alert("Vamos a eliminar " + id);

@@ -1076,6 +1076,13 @@ public function tablaContinuarReserva()
     } else {
         return $this->response->setJSON(array('data' => '', 'footer' => '')); // No hay datos, devuelve un array vacío
     }
+    
     }
+
+      public function finalizarReserva(){
+
+      }
+
+
 
 }

@@ -271,6 +271,7 @@ $routes->group('ventas/admin-reservas', function($routes) {
     $routes->post('anular/reserva', 'ventas\administracionReservas::operacionAnularReserva');
     $routes->post('form/ver/reserva', 'ventas\administracionReservas::modalVerReserva');
     $routes->post('tabla/verReserva',  'ventas\administracionReservas::tablaVerReserva');
+    $routes->post('operacion/finalizar/reserva', 'ventas\administracionReservas::finalizarReserva');
 
     
 });
