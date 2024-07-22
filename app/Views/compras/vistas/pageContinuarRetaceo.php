@@ -216,7 +216,7 @@
                 "method": "POST",
                 "url": '<?php echo base_url('compras/admin-retaceo/tabla/continuar/retaceo'); ?>',
                 "data": {
-                        x:''
+                        retaceoId:'<?= $retaceoId; ?>'
 
                 }
             },

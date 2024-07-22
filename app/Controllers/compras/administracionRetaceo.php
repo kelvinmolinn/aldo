@@ -223,64 +223,76 @@ class administracionRetaceo extends Controller
     }
     
     public function tablaContinuarRetaceo(){
+        $compRetaceoDetalle = new comp_retaceo_detalle();
         $output['data'] = array();
         $n = 0;
 
-        $n++;
-        // Aquí construye tus columnas
-        $columna1 = $n;
-        $columna2 = "(PD-001) MARIO KART" . "<br>" . "(PD-002) MANDO GENERICO";
+        $retaceoId = $this->request->getPost('retaceoId');
 
-        $columna3 = "2" . "<br><br>" . "33";
+        $consultaRetaceoDetalle = $compRetaceoDetalle
+                ->select("comp_retaceo_detalle.retaceoId,comp_retaceo_detalle.compraDetalleId,comp_retaceo_detalle.cantidadProducto,comp_retaceo_detalle.precioFOBUnitario,comp_retaceo_detalle.importe,comp_retaceo_detalle.flete,comp_retaceo_detalle.gasto,comp_retaceo_detalle.DAI,comp_retaceo_detalle.costoUnitarioRetaceo,comp_retaceo_detalle.costoTotal,inv_productos.codigoProducto,inv_productos.producto")
+                ->join("comp_compras_detalle", "comp_compras_detalle.compraDetalleId = comp_retaceo_detalle.compraDetalleId")
+                ->join("inv_productos", "inv_productos.productoId = comp_compras_detalle.productoId")
+                ->where("comp_retaceo_detalle.flgElimina", 0)
+                ->where("comp_retaceo_detalle.retaceoId", $retaceoId)
+                ->findAll();
 
-        $columna4 = "$ 25.00" . "<br><br>" . "$ 25.50";
+        foreach($consultaRetaceoDetalle AS $tableRetaceoDetalle){
+            $n++;
+            // Aquí construye tus columnas
+            $columna1 = $n;
+            $columna2 = "(".$tableRetaceoDetalle['codigoProducto'].")". $tableRetaceoDetalle['producto'];
 
-        $columna5 = "$ 50.00" . "<br><br>" . "$ 841.50";
+            $columna3 = number_format($tableRetaceoDetalle['cantidadProducto'], 2, ".", ",");
 
-        $columna6 = "$ 0.5350" . "<br><br>" . "$ 9.0040";
+            $columna4 = "$ " . number_format($tableRetaceoDetalle['precioFOBUnitario'], 2, ".", ",");
 
-        $columna7 = "$ 0.4458" . "<br><br>" . "$ 7.5033";
+            $columna5 = "$ " . number_format($tableRetaceoDetalle['importe'], 2, ".", ",");
 
-        $columna8 = "10". "<br><br>" . "0";
+            $columna6 = "$ " . number_format($tableRetaceoDetalle['flete'], 2, ".", ",");
 
-        $columna9 = "$ 30.46" . "<br><br>" . "$ 26.00";
+            $columna7 = "$ " . number_format($tableRetaceoDetalle['gasto'], 2, ".", ",");
 
-        $columna10 = "$ 60.98" . "<br><br>" . "$ 858.01";
+            $columna8 = "$ " . number_format($tableRetaceoDetalle['DAI'], 2, ".", ",");
 
-        $columna11 = "$ 35.00" . "<br><br>" . "$ 32.00";
+            $columna9 = "$ " . number_format($tableRetaceoDetalle['costoUnitarioRetaceo'], 2, ".", ",");
 
-        $columna12 = '  
-                        <button class="btn btn-primary mb-1" onclick="modalAgregarDAI()" data-toggle="tooltip" data-placement="top" title="DAI">
-                            <i class="fas fa-address-book"></i> DAI
-                        </button>' . '<br>' . '<button class="btn btn-primary mb-1" onclick="" data-toggle="tooltip" data-placement="top" title="DAI">
-                            <i class="fas fa-address-book"></i> DAI
-                        </button>';
+            $columna10 = "$ " . number_format($tableRetaceoDetalle['costoTotal'], 2, ".", ",");
 
-        /*$columna4 = '
-                        <button type= "button" class="btn btn-primary mb-1" onclick="cambiarInterfaz(`compras/admin-retaceo/vista/continuar/retaceo`);" data-toggle="tooltip" data-placement="top" title="Continuar retaceo">
-                            <i class="fas fa-sync-alt"></i>
-                        </button>';
+            $columna11 = "$ " . number_format($tableRetaceoDetalle['costoUnitarioRetaceo'] + $tableRetaceoDetalle['costoTotal'], 2, ".", ",");
 
-        $columna4 .= '
-                         <button type= "button" class="btn btn-danger mb-1" onclick="" data-toggle="tooltip" data-placement="top" title="Anular">
-                            <i class="fas fa-ban"></i>
-                        </button>
-                    ';*/
+            $columna12 = '  
+                            <button class="btn btn-primary mb-1" onclick="modalAgregarDAI()" data-toggle="tooltip" data-placement="top" title="DAI">
+                                <i class="fas fa-address-book"></i> DAI
+                            </button>';
 
-        $output['data'][] = array(
-            $columna1,
-            $columna2,
-            $columna3,
-            $columna4,
-            $columna5,
-            $columna6,
-            $columna7,
-            $columna8,
-            $columna9,
-            $columna10,
-            $columna11,
-            $columna12
-        );
+            /*$columna4 = '
+                            <button type= "button" class="btn btn-primary mb-1" onclick="cambiarInterfaz(`compras/admin-retaceo/vista/continuar/retaceo`);" data-toggle="tooltip" data-placement="top" title="Continuar retaceo">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>';
+
+            $columna4 .= '
+                             <button type= "button" class="btn btn-danger mb-1" onclick="" data-toggle="tooltip" data-placement="top" title="Anular">
+                                <i class="fas fa-ban"></i>
+                            </button>
+                        ';*/
+
+            $output['data'][] = array(
+                $columna1,
+                $columna2,
+                $columna3,
+                $columna4,
+                $columna5,
+                $columna6,
+                $columna7,
+                $columna8,
+                $columna9,
+                $columna10,
+                $columna11,
+                $columna12
+            );
+        } 
+
 
         // Verifica si hay datos
         if ($n > 0) {
