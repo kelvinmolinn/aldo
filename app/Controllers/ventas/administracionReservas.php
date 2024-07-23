@@ -181,18 +181,30 @@ public function tablaReservas()
                 <button class="btn btn-primary mb-1" onclick="cambiarInterfaz(`ventas/admin-reservas/vista/actualizar/reserva`, ' . htmlspecialchars(json_encode($jsonActualizarReserva)) . ');" data-toggle="tooltip" data-placement="top" title="Continuar reserva">
                     <i class="fas fa-sync-alt"></i> <span> </span>
                 </button>
-                <button class="btn btn-danger mb-1" onclick="modalAnularReserva(' . $columna['reservaId'] . ')" data-toggle="tooltip" data-placement="top" title="Anular">
-                    <i class="fas fa-ban"></i>
-                </button>
+
                 <button class="btn btn-info mb-1" onclick="modalVerReserva(`' . $columna['reservaId'] . '`);" data-toggle="tooltip" data-placement="top" title="Ver reserva">
                     <i class="fas fa-eye"></i><span> </span>
+                </button>
+
+                <button class="btn btn-danger mb-1" onclick="modalAnularReserva(' . $columna['reservaId'] . ')" data-toggle="tooltip" data-placement="top" title="Anular">
+                    <i class="fas fa-ban"></i>
                 </button>
             ';
         } elseif ($columna['estadoReserva'] === 'Finalizado') {
             $columna5 = '
+
+                <button class="btn btn-primary mb-1" onclick="modalFacturar(`' . $columna['reservaId'] . '`);" data-toggle="tooltip" data-placement="top" title="Facturar">
+                    <i class="fas fa-hand-holding-usd"></i><span> </span>
+                </button>
+
                 <button class="btn btn-info mb-1" onclick="modalVerReserva(`' . $columna['reservaId'] . '`);" data-toggle="tooltip" data-placement="top" title="Ver reserva">
                     <i class="fas fa-eye"></i><span> </span>
                 </button>
+
+                <button class="btn btn-danger mb-1" onclick="modalAnularReserva(' . $columna['reservaId'] . ')" data-toggle="tooltip" data-placement="top" title="Anular">
+                    <i class="fas fa-ban"></i>
+                </button>
+
             ';
         } else {
             $columna5 = '
@@ -374,120 +386,74 @@ public function tablaReservas()
     }
 
 
-public function modalNuevaReservaOperacion()
-{
-    $operacion = $this->request->getPost('operacion');
-    $reservaDetalleId = $this->request->getPost('reservaDetalleId');
-    $model = new fel_reservas_detalle();
-    $sucursalModel = new fel_reservas();  
-    $reservaId = $this->request->getPost('reservaId');
-    $productoId = $this->request->getPost('productoId');
-    $precioUnitario = $this->request->getPost('hiddenPrecioUnitario');
-    $cantidadProducto = $this->request->getPost('cantidadProducto');
-    $porcentajeDescuento = $this->request->getPost('porcentajeDescuento');
+   /* public function modalNuevaReservaOperacion()
+    {
+        $operacion = $this->request->getPost('operacion');
+        $reservaDetalleId = $this->request->getPost('reservaDetalleId');
+        $model = new fel_reservas_detalle();
+        $sucursalModel = new fel_reservas();  
+        $reservaId = $this->request->getPost('reservaId');
+        $productoId = $this->request->getPost('productoId');
+        $precioUnitario = $this->request->getPost('hiddenPrecioUnitario');
+        $cantidadProducto = $this->request->getPost('cantidadProducto');
+        $porcentajeDescuento = $this->request->getPost('porcentajeDescuento');
 
-    // Consulta para traer el 13% de la parametrización
-    $porcentajeIva = new conf_parametrizaciones;
-    $IVA = $porcentajeIva 
-        ->select("valorParametrizacion")
-        ->where("flgElimina", 0)
-        ->where("parametrizacionId", 1)
-        ->first(); 
+        // Consulta para traer el 13% de la parametrización
+        $porcentajeIva = new conf_parametrizaciones;
+        $IVA = $porcentajeIva 
+            ->select("valorParametrizacion")
+            ->where("flgElimina", 0)
+            ->where("parametrizacionId", 1)
+            ->first(); 
 
-    $IvaCalcular = ($precioUnitario * $IVA['valorParametrizacion']) / 100;
-    $precioUnitarioIVA = $precioUnitario + $IvaCalcular;
-    $ivaTotal = $IvaCalcular * $cantidadProducto;
-    $precioUnitarioVenta = $precioUnitario * (1 - ($porcentajeDescuento / 100));
-    $IvaVentaCalcular = ($precioUnitarioVenta * $IVA['valorParametrizacion']) / 100;
-    $precioUnitarioVentaIVA = $precioUnitarioVenta + $IvaVentaCalcular;
-    $totalReservaDetalle = $precioUnitarioVenta * $cantidadProducto;
-    $totalReservaDetalleIVA = $precioUnitarioVentaIVA * $cantidadProducto;
-
-    // Necesito Traer sucursalId de fel_reservas 
-    $reservaData = $sucursalModel->find($reservaId);
-    $sucursalId = $reservaData['sucursalId'];  
-
-    // Obtener la existencia actual del producto en la sucursal
-    $productosModel = new inv_productos_existencias();
-
-    $producto = $productosModel->select('existenciaProducto')
-                ->where('flgElimina', 0)
-                ->where('sucursalId', $sucursalId)
-                ->where('productoId', $productoId)
-                ->first();
-
-    if (!$producto) {
-        return $this->response->setJSON([
-            'success' => false,
-            'mensaje' => 'Producto no encontrado'
-        ]);
-    }
-
-    $existenciaActual = $producto['existenciaProducto'];
-
-    // Verificar si el producto ya está en la reserva
-    $detalleActual = $model->select('cantidadProducto, precioUnitario, porcentajeDescuento')
-                            ->where('flgElimina', 0)
-                            ->where('reservaId', $reservaId)
-                            ->where('productoId', $productoId)
-                            ->first();
-
-    if ($operacion == 'editar' && $reservaDetalleId) {
-        // Es una operación de edición
-        $detalleActualEditar = $model->select('cantidadProducto')
-                                     ->where('flgElimina', 0)
-                                     ->where('reservaId', $reservaId)
-                                     ->where('productoId', $productoId)
-                                     ->where('reservaDetalleId', $reservaDetalleId)
-                                     ->first();
-
-        if (($cantidadProducto - $detalleActualEditar['cantidadProducto']) > $existenciaActual) {
-            return $this->response->setJSON([
-                'success' => false,
-                'mensaje' => 'No hay existencias suficientes para realizar la reserva'
-            ]);
-        }
-
-        // Recalcular los valores basados en la nueva cantidad
+        $IvaCalcular = ($precioUnitario * $IVA['valorParametrizacion']) / 100;
+        $precioUnitarioIVA = $precioUnitario + $IvaCalcular;
+        $ivaTotal = $IvaCalcular * $cantidadProducto;
         $precioUnitarioVenta = $precioUnitario * (1 - ($porcentajeDescuento / 100));
+        $IvaVentaCalcular = ($precioUnitarioVenta * $IVA['valorParametrizacion']) / 100;
         $precioUnitarioVentaIVA = $precioUnitarioVenta + $IvaVentaCalcular;
         $totalReservaDetalle = $precioUnitarioVenta * $cantidadProducto;
         $totalReservaDetalleIVA = $precioUnitarioVentaIVA * $cantidadProducto;
 
-        $data = [
-            'cantidadProducto'          => $cantidadProducto,
-            'precioUnitario'            => $precioUnitario,
-            'porcentajeDescuento'       => $porcentajeDescuento,
-            'precioUnitarioIVA'         => $precioUnitarioIVA,
-            'ivaUnitario'               => $IvaCalcular,
-            'ivaTotal'                  => $ivaTotal,
-            'precioUnitarioVenta'       => $precioUnitarioVenta,
-            'precioUnitarioVentaIVA'    => $precioUnitarioVentaIVA,
-            'totalReservaDetalle'       => $totalReservaDetalle,
-            'totalReservaDetalleIVA'    => $totalReservaDetalleIVA
-        ];
+        // Necesito Traer sucursalId de fel_reservas 
+        $reservaData = $sucursalModel->find($reservaId);
+        $sucursalId = $reservaData['sucursalId'];  
 
-        $operacionReserva = $model->update($reservaDetalleId, $data);
-        
-        if ($operacionReserva) {
-            return $this->response->setJSON([
-                'success' => true,
-                'mensaje' => 'Reserva actualizada correctamente',
-                'reservaDetalleId' => $reservaDetalleId
-            ]);
-        } else {
+        // Obtener la existencia actual del producto en la sucursal
+        $productosModel = new inv_productos_existencias();
+
+        $producto = $productosModel->select('existenciaProducto')
+                    ->where('flgElimina', 0)
+                    ->where('sucursalId', $sucursalId)
+                    ->where('productoId', $productoId)
+                    ->first();
+
+        if (!$producto) {
             return $this->response->setJSON([
                 'success' => false,
-                'mensaje' => 'No se pudo actualizar la reserva'
+                'mensaje' => 'Producto no encontrado'
             ]);
         }
-    } else {
-        // Es una operación de agregar o no se especificó reservaDetalleId
-        if ($detalleActual && $detalleActual['cantidadProducto'] > 0) {
-            // El producto ya está en la reserva, actualizar la cantidad
-            $nuevaCantidad = $detalleActual['cantidadProducto'] + $cantidadProducto;
 
-            if ($nuevaCantidad > $existenciaActual) {
+        $existenciaActual = $producto['existenciaProducto'];
+
+        // Verificar si el producto ya está en la reserva
+        $detalleActual = $model->select('cantidadProducto, precioUnitario, porcentajeDescuento')
+                                ->where('flgElimina', 0)
+                                ->where('reservaId', $reservaId)
+                                ->where('productoId', $productoId)
+                                ->first();
+
+        if ($operacion == 'editar' && $reservaDetalleId) {
+            // Es una operación de edición
+            $detalleActualEditar = $model->select('cantidadProducto')
+                                        ->where('flgElimina', 0)
+                                        ->where('reservaId', $reservaId)
+                                        ->where('productoId', $productoId)
+                                        ->where('reservaDetalleId', $reservaDetalleId)
+                                        ->first();
+
+            if (($cantidadProducto - $detalleActualEditar['cantidadProducto']) > $existenciaActual) {
                 return $this->response->setJSON([
                     'success' => false,
                     'mensaje' => 'No hay existencias suficientes para realizar la reserva'
@@ -497,48 +463,12 @@ public function modalNuevaReservaOperacion()
             // Recalcular los valores basados en la nueva cantidad
             $precioUnitarioVenta = $precioUnitario * (1 - ($porcentajeDescuento / 100));
             $precioUnitarioVentaIVA = $precioUnitarioVenta + $IvaVentaCalcular;
-            $totalReservaDetalle = $precioUnitarioVenta * $nuevaCantidad;
-            $totalReservaDetalleIVA = $precioUnitarioVentaIVA * $nuevaCantidad;
+            $totalReservaDetalle = $precioUnitarioVenta * $cantidadProducto;
+            $totalReservaDetalleIVA = $precioUnitarioVentaIVA * $cantidadProducto;
 
             $data = [
-                'cantidadProducto'          => $nuevaCantidad,
-                'precioUnitario'            => $precioUnitario,
-                'porcentajeDescuento'       => $porcentajeDescuento,
-                'precioUnitarioIVA'         => $precioUnitarioIVA,
-                'ivaUnitario'               => $IvaCalcular,
-                'ivaTotal'                  => $ivaTotal,
-                'precioUnitarioVenta'       => $precioUnitarioVenta,
-                'precioUnitarioVentaIVA'    => $precioUnitarioVentaIVA,
-                'totalReservaDetalle'       => $totalReservaDetalle,
-                'totalReservaDetalleIVA'    => $totalReservaDetalleIVA
-            ];
-
-            $model->set($data)
-                  ->where('flgElimina', 0)
-                  ->where('reservaId', $reservaId)
-                  ->where('productoId', $productoId)
-                  ->update();
-            
-            return $this->response->setJSON([
-                'success' => true,
-                'mensaje' => 'Reserva actualizada correctamente',
-                'reservaDetalleId' => $reservaDetalleId
-            ]);
-        } else {
-            // Validar si la existencia es suficiente para una nueva inserción
-            if ($cantidadProducto > $existenciaActual) {
-                return $this->response->setJSON([
-                    'success' => false,
-                    'mensaje' => 'No hay existencias suficientes para realizar la reserva'
-                ]);
-            }
-
-            // Insertar nuevo detalle de reserva
-            $data = [
-                'productoId'                => $productoId,
                 'cantidadProducto'          => $cantidadProducto,
                 'precioUnitario'            => $precioUnitario,
-                'reservaId'                 => $reservaId,
                 'porcentajeDescuento'       => $porcentajeDescuento,
                 'precioUnitarioIVA'         => $precioUnitarioIVA,
                 'ivaUnitario'               => $IvaCalcular,
@@ -549,24 +479,301 @@ public function modalNuevaReservaOperacion()
                 'totalReservaDetalleIVA'    => $totalReservaDetalleIVA
             ];
 
-            $operacionReserva = $model->insert($data);
-
+            $operacionReserva = $model->update($reservaDetalleId, $data);
+            
             if ($operacionReserva) {
                 return $this->response->setJSON([
                     'success' => true,
-                    'mensaje' => 'Reserva agregada correctamente',
-                    'reservaDetalleId' => $model->insertID()
+                    'mensaje' => 'Reserva actualizada correctamente',
+                    'reservaDetalleId' => $reservaDetalleId
                 ]);
             } else {
                 return $this->response->setJSON([
                     'success' => false,
-                    'mensaje' => 'No se pudo insertar la reserva'
+                    'mensaje' => 'No se pudo actualizar la reserva'
                 ]);
             }
-        }
-    }
+        } else {
+            // Es una operación de agregar o no se especificó reservaDetalleId
+            if ($detalleActual && $detalleActual['cantidadProducto'] > 0) {
+                // El producto ya está en la reserva, actualizar la cantidad
+                $nuevaCantidad = $detalleActual['cantidadProducto'] + $cantidadProducto;
 
-}
+                if ($nuevaCantidad > $existenciaActual) {
+                    return $this->response->setJSON([
+                        'success' => false,
+                        'mensaje' => 'No hay existencias suficientes para realizar la reserva'
+                    ]);
+                }
+
+                // Recalcular los valores basados en la nueva cantidad
+                $precioUnitarioVenta = $precioUnitario * (1 - ($porcentajeDescuento / 100));
+                $precioUnitarioVentaIVA = $precioUnitarioVenta + $IvaVentaCalcular;
+                $totalReservaDetalle = $precioUnitarioVenta * $nuevaCantidad;
+                $totalReservaDetalleIVA = $precioUnitarioVentaIVA * $nuevaCantidad;
+
+                $data = [
+                    'cantidadProducto'          => $nuevaCantidad,
+                    'precioUnitario'            => $precioUnitario,
+                    'porcentajeDescuento'       => $porcentajeDescuento,
+                    'precioUnitarioIVA'         => $precioUnitarioIVA,
+                    'ivaUnitario'               => $IvaCalcular,
+                    'ivaTotal'                  => $ivaTotal,
+                    'precioUnitarioVenta'       => $precioUnitarioVenta,
+                    'precioUnitarioVentaIVA'    => $precioUnitarioVentaIVA,
+                    'totalReservaDetalle'       => $totalReservaDetalle,
+                    'totalReservaDetalleIVA'    => $totalReservaDetalleIVA
+                ];
+
+                $model->set($data)
+                    ->where('flgElimina', 0)
+                    ->where('reservaId', $reservaId)
+                    ->where('productoId', $productoId)
+                    ->update();
+                
+                return $this->response->setJSON([
+                    'success' => true,
+                    'mensaje' => 'Reserva actualizada correctamente',
+                    'reservaDetalleId' => $reservaDetalleId
+                ]);
+            } else {
+                // Validar si la existencia es suficiente para una nueva inserción
+                if ($cantidadProducto > $existenciaActual) {
+                    return $this->response->setJSON([
+                        'success' => false,
+                        'mensaje' => 'No hay existencias suficientes para realizar la reserva'
+                    ]);
+                }
+
+                // Insertar nuevo detalle de reserva
+                $data = [
+                    'productoId'                => $productoId,
+                    'cantidadProducto'          => $cantidadProducto,
+                    'precioUnitario'            => $precioUnitario,
+                    'reservaId'                 => $reservaId,
+                    'porcentajeDescuento'       => $porcentajeDescuento,
+                    'precioUnitarioIVA'         => $precioUnitarioIVA,
+                    'ivaUnitario'               => $IvaCalcular,
+                    'ivaTotal'                  => $ivaTotal,
+                    'precioUnitarioVenta'       => $precioUnitarioVenta,
+                    'precioUnitarioVentaIVA'    => $precioUnitarioVentaIVA,
+                    'totalReservaDetalle'       => $totalReservaDetalle,
+                    'totalReservaDetalleIVA'    => $totalReservaDetalleIVA
+                ];
+
+                $operacionReserva = $model->insert($data);
+
+                if ($operacionReserva) {
+                    return $this->response->setJSON([
+                        'success' => true,
+                        'mensaje' => 'Reserva agregada correctamente',
+                        'reservaDetalleId' => $model->insertID()
+                    ]);
+                } else {
+                    return $this->response->setJSON([
+                        'success' => false,
+                        'mensaje' => 'No se pudo insertar la reserva'
+                    ]);
+                }
+            }
+        }
+
+    }*/
+
+    public function modalNuevaReservaOperacion()
+    {
+        $operacion = $this->request->getPost('operacion');
+        $reservaDetalleId = $this->request->getPost('reservaDetalleId');
+        $model = new fel_reservas_detalle();
+        $sucursalModel = new fel_reservas();  
+        $reservaId = $this->request->getPost('reservaId');
+        $productoId = $this->request->getPost('productoId');
+        $precioUnitario = $this->request->getPost('hiddenPrecioUnitario');
+        $cantidadProducto = $this->request->getPost('cantidadProducto');
+        $porcentajeDescuento = $this->request->getPost('porcentajeDescuento');
+    
+        // Consulta para traer el 13% de la parametrización
+        $porcentajeIva = new conf_parametrizaciones;
+        $IVA = $porcentajeIva 
+            ->select("valorParametrizacion")
+            ->where("flgElimina", 0)
+            ->where("parametrizacionId", 1)
+            ->first(); 
+    
+        $IvaCalcular = ($precioUnitario * $IVA['valorParametrizacion']) / 100;
+        $precioUnitarioIVA = $precioUnitario + $IvaCalcular;
+        $ivaTotal = $IvaCalcular * $cantidadProducto;
+        $precioUnitarioVenta = $precioUnitario * (1 - ($porcentajeDescuento / 100));
+        $IvaVentaCalcular = ($precioUnitarioVenta * $IVA['valorParametrizacion']) / 100;
+        $precioUnitarioVentaIVA = $precioUnitarioVenta + $IvaVentaCalcular;
+        $totalReservaDetalle = $precioUnitarioVenta * $cantidadProducto;
+        $totalReservaDetalleIVA = $precioUnitarioVentaIVA * $cantidadProducto;
+    
+        // Necesito Traer sucursalId de fel_reservas 
+        $reservaData = $sucursalModel->find($reservaId);
+        $sucursalId = $reservaData['sucursalId'];  
+    
+        // Obtener la existencia actual del producto en la sucursal
+        $productosModel = new inv_productos_existencias();
+    
+        $producto = $productosModel->select('existenciaProducto')
+                    ->where('flgElimina', 0)
+                    ->where('sucursalId', $sucursalId)
+                    ->where('productoId', $productoId)
+                    ->first();
+    
+        if (!$producto) {
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'Producto no encontrado'
+            ]);
+        }
+    
+        $existenciaActual = $producto['existenciaProducto'];
+    
+        // Verificar si el producto ya está en la reserva
+        $detalleActual = $model->select('cantidadProducto, precioUnitario, porcentajeDescuento')
+                                ->where('flgElimina', 0)
+                                ->where('reservaId', $reservaId)
+                                ->where('productoId', $productoId)
+                                ->first();
+    
+        if ($operacion == 'editar' && $reservaDetalleId) {
+            // Es una operación de edición
+            $detalleActualEditar = $model->select('cantidadProducto')
+                                         ->where('flgElimina', 0)
+                                         ->where('reservaId', $reservaId)
+                                         ->where('productoId', $productoId)
+                                         ->where('reservaDetalleId', $reservaDetalleId)
+                                         ->first();
+    
+            /* if (($cantidadProducto - $detalleActualEditar['cantidadProducto']) > $existenciaActual) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'mensaje' => 'No hay existencias suficientes para realizar la reserva'
+                ]);
+            } */
+    
+            // Recalcular los valores basados en la nueva cantidad
+            $precioUnitarioVenta = $precioUnitario * (1 - ($porcentajeDescuento / 100));
+            $precioUnitarioVentaIVA = $precioUnitarioVenta + $IvaVentaCalcular;
+            $totalReservaDetalle = $precioUnitarioVenta * $cantidadProducto;
+            $totalReservaDetalleIVA = $precioUnitarioVentaIVA * $cantidadProducto;
+    
+            $data = [
+                'cantidadProducto'          => $cantidadProducto,
+                'precioUnitario'            => $precioUnitario,
+                'porcentajeDescuento'       => $porcentajeDescuento,
+                'precioUnitarioIVA'         => $precioUnitarioIVA,
+                'ivaUnitario'               => $IvaCalcular,
+                'ivaTotal'                  => $ivaTotal,
+                'precioUnitarioVenta'       => $precioUnitarioVenta,
+                'precioUnitarioVentaIVA'    => $precioUnitarioVentaIVA,
+                'totalReservaDetalle'       => $totalReservaDetalle,
+                'totalReservaDetalleIVA'    => $totalReservaDetalleIVA
+            ];
+    
+            $operacionReserva = $model->update($reservaDetalleId, $data);
+            
+            if ($operacionReserva) {
+                return $this->response->setJSON([
+                    'success' => true,
+                    'mensaje' => 'Reserva actualizada correctamente',
+                    'reservaDetalleId' => $reservaDetalleId
+                ]);
+            } else {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'mensaje' => 'No se pudo actualizar la reserva'
+                ]);
+            }
+        } else {
+            // Es una operación de agregar o no se especificó reservaDetalleId
+            if ($detalleActual && $detalleActual['cantidadProducto'] > 0) {
+                // El producto ya está en la reserva, actualizar la cantidad
+                $nuevaCantidad = $detalleActual['cantidadProducto'] + $cantidadProducto;
+    
+                /* if ($nuevaCantidad > $existenciaActual) {
+                    return $this->response->setJSON([
+                        'success' => false,
+                        'mensaje' => 'No hay existencias suficientes para realizar la reserva'
+                    ]);
+                } */
+    
+                // Recalcular los valores basados en la nueva cantidad
+                $precioUnitarioVenta = $precioUnitario * (1 - ($porcentajeDescuento / 100));
+                $precioUnitarioVentaIVA = $precioUnitarioVenta + $IvaVentaCalcular;
+                $totalReservaDetalle = $precioUnitarioVenta * $nuevaCantidad;
+                $totalReservaDetalleIVA = $precioUnitarioVentaIVA * $nuevaCantidad;
+    
+                $data = [
+                    'cantidadProducto'          => $nuevaCantidad,
+                    'precioUnitario'            => $precioUnitario,
+                    'porcentajeDescuento'       => $porcentajeDescuento,
+                    'precioUnitarioIVA'         => $precioUnitarioIVA,
+                    'ivaUnitario'               => $IvaCalcular,
+                    'ivaTotal'                  => $ivaTotal,
+                    'precioUnitarioVenta'       => $precioUnitarioVenta,
+                    'precioUnitarioVentaIVA'    => $precioUnitarioVentaIVA,
+                    'totalReservaDetalle'       => $totalReservaDetalle,
+                    'totalReservaDetalleIVA'    => $totalReservaDetalleIVA
+                ];
+    
+                $model->set($data)
+                      ->where('flgElimina', 0)
+                      ->where('reservaId', $reservaId)
+                      ->where('productoId', $productoId)
+                      ->update();
+                
+                return $this->response->setJSON([
+                    'success' => true,
+                    'mensaje' => 'Reserva actualizada correctamente',
+                    'reservaDetalleId' => $reservaDetalleId
+                ]);
+            } else {
+                // Validar si la existencia es suficiente para una nueva inserción
+                /* if ($cantidadProducto > $existenciaActual) {
+                    return $this->response->setJSON([
+                        'success' => false,
+                        'mensaje' => 'No hay existencias suficientes para realizar la reserva'
+                    ]);
+                } */
+    
+                // Insertar nuevo detalle de reserva
+                $data = [
+                    'productoId'                => $productoId,
+                    'cantidadProducto'          => $cantidadProducto,
+                    'precioUnitario'            => $precioUnitario,
+                    'reservaId'                 => $reservaId,
+                    'porcentajeDescuento'       => $porcentajeDescuento,
+                    'precioUnitarioIVA'         => $precioUnitarioIVA,
+                    'ivaUnitario'               => $IvaCalcular,
+                    'ivaTotal'                  => $ivaTotal,
+                    'precioUnitarioVenta'       => $precioUnitarioVenta,
+                    'precioUnitarioVentaIVA'    => $precioUnitarioVentaIVA,
+                    'totalReservaDetalle'       => $totalReservaDetalle,
+                    'totalReservaDetalleIVA'    => $totalReservaDetalleIVA
+                ];
+    
+                $operacionReserva = $model->insert($data);
+    
+                if ($operacionReserva) {
+                    return $this->response->setJSON([
+                        'success' => true,
+                        'mensaje' => 'Reserva agregada correctamente',
+                        'reservaDetalleId' => $model->insertID()
+                    ]);
+                } else {
+                    return $this->response->setJSON([
+                        'success' => false,
+                        'mensaje' => 'No se pudo insertar la reserva'
+                    ]);
+                }
+            }
+        }
+    
+    }
+    
 
 public function eliminarReserva(){
         
@@ -768,6 +975,7 @@ public function tablaContinuarReserva()
         // Verificar si el numComprobantePago ya existe
         $comprobanteExistente = $reservaPago
             ->where('numComprobantePago', $numComprobantePago)
+            ->where('reservaId', $reservaId)
             ->where('flgElimina', 0)
             ->first();
     
@@ -1079,10 +1287,66 @@ public function tablaContinuarReserva()
     
     }
 
-      public function finalizarReserva(){
+ /*     public function finalizarReserva(){
+        $reservaId = $this->request->getPost('reservaId');
+        $modelReserva = new fel_reservas();
 
+         // Actualizar el estado del traslado
+         $dataReservaEstado = [
+            'estadoReserva' => "Finalizado"
+        ];
+        $modelReserva->update($reservaId, $dataReservaEstado);
+        
+        return $this->response->setJSON([
+            'success' => true,
+            'mensaje' => 'Reserva finalizada!.',
+            'trasladosId' => $this->request->getPost('reservaId')
+        ]);
       }
 
+*/
+
+    public function finalizarReserva()
+    {
+        $reservaId = $this->request->getPost('reservaId');
+        $modelReserva = new fel_reservas();
+        $modelReservaDetalle = new fel_reservas_detalle();
+        $modelReservaPago = new fel_reservas_pago();
+
+        // Obtener el total a pagar para la reserva
+        $totalAPagar = $modelReservaDetalle
+            ->select('SUM(totalReservaDetalleIVA) as totalAPagar')
+            ->where('reservaId', $reservaId)
+            ->where('flgElimina', 0)
+            ->first()['totalAPagar'];
+
+        // Obtener el total pagado para la reserva
+        $totalPagado = $modelReservaPago
+            ->select('SUM(montoPago) as totalPagado')
+            ->where('reservaId', $reservaId)
+            ->where('flgElimina', 0)
+            ->first()['totalPagado'];
+
+        // Validar que el total pagado sea mayor o igual al total a pagar
+        if ($totalPagado < $totalAPagar) {
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'No se puede finalizar la reserva. El total pagado es menor al total a pagar.'
+            ]);
+        }
+
+        // Actualizar el estado de la reserva
+        $dataReservaEstado = [
+            'estadoReserva' => "Finalizado"
+        ];
+        $modelReserva->update($reservaId, $dataReservaEstado);
+        
+        return $this->response->setJSON([
+            'success' => true,
+            'mensaje' => 'Reserva finalizada!',
+            'trasladosId' => $this->request->getPost('reservaId')
+        ]);
+    }
 
 
 }

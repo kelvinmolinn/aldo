@@ -13,6 +13,8 @@ use App\Models\inv_kardex;
 use App\Models\log_productos_precios;
 use App\Models\conf_parametrizaciones;
 use App\Models\vista_usuarios_empleados;
+use App\Models\fel_reservas;
+use App\Models\fel_reservas_detalle;
 
 class AdministracionProducto extends Controller
 {
@@ -282,27 +284,40 @@ class AdministracionProducto extends Controller
     {
         $productoId = $this->request->getPost('productoId');
         $mostrarProductoExistencia = new inv_productos_existencias();
-        $datos = $mostrarProductoExistencia
-        ->select('inv_productos_existencias.productoExistenciaId,inv_productos_existencias.existenciaProducto,inv_productos_existencias.existenciaReservada,conf_sucursales.sucursalId,conf_sucursales.sucursal,inv_productos.productoId,inv_productos.producto,cat_14_unidades_medida.abreviaturaUnidadMedida')
-        ->join('conf_sucursales', 'conf_sucursales.sucursalId = inv_productos_existencias.sucursalId')
-        ->join('inv_productos', 'inv_productos.productoId = inv_productos_existencias.productoId')
-        ->join('cat_14_unidades_medida', 'cat_14_unidades_medida.unidadMedidaId = inv_productos.unidadMedidaId')
-        ->where('inv_productos_existencias.flgElimina', 0)
-        ->where('inv_productos_existencias.productoId', $productoId)
-        ->findAll();
+        $mostrarReservaDetalle = new fel_reservas_detalle();
+        $mostrarReserva = new fel_reservas();
     
-        //validar si el producto en la sucursal ya existe sumar la nueva existencia al post
-        // Construye el array de salida  para solo mostrar una 
+        $datos = $mostrarProductoExistencia
+            ->select('inv_productos_existencias.productoExistenciaId, inv_productos_existencias.existenciaProducto, inv_productos_existencias.existenciaReservada, conf_sucursales.sucursalId, conf_sucursales.sucursal, inv_productos.productoId, inv_productos.producto, cat_14_unidades_medida.abreviaturaUnidadMedida')
+            ->join('conf_sucursales', 'conf_sucursales.sucursalId = inv_productos_existencias.sucursalId')
+            ->join('inv_productos', 'inv_productos.productoId = inv_productos_existencias.productoId')
+            ->join('cat_14_unidades_medida', 'cat_14_unidades_medida.unidadMedidaId = inv_productos.unidadMedidaId')
+            ->where('inv_productos_existencias.flgElimina', 0)
+            ->where('inv_productos_existencias.productoId', $productoId)
+            ->findAll();
+    
         $output['data'] = array();
         $n = 1; // Variable para contar las filas
+    
         foreach ($datos as $columna) {
-            // Aquí construye tus columnas
+            // Consulta para obtener la cantidad reservada del producto en la sucursal
+            $cantidadReservada = $mostrarReservaDetalle
+                ->select('SUM(fel_reservas_detalle.cantidadProducto) AS cantidadReserva')
+                ->join('fel_reservas', 'fel_reservas.reservaId = fel_reservas_detalle.reservaId')
+                ->where('fel_reservas.sucursalId', $columna['sucursalId'])
+                ->where('fel_reservas_detalle.productoId', $productoId)
+                ->where('fel_reservas.facturaId IS NULL')
+                ->whereIn('fel_reservas.estadoReserva', ['Pendiente', 'Finalizado'])
+                ->where('fel_reservas_detalle.flgElimina', 0)
+                ->first();
+    
+            // Construir las columnas
             $columna1 = $n;
             $columna2 = "<b>Sucursal:</b> " . $columna['sucursal'];
-            $columna3 = "<b>Existencia:</b> " . $columna['existenciaProducto'].' '.'('.$columna['abreviaturaUnidadMedida'].')';
-           
-
-            // Agrega la fila al array de salida
+            $columna3 = "<b>Existencia:</b> " . $columna['existenciaProducto'] . ' (' . $columna['abreviaturaUnidadMedida'] . ')<br>' .
+                        '<small style="color:red;"><b>Reservado:</b> ' . ($cantidadReservada['cantidadReserva'] ?? 0) . ' (' . $columna['abreviaturaUnidadMedida'] . ')</small>';
+    
+            // Agregar la fila al array de salida
             $output['data'][] = array(
                 $columna1,
                 $columna2,
@@ -319,6 +334,7 @@ class AdministracionProducto extends Controller
             return $this->response->setJSON(array('data' => '')); // No hay datos, devuelve un array vacío
         }
     }
+    
     
 
 
