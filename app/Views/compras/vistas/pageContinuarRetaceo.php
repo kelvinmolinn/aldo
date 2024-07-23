@@ -132,11 +132,11 @@
             }
         });
     }
-    function modalAgregarDAI(codigoProducto,producto){
+    function modalAgregarDAI(jsonDAI){
         $.ajax({
             url: '<?php echo base_url('compras/admin-retaceo/form/agregar/dai'); ?>',
             type: 'POST',
-            data: {numDocumento : '<?= $camposEncabezado["numRetaceo"]; ?>', codigoProducto: codigoProducto, producto: producto}, // Pasar el ID del módulo como parámetro
+            data: {numDocumento : '<?= $camposEncabezado["numRetaceo"]; ?>', codigoProducto: jsonDAI.codigoProducto, producto: jsonDAI.producto}, // Pasar el ID del módulo como parámetro
             success: function(response) {
                 // Insertar el contenido de la modal en el cuerpo de la modal
                 $('#divModalContent').html(response);
