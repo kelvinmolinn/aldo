@@ -45,7 +45,7 @@ class administracionRetaceo extends Controller
             $columna1 = $n;
             $columna2 = "<b>N° de retaceo: </b> ".$consultaRetaceo['numRetaceo'] . "<br>" . "<b>Factura(s): </b> " . "<br>" . "<b>Estado: </b> ".$consultaRetaceo ['estadoRetaceo'] . "<br>" . "<b>Total de productos: </b> ";
     
-            $columna3 = "<b>Flete: </b> ".$consultaRetaceo['totalFlete'] . "<br>" . "<b>Gastos: </b> ".$consultaRetaceo['totalGastos'] . "<br>" . "<b>Costo total: </b> ";
+            $columna3 = "<b>Flete: </b> ". number_format($consultaRetaceo['totalFlete'], 2, ".", ",") . "<br>" . "<b>Gastos: </b> ". number_format($consultaRetaceo['totalGastos'], 2, ".", ",") . "<br>" . "<b>Costo total: </b> ";
 
             $jsonContinuarRetaceo = [
                 "retaceoId"      => $consultaRetaceo['retaceoId']
@@ -228,6 +228,7 @@ class administracionRetaceo extends Controller
         $n = 0;
 
         $retaceoId = $this->request->getPost('retaceoId');
+        $numDocumento = $this->request->getPost('numDocumento');
 
         $consultaRetaceoDetalle = $compRetaceoDetalle
                 ->select("comp_retaceo_detalle.retaceoId,comp_retaceo_detalle.compraDetalleId,comp_retaceo_detalle.cantidadProducto,comp_retaceo_detalle.precioFOBUnitario,comp_retaceo_detalle.importe,comp_retaceo_detalle.flete,comp_retaceo_detalle.gasto,comp_retaceo_detalle.DAI,comp_retaceo_detalle.costoUnitarioRetaceo,comp_retaceo_detalle.costoTotal,inv_productos.codigoProducto,inv_productos.producto")
@@ -237,13 +238,19 @@ class administracionRetaceo extends Controller
                 ->where("comp_retaceo_detalle.retaceoId", $retaceoId)
                 ->findAll();
 
+        $totalCantidad = 0;
+        $totalPrecioUnitarioFOB = 0;
+        $totalFlete = 0;
+        $totalGastos = 0;
+        $totalCosto = 0;
+
         foreach($consultaRetaceoDetalle AS $tableRetaceoDetalle){
             $n++;
             // Aquí construye tus columnas
             $columna1 = $n;
             $columna2 = "(".$tableRetaceoDetalle['codigoProducto'].")". $tableRetaceoDetalle['producto'];
 
-            $columna3 = number_format($tableRetaceoDetalle['cantidadProducto'], 2, ".", ",");
+            $columna3 = number_format($tableRetaceoDetalle['cantidadProducto'], 0, ".", ",");
 
             $columna4 = "$ " . number_format($tableRetaceoDetalle['precioFOBUnitario'], 2, ".", ",");
 
@@ -261,21 +268,15 @@ class administracionRetaceo extends Controller
 
             $columna11 = "$ " . number_format($tableRetaceoDetalle['costoUnitarioRetaceo'] + $tableRetaceoDetalle['costoTotal'], 2, ".", ",");
 
+            $jsonDAI = [
+                "codigoProducto"      => $tableRetaceoDetalle['codigoProducto'],
+                "producto"            => $tableRetaceoDetalle['producto']
+            ];
+            
             $columna12 = '  
-                            <button class="btn btn-primary mb-1" onclick="modalAgregarDAI()" data-toggle="tooltip" data-placement="top" title="DAI">
+                            <button class="btn btn-primary mb-1" onclick="modalAgregarDAI('.htmlspecialchars(json_encode($jsonDAI)).')" data-toggle="tooltip" data-placement="top" title="DAI">
                                 <i class="fas fa-address-book"></i> DAI
                             </button>';
-
-            /*$columna4 = '
-                            <button type= "button" class="btn btn-primary mb-1" onclick="cambiarInterfaz(`compras/admin-retaceo/vista/continuar/retaceo`);" data-toggle="tooltip" data-placement="top" title="Continuar retaceo">
-                                <i class="fas fa-sync-alt"></i>
-                            </button>';
-
-            $columna4 .= '
-                             <button type= "button" class="btn btn-danger mb-1" onclick="" data-toggle="tooltip" data-placement="top" title="Anular">
-                                <i class="fas fa-ban"></i>
-                            </button>
-                        ';*/
 
             $output['data'][] = array(
                 $columna1,
@@ -291,13 +292,24 @@ class administracionRetaceo extends Controller
                 $columna11,
                 $columna12
             );
+
+            $totalCantidad += $tableRetaceoDetalle['cantidadProducto'];
+            $totalPrecioUnitarioFOB += $tableRetaceoDetalle['precioFOBUnitario'];
+            $totalFlete += $tableRetaceoDetalle['flete'];
+            $totalGastos += $tableRetaceoDetalle['gasto'];
+            $totalCosto += $tableRetaceoDetalle['costoTotal'];
         } 
 
 
         // Verifica si hay datos
         if ($n > 0) {
                 $output['footer'] = array(
-                    '<div class="text-right"><b>Total</b></div>'
+                    '<div class="text-right"><b>Total</b></div>',
+                    '<div class="text-right"><b>'.number_format($totalCantidad, 0, ".", ",").'</b></div>',
+                    '<div class="text-right"><b>$ '.number_format($totalPrecioUnitarioFOB, 2, ".", ",").'</b></div>',
+                    '<div class="text-right"><b>$ '.number_format($totalFlete, 2, ".", ",").'</b></div>',
+                    '<div class="text-right"><b>$ '.number_format($totalGastos, 2, ".", ",").'</b></div>',
+                    '<div class="text-right"><b>$ '.number_format($totalCosto, 2, ".", ",").'</b></div>'
                  );
             return $this->response->setJSON($output);
         } else {
@@ -311,10 +323,11 @@ class administracionRetaceo extends Controller
 
         // Este select debe ser solo a comp_compras y de compras_detalle debe ser un SUM del totalcompradetalle
         // SELECT c.compraiD, c.numfactura, SUM(SELECT cd.totalcompradetalle FROM comp_compras_detalle WHERE cd.compraId = c.compraId AND cd.flgELimina = 0) FROM comp_compras c WHERE flgElimina, flgRetaceo, estadocompra
-        $data['campos'] = $comp_compras_detalle
-            ->select('comp_compras.compraId,comp_compras.numFactura,comp_compras.flgRetaceo,comp_compras_detalle.totalCompraDetalle')
-            ->join('comp_compras','comp_compras.compraId = comp_compras_detalle.compraId')
-            ->where('comp_compras_detalle.flgElimina', 0)
+        
+            $data['campos'] = $comp_compras
+            ->select('(SELECT SUM(comp_compras_detalle.totalCompraDetalle) FROM comp_compras_detalle WHERE comp_compras_detalle.compraId = comp_compras.compraId) AS totalComprasDetalleRetaceo', false)
+            ->select('comp_compras.compraId,comp_compras.numFactura')
+            ->where('comp_compras.flgElimina', 0)
             ->where('comp_compras.flgRetaceo', 'Si')
             ->where('comp_compras.estadoCompra', 'Finalizada')
             ->findAll();
@@ -330,6 +343,11 @@ class administracionRetaceo extends Controller
 
     public function modalAgregarDAI(){
         $data['variable'] = 0;
+
+        $data['numDocumento']   = $this->request->getPost('numDocumento');
+        $data['codigoProducto'] = $this->request->getPost('codigoProducto');
+        $data['producto']       = $this->request->getPost('producto');
+
         return view('compras/modals/modalAgregarDAI', $data);
     }
 

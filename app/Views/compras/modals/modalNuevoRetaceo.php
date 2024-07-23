@@ -26,14 +26,14 @@
                     <div class="row mb-2">
                             <div class="col-md-6">
                                 <div class="form-outline">
-                                    <input type="number" id="fleteRetaceo" name="fleteRetaceo" class="form-control" required>
+                                    <input type="number" id="fleteRetaceo" name="fleteRetaceo" class="form-control" min = "0.00"required>
                                     <label class="form-label" for="fleteRetaceo">Flete</label>
 
                                 </div>
                             </div>
                             <div class="col-md-6">
                                     <div class="form-outline">
-                                        <input type="number" id="GastosRetaceo" name="GastosRetaceo" class="form-control" required>
+                                        <input type="number" id="GastosRetaceo" name="GastosRetaceo" class="form-control" min = "0.00" required>
                                         <label class="form-label" for="GastosRetaceo">Gastos</label>
                                     </div>
                             </div>

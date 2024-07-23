@@ -25,13 +25,13 @@
         <div class="row mb-2">
             <div class="col-md-6">
                 <div class="form-outline">
-                    <input type="number" id="fleteContinuarRetaceo" name="fleteContinuarRetaceo" class="form-control active" required>
+                    <input type="number" id="fleteContinuarRetaceo" name="fleteContinuarRetaceo" class="form-control active" min = "0.00" required>
                     <label class="form-label" for="fleteContinuarRetaceo">Flete</label>
                 </div>
             </div>
             <div class="col-md-6">
                 <div class="form-outline">
-                    <input type="number" id="GastosContinuarRetaceo" name="GastosContinuarRetaceo" class="form-control active" required>
+                    <input type="number" id="GastosContinuarRetaceo" name="GastosContinuarRetaceo" class="form-control active" min = "0.00" required>
                     <label class="form-label" for="GastosContinuarRetaceo">Gastos</label>
                 </div>
             </div>
@@ -132,11 +132,11 @@
             }
         });
     }
-    function modalAgregarDAI(){
+    function modalAgregarDAI(codigoProducto,producto){
         $.ajax({
             url: '<?php echo base_url('compras/admin-retaceo/form/agregar/dai'); ?>',
             type: 'POST',
-            data: {}, // Pasar el ID del módulo como parámetro
+            data: {numDocumento : '<?= $camposEncabezado["numRetaceo"]; ?>', codigoProducto: codigoProducto, producto: producto}, // Pasar el ID del módulo como parámetro
             success: function(response) {
                 // Insertar el contenido de la modal en el cuerpo de la modal
                 $('#divModalContent').html(response);
@@ -217,7 +217,6 @@
                 "url": '<?php echo base_url('compras/admin-retaceo/tabla/continuar/retaceo'); ?>',
                 "data": {
                         retaceoId:'<?= $retaceoId; ?>'
-
                 }
             },
             "footerCallback": function(tfoot) {    
@@ -225,17 +224,20 @@
                 if(response && Object.keys(response.footer).length !== 0) {
                     var td = $(tfoot).find('td');
                     td.eq(1).html(response["footer"][0]);
-                    td.eq(3).html(response["footer"][1]);
-                    td.eq(4).html(response["footer"][2]);
+                    td.eq(2).html(response["footer"][1]);
+                    td.eq(3).html(response["footer"][2]);
+                    td.eq(5).html(response["footer"][3]);
+                    td.eq(6).html(response["footer"][4]);
+                    td.eq(9).html(response["footer"][5]);
                     $("#tdFooterTotales").html(response["footerTotales"]);
                 } else {
                     var td = $(tfoot).find('td');
                     td.eq(1).html('<b>Sumas</b>');
-                    td.eq(2).html('<div class="text-right"><b>35</b></div>');
-                    td.eq(3).html('<div class="text-right"><b>$ 50.50</b></div>');
-                    td.eq(5).html('<div class="text-right"><b>$ 9.54</b></div>');
-                    td.eq(6).html('<div class="text-right"><b>$ 7.95</b></div>');
-                    td.eq(9).html('<div class="text-right"><b>$ 918.99</b></div>');
+                    td.eq(2).html('');
+                    td.eq(3).html('');
+                    td.eq(5).html('');
+                    td.eq(6).html('');
+                    td.eq(9).html('');
                     $("#tdFooterTotales").html(``);
                 }
             },
@@ -263,7 +265,7 @@
         });   
 
         $("#numeroRetaceo").val(<?= $camposEncabezado["numRetaceo"]; ?>).trigger('change');      
-        $("#fleteContinuarRetaceo").val(<?= $camposEncabezado["totalFlete"]; ?>).trigger('change');    
-        $("#GastosContinuarRetaceo").val('<?= $camposEncabezado["totalGastos"]; ?>').trigger('change'); 
+        $("#fleteContinuarRetaceo").val(<?= number_format($camposEncabezado["totalFlete"], 2, ".", ","); ?>).trigger('change');    
+        $("#GastosContinuarRetaceo").val('<?= number_format($camposEncabezado["totalGastos"], 2, ".", ","); ?>').trigger('change'); 
     })
 </script>

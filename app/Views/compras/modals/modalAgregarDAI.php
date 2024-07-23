@@ -8,13 +8,13 @@
                 <div class="modal-body">
                     <div class="row mb-2">
                         <div class="col-md-6">
-                            <b><span>Número de documento: </span></b>1234
+                            <b><span>Número de documento: </span></b><?php echo $numDocumento?>
                         </div>
                     </div>
 
                     <div class="row mb-2">
                         <div class="col-md-6">
-                        <b><span>Producto: </span></b>(PD-001) MARIO KART
+                        <b><span>Producto: </span></b>(<?php echo $codigoProducto?>) <?php echo $producto?>
                         </div>
                     </div>
                     <div class="row">

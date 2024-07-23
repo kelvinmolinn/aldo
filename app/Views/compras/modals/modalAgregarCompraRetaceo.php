@@ -13,7 +13,7 @@
                                 <select name="selectCompraRetaceo[]" id="selectCompraRetaceo" multiple style="width: 100%;" required>
                                     <option value=""></option>
                                     <?php foreach ($campos as $campos){ ?>
-                                        <option value="<?php echo $campos['compraId']; ?>"><?php echo $campos['numFactura']; ?> - $<?php echo $campos['totalCompraDetalle']; ?></option>
+                                        <option value="<?php echo $campos['compraId']; ?>"><?php echo $campos['numFactura']; ?> - $<?php echo $campos['totalComprasDetalleRetaceo']; ?></option>
                                     <?php } ?>
                                 </select>
                             </div>
