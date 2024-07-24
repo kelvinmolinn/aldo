@@ -1,4 +1,4 @@
-<form id="frmModal" method="post" action="<?php echo base_url(''); ?>">
+<form id="frmModal" method="post" action="<?php echo base_url('compras/admin-retaceo/operacion/dai/retaceo'); ?>">
     <div id="modalAgregarDAI" class="modal" tabindex="-1" data-backdrop="static" data-keyboard="false">
         <div class="modal-dialog  modal-lg">
             <div class="modal-content">
@@ -6,15 +6,16 @@
                     <h5 class="modal-title">DAI</h5>
                 </div>
                 <div class="modal-body">
+                <input type="hidden" name="retaceoDetalleId" id="retaceoDetalleId" value="<?php echo $retaceoDetalleId; ?>">
                     <div class="row mb-2">
                         <div class="col-md-6">
-                            <b><span>Número de documento: </span></b><?php echo $numDocumento?>
+                            <b><span>Número de documento: </span></b><?php echo $numDocumento;?>
                         </div>
                     </div>
 
                     <div class="row mb-2">
                         <div class="col-md-6">
-                        <b><span>Producto: </span></b>(<?php echo $codigoProducto?>) <?php echo $producto?>
+                        <b><span>Producto: </span></b>(<?php echo $codigoProducto;?>) <?php echo $producto;?>
                         </div>
                     </div>
                     <div class="row">
@@ -27,7 +28,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" id="btnguardarProveedor" class="btn btn-primary">
+                    <button type="submit" id="btnguardarDAI" class="btn btn-primary">
                         <i class="fas fa-save"></i>
                         Guardar
                     </button>
@@ -45,7 +46,8 @@
         $("#selectCompraRetaceo").select2({
             placeholder: 'Compras',
             dropdownParent: $('#modalNuevoRetaceo')
-        });    
+        });
+
         $("#frmModal").submit(function(event) {
             event.preventDefault();
             $.ajax({

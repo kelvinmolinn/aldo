@@ -231,7 +231,7 @@ class administracionRetaceo extends Controller
         $numDocumento = $this->request->getPost('numDocumento');
 
         $consultaRetaceoDetalle = $compRetaceoDetalle
-                ->select("comp_retaceo_detalle.retaceoId,comp_retaceo_detalle.compraDetalleId,comp_retaceo_detalle.cantidadProducto,comp_retaceo_detalle.precioFOBUnitario,comp_retaceo_detalle.importe,comp_retaceo_detalle.flete,comp_retaceo_detalle.gasto,comp_retaceo_detalle.DAI,comp_retaceo_detalle.costoUnitarioRetaceo,comp_retaceo_detalle.costoTotal,inv_productos.codigoProducto,inv_productos.producto")
+                ->select("comp_retaceo_detalle.retaceoDetalleId,comp_retaceo_detalle.retaceoId,comp_retaceo_detalle.compraDetalleId,comp_retaceo_detalle.cantidadProducto,comp_retaceo_detalle.precioFOBUnitario,comp_retaceo_detalle.importe,comp_retaceo_detalle.flete,comp_retaceo_detalle.gasto,comp_retaceo_detalle.DAI,comp_retaceo_detalle.costoUnitarioRetaceo,comp_retaceo_detalle.costoTotal,inv_productos.codigoProducto,inv_productos.producto")
                 ->join("comp_compras_detalle", "comp_compras_detalle.compraDetalleId = comp_retaceo_detalle.compraDetalleId")
                 ->join("inv_productos", "inv_productos.productoId = comp_compras_detalle.productoId")
                 ->where("comp_retaceo_detalle.flgElimina", 0)
@@ -269,8 +269,9 @@ class administracionRetaceo extends Controller
             $columna11 = "$ " . number_format($tableRetaceoDetalle['costoUnitarioRetaceo'] + $tableRetaceoDetalle['costoTotal'], 2, ".", ",");
 
             $jsonDAI = [
-                "codigoProducto"      => $tableRetaceoDetalle['codigoProducto'],
-                "producto"            => $tableRetaceoDetalle['producto']
+                "codigoProducto"        => $tableRetaceoDetalle['codigoProducto'],
+                "producto"              => $tableRetaceoDetalle['producto'],
+                "retaceoDetalleId"      => $tableRetaceoDetalle['retaceoDetalleId']
             ];
             
             $columna12 = '  
@@ -347,6 +348,7 @@ class administracionRetaceo extends Controller
         $data['numDocumento']   = $this->request->getPost('numDocumento');
         $data['codigoProducto'] = $this->request->getPost('codigoProducto');
         $data['producto']       = $this->request->getPost('producto');
+        $data['retaceoDetalleId']       = $this->request->getPost('retaceoDetalleId');
 
         return view('compras/modals/modalAgregarDAI', $data);
     }
@@ -378,7 +380,7 @@ class administracionRetaceo extends Controller
                 "cantidadProducto"     => $compDetalle['cantidadProducto'],
                 "precioFOBUnitario"    => $compDetalle['precioUnitario'],
                 "importe"              => $totalCompraDetalle,
-                'DAI'                   => 0
+                'DAI'                  => 0
             ];
 
             // Insertar datos en la base de datos
@@ -481,6 +483,30 @@ class administracionRetaceo extends Controller
         }
     }
     public function modalOperacionDai(){
+        $retaceoDetalle = new comp_retaceo_detalle();
         
+        $retaceoDetalleId = $this->request->getPost('retaceoDetalleId');
+
+        $data = [
+            'DAI'       => $this->request->getPost('DAI')
+        ];
+
+            // Insertar datos en la base de datos
+            $operacionCalculoDAI = $retaceoDetalle->update($retaceoDetalleId, $data);
+
+        if ($operacionCalculoDAI) {
+            // Si el insert fue exitoso, devuelve el último ID insertado
+            return $this->response->setJSON([
+                'success' => true,
+                'mensaje' => 'Retaceo calculado correctamente',
+                'retaceoDetalleId' => $retaceoDetalleId
+            ]);
+        } else {
+            // Si el insert falló, devuelve un mensaje de error
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'No se pudo calcular el DAI'
+            ]);
+        }
     }
 }
