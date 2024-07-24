@@ -234,6 +234,7 @@ $routes->group('compras/admin-retaceo', function($routes) {
     $routes->post('operacion/guardar/retaceo', 'compras\administracionRetaceo::modalRetaceoOperacion');
     $routes->post('operacion/compra/retaceo', 'compras\administracionRetaceo::modalCompraRetaceoOperacion');
     $routes->post('calcular/retaceo', 'compras\administracionRetaceo::calcularRetaceo');    
+    $routes->post('operacion/dai/retaceo', 'compras\administracionRetaceo::modalOperacionDai');    
     
 });
 

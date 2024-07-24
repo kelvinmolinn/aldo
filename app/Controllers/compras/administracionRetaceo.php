@@ -480,4 +480,7 @@ class administracionRetaceo extends Controller
             ]);
         }
     }
+    public function modalOperacionDai(){
+        
+    }
 }

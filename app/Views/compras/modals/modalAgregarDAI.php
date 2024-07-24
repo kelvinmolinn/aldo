@@ -46,6 +46,39 @@
             placeholder: 'Compras',
             dropdownParent: $('#modalNuevoRetaceo')
         });    
-
+        $("#frmModal").submit(function(event) {
+            event.preventDefault();
+            $.ajax({
+                url: $(this).attr('action'), 
+                type: $(this).attr('method'),
+                data: $(this).serialize(),
+                success: function(response) {
+                    console.log(response);
+                    if (response.success) {
+                        // Insert exitoso, ocultar modal y mostrar mensaje
+                        $('#modalAgregarDAI').modal('hide');
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'DAI agregado al retaceo con éxito',
+                            text: response.mensaje
+                        }).then((result) => {
+                            $("#tablaContinuarRetaceo").DataTable().ajax.reload(null, false);
+                            calcularRetaceo();
+                        });
+                    } else {
+                        // Insert fallido, mostrar mensaje de error
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.mensaje
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    // Manejar errores si los hay
+                    console.error(xhr.responseText);
+                }
+            });
+        });
     })
 </script>
