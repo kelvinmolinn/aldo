@@ -52,12 +52,12 @@
     </table>
 </div>
 <script>
-    function modalEmitirDTE() {
+    function modalEmitirDTE(facturaId) {
         // Realizar una petición AJAX para obtener los datos del módulo por su ID
         $.ajax({
                 url: '<?php echo base_url('ventas/admin-facturacion/form/emitir/dte'); ?>',
                 type: 'POST',
-                data: {}, // Pasar el ID del módulo como parámetro
+                data: {facturaId: facturaId}, // Pasar el ID del módulo como parámetro
                 success: function(response) {
                     // Insertar el contenido de la modal en el cuerpo de la modal
                     $('#divModalContent').html(response);
@@ -71,12 +71,12 @@
             }
         });
     }
-    function modalAnularDTE() {
+    function modalAnularDTE(facturaId, obsAnulacion) {
         // Realizar una petición AJAX para obtener los datos del módulo por su ID
         $.ajax({
                 url: '<?php echo base_url('ventas/admin-facturacion/form/anular/dte'); ?>',
                 type: 'POST',
-                data: {}, // Pasar el ID del módulo como parámetro
+                data: {facturaId: facturaId, obsAnulacion: obsAnulacion}, // Pasar el ID del módulo como parámetro
                 success: function(response) {
                     // Insertar el contenido de la modal en el cuerpo de la modal
                     $('#divModalContent').html(response);
@@ -146,11 +146,14 @@
                     }
                 }
             },
-            "autoWidth": false,  // Deshabilitar autoWidth para que DataTables no ajuste automáticamente el ancho de las columnas
-        "columnDefs": [
-            { "targets": "_all", "className": "text-left" } // Aplicar alineación a todas las columnas
-        ],
-            
+            "columnDefs": [
+                { "width": "5%", "targets": 0 },   
+                { "width": "30%", "targets": 1 }, 
+                { "width": "20%", "targets": 2 }, 
+                { "width": "25%", "targets": 3 }, 
+                { "width": "10%", "targets": 4 },
+                { "width": "10%", "targets": 5 }
+            ],
             "language": {
                 "url": "../assets/plugins/datatables/js/spanish.json"
             },

@@ -285,7 +285,11 @@ $routes->group('ventas/admin-facturacion', function($routes) {
     $routes->post('operacion/guardar/dte', 'ventas\administracionFacturacion::modalDTEOperacion');
     $routes->post('tabla/facturacion', 'ventas\administracionFacturacion::tablaFacturacion');
     $routes->post('form/anular/dte', 'ventas\administracionFacturacion::modalAnularDTE');
+    $routes->post('anular/dte', 'ventas\administracionFacturacion::operacionAnularDTE');
+    $routes->post('vista/actualizar/dte', 'ventas\administracionFacturacion::vistaContinuarDTE');
     $routes->post('vista/continuar/dte', 'ventas\administracionFacturacion::vistaContinuarDTE');
+    $routes->post('operacion/actualizar/dte', 'ventas\administracionFacturacion::vistaActualizarDTEOperacion');
+    $routes->post('modal/nuevo/dte', 'ventas\administracionFacturacion::modalNuevoProductoDTE'); //Aqui
     $routes->post('tabla/continuar/dte', 'ventas\administracionFacturacion::tablaContinuarDTE');
     $routes->post('form/pago/dte', 'ventas\administracionFacturacion::modalPagoDTE');
     $routes->post('tabla/pago/dte', 'ventas\administracionFacturacion::tablaPagoDTE');
@@ -293,6 +297,7 @@ $routes->group('ventas/admin-facturacion', function($routes) {
     $routes->post('tabla/complemento/dte', 'ventas\administracionFacturacion::tablaComplementoDTE');
     $routes->post('form/error/dte', 'ventas\administracionFacturacion::tablaErrorDTE');
     $routes->post('form/imprimir/dte', 'ventas\administracionFacturacion::imprimirDTE');
+
 });
 
 $routes->group("select", function($routes) {

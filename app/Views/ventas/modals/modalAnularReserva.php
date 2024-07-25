@@ -59,7 +59,7 @@
                             $('#modalAnularReserva').modal('hide');
                             Swal.fire({
                                 icon: 'success',
-                                title: 'retaceo anulado con éxito',
+                                title: 'reserva anulada con éxito',
                                 text: response.mensaje
                             }).then((result) => {
                                 $("#tablaReserva").DataTable().ajax.reload(null, false);

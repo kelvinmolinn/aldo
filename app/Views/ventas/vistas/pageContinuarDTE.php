@@ -1,66 +1,70 @@
-<form id="frmContinuarDTE" method="post" action="<?php echo base_url(''); ?>">
+<form id="frmContinuarDTE" method="post" action="<?php echo base_url('ventas/admin-facturacion/operacion/actualizar/dte'); ?>">
+    <input type="hidden" id="facturaId" name="facturaId" value="<?= $facturaId; ?>">
     <h2>Continuar DTE</h2>
     <hr>
-    <button type= "button" id="btnRegresarReserva" class="btn btn-secondary estilo-btn mb-4">
-        <i class="fas fa-backspace"></i>
-            Volver a facturación
+    <button type="button" id="btnRegresarReserva" class="btn btn-secondary estilo-btn mb-4">
+        <i class="fas fa-backspace"></i> Volver a facturación
     </button>
-        <div class="row mb-2">
-            <div class="col-md-4">
-                <div class="form-select-control">
-                    <select name="selectSucursalDTE" id="selectSucursalDTE" style="width: 100%;" required>
-                        <option value=""></option>
-                        <option value="1">Aldo Games Store (Principal)</option>
-                    </select>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="form-select-control">
-                    <select name="selectTipoDTE" id="selectTipoDTE" style="width: 100%;" required>
-                        <option value=""></option>
-                        <option value="1">Factura</option>
-                    </select>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="form-outline">
-                    <input type="date" id="fechaDTE" name="fechaDTE" class="form-control active" required>
-                    <label class="form-label" for="fechaDTE">Fecha del DTE</label>
-                </div>
+    <div class="row mb-2">
+        <div class="col-md-4">
+            <div class="form-select-control">
+                <select name="sucursalId" id="sucursalId" class="form-control" style="width: 100%;" required>
+                    <option></option>
+                    <?php foreach ($sucursales as $sucursal) : ?>
+                        <option value="<?php echo $sucursal['sucursalId']; ?>"><?php echo $sucursal['sucursal']; ?></option>
+                    <?php endforeach; ?>
+                </select>
             </div>
         </div>
-        <div class="row mt-4 mb-4">
-            <div class="col-md-6">
-                <div class="form-select-control">
-                    <select name="selectNombreClienteDTE" id="selectNombreClienteDTE" style="width: 100%;" required>
-                        <option value=""></option>
-                        <option value="1">Cliente Prueba</option>
-                    </select>
-                </div>
+        <div class="col-md-4">
+            <div class="form-select-control">
+                <select name="tipoDTEId" id="tipoDTEId" class="form-control" style="width: 100%;" required>
+                    <option></option>
+                    <?php foreach ($tipoDTE as $tipoDTE) : ?>
+                        <option value="<?php echo $tipoDTE['tipoDTEId']; ?>"><?php echo $tipoDTE['tipoDocumentoDTE']; ?></option>
+                    <?php endforeach; ?>
+                </select>
             </div>
-            <div class="col-md-6">
-                <div class="form-select-control">
-                    <select name="selectNombreVendedorDTE" id="selectNombreVendedorDTE" style="width: 100%;" required>
-                        <option value=""></option>
-                        <option value="1">Empleado Prueba</option>
-                    </select>
-                </div>
-            </div>         
         </div>
-        <div class="text-right">
-            <button type="submit" id="btnguardarReserva" class="btn btn-primary">
-                <i class="fas fa-pencil-alt"></i>
-                Actualizar DTE
-            </button>
+        <div class="col-md-4">
+            <div class="form-outline">
+                <input type="date" id="fechaEmision" name="fechaEmision" class="form-control active" value="<?= $campos['fechaEmision']; ?>" readonly>
+                <label class="form-label" for="fechaEmision">Fecha de emisión</label>
+            </div>
         </div>
+    </div>
+    <div class="row mt-4 mb-4">
+        <div class="col-md-6">
+            <div class="form-select-control">
+                <select name="clienteId" id="clienteId" class="form-control" style="width: 100%;" required>
+                    <option></option>
+                    <?php foreach ($clientes as $cliente) : ?>
+                        <option value="<?php echo $cliente['clienteId']; ?>"><?php echo $cliente['cliente']; ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-select-control">
+                <select name="empleadoId" id="empleadoId" style="width: 100%;" required>
+                    <option></option>
+                    <?php foreach ($empleados as $empleado) : ?>
+                        <option value="<?php echo $empleado['empleadoId']; ?>"><?php echo $empleado['primerNombre']; ?> <?php echo $empleado['primerApellido']; ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+        </div>         
+    </div>
+    <div class="text-right">
+        <button type="submit" id="btnguardarReserva" class="btn btn-primary">
+            <i class="fas fa-pencil-alt"></i> Actualizar DTE
+        </button>
+    </div>
 </form>
 <hr>
-<form id="frmContinuarReserva" method="post" action="">
-        
     <div class="text-right mb-4">
-        <button type= "button" id="btnNuevoProveedor" class="btn btn-primary estilo-btn" onclick="">
-            <i class="fas fa-save"></i>
-            Agregar producto
+        <button type= "button" id="btnNuevoProveedor" class="btn btn-primary estilo-btn" onclick="modalProductoDTE(0, 'insertar')">
+            <i class="fas fa-save"></i> Agregar producto
         </button>
     </div>
     <div class="table-responsive">
@@ -95,18 +99,19 @@
         </table>
     </div>
 </form>
+
 <script>
-    function modalPagoDTE() {
+        function modalProductoDTE(facturaDetalleId, operacion) {
         // Realizar una petición AJAX para obtener los datos del módulo por su ID
         $.ajax({
-                url: '<?php echo base_url('ventas/admin-facturacion/form/pago/dte'); ?>',
+                url: '<?php echo base_url('ventas/admin-reservas/modal/nuevo/reserva'); ?>',
                 type: 'POST',
-                data: {}, // Pasar el ID del módulo como parámetro
+                data: { facturaDetalleId: facturaDetalleId, operacion: operacion, facturaId: <?= $facturaId; ?>}, // Pasar el ID del módulo como parámetro
                 success: function(response) {
                     // Insertar el contenido de la modal en el cuerpo de la modal
                     $('#divModalContent').html(response);
                     // Mostrar la modal
-                    $('#modalPagoDTE').modal('show');
+                    $('#modalProductosDTE').modal('show');
                     
                 },
             error: function(xhr, status, error) {
@@ -115,119 +120,66 @@
             }
         });
     }
-    function modalComplementoDTE() {
-        // Realizar una petición AJAX para obtener los datos del módulo por su ID
-        $.ajax({
-                url: '<?php echo base_url('ventas/admin-facturacion/form/complemento/dte'); ?>',
-                type: 'POST',
-                data: {}, // Pasar el ID del módulo como parámetro
-                success: function(response) {
-                    // Insertar el contenido de la modal en el cuerpo de la modal
-                    $('#divModalContent').html(response);
-                    // Mostrar la modal
-                    $('#modalEmitirDTE').modal('show');
-                    
-                },
-            error: function(xhr, status, error) {
-                // Manejar errores si los hay
-                console.error(xhr.responseText);
-            }
-        });
-    }
-    function modalErrorDTE() {
-        // Realizar una petición AJAX para obtener los datos del módulo por su ID
-        $.ajax({
-                url: '<?php echo base_url('ventas/admin-facturacion/form/error/dte'); ?>',
-                type: 'POST',
-                data: {}, // Pasar el ID del módulo como parámetro
-                success: function(response) {
-                    // Insertar el contenido de la modal en el cuerpo de la modal
-                    $('#divModalContent').html(response);
-                    // Mostrar la modal
-                    $('#modalErrorDTE').modal('show');
-                    
-                },
-            error: function(xhr, status, error) {
-                // Manejar errores si los hay
-                console.error(xhr.responseText);
-            }
-        });
-    }
-    function CertificarDTE() {
-        //alert("Vamos a eliminar " + id);
-            Swal.fire({
-                title: 'DTE anulado',
-                text: "DTE anulado con éxito",
-                icon: 'success',
-                showCancelButton: false,
-                confirmButtonColor: '#3085d6',
-                confirmButtonText: 'Aceptar',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Si el usuario confirma, enviar la solicitud AJAX para eliminar el usuario de la sucursal
-                        $.ajax({
-                            url: '',
-                            type: 'POST',
-                            data: {
-                                
-                            },
-                            success: function(response) {
-                                console.log(response);
-                                if (response.success) {
-                                    Swal.fire({
-                                        icon: 'success',
-                                        title: 'DTE certificado con Éxito!',
-                                        text: response.mensaje
-                                    }).then((result) => {
-                                    });
-                                } else {
-                                    // Insert fallido, mostrar mensaje de error
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Error',
-                                        text: response.mensaje
-                                    });
-                                }
-                            },
-                            error: function(xhr, status, error) {
-                                // Manejar errores si los hay
-                                console.error(xhr.responseText);
-                            }
-                        });
-                }
-            });
-    }
+
     $(document).ready(function(){
-        $("#selectSucursalDTE").select2({
-            placeholder: 'Sucursal'
-        });
-
-        $("#selectTipoDTE").select2({
-            placeholder: 'Tipo DTE'
-        });
-        
-        $("#selectNombreClienteDTE").select2({
-            placeholder: 'Cliente'
-        });
-
-        $("#selectNombreVendedorDTE").select2({
-            placeholder: 'Empleado'
-        });
-
         tituloVentana("Continuar DTE");
         $('#btnRegresarReserva').on('click', function() {
             cambiarInterfaz('ventas/admin-facturacion/index', {renderVista: 'No'});
         });
 
+        $("#sucursalId").select2({
+            placeholder: 'Sucursal'
+        });
 
+        $("#tipoDTEId").select2({
+            placeholder: 'Tipo DTE'
+        });
+        
+        $("#clienteId").select2({
+            placeholder: 'Cliente'
+        });
+
+        $("#empleadoId").select2({
+            placeholder: 'Empleado'
+        });
+
+        $("#frmContinuarDTE").submit(function(event) {
+            event.preventDefault();
+            $.ajax({
+                url: $(this).attr('action'), 
+                type: $(this).attr('method'),
+                data: $(this).serialize(),
+                success: function(response) {
+                    console.log(response);
+                    if (response.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'DTE actualizado con éxito',
+                            text: response.mensaje
+                        }).then((result) => {
+                            $("#tablaDTE").DataTable().ajax.reload(null, false);
+                            $("#tablaContinuarDTE").DataTable().ajax.reload(null, false);
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.mensaje
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error(xhr.responseText);
+                }
+            });
+        });
 
         $('#tablaContinuarDTE').DataTable({
             "ajax": {
                 "method": "POST",
-                "url": '<?php echo base_url('ventas/admin-facturacion/tabla/continuar/dt'); ?>',
+                "url": '<?php echo base_url('ventas/admin-facturacion/tabla/continuar/dte'); ?>',
                 "data": {
-                        x:''
-
+                    x:''
                 }
             },
             "footerCallback": function(tfoot) {    
@@ -258,10 +210,14 @@
             "language": {
                 "url": "../assets/plugins/datatables/js/spanish.json"
             },
-                "drawCallback": function(settings) {
-                // Inicializar tooltips de Bootstrap después de cada dibujo de la tabla
+            "drawCallback": function(settings) {
                 $('[data-toggle="tooltip"]').tooltip();
             },
-        });   
+        }); 
+
+        $("#sucursalId").val(<?= $campos["sucursalId"]; ?>).trigger('change');       
+        $("#clienteId").val(<?= $campos["clienteId"]; ?>).trigger('change'); 
+        $("#tipoDTEId").val(<?= $campos["tipoDTEId"]; ?>).trigger('change');  
+        $("#empleadoId").val(<?= $campos["empleadoId"]; ?>).trigger('change');   
     })
 </script>

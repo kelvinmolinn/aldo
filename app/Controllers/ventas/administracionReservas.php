@@ -140,6 +140,7 @@ public function tablaReservas()
         ->join('conf_sucursales', 'conf_sucursales.sucursalId = fel_reservas.sucursalId')
         ->join('fel_clientes', 'fel_clientes.clienteId = fel_reservas.clienteId')
         ->where('fel_reservas.flgElimina', 0)
+         ->orderBy('fel_reservas.reservaId', 'DESC') // Ordenar por ID en orden descendente
         ->findAll();
 
     $output['data'] = array();

@@ -50,8 +50,7 @@
             </button>
         </div>
 </form>
-<hr>
-        
+<hr>  
     <div class="text-right mb-4">
         <button type= "button" id="btnNuevoProveedor" class="btn btn-primary estilo-btn" onclick="modalProductoReserva(0, 'insertar')">
             <i class="fas fa-save"></i>
