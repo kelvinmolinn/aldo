@@ -711,12 +711,16 @@ public function tablaFacturacion()
             $columna5 = "$ 13.80";
            
             $columna6 = "$ 120.00";
+
+            $columna7 = "$ 120.00";
+
+            $columna8 = "$ 120.00";
            
-            $columna7 = '
+            $columna9 = '
                             <button type= "button" class="btn btn-primary mb-1" onclick="" data-toggle="tooltip" data-placement="top" title="Editar">
                                 <i class="fas fa-sync-alt"></i>
                             </button>';
-            $columna7 .= '
+            $columna9 .= '
                             <button type= "button" class="btn btn-danger mb-1" onclick="" data-toggle="tooltip" data-placement="top" title="Eliminar">
                                 <i class="fas fa-trash"></i>
                             </button>';
@@ -728,7 +732,9 @@ public function tablaFacturacion()
                 $columna4,
                 $columna5,
                 $columna6,
-                $columna7
+                $columna7,
+                $columna8,
+                $columna9
             );
 
             if ($n > 0) {

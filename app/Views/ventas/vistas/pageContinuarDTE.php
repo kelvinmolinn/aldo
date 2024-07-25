@@ -62,60 +62,51 @@
     </div>
 </form>
 <hr>
-    <div class="text-right mb-4">
-        <button type= "button" id="btnNuevoProveedor" class="btn btn-primary estilo-btn" onclick="modalProductoDTE(0, 'insertar')">
-            <i class="fas fa-save"></i> Agregar producto
-        </button>
-    </div>
-    <div class="table-responsive">
-        <table class="table table-hover" id="tablaContinuarDTE" style="width: 100%;">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Producto</th>
-                    <th>Precio venta</th>
-                    <th>Cantidad</th>
-                    <th>IVA 13%</th>
-                    <th>Precio total</th>
-                    <th>Acciones</th>
-            </thead>
-            <tbody>
-            </tbody>
-            <tfoot>
-                <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td id="tdFooterTotales" colspan="6"></td>
-                    <td></td>
-                </tr>
-            </tfoot>
-        </table>
-    </div>
-</form>
+<div class="text-right mb-4">
+    <button type="button" id="btnNuevoProveedor" class="btn btn-primary estilo-btn" onclick="modalProductoDTE(0, 'insertar')">
+        <i class="fas fa-save"></i> Agregar producto
+    </button>
+</div>
+<div class="table-responsive">
+    <table class="table table-hover" id="tablaContinuarDTE" style="width: 100%;">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Producto</th>
+                <th>Precio Uni.</th>
+                <th>Descuento</th>
+                <th>Precio venta</th>
+                <th>Cantidad</th>
+                <th>IVA 13%</th>
+                <th>Precio total</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="9"></td>
+            </tr>
+            <tr>
+                <td id="tdFooterTotales" colspan="8"></td>
+                <td></td>
+            </tr>
+        </tfoot>
+    </table>
+</div>
 
 <script>
-        function modalProductoDTE(facturaDetalleId, operacion) {
-        // Realizar una petición AJAX para obtener los datos del módulo por su ID
+    function modalProductoDTE(facturaDetalleId, operacion) {
         $.ajax({
-                url: '<?php echo base_url('ventas/admin-facturacion/modal/nuevo/dte'); ?>',
-                type: 'POST',
-                data: { facturaDetalleId: facturaDetalleId, operacion: operacion, facturaId: <?= $facturaId; ?>}, // Pasar el ID del módulo como parámetro
-                success: function(response) {
-                    // Insertar el contenido de la modal en el cuerpo de la modal
-                    $('#divModalContent').html(response);
-                    // Mostrar la modal
-                    $('#modalProductosDTE').modal('show');
-                    
-                },
+            url: '<?php echo base_url('ventas/admin-facturacion/modal/nuevo/dte'); ?>',
+            type: 'POST',
+            data: { facturaDetalleId: facturaDetalleId, operacion: operacion, facturaId: <?= $facturaId; ?>},
+            success: function(response) {
+                $('#divModalContent').html(response);
+                $('#modalProductosDTE').modal('show');
+            },
             error: function(xhr, status, error) {
-                // Manejar errores si los hay
                 console.error(xhr.responseText);
             }
         });
@@ -150,7 +141,6 @@
                 type: $(this).attr('method'),
                 data: $(this).serialize(),
                 success: function(response) {
-                    console.log(response);
                     if (response.success) {
                         Swal.fire({
                             icon: 'success',
@@ -205,7 +195,9 @@
                 { "width": "9%", "targets": 3,  "className": "text-left" },
                 { "width": "9%", "targets": 4,  "className": "text-left" },
                 { "width": "9%", "targets": 5,  "className": "text-left" },
-                { "width": "9%", "targets": 6,  "className": "text-left" }
+                { "width": "9%", "targets": 6,  "className": "text-left" },
+                { "width": "9%", "targets": 7,  "className": "text-left" },
+                { "width": "9%", "targets": 8,  "className": "text-left" }
             ],
             "language": {
                 "url": "../assets/plugins/datatables/js/spanish.json"
