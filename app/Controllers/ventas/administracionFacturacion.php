@@ -2,9 +2,39 @@
 
 namespace App\Controllers\ventas;
 use CodeIgniter\Controller;
-
-
+use App\Models\inv_productos;
+use App\Models\inv_productos_existencias;
+use App\Models\cat_14_unidades_medida;
+use App\Models\inv_productos_tipo;
+use App\Models\inv_productos_plataforma;
+use App\Models\conf_sucursales;
+use App\Models\inv_kardex;
+use App\Models\log_productos_precios;
+use App\Models\conf_parametrizaciones;
+use App\Models\fel_reservas;
+use App\Models\fel_reservas_detalle;
+use App\Models\fel_reservas_pago;
+use App\Models\fel_clientes;
+use App\Models\vista_usuarios_empleados;
+use App\Models\comp_compras_detalle;
+use App\Models\cat_17_forma_pago;
 use App\Models\comp_proveedores;
+use App\Models\cat_04_tipo_transmision;
+use App\Models\cat_09_establecimiento;
+use App\Models\cat_11_tipo_item;
+use App\Models\cat_16_condicion_pago;
+use App\Models\cat_18_plazo_pago;
+use App\Models\fel_facturas;
+use App\Models\fel_facturas_total;
+use App\Models\fel_facturas_pago;
+use App\Models\fel_facturas_detalle;
+use App\Models\fel_facturas_complemento;
+use App\Models\fel_facturas_certificacion_errores;
+use App\Models\fel_factura_certificacion;
+use App\Models\conf_empleados;
+use App\Models\cat_02_tipo_dte;
+
+
 
 class administracionFacturacion extends Controller
 {
@@ -24,122 +54,222 @@ class administracionFacturacion extends Controller
         return view('ventas/vistas/facturacion', $data);
     }
 
+    public function modalEmitirDTE(){
+        // Cargar el modelos
+        $sucursalesModel = new conf_sucursales();
+        $data['sucursales'] = $sucursalesModel->where('flgElimina', 0)->findAll();
+
+        $clientesModel = new fel_clientes();
+        $data['clientes'] = $clientesModel->where('flgElimina', 0)->findAll();
+
+        $empleadosModel = new conf_empleados();
+        $data['empleados'] = $empleadosModel->where('flgElimina', 0)->findAll();
+
+        $tipoDTEModel = new cat_02_tipo_dte();
+        $data['tipoDTE'] = $tipoDTEModel->where('flgElimina', 0)->findAll();
+
+        $operacion = $this->request->getPost('operacion');
+        $data['sucursalId'] = $this->request->getPost('sucursalId');
+        $data['clienteId'] = $this->request->getPost('clienteId');
+        $data['empleadoId'] = $this->request->getPost('empleadoId');
+        $data['tipoDTEId'] = $this->request->getPost('tipoDTEId');
+
+        if($operacion == 'editar') {
+            $facturaId = $this->request->getPost('facturaId');
+            $DTEProducto = new fel_facturas();
+
+            // seleccionar solo los campos que estan en la modal (solo los input y select)
+            $data['campos'] = $producto->select('fel_facturas.facturaId,fel_facturas.fechaEmision,fel_facturas.obsAnulacion,fel_facturas.estadoFactura,conf_sucursales.sucursalId,conf_sucursales.sucursal,fel_clientes.clienteId,fel_clientes.cliente,conf_empleados.empleadoId,conf_empleados.primerNombre,conf_empleados.primerApellido,cat_02_tipo_dte.tipoDTEId,cat_02_tipo_dte.tipoDocumentoDTE')
+            ->join('conf_sucursales', 'conf_sucursales.sucursalId = fel_facturas.sucursalId')
+            ->join('fel_clientes', 'fel_clientes.clienteId = fel_facturas.clienteId')
+            ->join('conf_empleados', 'conf_empleados.empleadoId = fel_facturas.empleadoIdVendedor')
+            ->join('cat_02_tipo_dte', 'cat_02_tipo_dte.tipoDTEId = fel_facturas.tipoDTEId')
+            ->where('fel_facturas.flgElimina', 0)
+            ->where('fel_facturas.facturaId', $facturaId)->first();
+        } else {
+
+            // formar los campos que estan en la modal (input y select) con el nombre equivalente en la BD
+            $data['campos'] = [
+                'facturaId'              => 0,
+                'sucursalId'             => '',
+                'tipoDTEId'              => '',
+                'fechaEmision'           => '',
+                'clienteId'              => '',
+                'empleadoIdVendedor'     => ''
+
+            ];
+        }
+        $data['operacion'] = $operacion;
+        return view('ventas/modals/modalEmitirDTE', $data);
+    }
+
+    public function modalDTEOperacion()
+    {
+        // Continuar con la operación de inserción o actualización en la base de datos
+        $operacion = $this->request->getPost('operacion');
+        $facturaId = $this->request->getPost('facturaId');
+        $model = new fel_facturas();
+        $modelParametrizaciones = new conf_parametrizaciones();
+        $modelCondicion = new cat_16_condicion_pago();
+
+        $porcentajeIVA = $modelParametrizaciones->select('valorParametrizacion')
+        ->where('flgElimina', 0)
+        ->where('parametrizacionId', 1)
+        ->first();
+
+        $condicionFacturaMHId = $modelCondicion->select('condicionFacturaMHId')
+        ->where('flgElimina', 0)
+        ->where('condicionFacturaMHId', 1)
+        ->first();
+
+        $data = [
+            'sucursalId'           => $this->request->getPost('sucursalId'),
+            'fechaEmision'         => $this->request->getPost('fechaEmision'),
+            'horaEmision'          => date('H:i'),
+            'clienteId'            => $this->request->getPost('clienteId'),
+            'empleadoIdVendedor'   => $this->request->getPost('empleadoIdVendedor'),
+            'tipoDTEId'            => $this->request->getPost('tipoDTEId'),
+            'porcentajeIVA'        => $porcentajeIVA,
+            'condicionFacturaMHId' => $condicionFacturaMHId,
+            'estadoFactura'        => "Pendiente"
+        ];
+    
+        if ($operacion == 'editar') {
+            $operacionDTE = $model->update($this->request->getPost('facturaId'), $data);
+        } else {
+            // Insertar datos en la base de datos
+            $operacionDTE = $model->insert($data);
+        }
+    
+        if ($operacionDTE) {
+            // Si el insert fue exitoso, devuelve el último ID insertado
+            return $this->response->setJSON([
+                'success' => true,
+                'mensaje' => 'DTE ' . ($operacion == 'editar' ? 'actualizado' : 'agregado') . ' correctamente',
+                'facturaId' => ($operacion == 'editar' ? $this->request->getPost('facturaId') : $model->insertID())
+            ]);
+        } else {
+            // Si el insert falló, devuelve un mensaje de error
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'No se pudo insertar el DTE'
+            ]);
+        }
+      
+    }
+
     public function tablaFacturacion(){
+        $facturaId = $this->request->getPost('facturaId');
+        $mostrarDTE = new fel_facturas();
+        $datos = $mostrarDTE
+        ->select('fel_facturas.facturaId,fel_facturas.fechaEmision,fel_facturas.obsAnulacion,fel_facturas.estadoFactura,conf_sucursales.sucursalId,conf_sucursales.sucursal,fel_clientes.clienteId,fel_clientes.cliente,fel_clientes.nrcCliente,fel_clientes.numDocumentoIdentificacion,fel_clientes.direccionCliente,conf_empleados.empleadoId,conf_empleados.primerNombre,conf_empleados.primerApellido,cat_02_tipo_dte.tipoDTEId,cat_02_tipo_dte.tipoDocumentoDTE')
+        ->join('conf_sucursales', 'conf_sucursales.sucursalId = fel_facturas.sucursalId')
+        ->join('fel_clientes', 'fel_clientes.clienteId = fel_facturas.clienteId')
+        ->join('conf_empleados', 'conf_empleados.empleadoId = fel_facturas.empleadoIdVendedor')
+        ->join('cat_02_tipo_dte', 'cat_02_tipo_dte.tipoDTEId = fel_facturas.tipoDTEId')
+        ->where('fel_facturas.flgElimina', 0)
+        ->findAll();
+
         $output['data'] = array();
-            $n = 0;
+        $n = 1; // Variable para contar las filas
+        foreach ($datos as $columna) {
+            // Determina la clase Bootstrap basada en el estado del descargo
+            $estadoClase = '';
+            if ($columna['estadoFactura'] === 'Pendiente') {
+                $estadoClase = 'badge badge-secondary';
+            } elseif ($columna['estadoFactura'] === 'Finalizado') {
+                $estadoClase = 'badge badge-success';
+            } elseif ($columna['estadoFactura'] === 'Anulado') {
+                $estadoClase = 'badge badge-danger';
+            }
 
-            $n++;
-            // Aquí construye tus columnas
+        // Construir columna 2
+        $columna2 = "<b>Sucursal:</b> " . $columna['sucursal'] . "<br><b>Vendedor:</b> " . $columna['primerNombre']." ". $columna['primerApellido'];
 
-            
-            $v = 1;
-           switch($v){
-            case 1:
-                $columna1 = $n;
+        // Construir columna 3
+        $columna3 = "<b>Fecha:</b> " . $columna['fechaEmision'];
 
-                $columna2 = "<b>Sucursal: </b> Aldo Games Store (Principal)" . "<br>" . "<b>Núm. Control:</b> " . "<br>" . "<b>Cód. Generación:</b>" . "<br>" . "<b>Cliente:</b> ";
-    
-                $columna3 = "<b>fecha y hora de emisión: </b> 25/06/2024";
-    
-                $columna4 = "<b>Pendiente </b>";
-    
-                $columna5 = "<b>Total del DTE: </b>";
+         // Construir columna 4
+         $columna4 = "<b>Cliente:</b> " . $columna['cliente'] . "<br><b>NRC:</b> " . $columna['nrcCliente']." ". "<br><b>Dirección:</b> " . $columna['direccionCliente'];
 
+         // Construir columna 5
+         $columna5 = "<b>Montos:</b> " ;
+                 // Construir botones basado en estadoFactura
+        if ($columna['estadoFactura'] === 'Pendiente') {
+            $jsonActualizarReserva = [
+                "facturaId" => $columna['facturaId']
+            ];
             $columna6 = '
-                <button type= "button" class="btn btn-primary mb-1" onclick="cambiarInterfaz(`ventas/admin-facturacion/vista/continuar/dte`, {renderVista: `No`});" data-toggle="tooltip" data-placement="top" title="Continuar DTE">
-                    <i class="fas fa-sync-alt"></i>
-                </button>';
-            $columna6 .= '
-                <button type= "button" class="btn btn-danger mb-1" onclick="modalAnularDTE()" data-toggle="tooltip" data-placement="top" title="Anular DTE">
+
+
+
+                <button class="btn btn-primary mb-1" onclick="cambiarInterfaz(`ventas/admin-facturacion/vista/continuar/dte`, ' . htmlspecialchars(json_encode($jsonActualizarReserva)) . ');" data-toggle="tooltip" data-placement="top" title="Continuar DTE">
+                    <i class="fas fa-sync-alt"></i> <span> </span>
+                </button>
+
+                <button class="btn btn-danger mb-1" onclick="modalAnularDTE(' . $columna['facturaId'] . ')" data-toggle="tooltip" data-placement="top" title="Anular">
+                    <i class="fas fa-ban"></i>
+                </button>
+            ';
+        } elseif ($columna['estadoFactura'] === 'Finalizado') {
+            $columna6 = '
+
+                <button class="btn btn-primary mb-1" onclick="modalFacturar(`' . $columna['facturaId'] . '`);" data-toggle="tooltip" data-placement="top" title="Facturar">
+                    <i class="fas fa-hand-holding-usd"></i><span> </span>
+                </button>
+
+                <button class="btn btn-info mb-1" onclick="modalVerReserva(`' . $columna['facturaId'] . '`);" data-toggle="tooltip" data-placement="top" title="Ver reserva">
+                    <i class="fas fa-eye"></i><span> </span>
+                </button>
+
+                <button class="btn btn-danger mb-1" onclick="modalAnularReserva(' . $columna['facturaId'] . ')" data-toggle="tooltip" data-placement="top" title="Anular">
+                    <i class="fas fa-ban"></i>
+                </button>
+
+
+                <button type= "button" class="btn btn-primary mb-1" onclick="" data-toggle="tooltip" data-placement="top" title="ver DTE">
+                            <i class="fas fa-eye"></i>
+                </button>;
+
+                <button type= "button" class="btn btn-primary mb-1" onclick="" data-toggle="tooltip" data-placement="top" title="Complementos">
+                    <i class="fas fa-clipboard-list"></i>
+                </button>;
+      
+                <button type= "button" class="btn btn-primary mb-1" onclick="modalImprimirDTE()" data-toggle="tooltip" data-placement="top" title="Imprimir DTE">
+                    <i class="fas fa-print"></i>
+                </button>;
+           
+                <button type= "button" class="btn btn-primary mb-1" onclick="window.location.href=`https://admin.factura.gob.sv/consultaPublica`" data-toggle="tooltip" data-placement="top" title="Consultar DTE">
+                    <i class="fas fa-file-alt"></i>
+                </button>;
+                            
+         
+                <button type= "button" class="btn btn-danger mb-1" onclick="modalInvalidarDTE()" data-toggle="tooltip" data-placement="top" title="Invalidar DTE">
                     <i class="fas fa-ban"></i>
                 </button>';
-            break;
 
-            case 2:
-                $columna1 = $n;
+            ;
 
-                $columna2 = "<b>Sucursal: </b> Aldo Games Store (Principal)" . "<br>" . "<b>Núm. Control:</b> DTE-03-12345678-000000000000001
-" . "<br>" . "<b>Cód. Generación:</b> C6A9868C-028D-421B-A9A0-36274CECC2C7
-" . "<br>" . "<b>Cliente: Cliente prueba</b> ";
-    
-                $columna3 = "<b>fecha y hora de emisión: </b> 25/06/2024";
-    
-                $columna4 = "<b>Certificado </b>";
-    
-                $columna5 = "<b>Total del DTE: </b> $120.00";
+        }
 
-            $columna6 = '
-                        <button type= "button" class="btn btn-primary mb-1" onclick="" data-toggle="tooltip" data-placement="top" title="ver DTE">
-                            <i class="fas fa-eye"></i>
-                        </button>';
-            
-            $columna6 .= '
-                            <button type= "button" class="btn btn-primary mb-1" onclick="" data-toggle="tooltip" data-placement="top" title="Complementos">
-                                <i class="fas fa-clipboard-list"></i>
-                            </button>';
-            $columna6 .= '
-                            <button type= "button" class="btn btn-primary mb-1" onclick="modalImprimirDTE()" data-toggle="tooltip" data-placement="top" title="Imprimir DTE">
-                                <i class="fas fa-print"></i>
-                            </button>';
-            $columna6 .= '
-                            <button type= "button" class="btn btn-primary mb-1" onclick="window.location.href=`https://admin.factura.gob.sv/consultaPublica`" data-toggle="tooltip" data-placement="top" title="Consultar DTE">
-                                <i class="fas fa-file-alt"></i>
-                            </button>';
-                            
-            $columna6 .= '
-                            <button type= "button" class="btn btn-danger mb-1" onclick="modalAnularDTE()" data-toggle="tooltip" data-placement="top" title="Anular DTE">
-                                <i class="fas fa-ban"></i>
-                            </button>';
-             break;
-    
-            case 3:
-                $columna1 = $n;
+        // Agrega la fila al array de salida
+        $output['data'][] = array(
+            $n,
+            $columna2,
+            $columna3,
+            $columna4,
+            $columna5,
+            $columna6
+        );
 
-                $columna2 = "<b>Sucursal: </b> Aldo Games Store (Principal)" . "<br>" . "<b>Núm. Control:</b> DTE-03-12345678-000000000000001
-" . "<br>" . "<b>Cód. Generación:</b> C6A9868C-028D-421B-A9A0-36274CECC2C7
-" . "<br>" . "<b>Cliente: </b> Cliente prueba";
-    
-                $columna3 = "<b>fecha y hora de emisión: </b> 25/06/2024";
-    
-                $columna4 = "<b>Anulado </b>";
-    
-                $columna5 = "<b>Total del DTE: </b> $120.00";
-
-                $columna6 = '
-                                <button type= "button" class="btn btn-primary mb-1" onclick="" data-toggle="tooltip" data-placement="top" title="ver DTE">
-                                    <i class="fas fa-eye"></i>
-                                </button>';
-                $columna6 .= '
-                                <button type= "button" class="btn btn-primary mb-1" onclick="" data-toggle="tooltip" data-placement="top" title="Complementos">
-                                    <i class="fas fa-clipboard-list"></i>
-                                </button>';
-                $columna6 .= '
-                                <button type= "button" class="btn btn-primary mb-1" onclick="" data-toggle="tooltip" data-placement="top" title="Consultar DTE">
-                                    <i class="fas fa-file-alt"></i>
-                                </button>';
-            break;
-           }
-                            
-            $output['data'][] = array(
-                $columna1,
-                $columna2,
-                $columna3,
-                $columna4,
-                $columna5,
-                $columna6
-            );
-
+        $n++;
+        }
         // Verifica si hay datos
-        if ($n > 0) {
+        if ($n > 1) {
             return $this->response->setJSON($output);
         } else {
             return $this->response->setJSON(array('data' => '')); // No hay datos, devuelve un array vacío
         }
-    }
-
-    public function modalEmitirDTE(){
-        $data['variable'] = 0;
-        return view('ventas/modals/modalEmitirDTE', $data);
     }
 
     public function modalAnularDTE(){
@@ -274,6 +404,7 @@ class administracionFacturacion extends Controller
             return $this->response->setJSON(array('data' => '', 'footer'=>'')); // No hay datos, devuelve un array vacío
         }     
     }
+
     public function modalPagoDTE(){
         $data['variable'] = 0;
         return view('ventas/modals/modalPagoDTE', $data);
@@ -310,6 +441,7 @@ class administracionFacturacion extends Controller
             return $this->response->setJSON(array('data' => '')); // No hay datos, devuelve un array vacío
         }
     }
+
     public function modalComplementoDTE(){
         $data['variable'] = 0;
         return view('ventas/modals/modalComplementoDTE', $data);

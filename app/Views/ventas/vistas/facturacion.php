@@ -30,20 +30,20 @@
     </div>
 </div>
 <div class="text-right mb-4">
-    <button type= "button" id="btnBuscarReserva" name="btnBuscarReserva" class="btn btn-primary estilo-btn" onclick="$('#tablaReserva').DataTable().ajax.reload(null, false);">
+    <button type= "button" id="btnBuscarReserva" name="btnBuscarReserva" class="btn btn-primary estilo-btn" onclick="$('#tablaDTE').DataTable().ajax.reload(null, false);">
         <i class="fas fa-search"></i>
         Buscar
     </button>
 </div>
 <div class="table-responsive">
-    <table class="table table-hover" id="tablaReserva" style="width: 100%;">
+    <table class="table table-hover" id="tablaDTE" style="width: 100%;">
         <thead>
             <tr>
                 <th>#</th>
                 <th>DTE</th>
                 <th>Fecha</th>
-                <th>Estado</th>
-                <th>Totales</th>
+                <th>Cliente</th>
+                <th>Monto</th>
                 <th>Acciones</th>
             </tr>
         </thead>
@@ -136,7 +136,7 @@
     });
         tituloVentana("Facturación");
 
-        $('#tablaReserva').DataTable({
+        $('#tablaDTE').DataTable({
             "ajax": {
                 "method": "POST",
                 "url": '<?php echo base_url('ventas/admin-facturacion/tabla/facturacion'); ?>',
@@ -146,14 +146,10 @@
                     }
                 }
             },
-            "columnDefs": [
-                { "width": "5%", "targets": 0 },   
-                { "width": "15%", "targets": 1 }, 
-                { "width": "20%", "targets": 2 }, 
-                { "width": "20%", "targets": 3 }, 
-                { "width": "20%", "targets": 4 },
-                { "width": "20%", "targets": 5 } 
-            ],
+            "autoWidth": false,  // Deshabilitar autoWidth para que DataTables no ajuste automáticamente el ancho de las columnas
+        "columnDefs": [
+            { "targets": "_all", "className": "text-left" } // Aplicar alineación a todas las columnas
+        ],
             
             "language": {
                 "url": "../assets/plugins/datatables/js/spanish.json"

@@ -215,10 +215,11 @@
         });
 
         tituloVentana("Continuar DTE");
-
         $('#btnRegresarReserva').on('click', function() {
-            cambiarInterfaz('ventas/admin-reserva/index', {renderVista: 'No'});
+            cambiarInterfaz('ventas/admin-facturacion/index', {renderVista: 'No'});
         });
+
+
 
         $('#tablaContinuarDTE').DataTable({
             "ajax": {

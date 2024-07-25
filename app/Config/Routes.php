@@ -279,8 +279,9 @@ $routes->group('ventas/admin-reservas', function($routes) {
 
 $routes->group('ventas/admin-facturacion', function($routes) {
     $routes->post('index', 'ventas\administracionFacturacion::index');
-    $routes->post('tabla/facturacion', 'ventas\administracionFacturacion::tablaFacturacion');
     $routes->post('form/emitir/dte', 'ventas\administracionFacturacion::modalEmitirDTE');
+    $routes->post('operacion/guardar/dte', 'ventas\administracionFacturacion::modalDTEOperacion');
+    $routes->post('tabla/facturacion', 'ventas\administracionFacturacion::tablaFacturacion');
     $routes->post('form/anular/dte', 'ventas\administracionFacturacion::modalAnularDTE');
     $routes->post('vista/continuar/dte', 'ventas\administracionFacturacion::vistaContinuarDTE');
     $routes->post('tabla/continuar/dte', 'ventas\administracionFacturacion::tablaContinuarDTE');
