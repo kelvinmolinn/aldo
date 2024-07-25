@@ -235,7 +235,9 @@ $routes->group('compras/admin-retaceo', function($routes) {
     $routes->post('operacion/compra/retaceo', 'compras\administracionRetaceo::modalCompraRetaceoOperacion');
     $routes->post('calcular/retaceo', 'compras\administracionRetaceo::calcularRetaceo');    
     $routes->post('operacion/dai/retaceo', 'compras\administracionRetaceo::modalOperacionDai');    
-    
+
+    $routes->post('pdf/generate', 'compras\Reportes\indexReporte::index');
+
 });
 
 $routes->group('ventas/admin-clientes', function($routes) {
@@ -299,6 +301,8 @@ $routes->group("select", function($routes) {
     $routes->post('catalogos-hacienda/paises-municipios', 'select\selectCatalogosMH::selectPaisMunicipio');
     $routes->post('catalogos-hacienda/producto-precio', 'select\selectCatalogosMH::selectProductoPrecioUnitario');
 });
+
+
 // Rutas de errores
 $routes->get('404', 'Errores::error404');
 

@@ -35,6 +35,12 @@
         Buscar
     </button>
 </div>
+<form action="<?= base_url('compras/admin-retaceo/pdf/generate'); ?>" method="post">
+    <button type= "submit" id="btnPDF" class="btn btn-primary estilo-btn mb-4">
+        <i class="fas fa-save"></i>
+            PDF
+    </button>
+</form>
 <div class="table-responsive">
     <table class="table table-hover" id="tablaRetaceo" style="width: 100%;">
         <thead>
@@ -92,56 +98,56 @@
 
     $(document).ready(function() {
 
-    function EventoEnter(inputId) {
-        $('#' + inputId).on('keypress', function(event) {
-            if (event.key === 'Enter') {
-                event.preventDefault(); // Evita el comportamiento por defecto
-                $('#btnBuscarRetaceo').click(); // Simula el clic en el botón
+        function EventoEnter(inputId) {
+            $('#' + inputId).on('keypress', function(event) {
+                if (event.key === 'Enter') {
+                    event.preventDefault(); // Evita el comportamiento por defecto
+                    $('#btnBuscarRetaceo').click(); // Simula el clic en el botón
+                }
+            });
+        }
+        EventoEnter('filtroNumRetaceo');
+        EventoEnter('filtroProveedorRetaceo');
+        EventoEnter('filtroFechaRetaceo');
+        
+
+        $('input, textarea').on('focus', function() {
+            $(this).addClass('active');
+        });
+
+        // Remover clase 'active' si el input está vacío al perder el foco
+        $('input, textarea').on('blur', function() {
+            if ($(this).val().trim() === '') {
+                $(this).removeClass('active');
             }
         });
-    }
-    EventoEnter('filtroNumRetaceo');
-    EventoEnter('filtroProveedorRetaceo');
-    EventoEnter('filtroFechaRetaceo');
-    
+            tituloVentana("Nuevo Retaceo");
 
-    $('input, textarea').on('focus', function() {
-        $(this).addClass('active');
-    });
-
-    // Remover clase 'active' si el input está vacío al perder el foco
-    $('input, textarea').on('blur', function() {
-        if ($(this).val().trim() === '') {
-            $(this).removeClass('active');
-        }
-    });
-        tituloVentana("Nuevo Retaceo");
-
-        $('#tablaRetaceo').DataTable({
-            "ajax": {
-                "method": "POST",
-                "url": '<?php echo base_url('compras/admin-retaceo/tabla/retaceo'); ?>',
-                "data": function() { 
-                    return {
-                        x:'' 
+            $('#tablaRetaceo').DataTable({
+                "ajax": {
+                    "method": "POST",
+                    "url": '<?php echo base_url('compras/admin-retaceo/tabla/retaceo'); ?>',
+                    "data": function() { 
+                        return {
+                            x:'' 
+                        }
                     }
-                }
-            },
-            "columnDefs": [
-                { "width": "10%", "targets": 0 }, 
-                { "width": "40%", "targets": 1 }, 
-                { "width": "30%", "targets": 2 }, 
-                { "width": "20%", "targets": 3 }
-            ],
-            
-            "language": {
-                "url": "../assets/plugins/datatables/js/spanish.json"
-            },
+                },
+                "columnDefs": [
+                    { "width": "10%", "targets": 0 }, 
+                    { "width": "40%", "targets": 1 }, 
+                    { "width": "30%", "targets": 2 }, 
+                    { "width": "20%", "targets": 3 }
+                ],
+                
+                "language": {
+                    "url": "../assets/plugins/datatables/js/spanish.json"
+                },
 
-            "drawCallback": function(settings) {
-            // Inicializar tooltips de Bootstrap después de cada dibujo de la tabla
-                $('[data-toggle="tooltip"]').tooltip();
-            },
-        });
+                "drawCallback": function(settings) {
+                // Inicializar tooltips de Bootstrap después de cada dibujo de la tabla
+                    $('[data-toggle="tooltip"]').tooltip();
+                },
+            });
     });
 </script>
