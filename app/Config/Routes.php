@@ -290,6 +290,7 @@ $routes->group('ventas/admin-facturacion', function($routes) {
     $routes->post('vista/continuar/dte', 'ventas\administracionFacturacion::vistaContinuarDTE');
     $routes->post('operacion/actualizar/dte', 'ventas\administracionFacturacion::vistaActualizarDTEOperacion');
     $routes->post('modal/nuevo/dte', 'ventas\administracionFacturacion::modalNuevoProductoDTE'); //Aqui
+     $routes->post('operacion/guardar/NuevoDTE', 'ventas\administracionFacturacion::modalNuevoDTEOperacion');
     $routes->post('tabla/continuar/dte', 'ventas\administracionFacturacion::tablaContinuarDTE');
     $routes->post('form/pago/dte', 'ventas\administracionFacturacion::modalPagoDTE');
     $routes->post('tabla/pago/dte', 'ventas\administracionFacturacion::tablaPagoDTE');

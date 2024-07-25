@@ -331,7 +331,7 @@ public function tablaReservas()
         }
     }
 
-    public function modalNuevoProductoReserva()
+    public function modalNuevoProductoDTE()
     {
 
         // Cargar el modelos

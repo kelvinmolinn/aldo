@@ -9,7 +9,7 @@ class fel_facturas_detalle extends Model
     protected $table = 'fel_facturas_detalle';
     protected $primaryKey = 'facturaDetalleId'; // si el nombre de la clave primaria es diferente
 
-    protected $allowedFields = ['facturaDetalleId', 'facturaId', 'productoId', 'codigoProducto', 'conceptoProducto', 'tipoItemMHId', 'precioUnitario', 'precioUnitarioIVA', 'cantidadProducto', 'ivaUnitario', 'ivaTotal', 'porcentajeDescuento', 'descuentoTotal', 'totalDetalle', 'totalDetalleIVA', 'fhEdita', 'fhAgrega', 'usuarioIdEdita', 'usuarioIdAgrega', 'flgElimina', 'fhElimina', 'usuarioIdElimina'];
+    protected $allowedFields = ['facturaDetalleId', 'facturaId', 'productoId', 'codigoProducto', 'conceptoProducto', 'tipoItemMHId', 'precioUnitario', 'precioUnitarioIVA', 'cantidadProducto', 'ivaUnitario', 'ivaTotal', 'porcentajeDescuento','precioUnitarioVenta','precioUnitarioVentaIVA', 'descuentoTotal', 'totalDetalle', 'totalDetalleIVA', 'fhEdita', 'fhAgrega', 'usuarioIdEdita', 'usuarioIdAgrega', 'flgElimina', 'fhElimina', 'usuarioIdElimina'];
 
             //Agregar desde aqui
 

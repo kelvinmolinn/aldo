@@ -104,7 +104,7 @@
         function modalProductoDTE(facturaDetalleId, operacion) {
         // Realizar una petición AJAX para obtener los datos del módulo por su ID
         $.ajax({
-                url: '<?php echo base_url('ventas/admin-reservas/modal/nuevo/reserva'); ?>',
+                url: '<?php echo base_url('ventas/admin-facturacion/modal/nuevo/dte'); ?>',
                 type: 'POST',
                 data: { facturaDetalleId: facturaDetalleId, operacion: operacion, facturaId: <?= $facturaId; ?>}, // Pasar el ID del módulo como parámetro
                 success: function(response) {
