@@ -73,7 +73,7 @@
             <tr>
                 <th>#</th>
                 <th>Producto</th>
-                <th>Precio Uni.</th>
+                <th>Precio Unitario</th>
                 <th>Descuento</th>
                 <th>Precio venta</th>
                 <th>Cantidad</th>
@@ -169,7 +169,7 @@
                 "method": "POST",
                 "url": '<?php echo base_url('ventas/admin-facturacion/tabla/continuar/dte'); ?>',
                 "data": {
-                    x:''
+                    facturaId: '<?= $facturaId; ?>'
                 }
             },
             "footerCallback": function(tfoot) {    

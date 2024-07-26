@@ -477,7 +477,7 @@ public function tablaFacturacion()
  
     }
 
-        public function modalNuevoDTEOperacion()
+    public function modalNuevoDTEOperacion()
     {
         $operacion = $this->request->getPost('operacion');
         $facturaDetalleId = $this->request->getPost('facturaDetalleId');
@@ -488,7 +488,7 @@ public function tablaFacturacion()
         $precioUnitario = $this->request->getPost('hiddenPrecioUnitario');
         $cantidadProducto = $this->request->getPost('cantidadProducto');
         $porcentajeDescuento = $this->request->getPost('porcentajeDescuento');
-
+    
         // Consulta para traer el 13% de la parametrización
         $porcentajeIva = new conf_parametrizaciones();
         $IVA = $porcentajeIva 
@@ -496,7 +496,7 @@ public function tablaFacturacion()
             ->where("flgElimina", 0)
             ->where("parametrizacionId", 1)
             ->first();
-
+    
         $IvaCalcular = ($precioUnitario * $IVA['valorParametrizacion']) / 100;
         $precioUnitarioIVA = $precioUnitario + $IvaCalcular;
         $ivaTotal = $IvaCalcular * $cantidadProducto;
@@ -505,12 +505,12 @@ public function tablaFacturacion()
         $precioUnitarioVentaIVA = $precioUnitarioVenta + $IvaVentaCalcular;
         $totalDetalle = $precioUnitarioVenta * $cantidadProducto;
         $totalDetalleIVA = $precioUnitarioVentaIVA * $cantidadProducto;
-
+    
         // Obtener sucursalId de fel_reservas 
         $dteData = $sucursalModel->find($facturaId);
         $sucursalId = $dteData['sucursalId'];  
         $tipoItemMHId = 1; // Valor por defecto para tipoItemMHId
-
+    
         // Obtener la existencia actual del producto en la sucursal
         $productosModel = new inv_productos_existencias();
         $productoExistencia = $productosModel->select('existenciaProducto')
@@ -518,38 +518,38 @@ public function tablaFacturacion()
                     ->where('sucursalId', $sucursalId)
                     ->where('productoId', $productoId)
                     ->first();
-
+    
         if (!$productoExistencia) {
             return $this->response->setJSON([
                 'success' => false,
                 'mensaje' => 'Producto no encontrado'
             ]);
         }
-
+    
         $existenciaActual = $productoExistencia['existenciaProducto'];
-
+    
         // Obtener el codigoProducto desde inv_productos
         $productosModel = new inv_productos();
         $producto = $productosModel->select('codigoProducto')
                     ->where('productoId', $productoId)
                     ->first();
-
+    
         if (!$producto) {
             return $this->response->setJSON([
                 'success' => false,
                 'mensaje' => 'Código de producto no encontrado'
             ]);
         }
-
+    
         $codigoProducto = $producto['codigoProducto'];
-
+    
         // Verificar si el producto ya está en la reserva
         $detalleActual = $model->select('cantidadProducto, precioUnitario, porcentajeDescuento')
                                 ->where('flgElimina', 0)
                                 ->where('facturaId', $facturaId)
                                 ->where('productoId', $productoId)
                                 ->first();
-
+    
         if ($operacion == 'editar' && $facturaDetalleId) {
             // Es una operación de edición
             $detalleActualEditar = $model->select('cantidadProducto')
@@ -558,20 +558,27 @@ public function tablaFacturacion()
                                          ->where('productoId', $productoId)
                                          ->where('facturaDetalleId', $facturaDetalleId)
                                          ->first();
-
+    
+            if (!$detalleActualEditar) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'mensaje' => 'Detalle de la factura no encontrado'
+                ]);
+            }
+    
             if (($cantidadProducto - $detalleActualEditar['cantidadProducto']) > $existenciaActual) {
                 return $this->response->setJSON([
                     'success' => false,
                     'mensaje' => 'No hay existencias suficientes para realizar el DTE'
                 ]);
             }
-
+    
             // Recalcular los valores basados en la nueva cantidad
             $precioUnitarioVenta = $precioUnitario * (1 - ($porcentajeDescuento / 100));
             $precioUnitarioVentaIVA = $precioUnitarioVenta + $IvaVentaCalcular;
             $totalDetalle = $precioUnitarioVenta * $cantidadProducto;
             $totalDetalleIVA = $precioUnitarioVentaIVA * $cantidadProducto;
-
+    
             $data = [
                 'cantidadProducto'          => $cantidadProducto,
                 'precioUnitario'            => $precioUnitario,
@@ -586,7 +593,7 @@ public function tablaFacturacion()
                 'codigoProducto'            => $codigoProducto,
                 'tipoItemMHId'              => $tipoItemMHId
             ];
-
+    
             $operacionDTE = $model->update($facturaDetalleId, $data);
             
             if ($operacionDTE) {
@@ -606,20 +613,20 @@ public function tablaFacturacion()
             if ($detalleActual && $detalleActual['cantidadProducto'] > 0) {
                 // El producto ya está en la reserva, actualizar la cantidad
                 $nuevaCantidad = $detalleActual['cantidadProducto'] + $cantidadProducto;
-
+    
                 if ($nuevaCantidad > $existenciaActual) {
                     return $this->response->setJSON([
                         'success' => false,
                         'mensaje' => 'No hay existencias suficientes para realizar el DTE'
                     ]);
                 }
-
+    
                 // Recalcular los valores basados en la nueva cantidad
                 $precioUnitarioVenta = $precioUnitario * (1 - ($porcentajeDescuento / 100));
                 $precioUnitarioVentaIVA = $precioUnitarioVenta + $IvaVentaCalcular;
                 $totalDetalle = $precioUnitarioVenta * $nuevaCantidad;
                 $totalDetalleIVA = $precioUnitarioVentaIVA * $nuevaCantidad;
-
+    
                 $data = [
                     'cantidadProducto'          => $nuevaCantidad,
                     'precioUnitario'            => $precioUnitario,
@@ -634,7 +641,7 @@ public function tablaFacturacion()
                     'codigoProducto'            => $codigoProducto,
                     'tipoItemMHId'              => $tipoItemMHId
                 ];
-
+    
                 $model->set($data)
                       ->where('flgElimina', 0)
                       ->where('facturaId', $facturaId)
@@ -654,7 +661,7 @@ public function tablaFacturacion()
                         'mensaje' => 'No hay existencias suficientes para realizar la reserva'
                     ]);
                 }
-
+    
                 // Insertar nuevo detalle de reserva
                 $data = [
                     'productoId'                => $productoId,
@@ -672,9 +679,9 @@ public function tablaFacturacion()
                     'codigoProducto'            => $codigoProducto,
                     'tipoItemMHId'              => $tipoItemMHId
                 ];
-
+    
                 $operacionDTE = $model->insert($data);
-
+    
                 if ($operacionDTE) {
                     return $this->response->setJSON([
                         'success' => true,
@@ -690,41 +697,60 @@ public function tablaFacturacion()
             }
         }
     }
+    
 
 
     public function tablaContinuarDTE(){
+
+        $facturaId = $this->request->getPost('facturaId');
+        $mostrarDTE = new fel_facturas_detalle();
+        $datos = $mostrarDTE
+        ->select('fel_facturas_detalle.facturaDetalleId,fel_facturas_detalle.facturaId,fel_facturas_detalle.cantidadProducto,fel_facturas_detalle.productoId,fel_facturas_detalle.precioUnitario,fel_facturas_detalle.precioUnitarioIVA,fel_facturas_detalle.porcentajeDescuento,fel_facturas_detalle.descuentoTotal,fel_facturas_detalle.precioUnitarioVenta,fel_facturas_detalle.precioUnitarioVentaIVA,fel_facturas_detalle.ivaUnitario,fel_facturas_detalle.ivaTotal,fel_facturas_detalle.totalDetalle,fel_facturas_detalle.totalDetalleIVA,inv_productos.productoId, inv_productos.producto,inv_productos.codigoProducto,cat_14_unidades_medida.unidadMedida')
+        ->join('inv_productos', 'inv_productos.productoId = fel_facturas_detalle.productoId')
+        ->join('cat_14_unidades_medida', 'cat_14_unidades_medida.unidadMedidaId = inv_productos.unidadMedidaId')
+        ->join('fel_facturas', 'fel_facturas.facturaId = fel_facturas_detalle.facturaId')
+        ->where('fel_facturas_detalle.flgElimina', 0)
+        ->where('fel_facturas_detalle.facturaId', $facturaId)
+        ->findAll();
+
+            
         $output['data'] = array();
-            $n = 0;
+        $n = 1; // Variable para contar las filas
 
-            $n++;
-            $output['data'] = array();
+        // Variables para sumar los totales
+        $subtotal = 0;
+        $ivaTotal = 0;
+        $totalAPagar = 0;
+        $descuentos = 0;
 
-            // Aquí construye tus columnas
+        foreach ($datos as $columna) {
+            // Construir columnas
             $columna1 = $n;
 
-            $columna2 = "(PD-001) Mario Kart";
+            $columna2 = "<b>Producto:</b> " . $columna['producto'] . "<br><b>Código :</b> " . $columna['codigoProducto'];
 
-            $columna3 = "$ 53.10";
+            $columna3 = "<b>sin IVA: </b> $" . number_format($columna['precioUnitario'], 2, '.', ',') . "<br><b>Con IVA: </b> $" . number_format($columna['precioUnitarioIVA'], 2, '.', ',');
 
-            $columna4 = "2";
+            $columna4 =  " "; 
 
-            $columna5 = "$ 13.80";
-           
-            $columna6 = "$ 120.00";
+            $columna5 = "<b>Sin IVA: </b> $" . number_format($columna['precioUnitarioVenta'], 2, '.', ',') . "<br><b>Con IVA: </b> $" . number_format($columna['precioUnitarioVentaIVA'], 2, '.', ',');
 
-            $columna7 = "$ 120.00";
+            $columna6 = " <b>Cantidad: </b> " . $columna['cantidadProducto'] . " (" . $columna['unidadMedida'] . ")";
 
-            $columna8 = "$ 120.00";
-           
+            $columna7 = "<b>unitario: </b> $" . number_format($columna['ivaUnitario'], 2, '.', ',') . "<br><b>total: </b> $" . number_format($columna['ivaTotal'], 2, '.', ',');
+
+            $columna8 = "<b>Sin IVA: </b> $" . number_format($columna['totalDetalle'], 2, '.', ',') . "<br><b>Con IVA: </b> $" . number_format($columna['totalDetalleIVA'], 2, '.', ',');
+
             $columna9 = '
-                            <button type= "button" class="btn btn-primary mb-1" onclick="" data-toggle="tooltip" data-placement="top" title="Editar">
-                                <i class="fas fa-sync-alt"></i>
-                            </button>';
-            $columna9 .= '
-                            <button type= "button" class="btn btn-danger mb-1" onclick="" data-toggle="tooltip" data-placement="top" title="Eliminar">
-                                <i class="fas fa-trash"></i>
-                            </button>';
-                            
+                <button class="btn btn-primary mb-1" onclick="modalProductoDTE(' . $columna['facturaDetalleId'] . ', `editar`);" data-toggle="tooltip" data-placement="top" title="Editar">
+                    <i class="fas fa-pen"></i>
+                </button>
+                <button class="btn btn-danger mb-1" onclick="eliminarReserva(' . $columna['facturaDetalleId'] . ');" data-toggle="tooltip" data-placement="top" title="Eliminar">
+                    <i class="fas fa-trash"></i>
+                </button>
+            ';
+
+            // Agregar la fila al array de salida
             $output['data'][] = array(
                 $columna1,
                 $columna2,
@@ -737,48 +763,90 @@ public function tablaFacturacion()
                 $columna9
             );
 
-            if ($n > 0) {
-                $output['footer'] = array(
-                    '',
-                    '' ,
-                    ''
-                );
+            // Sumar los valores de cada columna
+            $subtotal += $columna['totalDetalle'];
+            $ivaTotal += $columna['ivaTotal'];
+            $totalAPagar += $columna['totalDetalleIVA'];
+            $descuentos += ($columna['precioUnitario'] - $columna['precioUnitarioVenta']) * $columna['cantidadProducto'];
 
-                $output['footerTotales'] = '
-                    <b>
-                        <div class="row text-right">
-                            <div class="col-8">
-                                Sub total:
-                            </div>
-                            <div class="col-4">
-                                $ 106.2
-                            </div>
-                        </div>
-                        <div class="row text-right">
-                            <div class="col-8">
-                                IVA 13%:
-                            </div>
-                            <div class="col-4">
-                                $ 13.80
-                            </div>
-                        </div>
-                        <div class="row text-right">
-                            <div class="col-8">
-                                Total a pagar:
-                            </div>
-                            <div class="col-4">
-                                $ 120.00
-                            </div>
-                        </div>
-                        <div class="row text-right">
-                            <div class="col-8">
-                                Total pagado:
-                            </div>
-                            <div class="col-4">
-                                $ 120.00
-                            </div>
-                        </div>
-                        <div class="row text-right">
+            $n++;
+        }
+
+        // Obtener el número de pagos y la suma total de los pagos para la facturaId
+        $DTEPago = new fel_facturas_pago();
+        $pagosReserva = $DTEPago
+            ->select('COUNT(*) as numeroPagos, SUM(totalPago) as totalPagado')
+            ->where('facturaId', $facturaId)
+            ->where('flgElimina', 0) // Suponiendo que 'flgElimina' marca los pagos eliminados
+            ->first();
+
+        $numeroPagos = $pagosReserva['numeroPagos'];
+        $totalPagado = $pagosReserva['totalPagado'] ?? 0; // Si no hay pagos previos, se considera 0
+
+        // Determinar la clase CSS según la condición
+        $totalPagadoClass = ($totalPagado < $totalAPagar) ? 'text-danger' : 'text-success';
+
+        // Determinar el texto, clase y estado del botón
+        $botonTexto = ($totalPagado < $totalAPagar) ? 'Pagos (' . $numeroPagos . ')' : 'Pagado';
+        $botonClase = ($totalPagado < $totalAPagar) ? 'btn-primary' : 'btn-success';
+        $botonDisabled = ($totalPagado < $totalAPagar) ? '' : 'disabled';
+
+        if ($n > 1) {
+            $output['footer'] = array(
+                '',
+                '',
+                ''
+            );
+
+            $output['footerTotales'] = '
+                <div class="row text-right">
+                    <div class="col-8">
+                        <b> Subtotal (=) :</b>
+                    </div>
+                    <div class="col-4">
+                        $ ' . number_format($subtotal, 2, '.', ',') . '
+                    </div>
+                </div>
+                <div class="row text-right">
+                    <div class="col-8">
+                        <b>Descuentos (-) :</b>
+                    </div>
+                    <div class="col-4">
+                        $ ' . number_format($descuentos, 2, '.', ',') . '
+                    </div>
+                </div>
+                <div class="row text-right">
+                    <div class="col-8">
+                        <b>IVA (+) :</b>
+                    </div>
+                    <div class="col-4">
+                        $ ' . number_format($ivaTotal, 2, '.', ',') . '
+                    </div>
+                </div>
+                <div class="row text-right">
+                    <div class="col-8">
+                        <b>Total a pagar (=) :</b>
+                    </div>
+                    <div class="col-4">
+                        <b>$ ' . number_format($totalAPagar, 2, '.', ',') . ' </b>
+                    </div>
+                </div>
+                <div class="row text-right">
+                    <div class="col-8">
+                        <b>Total pagado:</b>
+                    </div>
+                    <div class="col-4">
+                        <b class="' . $totalPagadoClass . '">$ ' . number_format($totalPagado, 2, '.', ',') . ' </b>
+                    </div>
+                </div>
+                <div class="row text-right">
+                    <div class="col-12">
+                        <button type="button" class="btn ' . $botonClase . ' mb-1" onclick="modalPagoReserva(`' . $facturaId . '`, `editar`)" data-toggle="tooltip" data-placement="top" title="Pagos" ' . $botonDisabled . '>
+                            <i class="fas fa-hand-holding-usd"></i> ' . $botonTexto . '
+                        </button>
+                    </div>
+                </div>
+                    <div class="row text-right">
                             <div class="col-12">
                                 <button type= "button" class="btn btn-primary mb-1" onclick="modalPagoDTE()" data-toggle="tooltip" data-placement="top" title="Pagos">
                                     <i class="fas fa-hand-holding-usd"></i>
@@ -803,13 +871,17 @@ public function tablaFacturacion()
                             </div>
                         </div>
                     </b>
-
-                ';
+            ';
             return $this->response->setJSON($output);
-        } else {
-            return $this->response->setJSON(array('data' => '', 'footer'=>'')); // No hay datos, devuelve un array vacío
-        }     
-    }
+            } else {
+                return $this->response->setJSON(array('data' => '', 'footer' => '')); // No hay datos, devuelve un array vacío
+            }
+
+            
+}
+
+       
+  
 
     public function modalPagoDTE(){
         $data['variable'] = 0;
