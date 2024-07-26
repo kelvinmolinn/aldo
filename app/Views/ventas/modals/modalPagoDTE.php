@@ -1,43 +1,46 @@
-<form id="frmModal" method="post" action="<?php echo base_url(''); ?>">
+<form id="frmModal" method="post" action="<?php echo base_url('ventas/admin-facturacion/operacion/guardar/pagoDTE'); ?>">
     <div id="modalPagoDTE" class="modal" tabindex="-1" data-backdrop="static" data-keyboard="false">
         <div class="modal-dialog  modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">pagos del DTE - Número de DTE: 1<?php //echo $proveedor; ?></h5>
+                    <h5 class="modal-title">pagos del DTE - Número de DTE:  <?php echo $facturaId; ?></h5>
                 </div>
                 <div class="modal-body">
+                    <input type="hidden" id="facturaId" name="facturaId" value="<?= $facturaId; ?>">
                     <div class="row mb-4">
                         <div class="col-md-6">
                             <div class="form-select-control">
-                                <select name="selectFormaPago" id="selectFormaPago" style="width: 100%;" required>
-                                    <option value=""></option>
-                                    <option value="1">Billetes y monedas</option>
+                                <select name="formaPagoMHId" id="formaPagoMHId" style="width: 100%;" required>
+                                    <option></option>
+                                    <?php foreach ($formaPago as $pago) : ?>
+                                        <option value="<?php echo $pago['formaPagoMHId']; ?>"><?php echo $pago['formaPago']; ?></option>
+                                    <?php endforeach; ?>
                                 </select>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-outline">
-                                <input type="number" id="numeroComprobante" name="numeroComprobante" class="form-control active" required>
-                                <label class="form-label" for="numeroComprobante">Monto</label>
+                                <input type="number" id="totalPago" name="totalPago" class="form-control active number-input" min="0.01" step="0.01" required>
+                                <label class="form-label" for="totalPago">Monto</label>
                             </div>
                         </div>
                     </div>
                     <div class="row mb-4">
                         <div class="col-md-6">
                             <div class="form-outline">
-                                <input type="text" id="comentarioPago" name="comentarioPago" class="form-control active" required>
-                                <label class="form-label" for="comentarioPago">Descripión</label>
+                                <input type="text" id="descripcionPago" name="descripcionPago" class="form-control active" required>
+                                <label class="form-label" for="descripcionPago">Descripión</label>
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <button type="button" class="btn btn-primary" data-dismiss="modal">
+                            <button type="submit"id="btnNuevoContactoProveedor" class="btn btn-primary estilo-btn" onclick="" >
                                 <i class="fas fa-save"></i>
                                 Guardar
                             </button>
                         </div>
                     </div>      
                     <div class="table-responsive">
-                        <table class="table table-hover" id="tablaPagoReserva" style="width: 100%;">
+                        <table class="table table-hover" id="tablaPagoDTE" style="width: 100%;">
                             <thead>
                                 <tr>
                                     <th>#</th>
@@ -64,16 +67,52 @@
 
 <script>
     $(document).ready(function() {
-        $("#selectFormaPago").select2({
+        $("#formaPagoMHId").select2({
             placeholder: "Forma pago"
         });
 
-        $('#tablaPagoReserva').DataTable({
+                $("#frmModal").submit(function(event) {
+            event.preventDefault();
+            $.ajax({
+                url: $(this).attr('action'), 
+                type: $(this).attr('method'),
+                data: $(this).serialize(),
+                success: function(response) {
+                    console.log(response);
+                    if (response.success) {
+                        // Insert exitoso, ocultar modal y mostrar mensaje
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Pago agregado con éxito',
+                            text: response.mensaje
+                        }).then((result) => {
+                            $("#tablaPagoDTE").DataTable().ajax.reload(null, false);
+                            $("#tablaContinuarDTE").DataTable().ajax.reload(null, false);
+                            
+                        });
+                        console.log("Último ID insertado:", response.facturaPagoId);
+                    } else {
+                        // Insert fallido, mostrar mensaje de error
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.mensaje
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    // Manejar errores si los hay
+                    console.error(xhr.responseText);
+                }
+            });
+        });
+
+        $('#tablaPagoDTE').DataTable({
             "ajax": {
                 "method": "POST",
                 "url": '<?php echo base_url('ventas/admin-facturacion/tabla/pago/dte'); ?>',
                 "data": {
-                    x:''
+                     facturaId:<?php echo $facturaId;?>
                 }
             },
             "columnDefs": [

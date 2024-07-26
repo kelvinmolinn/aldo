@@ -181,5 +181,6 @@
 
         // Inicializar precios al cargar el formulario
         actualizarPrecios();
+         $("#productoId").val(<?= $campos["productoId"]; ?>).trigger('change'); 
     });
 </script>

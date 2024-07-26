@@ -97,6 +97,75 @@
 </div>
 
 <script>
+
+    function eliminarDTE(id) {
+        //alert("Vamos a eliminar " + id);
+            Swal.fire({
+                title: '¿Estás seguro que desea eliminar el producto?',
+                text: "Se eiminara el producto del DTE.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Si el usuario confirma, enviar la solicitud AJAX para eliminar el usuario de la sucursal
+                        $.ajax({
+                            url: '<?php echo base_url('ventas/admin-facturacion/operacion/eliminar/dte'); ?>',
+                            type: 'POST',
+                            data: {
+                                facturaDetalleId: id
+                            },
+                            success: function(response) {
+                                console.log(response);
+                                if (response.success) {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Producto eliminado con Éxito!',
+                                        text: response.mensaje
+                                    }).then((result) => {
+                                        $("#tablaContinuarDTE").DataTable().ajax.reload(null, false);
+                                    });
+                                } else {
+                                    // Insert fallido, mostrar mensaje de error
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Error',
+                                        text: response.mensaje
+                                    });
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                // Manejar errores si los hay
+                                console.error(xhr.responseText);
+                            }
+                        });
+                }
+            });
+    }
+
+        function modalPagoDTE(facturaId) {
+        // Realizar una petición AJAX para obtener los datos del módulo por su ID
+        $.ajax({
+                url: '<?php echo base_url('ventas/admin-facturacion/form/pago/dte'); ?>',
+                type: 'POST',
+                data: {facturaId : facturaId}, // Pasar el ID del módulo como parámetro
+                success: function(response) {
+                    // Insertar el contenido de la modal en el cuerpo de la modal
+                    $('#divModalContent').html(response);
+                    // Mostrar la modal
+                    $('#modalPagoDTE').modal('show');
+                    
+                },
+            error: function(xhr, status, error) {
+                // Manejar errores si los hay
+                console.error(xhr.responseText);
+            }
+        });
+    }
+
     function modalProductoDTE(facturaDetalleId, operacion) {
         $.ajax({
             url: '<?php echo base_url('ventas/admin-facturacion/modal/nuevo/dte'); ?>',
