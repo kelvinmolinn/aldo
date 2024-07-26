@@ -296,6 +296,7 @@ $routes->group('ventas/admin-facturacion', function($routes) {
     $routes->post('form/pago/dte', 'ventas\administracionFacturacion::modalPagoDTE');
     $routes->post('operacion/guardar/pagoDTE', 'ventas\administracionFacturacion::modalPagoDTEOperacion');
     $routes->post('tabla/pago/dte', 'ventas\administracionFacturacion::tablaPagoDTE');
+    $routes->post('operacion/eliminar/pago', 'ventas\administracionFacturacion::eliminarDTEPago');
     $routes->post('form/complemento/dte', 'ventas\administracionFacturacion::modalComplementoDTE');
     $routes->post('tabla/complemento/dte', 'ventas\administracionFacturacion::tablaComplementoDTE');
     $routes->post('form/error/dte', 'ventas\administracionFacturacion::tablaErrorDTE');
