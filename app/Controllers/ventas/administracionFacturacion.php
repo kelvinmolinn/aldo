@@ -1218,36 +1218,70 @@ public function modalPagoDTEOperacion() {
 }
 
     public function tablaPagoDTE(){
+        $facturaId    = $this->request->getPost('facturaId');
+        $tablaPagoDTE = new fel_facturas_pago();
+
+        $datos = $tablaPagoDTE
+          ->select('fel_facturas_pago.facturaPagoId,cat_17_forma_pago.formaPago, fel_facturas_pago.totalPago, fel_facturas_pago.descripcionPago')
+          ->join('cat_17_forma_pago' , 'cat_17_forma_pago.formaPagoMHId = fel_facturas_pago.formaPagoMHId')
+          ->where('fel_facturas_pago.flgElimina', 0)
+          ->where('fel_facturas_pago.facturaId',$facturaId)
+          ->findAll();
         $output['data'] = array();
-        $n = 0;
+        $n = 1; // Variable para contar las filas
+        foreach ($datos as $columna) {
+            // Aquí construye tus columnas
+            $columna1 = $n;
+            $columna2 = "<b>Forma pago:</b> " . $columna['formaPago'] . "<br><b>Comentario :</b> " . $columna['descripcionPago'];
 
-        $n++;
-        // Aquí construye tus columnas
-        $columna1 = $n;
+            $columna3 = "<b>Monto:</b> " . number_format($columna['totalPago'], 2);
 
-        $columna2 = "<b>Forma de pago: </b> Billetes y monedas" . "<br>" . "<b>Descripción/Comprobanto: </b> Cancelado en efectivo";
 
-        $columna3 = "$ 120.00";
-        
-        $columna4 = '
-                        <button type= "button" class="btn btn-danger mb-1" onclick="" data-toggle="tooltip" data-placement="top" title="Eliminar">
-                            <i class="fas fa-trash"></i>
-                        </button>';
-                        
-        $output['data'][] = array(
-            $columna1,
-            $columna2,
-            $columna3,
-            $columna4
-        );
-
+            $columna4 = '
+                <button type="button" class="btn btn-danger mb-1" onclick="eliminarDTEPago(`'.$columna["facturaPagoId"].'`)" data-toggle="tooltip" data-placement="top" title="Eliminar">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            ';
+            // Agrega la fila al array de salida
+            $output['data'][] = array(
+                $columna1,
+                $columna2,
+                $columna3,
+                $columna4
+            );
+    
+            $n++;
+        }
         // Verifica si hay datos
-        if ($n > 0) {
+        if ($n > 1) {
             return $this->response->setJSON($output);
         } else {
             return $this->response->setJSON(array('data' => '')); // No hay datos, devuelve un array vacío
         }
     }
+
+        public function eliminarDTEPago(){
+        
+        $eliminarDTEPago = new fel_facturas_pago();
+        
+        $facturaPagoId = $this->request->getPost('facturaPagoId');
+        $data = ['flgElimina' => 1];
+        
+        $eliminarDTEPago->update($facturaPagoId, $data);
+    
+        if($eliminarDTEPago) {
+            return $this->response->setJSON([
+                'success' => true,
+                'mensaje' => 'Pago eliminado correctamente'
+            ]);
+        } else {
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'No se pudo eliminar el pago del dte'
+            ]);
+        }
+    }
+
 
     public function modalComplementoDTE(){
         $data['variable'] = 0;
