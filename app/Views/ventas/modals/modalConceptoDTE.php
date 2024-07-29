@@ -1,18 +1,18 @@
-<form id="frmModal" method="post" action="<?php echo base_url('ventas/admin-facturacion/anular/dte'); ?>">
-    <div id="modalAnularDTE" class="modal" tabindex="-1" data-backdrop="static" data-keyboard="false">
+<form id="frmModal" method="post" action="<?php echo base_url('ventas/admin-facturacion/concepto/dte'); ?>">
+    <div id="modalConceptoDTE" class="modal" tabindex="-1" data-backdrop="static" data-keyboard="false">
         <div class="modal-dialog  modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title"> Anular DTE 
+                    <h5 class="modal-title"> Concepto del producto 
                        
                 </div>
                 <div class="modal-body">
-                <input type="hidden" id="facturaId" name="facturaId" Value="<?php echo $campos['facturaId']?>">
+                <input type="hidden" id="facturaDetalleId" name="facturaDetalleId" Value="<?php echo $campos['facturaDetalleId']?>">
                     <div class="row">
                         <div class="col-md-12">
                             <div class="form-outline">
-                                <input type="text" id="obsAnulacion" name="obsAnulacion" class="form-control" value="">
-                                <label class="form-label" for="obsAnulacion">Motivo de la anulación</label>
+                                <input type="text" id="conceptoProducto" name="conceptoProducto" class="form-control" value="">
+                                <label class="form-label" for="conceptoProducto">Concepto del producto</label>
                             </div>
                         </div>
                     </div>
@@ -38,8 +38,8 @@
                 $("#frmModal").submit(function(event) {
             event.preventDefault();
             Swal.fire({
-            title: '¿Estás seguro que desea anular el DTE?',
-            text: "Se anulara el DTE seleccionado.",
+            title: '¿Estás seguro que desea agregar concepto al DTE?',
+            text: "Se agregará el concepto al DTE seleccionado.",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
@@ -56,13 +56,13 @@
                         console.log(response);
                         if (response.success) {
                             // Insert exitoso, ocultar modal y mostrar mensaje
-                            $('#modalAnularDTE').modal('hide');
+                            $('#modalConceptoDTE').modal('hide');
                             Swal.fire({
                                 icon: 'success',
-                                title: 'DTE anulado con éxito',
+                                title: 'Concepto agregado con éxito',
                                 text: response.mensaje
                             }).then((result) => {
-                                $("#tablaDTE").DataTable().ajax.reload(null, false);
+                                $("#tablaContinuarDTE").DataTable().ajax.reload(null, false);
 
                             });
                         } else {

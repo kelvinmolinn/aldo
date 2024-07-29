@@ -942,10 +942,10 @@ public function tablaFacturacion()
 
     public function tablaContinuarDTE(){
 
-        $facturaId = $this->request->getPost('facturaId');
-        $mostrarDTE = new fel_facturas_detalle();
-        $datos = $mostrarDTE
-        ->select('fel_facturas_detalle.facturaDetalleId,fel_facturas_detalle.facturaId,fel_facturas_detalle.cantidadProducto,fel_facturas_detalle.productoId,fel_facturas_detalle.precioUnitario,fel_facturas_detalle.precioUnitarioIVA,fel_facturas_detalle.porcentajeDescuento,fel_facturas_detalle.descuentoTotal,fel_facturas_detalle.precioUnitarioVenta,fel_facturas_detalle.precioUnitarioVentaIVA,fel_facturas_detalle.ivaUnitario,fel_facturas_detalle.ivaTotal,fel_facturas_detalle.totalDetalle,fel_facturas_detalle.totalDetalleIVA,inv_productos.productoId, inv_productos.producto,inv_productos.codigoProducto,cat_14_unidades_medida.unidadMedida')
+    $facturaId = $this->request->getPost('facturaId');
+    $mostrarDTE = new fel_facturas_detalle();
+    $datos = $mostrarDTE
+        ->select('fel_facturas_detalle.facturaDetalleId,fel_facturas_detalle.facturaId,fel_facturas_detalle.cantidadProducto,fel_facturas_detalle.productoId,fel_facturas_detalle.conceptoProducto,fel_facturas_detalle.precioUnitario,fel_facturas_detalle.precioUnitarioIVA,fel_facturas_detalle.porcentajeDescuento,fel_facturas_detalle.descuentoTotal,fel_facturas_detalle.precioUnitarioVenta,fel_facturas_detalle.precioUnitarioVentaIVA,fel_facturas_detalle.ivaUnitario,fel_facturas_detalle.ivaTotal,fel_facturas_detalle.totalDetalle,fel_facturas_detalle.totalDetalleIVA,inv_productos.productoId, inv_productos.producto,inv_productos.codigoProducto,cat_14_unidades_medida.unidadMedida')
         ->join('inv_productos', 'inv_productos.productoId = fel_facturas_detalle.productoId')
         ->join('cat_14_unidades_medida', 'cat_14_unidades_medida.unidadMedidaId = inv_productos.unidadMedidaId')
         ->join('fel_facturas', 'fel_facturas.facturaId = fel_facturas_detalle.facturaId')
@@ -953,47 +953,50 @@ public function tablaFacturacion()
         ->where('fel_facturas_detalle.facturaId', $facturaId)
         ->findAll();
 
-            
-        $output['data'] = array();
-        $n = 1; // Variable para contar las filas
+    $output['data'] = array();
+    $n = 1; // Variable para contar las filas
 
-        // Variables para sumar los totales
-        $subtotal = 0;
-        $ivaTotal = 0;
-        $totalAPagar = 0;
-        $descuentos = 0;
+    // Variables para sumar los totales
+    $subtotal = 0;
+    $ivaTotal = 0;
+    $totalAPagar = 0;
+    $descuentos = 0;
 
-        foreach ($datos as $columna) {
-            // Construir columnas
-            $columna1 = $n;
+    foreach ($datos as $columna) {
+        // Construir columnas
+        $columna1 = $n;
 
-            $columna2 = "<b>Producto:</b> " . $columna['producto'] . "<br><b>Código :</b> " . $columna['codigoProducto'];
+        // Verificar si conceptoProducto tiene datos
+        $conceptoTexto = !empty($columna['conceptoProducto']) ? "<br><b>Concepto :</b> " . $columna['producto'] . " ( " . $columna['conceptoProducto'] . " )" : "";
 
-            $columna3 = "<b>sin IVA: </b> $" . number_format($columna['precioUnitario'], 2, '.', ',') . "<br><b>Con IVA: </b> $" . number_format($columna['precioUnitarioIVA'], 2, '.', ',');
+        $columna2 = "<b>Producto:</b> " . $columna['producto'] . "<br><b>Código :</b> " . $columna['codigoProducto'] . $conceptoTexto;
 
-            $columna4 =   "<b>Procentaje: </b> " . number_format($columna['porcentajeDescuento'], 2, '.', ',') ."%". "<br><b>Total :</b> $" .  number_format($columna['descuentoTotal'], 2, '.', ',');
+        $columna3 = "<b>sin IVA: </b> $" . number_format($columna['precioUnitario'], 2, '.', ',') . "<br><b>Con IVA: </b> $" . number_format($columna['precioUnitarioIVA'], 2, '.', ',');
 
-            $columna5 = "<b>Sin IVA: </b> $" . number_format($columna['precioUnitarioVenta'], 2, '.', ',') . "<br><b>Con IVA: </b> $" . number_format($columna['precioUnitarioVentaIVA'], 2, '.', ',');
+        $columna4 = "<b>Procentaje: </b> " . number_format($columna['porcentajeDescuento'], 2, '.', ',') . "%" . "<br><b>Total :</b> $" . number_format($columna['descuentoTotal'], 2, '.', ',');
 
-            $columna6 = " <b>Cantidad: </b> " . $columna['cantidadProducto'] . " (" . $columna['unidadMedida'] . ")";
+        $columna5 = "<b>Sin IVA: </b> $" . number_format($columna['precioUnitarioVenta'], 2, '.', ',') . "<br><b>Con IVA: </b> $" . number_format($columna['precioUnitarioVentaIVA'], 2, '.', ',');
 
-            $columna7 = "<b>unitario: </b> $" . number_format($columna['ivaUnitario'], 2, '.', ',') . "<br><b>total: </b> $" . number_format($columna['ivaTotal'], 2, '.', ',');
+        $columna6 = " <b>Cantidad: </b> " . $columna['cantidadProducto'] . " (" . $columna['unidadMedida'] . ")";
 
-            $columna8 = "<b>Sin IVA: </b> $" . number_format($columna['totalDetalle'], 2, '.', ',') . "<br><b>Con IVA: </b> $" . number_format($columna['totalDetalleIVA'], 2, '.', ',');
+        $columna7 = "<b>unitario: </b> $" . number_format($columna['ivaUnitario'], 2, '.', ',') . "<br><b>total: </b> $" . number_format($columna['ivaTotal'], 2, '.', ',');
 
-            $columna9 = '
-                <button class="btn btn-primary mb-1" onclick="modalProductoDTE(' . $columna['facturaDetalleId'] . ', `editar`);" data-toggle="tooltip" data-placement="top" title="Editar">
-                    <i class="fas fa-pen"></i>
-                </button>
+        $columna8 = "<b>Sin IVA: </b> $" . number_format($columna['totalDetalle'], 2, '.', ',') . "<br><b>Con IVA: </b> $" . number_format($columna['totalDetalleIVA'], 2, '.', ',');
 
-                <button class="btn btn-info mb-1" onclick="modalConcepto(' . $columna['facturaDetalleId'] . ', `editar`);" data-toggle="tooltip" data-placement="top" title="Concepto">
-                    <i class="fas fa-clipboard-list"></i>
-                </button>
+        $columna9 = '
+            <button class="btn btn-primary mb-1" onclick="modalProductoDTE(' . $columna['facturaDetalleId'] . ', `editar`);" data-toggle="tooltip" data-placement="top" title="Editar">
+                <i class="fas fa-pen"></i>
+            </button>
 
-                <button class="btn btn-danger mb-1" onclick="eliminarDTE(' . $columna['facturaDetalleId'] . ');" data-toggle="tooltip" data-placement="top" title="Eliminar">
-                    <i class="fas fa-trash"></i>
-                </button>
-            ';
+            <button class="btn btn-info mb-1" onclick="modalConceptoDTE(' . $columna['facturaDetalleId'] . ', `editar`);" data-toggle="tooltip" data-placement="top" title="Concepto">
+                <i class="fas fa-clipboard-list"></i>
+            </button>
+
+            <button class="btn btn-danger mb-1" onclick="eliminarDTE(' . $columna['facturaDetalleId'] . ');" data-toggle="tooltip" data-placement="top" title="Eliminar">
+                <i class="fas fa-trash"></i>
+            </button>
+        ';
+
 
             // Agregar la fila al array de salida
             $output['data'][] = array(
@@ -1086,7 +1089,7 @@ public function tablaFacturacion()
                 </div>
                 <div class="row text-right">
                     <div class="col-12">
-                        <button type="button" class="btn ' . $botonClase . ' mb-1" onclick="modalPagoDTE(`' . $facturaId . '`, `editar`)" data-toggle="tooltip" data-placement="top" title="Pagos" ' . $botonDisabled . '>
+                        <button type="button" class="btn ' . $botonClase . ' mb-1" onclick="modalPagoDTE(`' . $facturaId . '`, `editar`)" data-toggle="tooltip" data-placement="top" title="Pagos" >
                             <i class="fas fa-hand-holding-usd"></i> ' . $botonTexto . '
                         </button>
                     </div>
@@ -1094,7 +1097,7 @@ public function tablaFacturacion()
 
                         <div class="row text-right">
                             <div class="col-4">
-                                <button type= "button" class="btn btn-primary mb-1" onclick="modalComplementoDTE()" data-toggle="tooltip" data-placement="top" title="Complementos">
+                                <button type= "button" class="btn btn-primary mb-1" onclick="modalComplementoDTE(`' . $facturaId . '`, `editar`)" data-toggle="tooltip" data-placement="top" title="Complementos">
                                     <i class="fas fa-clipboard-list"></i> Complementos
                                 </button>
                             </div>
@@ -1282,38 +1285,146 @@ public function modalPagoDTEOperacion() {
         }
     }
 
+        public function modalConceptoDTE(){
+        $fel_facturas_detalle = new fel_facturas_detalle();
+        $facturaDetalleId = $this->request->getPost('facturaDetalleId');
+
+        $data['campos'] = $fel_facturas_detalle
+        ->select('facturaDetalleId')
+        ->where('flgElimina', 0)
+        ->where('facturaDetalleId', $facturaDetalleId)
+        ->first();
+        return view('ventas/modals/modalConceptoDTE', $data);
+    }
+
+        public function operacionConceptoDTE(){
+        $conceptoDTE = new fel_facturas_detalle();
+        
+            $facturaDetalleId = $this->request->getPost('facturaDetalleId');
+            $conceptoProducto = $this->request->getPost('conceptoProducto');
+
+            $data = [
+                'conceptoProducto'          =>  $conceptoProducto
+            ];
+            
+            $conceptoDTE->update($facturaDetalleId, $data);
+
+            if($conceptoDTE) {
+                return $this->response->setJSON([
+                    'success' => true,
+                    'mensaje' => 'Concepto agregado correctamente'
+                ]);
+            } else {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'mensaje' => 'No se pudo agregar el concepto'
+                ]);
+            }
+    }
+
 
     public function modalComplementoDTE(){
-        $data['variable'] = 0;
+
+        $data['facturaId'] = $this->request->getPost('facturaId');
+        $complementoModel = new fel_facturas_complemento();
+        // Obtener las formas de pago
+        $data['complementoFactura'] = $complementoModel
+            ->select("facturaComplementoId, tipoComplemento, complementoFactura")
+            ->where("flgElimina", 0)
+            ->findAll();
         return view('ventas/modals/modalComplementoDTE', $data);
     }
 
+public function modalComplementoDTEOperacion() {
+    $complementoDTE = new fel_facturas_complemento();
+    $facturaId = $this->request->getPost('facturaId');
+    $tipoComplemento = $this->request->getPost('tipoComplemento'); 
+    $complementoFactura = $this->request->getPost('complementoFactura'); 
+
+
+    // Datos a insertar
+    $dataInsert = [
+        'facturaId' => $facturaId,
+        'tipoComplemento' => $this->request->getPost('tipoComplemento'),
+        'complementoFactura' => $this->request->getPost('complementoFactura')
+    ];
+
+    // Insertar datos en la base de datos
+    $operacionComplemento = $complementoDTE->insert($dataInsert);
+    
+    if ($operacionComplemento) {
+        // Si el insert fue exitoso, devuelve el último ID insertado
+        return $this->response->setJSON([
+            'success' => true,
+            'mensaje' => 'Complemento agregado correctamente',
+            'facturaComplementoId' => $complementoDTE->insertID()
+        ]);
+    } else {
+        // Si el insert falló, devuelve un mensaje de error
+        return $this->response->setJSON([
+            'success' => false,
+            'mensaje' => 'No se pudo insertar el complemento'
+        ]);
+    }
+}
+
     public function tablaComplementoDTE(){
+        $facturaId    = $this->request->getPost('facturaId');
+        $tablaComplementoDTE = new fel_facturas_complemento();
+
+        $datos = $tablaComplementoDTE
+          ->select('fel_facturas_complemento.facturaComplementoId, fel_facturas_complemento.tipoComplemento, fel_facturas_complemento.complementoFactura')
+          ->where('fel_facturas_complemento.flgElimina', 0)
+          ->where('fel_facturas_complemento.facturaId',$facturaId)
+          ->findAll();
         $output['data'] = array();
-        $n = 0;
+        $n = 1; // Variable para contar las filas
+        foreach ($datos as $columna) {
+            // Aquí construye tus columnas
+            $columna1 = $n;
+            $columna2 = "<b>Tipo:</b> " . $columna['tipoComplemento'] . "<br><b>Descripción :</b> " . $columna['complementoFactura'];
 
-        $n++;
-        // Aquí construye tus columnas
-        $columna1 = $n;
-
-        $columna2 = "Edición especial";
-        
-        $columna3 = '
-                        <button type= "button" class="btn btn-danger mb-1" onclick="" data-toggle="tooltip" data-placement="top" title="Eliminar">
-                            <i class="fas fa-trash"></i>
-                        </button>';
-                        
-        $output['data'][] = array(
-            $columna1,
-            $columna2,
-            $columna3
-        );
-
+            $columna3 = '
+                <button type="button" class="btn btn-danger mb-1" onclick="eliminarDTEComplemento(`'.$columna["facturaComplementoId"].'`)" data-toggle="tooltip" data-placement="top" title="Eliminar">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            ';
+            // Agrega la fila al array de salida
+            $output['data'][] = array(
+                $columna1,
+                $columna2,
+                $columna3
+            );
+    
+            $n++;
+        }
         // Verifica si hay datos
-        if ($n > 0) {
+        if ($n > 1) {
             return $this->response->setJSON($output);
         } else {
             return $this->response->setJSON(array('data' => '')); // No hay datos, devuelve un array vacío
+        }
+    }
+
+        public function eliminarDTEComplemento(){
+        
+        $eliminarDTEComplemento = new fel_facturas_complemento();
+        
+        $facturaComplementoId = $this->request->getPost('facturaComplementoId');
+        $data = ['flgElimina' => 1];
+        
+        $eliminarDTEComplemento->update($facturaComplementoId, $data);
+    
+        if($eliminarDTEComplemento) {
+            return $this->response->setJSON([
+                'success' => true,
+                'mensaje' => 'Complemento eliminado correctamente'
+            ]);
+        } else {
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'No se pudo eliminar el complemento del dte'
+            ]);
         }
     }
 

@@ -301,6 +301,13 @@ $routes->group('ventas/admin-facturacion', function($routes) {
     $routes->post('tabla/complemento/dte', 'ventas\administracionFacturacion::tablaComplementoDTE');
     $routes->post('form/error/dte', 'ventas\administracionFacturacion::tablaErrorDTE');
     $routes->post('form/imprimir/dte', 'ventas\administracionFacturacion::imprimirDTE');
+    $routes->post('form/concepto/dte', 'ventas\administracionFacturacion::modalConceptoDTE');
+    $routes->post('concepto/dte', 'ventas\administracionFacturacion::operacionConceptoDTE');
+    $routes->post('form/complemento/dte', 'ventas\administracionFacturacion::modalComplementoDTE');
+    $routes->post('operacion/guardar/complementoDTE', 'ventas\administracionFacturacion::modalComplementoDTEOperacion');
+    $routes->post('tabla/complemento/dte', 'ventas\administracionFacturacion::tablaComplementoDTE');
+    $routes->post('operacion/eliminar/complemento', 'ventas\administracionFacturacion::eliminarDTEComplemento');
+
 
 });
 

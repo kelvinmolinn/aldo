@@ -166,6 +166,48 @@
         });
     }
 
+            function modalConceptoDTE(facturaDetalleId) {
+        // Realizar una petición AJAX para obtener los datos del módulo por su ID
+        $.ajax({
+                url: '<?php echo base_url('ventas/admin-facturacion/form/concepto/dte'); ?>',
+                type: 'POST',
+                data: {facturaDetalleId : facturaDetalleId}, // Pasar el ID del módulo como parámetro
+                success: function(response) {
+                    // Insertar el contenido de la modal en el cuerpo de la modal
+                    $('#divModalContent').html(response);
+                    // Mostrar la modal
+                    $('#modalConceptoDTE').modal('show');
+                    
+                },
+            error: function(xhr, status, error) {
+                // Manejar errores si los hay
+                console.error(xhr.responseText);
+            }
+        });
+    }
+
+                function modalComplementoDTE(facturaId, facturaComplementoId) {
+        // Realizar una petición AJAX para obtener los datos del módulo por su ID
+        $.ajax({
+                url: '<?php echo base_url('ventas/admin-facturacion/form/complemento/dte'); ?>',
+                type: 'POST',
+                data: {facturaComplementoId : facturaComplementoId, facturaId : facturaId}, // Pasar el ID del módulo como parámetro
+                success: function(response) {
+                    // Insertar el contenido de la modal en el cuerpo de la modal
+                    $('#divModalContent').html(response);
+                    // Mostrar la modal
+                    $('#modalComplementoDTE').modal('show');
+                    
+                },
+            error: function(xhr, status, error) {
+                // Manejar errores si los hay
+                console.error(xhr.responseText);
+            }
+        });
+    }
+
+
+
     function modalProductoDTE(facturaDetalleId, operacion) {
         $.ajax({
             url: '<?php echo base_url('ventas/admin-facturacion/modal/nuevo/dte'); ?>',
