@@ -102,7 +102,7 @@
         //alert("Vamos a eliminar " + id);
             Swal.fire({
                 title: '¿Estás seguro que desea eliminar el producto?',
-                text: "Se eiminara el producto del DTE.",
+                text: "Se eliminara el producto del DTE.",
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
@@ -124,6 +124,54 @@
                                     Swal.fire({
                                         icon: 'success',
                                         title: 'Producto eliminado con Éxito!',
+                                        text: response.mensaje
+                                    }).then((result) => {
+                                        $("#tablaContinuarDTE").DataTable().ajax.reload(null, false);
+                                    });
+                                } else {
+                                    // Insert fallido, mostrar mensaje de error
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Error',
+                                        text: response.mensaje
+                                    });
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                // Manejar errores si los hay
+                                console.error(xhr.responseText);
+                            }
+                        });
+                }
+            });
+    }
+
+        function  certificarDTE(id) {
+        //alert("Vamos a certificar " + id);
+            Swal.fire({
+                title: '¿Estás seguro que desea certificar el DTE?',
+                text: "Se certificará el DTE.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, Certificar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Si el usuario confirma, enviar la solicitud AJAX para certificar 
+                        $.ajax({
+                            url: '<?php echo base_url('ventas/admin-facturacion/operacion/certificar/dte'); ?>',
+                            type: 'POST',
+                            data: {
+                                facturaDetalleId: id
+                            },
+                            success: function(response) {
+                                console.log(response);
+                                if (response.success) {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'DTE certificado con Éxito!',
                                         text: response.mensaje
                                     }).then((result) => {
                                         $("#tablaContinuarDTE").DataTable().ajax.reload(null, false);

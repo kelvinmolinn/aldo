@@ -1107,7 +1107,7 @@ public function tablaFacturacion()
                                 </button>
                             </div>
                             <div class="col-4">
-                                <button type= "button" class="btn btn-primary mb-1" onclick="CertificarDTE()" data-toggle="tooltip" data-placement="top" title="Certificar DTE">
+                                <button type= "button" class="btn btn-primary mb-1" onclick="certificarDTE()" data-toggle="tooltip" data-placement="top" title="Certificar DTE">
                                     <i class="fas fa-save"></i> Certificar DTE
                                 </button>
                             </div>
@@ -1427,6 +1427,82 @@ public function modalComplementoDTEOperacion() {
             ]);
         }
     }
+
+public function certificarDTE()
+{
+    // Obtener el ID de la factura desde la solicitud
+    $facturaId = $this->request->getPost('facturaId');
+      $facturaDetalleId = $this->request->getPost('facturaDetalleId');
+    // Modelo para las facturas
+    $sucursalModel = new fel_facturas();
+    
+
+    // Modelo para los detalles de la factura
+    $detalleModel = new fel_facturas_detalle();
+    
+    // Obtener todos los detalles de la factura
+    $detalles = $detalleModel->where('facturaId', $facturaId)->where('flgElimina', 0)->findAll();
+    if ($detalles) {
+        return $this->response->setJSON([
+            'success' => false,
+            'mensaje' => 'No se encontraron detalles de la factura'
+        ]);
+    }
+
+    // Modelo para las existencias de productos
+    $productosExistenciasModel = new inv_productos_existencias();
+    $productosModel = new inv_productos();
+
+    // Verificar las existencias de cada producto en la sucursal
+    foreach ($detalles as $detalle) {
+        $productoId = $detalle['productoId'];
+        $cantidadProducto = $detalle['cantidadProducto'];
+
+        // Obtener la existencia actual del producto en la sucursal
+        $productoExistencia = $productosExistenciasModel->select('existenciaProducto')
+            ->where('flgElimina', 0)
+            ->where('sucursalId', $sucursalId)
+            ->where('productoId', $productoId)
+            ->first();
+
+        if (!$productoExistencia) {
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => "Producto ID $productoId no encontrado en la sucursal"
+            ]);
+        }
+
+        $existenciaActual = $productoExistencia['existenciaProducto'];
+
+        // Obtener el código del producto desde inv_productos
+        $producto = $productosModel->select('codigoProducto')
+            ->where('productoId', $productoId)
+            ->first();
+
+        if (!$producto) {
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => "Código de producto no encontrado para Producto ID $productoId"
+            ]);
+        }
+
+        $codigoProducto = $producto['codigoProducto'];
+
+        // Verificar si la cantidad del producto en la factura supera la existencia actual
+        if ($cantidadProducto > $existenciaActual) {
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => "No hay existencias suficientes para el producto ID $productoId (Código: $codigoProducto)"
+            ]);
+        }
+    }
+
+    // Si todas las existencias son suficientes
+    return $this->response->setJSON([
+        'success' => true,
+        'mensaje' => 'Certificación de DTE exitosa'
+    ]);
+}
 
     public function tablaErrorDTE(){
         $data['variable'] = 0;
