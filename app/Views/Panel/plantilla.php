@@ -36,14 +36,14 @@
 
     <style>
     /* Estilo personalizado para cambiar la sombra al pasar el mouse */
-    .nav-color:hover {
-      box-shadow: 0 4px 8px rgba(255, 255, 255, 0.5); 
-    }
+      .nav-color:hover {
+        box-shadow: 0 4px 8px rgba(255, 255, 255, 0.5); 
+      }
 
-    .nav-cerrar-sesion:hover {
-      box-shadow: 2px 2px 8px 4px rgba(0, 0, 0, 0.5); /* Sombra de color rojo */
-    }
-  </style>
+      .nav-cerrar-sesion:hover {
+        box-shadow: 2px 2px 8px 4px rgba(0, 0, 0, 0.5); /* Sombra de color rojo */
+      }
+    </style>
 </head>
 <body class="hold-transition sidebar-mini">
 <!-- Site wrapper -->
@@ -105,208 +105,7 @@
       </div>
 
       <!-- Sidebar Menu -->
-      <?php
-        if(session('defaultPass') == "Propia") {
-      ?>
-          <nav class="mt-2">
-            <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-              <!-- Add icons to the links using the .nav-icon class with font-awesome or any other icon font library -->
-              <li class="nav-item">
-                <a role="button" class="nav-link nav-color" onclick="cambiarInterfaz('escritorio/dashboard', {renderVista: 'No'});">
-                  <i class="nav-icon fas fa-home"></i>
-                  <p>INICIO</p>
-                </a>
-              </li>
-                        <li class="nav-item">
-                <a href="#" class="nav-link nav-color">
-                  <i class="nav-icon fas fa-cog"></i>
-                  <p>Configuración usuario
-                    <i class="right fas fa-angle-left"></i>
-                  </p>
-                </a>
-                <ul class="nav nav-treeview ml-3">
-                  <li class="nav-item">
-                    <a href="#" class="nav-link nav-color">
-                      <i class=" fas fa-user-cog"></i>
-                      <p> Admin. usuario
-                        <i class="right fas fa-angle-left"></i>
-                      </p>
-                    </a>
-                    <ul class="nav nav-treeview ml-4">
-                      <li class="nav-item">
-                        <a role="button" class="nav-link nav-color" onclick="cambiarInterfaz('conf-general/admin-usuarios/index', {renderVista: 'No'});">
-                          <i class="fas fa-user "></i>
-                          <p>Usuarios</p>
-                        </a>
-                      </li>
-                    </ul>
-                    <ul class="nav nav-treeview ml-4">
-                      <li class="nav-item">
-                        <a role="button" class="nav-link nav-color" onclick="cambiarInterfaz('conf-general/admin-roles/index', {renderVista: 'No'});">
-                          <i class="fas fa-user "></i>
-                          <p>Roles</p>
-                        </a>
-                      </li>
-                    </ul>
-                  </li>
-                  <li class="nav-item">
-                    <a href="#" class="nav-link nav-color">
-                      <i class=" fas fa-wrench"></i>
-                      <p> Admin. módulos
-                        <i class="right fas fa-angle-left"></i>
-                      </p>
-                    </a>
-                    <ul class="nav nav-treeview ml-4">
-                      <li class="nav-item">
-                        <a role="button" class="nav-link nav-color" onclick="cambiarInterfaz('conf-general/admin-modulos/index', {renderVista: 'No'});">
-                          <i class="fas fa-tasks "></i>
-                          <p>Módulos</p>
-                        </a>
-                      </li>
-                    </ul>
-                  </li>
-                </ul>
-              </li>
-              <li class="nav-item">
-                <a href="#" class="nav-link nav-color">
-                  <i class="nav-icon fas fa-shopping-cart"></i>
-                  <p>Compras
-                    <i class="right fas fa-angle-left"></i>
-                  </p>
-                </a>
-                <ul class="nav nav-treeview ml-3">
-                  <li class="nav-item">
-                    <a role="button" class="nav-link nav-color" onclick="cambiarInterfaz('compras/admin-proveedores/index', {renderVista: 'No'});">
-                      <i class="fas fa-users"></i>
-                      <p> Proveedores  
-                      </p>
-                    </a>
-                  </li>
-                  <li class="nav-item">
-                    <a role="button" class="nav-link nav-color" onclick="cambiarInterfaz('compras/admin-compras/index', {renderVista: 'No'});">
-                      <i class="fas fa-store"></i>
-                      <p> Compras  
-                      </p>
-                    </a>
-                  </li>
-                  <li class="nav-item">
-                    <a role="button" class="nav-link nav-color" onclick="cambiarInterfaz('compras/admin-retaceo/index', {renderVista: 'No'});">
-                    <i class="fas fa-list-ol"></i>
-                      <p> Retaceo  
-                      </p>
-                    </a>
-                  </li>
-                </ul>
-              </li>
-
-              <li class="nav-item">
-                <a href="#" class="nav-link nav-color">
-                  <i class="nav-icon fas fa-box-open"></i>
-                  <p>Inventario
-                    <i class="right fas fa-angle-left"></i>
-                  </p>
-                </a>
-                    <ul class="nav nav-treeview ml-3">
-                      <li class="nav-item">
-                        <a role="button" class="nav-link nav-color" onclick="cambiarInterfaz('inventario/admin-producto/index', {renderVista: 'No'});">
-                          <i class="fas fa-box-open"></i>
-                          <p>Existencia productos</p>
-                        </a>
-                      </li>
-
-                      <li class="nav-item">
-                        <a role="button" class="nav-link nav-color" onclick="cambiarInterfaz('inventario/admin-salida/index', {renderVista: 'No'});">
-                          <i class="fas fa-arrow-circle-right"></i>
-                          <p>Descargos/Salidas</p>
-                        </a>
-                      </li>
-
-                      <li class="nav-item">
-                        <a role="button" class="nav-link nav-color" onclick="cambiarInterfaz('inventario/admin-traslados/index', {renderVista: 'No'});">
-                          <i class="fas fa-truck"></i>
-                          <p>Traslados de productos</p>
-                        </a>
-                      </li>
-
-                      <li class="nav-item">
-                        <a role="button" class="nav-link nav-color" onclick="cambiarInterfaz('inventario/admin-tipo/index', {renderVista: 'No'});">
-                          <i class="fas fa-box"></i>
-                          <p>Tipos de producto</p>
-                        </a>
-                      </li>
-
-                      <li class="nav-item">
-                        <a role= "button" class="nav-link nav-color" onclick="cambiarInterfaz('inventario/admin-plataforma/index', {renderVista: 'No'});">
-                          <i class="fas fa-gamepad"></i>
-                          <p>Plataforma</p>
-                        </a>
-                      </li>
-
-                      <li class="nav-item">
-                        <a role="button" class="nav-link nav-color" onclick="cambiarInterfaz('inventario/admin-unidades/index', {renderVista: 'No'});">
-                          <i class="fas fa-tag"></i>
-                          <p>Unidades de medida</p>
-                        </a>
-                      </li>
-                    </ul>
-              </li>
-              <li class="nav-item">
-                <a href="#" class="nav-link nav-color">
-                  <i class="nav-icon fas fa-money-check-alt"></i>
-                  <p>Ventas
-                    <i class="right fas fa-angle-left"></i>
-                  </p>
-                </a>
-                    <ul class="nav nav-treeview ml-3">
-                      <li class="nav-item">
-                        <a role="button" class="nav-link nav-color" onclick="cambiarInterfaz('ventas/admin-clientes/index', {renderVista: 'No'});">
-                          <i class="fas fa-users"></i>
-                          <p>Clientes</p>
-                        </a>
-                      </li>
-                      <li class="nav-item">
-                        <a role="button" class="nav-link nav-color" onclick="cambiarInterfaz('ventas/admin-reservas/index', {renderVista: 'No'});">
-                          <i class="fas fa-dolly"></i>
-                          <p>Reservas</p>
-                        </a>
-                      </li>
-                      <li class="nav-item">
-                        <a role="button" class="nav-link nav-color" onclick="cambiarInterfaz('ventas/admin-facturacion/index', {renderVista: 'No'});">
-                          <i class="fas fa-cash-register"></i>
-                          <p>Facturación</p>
-                        </a>
-                      </li>
-                    </ul>
-              </li>
-              <li class="nav-item">
-                <a href="#" onclick="cerrarSession();" class="nav-link nav-cerrar-sesion">
-                  <i class="fas fa-sign-out-alt"></i>
-                  <p>Cerrar Sesión</p>
-                </a>
-              </li>
-            </ul>
-          </nav>
-      <?php 
-        } else {
-      ?>
-          <nav class="mt-2">
-            <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-              <li class="nav-item">
-                <a href="#" onclick="cerrarSession();" class="nav-link">
-                  <i class="fas fa-sign-out-alt text-danger"></i>
-                  <p>Cerrar Sesión</p>
-                </a>
-              </li>
-            </ul>
-          </nav>
-      <?php
-        }
-      ?>
-      <!--<nav class="mt-2">
-        <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-
-        </ul>
-      </nav>-->
+      <?= $menuUsuario; ?>
       <!-- /.sidebar-menu -->
     </div>
     <!-- /.sidebar -->
@@ -323,7 +122,7 @@
 
   <footer class="main-footer">
     <div class="float-right d-none d-sm-block">
-      <b>Version</b> 1.3.0
+      <b>Version</b> 1.0.0
     </div>
     <strong>Copyright &copy;</strong> DK development 2024. 
   </footer>
@@ -340,11 +139,11 @@
   function cerrarSession(){
     Swal.fire({
       title: '¿Está seguro que desea cerrar sesión?',
-      text: 'Recuerde guardar los últimos cambios realizados para evitar perderlos.',
+      text: 'Recuerde guardas los cambios y modificaciones realizadas',
       icon: 'warning',
       showCancelButton: true,
-      cancelButton: '#d33',
-      confirmButtonText: 'Cerrar sesión' 
+      confirmButtonText: 'Sí, cerrar sesión',
+      cancelButtonText: 'Cancelar'
     }).then((result) =>{
       if(result.isConfirmed){
         window.location.href = '<?= site_url('cerrarSession'); ?>';
@@ -372,5 +171,5 @@ function cambiarInterfaz(ruta, campos) {
         }
     });
 }
-</script>
+  </script>
 </html>

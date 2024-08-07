@@ -9,14 +9,24 @@
         </button>
     </div>
     <div class="col-md-6 text-right">
-        <button type= "button" id="btnAbrirModal2" class="btn btn-primary" onclick="modalExistencia(0, 'insertar');">
-            <i class="fas fa-save"></i>
-            Existencia Inicial
-        </button>
-        <button type= "button" id="btnAbrirModal" class="btn btn-primary" onclick="modalProducto(0, 'insertar');">
-            <i class="fas fa-save"></i>
-            Nuevo producto
-        </button>
+        <?php 
+            if(in_array(2, session('permisosUsuario'))) {
+        ?>
+                <button type= "button" id="btnAbrirModal2" class="btn btn-primary" onclick="modalExistencia(0, 'insertar');">
+                    <i class="fas fa-save"></i>
+                    Existencia Inicial
+                </button>
+        <?php 
+            } // cierre if
+            if(in_array(1, session('permisosUsuario'))) {
+        ?>
+                <button type= "button" id="btnAbrirModal" class="btn btn-primary" onclick="modalProducto(0, 'insertar');">
+                    <i class="fas fa-save"></i>
+                    Nuevo producto
+                </button>
+        <?php
+            } // cierre if
+        ?>
     </div>
 </div>
 <div class= "table-responsive">

@@ -93,6 +93,7 @@ class AdministracionProducto extends Controller
 
     public function tablaProducto()
     {
+        $session = session();
         // Obtener el valor de la parametrización
         $parametrizacionModel = new conf_parametrizaciones();
         $parametrizacion = $parametrizacionModel->select('valorParametrizacion')->where('parametrizacionId', 1)->first();
@@ -135,12 +136,16 @@ class AdministracionProducto extends Controller
             $columna4 = "<b>Sin IVA: $</b> " . $precioVenta . "<br>" . "<b>(+) IVA: $</b> " . $precioVentaConIVA;
 
             // Construir los botones
-            $columna5 = '
-                <button class="btn btn-info mb-1" onclick="modalExistenciaProducto(`'.$columna['productoId'].'`);" data-toggle="tooltip" data-placement="top" title="Existencias de producto">
-                    <span></span>
-                    <i class="fas fa-box-open"></i>
-                </button>
-            ';
+            if(in_array(3, $session->get('permisosUsuario'))) {
+                $columna5 = '
+                    <button class="btn btn-info mb-1" onclick="modalExistenciaProducto(`'.$columna['productoId'].'`);" data-toggle="tooltip" data-placement="top" title="Existencias de producto">
+                        <span></span>
+                        <i class="fas fa-box-open"></i>
+                    </button>
+                ';
+            } else {
+                $columna5 = "";
+            }
 
             if ($columna['estadoProducto'] == 'Activo') {
                 $columna5 .= '
@@ -148,11 +153,15 @@ class AdministracionProducto extends Controller
                         <span></span>
                         <i class="fas fa-pencil-alt"></i>
                     </button>
-                    <button class="btn btn-success mb-1 " onclick="modalPrecios(`'.$columna['productoId'].'`);" data-toggle="tooltip" data-placement="top" title="Actualizar precios de venta">
-                        <span></span>
-                        <i class="fas fa-dollar-sign"></i>
-                    </button>
                 ';
+                if(in_array(7, $session->get('permisosUsuario'))) {
+                    $columna5 .= '
+                        <button class="btn btn-success mb-1 " onclick="modalPrecios(`'.$columna['productoId'].'`);" data-toggle="tooltip" data-placement="top" title="Actualizar precios de venta">
+                            <span></span>
+                            <i class="fas fa-dollar-sign"></i>
+                        </button>
+                    ';
+                }
             }
 
             $columna5 .= '

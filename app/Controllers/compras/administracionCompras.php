@@ -754,6 +754,7 @@ class administracionCompras extends Controller
                 if($paisId == 61){
                     // Local pero ya existe un producto con ese costo, actualizar cantidades (sumar)
                     $cantidadProducto = $ExisteProducto["cantidadProducto"] + $this->request->getPost('cantidadProducto');
+                    
                     $ivaTotal = $cantidadProducto * $ivaUnitario;
                     $totalCompraDetalle = $cantidadProducto * $precioUnitario;
                     $totalCompraDetalleIVA = $cantidadProducto * $precioUnitarioIva;

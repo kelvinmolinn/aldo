@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Models\UsuarioLogin;
 use App\Models\log_usuarios;
+use App\Models\conf_roles_permisos;
 
 class Login extends BaseController
 {
@@ -73,13 +74,15 @@ class Login extends BaseController
 
                 // Iniciar sesión y redirigir al dashboard
                 $session = session();
+
                 // Establecer variables de sesión
                 $session->set([
-                    'usuarioId'     => $dataUsuario['usuarioId'],
-                    'nombreUsuario' => $dataUsuario['primerNombre'] . " " . $dataUsuario['primerApellido'],
-                    'logUsuarioId'  => $logUsuarioId,
-                    'defaultPass'   => $flgDefaultPassword,
-                    'route'         => 'escritorio/dashboard'
+                    'rolId'                 => $dataUsuario['rolId'],
+                    'usuarioId'             => $dataUsuario['usuarioId'],
+                    'nombreUsuario'         => $dataUsuario['primerNombre'] . " " . $dataUsuario['primerApellido'],
+                    'logUsuarioId'          => $logUsuarioId,
+                    'defaultPass'           => $flgDefaultPassword,
+                    'route'                 => 'escritorio/dashboard'
                     // 'nombreUsuario' => $dataUsuario['primerNombre'] . ' ' . $dataUsuario['primerApellido']
                 ]);
 
@@ -106,7 +109,7 @@ class Login extends BaseController
                         $data = [
                             "intentosIngreso"   => $intentosLogin
                         ];
-                        $respuesta = "Usuario o contraseña incorrecto";
+                        $respuesta = "Usuario o contraseña incorrectossss";
                     }
 
                     $usuarioModel->update($dataUsuario['usuarioId'], $data);

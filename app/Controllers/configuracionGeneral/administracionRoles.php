@@ -335,6 +335,7 @@ class AdministracionRoles extends Controller
             ->join('conf_menu_permisos', 'conf_menu_permisos.menuPermisoId = conf_roles_permisos.menuPermisoId')
             ->where('conf_roles_permisos.flgElimina', 0)
             ->where('conf_roles_permisos.rolId', $rolId)
+            ->where('conf_menu_permisos.menuId', $menuId)
             ->findAll();
             
         $output['data'] = array();
