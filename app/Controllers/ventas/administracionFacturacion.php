@@ -736,7 +736,7 @@ public function tablaFacturacion()
     // Calcular el descuento total para la factura
     $descuentoTotal = $precioUnitario * ($porcentajeDescuento / 100) * $cantidadProducto;
 
-    // Obtener sucursalId de fel_reservas 
+    // Obtener sucursalId de fel_facturas 
     $dteData = $sucursalModel->find($facturaId);
     $sucursalId = $dteData['sucursalId'];  
     $tipoItemMHId = 1; // Valor por defecto para tipoItemMHId
@@ -1432,17 +1432,30 @@ public function certificarDTE()
 {
     // Obtener el ID de la factura desde la solicitud
     $facturaId = $this->request->getPost('facturaId');
-      $facturaDetalleId = $this->request->getPost('facturaDetalleId');
+
     // Modelo para las facturas
     $sucursalModel = new fel_facturas();
     
+    // Obtener sucursalId de fel_facturas 
+    $dteData = $sucursalModel->find($facturaId);
+    
+    // Verificar si $dteData existe y tiene el campo 'sucursalId'
+    if ($dteData || isset($dteData['sucursalId'])) {
+        return $this->response->setJSON([
+            'success' => false,
+            'mensaje' => 'Factura no encontrada o sucursalId no definido'
+        ]);
+    }
+    
+    $sucursalId = $dteData['sucursalId'];  
 
     // Modelo para los detalles de la factura
     $detalleModel = new fel_facturas_detalle();
     
     // Obtener todos los detalles de la factura
     $detalles = $detalleModel->where('facturaId', $facturaId)->where('flgElimina', 0)->findAll();
-    if ($detalles) {
+    
+    if (empty($detalles)) {
         return $this->response->setJSON([
             'success' => false,
             'mensaje' => 'No se encontraron detalles de la factura'
@@ -1503,6 +1516,7 @@ public function certificarDTE()
         'mensaje' => 'Certificación de DTE exitosa'
     ]);
 }
+
 
     public function tablaErrorDTE(){
         $data['variable'] = 0;
