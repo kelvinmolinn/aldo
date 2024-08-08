@@ -95,7 +95,16 @@
         </tfoot>
     </table>
 </div>
-
+    <div class="row mb-4 mt-4">
+        <div class="col-md-12">
+            <div class="text-right">
+                <button type="submit" id="btnFinalizarReserva" class="btn btn-primary" onclick="certificarDTE();">
+                    <i class="fas fa-save"></i>
+                    Certificar DTE
+                </button>
+            </div>
+        </div>
+    </div>
 <script>
 
     function eliminarDTE(id) {
@@ -146,7 +155,7 @@
             });
     }
 
-        function  certificarDTE(id) {
+        function  certificarDTE(facturaId) {
         //alert("Vamos a certificar " + id);
             Swal.fire({
                 title: '¿Estás seguro que desea certificar el DTE?',
@@ -164,7 +173,7 @@
                             url: '<?php echo base_url('ventas/admin-facturacion/operacion/certificar/dte'); ?>',
                             type: 'POST',
                             data: {
-                                facturaDetalleId: id
+                               facturaId : facturaId
                             },
                             success: function(response) {
                                 console.log(response);

@@ -19,6 +19,7 @@ use App\Models\vista_usuarios_empleados;
 use App\Models\comp_compras_detalle;
 use App\Models\cat_17_forma_pago;
 use App\Models\comp_proveedores;
+use App\Models\comp_retaceo_detalle;
 use App\Models\cat_04_tipo_transmision;
 use App\Models\cat_09_establecimiento;
 use App\Models\cat_11_tipo_item;
@@ -180,7 +181,7 @@ public function tablaFacturacion()
         $estadoClase = '';
         if ($columna['estadoFactura'] === 'Pendiente') {
             $estadoClase = 'badge badge-secondary';
-        } elseif ($columna['estadoFactura'] === 'Finalizado') {
+        } elseif ($columna['estadoFactura'] === 'Certificado') {
             $estadoClase = 'badge badge-success';
         } elseif ($columna['estadoFactura'] === 'Anulado') {
             $estadoClase = 'badge badge-danger';
@@ -216,7 +217,7 @@ public function tablaFacturacion()
                     <i class="fas fa-ban"></i>
                 </button>
             ';
-        } elseif ($columna['estadoFactura'] === 'Finalizado') {
+        } elseif ($columna['estadoFactura'] === 'Certificado') {
             $columna6 = '
                 <button class="btn btn-primary mb-1" onclick="modalFacturar(`' . $columna['facturaId'] . '`);" data-toggle="tooltip" data-placement="top" title="Facturar">
                     <i class="fas fa-hand-holding-usd"></i><span> </span>
@@ -1102,12 +1103,12 @@ public function tablaFacturacion()
                                 </button>
                             </div>
                             <div class="col-4">
-                                <button type= "button" class="btn btn-danger mb-1" onclick="modalErrorDTE()" data-toggle="tooltip" data-placement="top" title="Error de certificación">
+                                <button type= "button" class="btn btn-danger mb-1" onclick="modalErrorDTE(`' . $facturaId . '`)" data-toggle="tooltip" data-placement="top" title="Error de certificación">
                                     <i class="fas fa-ban"></i> Errores de certificación
                                 </button>
                             </div>
                             <div class="col-4">
-                                <button type= "button" class="btn btn-primary mb-1" onclick="certificarDTE()" data-toggle="tooltip" data-placement="top" title="Certificar DTE">
+                                <button type= "button" class="btn btn-primary mb-1" onclick="certificarDTE(`' . $facturaId . '`)" data-toggle="tooltip" data-placement="top" title="Certificar DTE">
                                     <i class="fas fa-save"></i> Certificar DTE
                                 </button>
                             </div>
@@ -1430,91 +1431,182 @@ public function modalComplementoDTEOperacion() {
 
 public function certificarDTE()
 {
-    // Obtener el ID de la factura desde la solicitud
+    // Intentar obtener los valores desde la solicitud POST
     $facturaId = $this->request->getPost('facturaId');
-
-    // Modelo para las facturas
-    $sucursalModel = new fel_facturas();
+    $sucursalId = $this->request->getPost('sucursalId');
+    $facturaDetalleId = $this->request->getPost('facturaDetalleId');
+    $retaceoDetalleId = $this->request->getPost('retaceoDetalleId'); 
     
-    // Obtener sucursalId de fel_facturas 
-    $dteData = $sucursalModel->find($facturaId);
-    
-    // Verificar si $dteData existe y tiene el campo 'sucursalId'
-    if ($dteData || isset($dteData['sucursalId'])) {
-        return $this->response->setJSON([
-            'success' => false,
-            'mensaje' => 'Factura no encontrada o sucursalId no definido'
-        ]);
+    // Si falta el facturaId, intentar obtenerlo de otra manera
+    if (!$facturaId) {
+        $facturaModel = new fel_facturas();
+        $factura = $facturaModel->orderBy('fhAgrega', 'DESC')->first(); // Obtener la factura más reciente
+        if ($factura) {
+            $facturaId = $factura['facturaId'];
+            $sucursalId = $factura['sucursalId'];
+        }
     }
-    
-    $sucursalId = $dteData['sucursalId'];  
-
-    // Modelo para los detalles de la factura
-    $detalleModel = new fel_facturas_detalle();
-    
-    // Obtener todos los detalles de la factura
-    $detalles = $detalleModel->where('facturaId', $facturaId)->where('flgElimina', 0)->findAll();
-    
-    if (empty($detalles)) {
-        return $this->response->setJSON([
-            'success' => false,
-            'mensaje' => 'No se encontraron detalles de la factura'
-        ]);
-    }
-
-    // Modelo para las existencias de productos
-    $productosExistenciasModel = new inv_productos_existencias();
-    $productosModel = new inv_productos();
-
-    // Verificar las existencias de cada producto en la sucursal
-    foreach ($detalles as $detalle) {
-        $productoId = $detalle['productoId'];
-        $cantidadProducto = $detalle['cantidadProducto'];
-
-        // Obtener la existencia actual del producto en la sucursal
-        $productoExistencia = $productosExistenciasModel->select('existenciaProducto')
+    // Si falta el facturaDetalleId, intentarlo obtenerlo a través del facturaId
+    if (!$facturaDetalleId && $facturaId) {
+        $detalleModel = new fel_facturas_detalle();
+        $detalle = $detalleModel
+            ->select('facturaDetalleId')
+            ->where('facturaId', $facturaId)
             ->where('flgElimina', 0)
+            ->first();
+
+        if ($detalle) {
+            $facturaDetalleId = $detalle['facturaDetalleId'];
+        }
+    }
+
+    // Verificar si los IDs requeridos están disponibles
+    if (!$facturaId || !$sucursalId || !$facturaDetalleId) {
+        return $this->response->setJSON([
+            'success' => false,
+            'mensaje' => 'No se pudo obtener los IDs necesarios.',
+            'facturaId' => $facturaId,
+            'sucursalId' => $sucursalId,
+            'facturaDetalleId' => $facturaDetalleId
+        ]);
+    }
+    // Obtener el modelo para manejar los productos, existencias y costos
+    $productosExistenciasModel = new inv_productos_existencias();
+    $detalleModel = new fel_facturas_detalle();
+    $modelKardex = new inv_kardex();
+    $productosInfoModel = new inv_productos();
+    $comprasDetalleModel = new comp_compras_detalle();
+    $retaceoDetalleModel = new comp_retaceo_detalle();
+    $productosInfoModel = new inv_productos(); // Nuevo modelo para obtener información de costos
+    // Obtener los detalles de los productos asociados a la factura
+    $productosFactura = $detalleModel
+        ->select('productoId, cantidadProducto, precioUnitarioVenta, porcentajeDescuento')
+        ->where('facturaId', $facturaId)
+        ->where('flgElimina', 0)
+        ->findAll();
+
+    foreach ($productosFactura as $producto) {
+        $productoId = $producto['productoId'];
+        $cantidadProducto = $producto['cantidadProducto'];
+   
+        // Obtener la existencia actual del producto en la sucursal
+        $productoExistencia = $productosExistenciasModel
+            ->select('productoExistenciaId, existenciaProducto')
             ->where('sucursalId', $sucursalId)
             ->where('productoId', $productoId)
+            ->where('flgElimina', 0)
             ->first();
 
-        if (!$productoExistencia) {
+        if (!$productoExistencia || $cantidadProducto > $productoExistencia['existenciaProducto']) {
             return $this->response->setJSON([
                 'success' => false,
-                'mensaje' => "Producto ID $productoId no encontrado en la sucursal"
+                'mensaje' => "No hay existencias suficientes para el producto ID $productoId en la sucursal $sucursalId.",
             ]);
         }
 
-        $existenciaActual = $productoExistencia['existenciaProducto'];
+        // Obtener datos adicionales del producto
+        $productoInfo = $productosInfoModel->find($productoId);
 
-        // Obtener el código del producto desde inv_productos
-        $producto = $productosModel->select('codigoProducto')
+        // Obtener el costo FOB
+        $costoFOBResult = $comprasDetalleModel
+            ->select('precioUnitario')
             ->where('productoId', $productoId)
+            ->where('flgElimina', 0)
+            ->orderBy('compraDetalleId', 'DESC')
             ->first();
+        
+        $costoFOB = $costoFOBResult ? $costoFOBResult['precioUnitario'] : 0;
 
-        if (!$producto) {
-            return $this->response->setJSON([
-                'success' => false,
-                'mensaje' => "Código de producto no encontrado para Producto ID $productoId"
-            ]);
+        // Obtener el costo promedio y el precio de venta del producto
+        $costoPromedio = $productoInfo ? $productoInfo['CostoPromedio'] : 0;
+        $precioVentaUnitario = $productoInfo ? $productoInfo['precioVenta'] : 0;
+
+        // Verificar si se obtuvo retaceoDetalleId y obtener costo unitario retaceo
+        if ($retaceoDetalleId) {
+            $retaceoInfo = $retaceoDetalleModel->find($retaceoDetalleId);
+            $costoUnitarioRetaceo = $retaceoInfo ? $retaceoInfo['costoUnitarioRetaceo'] : 0;
+        } else {
+            $costoUnitarioRetaceo = 0;
         }
+        // Calcular valores para la entrada del Kardex
+        $existenciaAntes = $productoExistencia['existenciaProducto'];
+        $existenciaDespues = $existenciaAntes - $cantidadProducto;
+        $precioVentaUnitarioConDescuento = $producto['precioUnitarioVenta'] * (1 - $producto['porcentajeDescuento'] / 100);
 
-        $codigoProducto = $producto['codigoProducto'];
+        // Insertar en Kardex
+        $modelKardex->insert([
+            'tipoMovimiento' => 'Salida',
+            'descripcionMovimiento' => "Salida registrada por emisión de DTE: $facturaId",
+            'productoExistenciaId' => $productoExistencia['productoExistenciaId'],
+            'existenciaAntesMovimiento' => $existenciaAntes,
+            'cantidadMovimiento' => $cantidadProducto,
+            'existenciaDespuesMovimiento' => $existenciaDespues,
+            'costoUnitarioFOB' => $costoFOB,
+            'costoUnitarioRetaceo' => $costoUnitarioRetaceo,
+            'costoPromedio' => $costoPromedio,
+            'precioVentaUnitario' => $precioVentaUnitarioConDescuento,
+            'fechaDocumento' => $factura['fechaEmision'],
+            'fechaMovimiento' => date('Y-m-d H:i:s'),
+            'tablaMovimiento' => 'fel_factura_detalle',
+            'tablaMovimientoId' => $facturaDetalleId
+        ]);
 
-        // Verificar si la cantidad del producto en la factura supera la existencia actual
-        if ($cantidadProducto > $existenciaActual) {
-            return $this->response->setJSON([
-                'success' => false,
-                'mensaje' => "No hay existencias suficientes para el producto ID $productoId (Código: $codigoProducto)"
-            ]);
-        }
+        // Actualizar la existencia en inv_productos_existencias
+        $productosExistenciasModel->update($productoExistencia['productoExistenciaId'], [
+            'existenciaProducto' => $existenciaDespues
+        ]);
     }
 
-    // Si todas las existencias son suficientes
+    // Obtener datos de la sucursal
+    $confSucursalModel = new conf_sucursales();
+    $sucursalData = $confSucursalModel->find($sucursalId);
+    $codEstablecimientoMH = $sucursalData['codEstablecimientoMH'];
+    $puntoVentaMH = $sucursalData['puntoVentaMH'];
+
+    // Obtener el codigoMH del tipo de DTE (asumimos que tienes $tipoDTEId)
+    $tipoDTEId = 1; // Asumimos un valor para $tipoDTEId, ajusta según tu necesidad
+    $tipoDTEModel = new cat_02_tipo_dte();
+    $tipoDTEData = $tipoDTEModel->find($tipoDTEId);
+    $codigoMH = $tipoDTEData['codigoMH'];
+
+    // Generar numeroControl
+    $numeroControl = "DTE-{$codigoMH}-{$codEstablecimientoMH}-{$puntoVentaMH}" . str_pad($facturaId, 15, '0', STR_PAD_LEFT);
+
+    // Generar codigoGeneracion usando la función codigo de generacion() y convertir a mayúsculas
+    $codigoGeneracion = strtoupper($this->codigoGeneracion());
+
+    // Simular selloRecibido y convertir a mayúsculas
+    $selloRecibido = strtoupper("REC-" . bin2hex(random_bytes(10)) . "-MH");
+
+    // Insertar en fel_factura_certificacion
+    $certificacionModel = new fel_factura_certificacion();
+    $certificacionModel->insert([
+        'facturaId' => $facturaId,
+        'numeroControl' => $numeroControl,
+        'codigoGeneracion' => $codigoGeneracion,
+        'tipoTransmisionMHId' => 1,  // Valor estático según lo especificado
+        'selloRecibido' => $selloRecibido,
+        'descripcionMensaje' => 'Recibido',
+        'estadoCertificacion' => 'Certificado'
+    ]);
+
+    // Retornar la respuesta exitosa
     return $this->response->setJSON([
         'success' => true,
         'mensaje' => 'Certificación de DTE exitosa'
     ]);
+}
+
+private function codigoGeneracion() {
+    if (function_exists('com_create_guid') === true) {
+        return trim(com_create_guid(), '{}');
+    }
+    
+    $data = PHP_MAJOR_VERSION < 7 ? openssl_random_pseudo_bytes(16) : random_bytes(16);
+    $data[6] = chr(ord($data[6]) & 0x0f | 0x40);    // Set version to 0100
+    $data[8] = chr(ord($data[8]) & 0x3f | 0x80);    // Set bits 6-7 to 10
+    
+    return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
 }
 
 
