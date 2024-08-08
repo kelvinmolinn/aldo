@@ -513,9 +513,14 @@ class administracionRetaceo extends Controller
 
     public function finalizarRetaceo(){
         $inv_kardex = new inv_kardex();
+        $retaceoDetalle = new comp_retaceo_detalle();
 
-        
-        
+        $datosRetaceoDetalle = $retaceoDetalle
+            ->select('sucursalId,fechaDocumento')
+            ->where('flgElimina', 0)
+            ->where('retaceoId', $retaceoId)
+            ->first();
+
         $data = [
             "tipoMovimiento"        => "Entrada",
             "descripcionMovimiento" => "Entrada registrada desde el retaceo",
