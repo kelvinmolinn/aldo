@@ -44,7 +44,7 @@
         </div>
 </form>
 <hr>
-<form id="frmContinuarRetaceo" method="post" action="">
+<form id="frmContinuarRetaceo" method="post" action="<?php echo base_url('compras/admin-retaceo/operacion/finalizar/retaceo'); ?>">
         
     <div class="text-right mb-4">
         <button type= "button" id="btnNuevoProveedor" class="btn btn-primary estilo-btn" onclick="modalAgregarCompraRetaceo();">

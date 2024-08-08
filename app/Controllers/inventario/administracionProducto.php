@@ -154,14 +154,20 @@ class AdministracionProducto extends Controller
                         <i class="fas fa-pencil-alt"></i>
                     </button>
                 ';
-                if(in_array(7, $session->get('permisosUsuario'))) {
+                $columna5 .= '
+                        <button class="btn btn-success mb-1 " onclick="modalPrecios(`'.$columna['productoId'].'`);" data-toggle="tooltip" data-placement="top" title="Actualizar precios de venta">
+                            <span></span>
+                            <i class="fas fa-dollar-sign"></i>
+                        </button>
+                    ';
+                /*if(in_array(7, $session->get('permisosUsuario'))) {
                     $columna5 .= '
                         <button class="btn btn-success mb-1 " onclick="modalPrecios(`'.$columna['productoId'].'`);" data-toggle="tooltip" data-placement="top" title="Actualizar precios de venta">
                             <span></span>
                             <i class="fas fa-dollar-sign"></i>
                         </button>
                     ';
-                }
+                }*/
             }
 
             $columna5 .= '

@@ -9,6 +9,7 @@ use App\Models\comp_retaceo;
 use App\Models\comp_retaceo_detalle;
 use App\Models\comp_compras;
 use App\Models\comp_compras_detalle;
+use App\Models\inv_kardex;
 
 class administracionRetaceo extends Controller
 {
@@ -266,7 +267,7 @@ class administracionRetaceo extends Controller
 
             $columna10 = "$ " . number_format($tableRetaceoDetalle['costoTotal'], 2, ".", ",");
 
-            $columna11 = "$ " . number_format($tableRetaceoDetalle['costoUnitarioRetaceo'] + $tableRetaceoDetalle['costoTotal'], 2, ".", ",");
+            $columna11 = "$ " . number_format(0.00, 2, ".", ",");
 
             $jsonDAI = [
                 "codigoProducto"        => $tableRetaceoDetalle['codigoProducto'],
@@ -506,6 +507,35 @@ class administracionRetaceo extends Controller
             return $this->response->setJSON([
                 'success' => false,
                 'mensaje' => 'No se pudo calcular el DAI'
+            ]);
+        }
+    }
+
+    public function finalizarRetaceo(){
+        $inv_kardex = new inv_kardex();
+
+        
+        
+        $data = [
+            "tipoMovimiento"        => "Entrada",
+            "descripcionMovimiento" => "Entrada registrada desde el retaceo",
+            "productoExistenciaId"  => 
+
+        // Insertar datos en la base de datos
+        $finRetaceo = $inv_kardex->insert($data);
+
+        if ($finRetaceofinRetaceo) {
+            // Si el insert fue exitoso, devuelve el último ID insertado
+            return $this->response->setJSON([
+                'success' => true,
+                'mensaje' => 'Se agrego al kardex desde el retaceo correctamente',
+                'kardexId' =>  $inv_kardex->insertID() 
+            ]);
+        } else {
+            // Si el insert falló, devuelve un mensaje de error
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'No se pudo insertar al kardex'
             ]);
         }
     }
