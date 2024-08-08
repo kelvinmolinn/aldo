@@ -1433,35 +1433,10 @@ public function certificarDTE()
 {
     // Intentar obtener los valores desde la solicitud POST
     $facturaId = $this->request->getPost('facturaId');
-    $sucursalId = $this->request->getPost('sucursalId');
-    $facturaDetalleId = $this->request->getPost('facturaDetalleId');
-    $retaceoDetalleId = $this->request->getPost('retaceoDetalleId'); 
-    
-    // Si falta el facturaId, intentar obtenerlo de otra manera
-    if (!$facturaId) {
-        $facturaModel = new fel_facturas();
-        $factura = $facturaModel->orderBy('fhAgrega', 'DESC')->first(); // Obtener la factura más reciente
-        if ($factura) {
-            $facturaId = $factura['facturaId'];
-            $sucursalId = $factura['sucursalId'];
-        }
-    }
-    // Si falta el facturaDetalleId, intentarlo obtenerlo a través del facturaId
-    if (!$facturaDetalleId && $facturaId) {
-        $detalleModel = new fel_facturas_detalle();
-        $detalle = $detalleModel
-            ->select('facturaDetalleId')
-            ->where('facturaId', $facturaId)
-            ->where('flgElimina', 0)
-            ->first();
-
-        if ($detalle) {
-            $facturaDetalleId = $detalle['facturaDetalleId'];
-        }
-    }
-
+    //$sucursalId = $this->request->getPost('sucursalId');
+    // sucursalId lo traerá haciendo SELECT a fel_facturas (de ahi puede traer la fechaFactura y los otros campos)
     // Verificar si los IDs requeridos están disponibles
-    if (!$facturaId || !$sucursalId || !$facturaDetalleId) {
+    if (!$facturaId) {
         return $this->response->setJSON([
             'success' => false,
             'mensaje' => 'No se pudo obtener los IDs necesarios.',

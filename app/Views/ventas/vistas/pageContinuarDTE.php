@@ -155,7 +155,7 @@
             });
     }
 
-        function  certificarDTE(facturaId) {
+        function  certificarDTE() {
         //alert("Vamos a certificar " + id);
             Swal.fire({
                 title: '¿Estás seguro que desea certificar el DTE?',
@@ -173,7 +173,7 @@
                             url: '<?php echo base_url('ventas/admin-facturacion/operacion/certificar/dte'); ?>',
                             type: 'POST',
                             data: {
-                               facturaId : facturaId
+                               facturaId : '<?= $facturaId; ?>'
                             },
                             success: function(response) {
                                 console.log(response);
