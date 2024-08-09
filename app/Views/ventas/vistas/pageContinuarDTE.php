@@ -98,12 +98,17 @@
     <div class="row mb-4 mt-4">
         <div class="col-md-12">
             <div class="text-right">
+                <button type="submit" id="btnFinalizarReserva" class="btn btn-danger" onclick="certificarDTEError();">
+                    <i class="fas fa-save"></i>
+                    Certificar DTE con error
+                </button>
                 <button type="submit" id="btnFinalizarReserva" class="btn btn-primary" onclick="certificarDTE();">
                     <i class="fas fa-save"></i>
                     Certificar DTE
                 </button>
             </div>
         </div>
+
     </div>
 <script>
 
@@ -183,7 +188,57 @@
                                         title: 'DTE certificado con Éxito!',
                                         text: response.mensaje
                                     }).then((result) => {
-                                        $("#tablaContinuarDTE").DataTable().ajax.reload(null, false);
+                                        //$("#tablaContinuarDTE").DataTable().ajax.reload(null, false);
+                                        cambiarInterfaz('ventas/admin-facturacion/index', {renderVista:'No'});
+                                    });
+                                } else {
+                                    // Insert fallido, mostrar mensaje de error
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Error',
+                                        text: response.mensaje
+                                    });
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                // Manejar errores si los hay
+                                console.error(xhr.responseText);
+                            }
+                        });
+                }
+            });
+    }
+
+            function  certificarDTEError() {
+        //alert("Vamos a certificar " + id);
+            Swal.fire({
+                title: '¿Estás seguro que desea certificar el DTE?',
+                text: "Se certificará el DTE.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, Certificar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Si el usuario confirma, enviar la solicitud AJAX para certificar 
+                        $.ajax({
+                            url: '<?php echo base_url('ventas/admin-facturacion/operacion/certificar/dteError'); ?>',
+                            type: 'POST',
+                            data: {
+                               facturaId : '<?= $facturaId; ?>'
+                            },
+                            success: function(response) {
+                                console.log(response);
+                                if (response.success) {
+                                    Swal.fire({
+                                        icon: 'warning',
+                                        title: 'DTE con error!',
+                                        text: response.mensaje
+                                    }).then((result) => {
+                                        //$("#tablaContinuarDTE").DataTable().ajax.reload(null, false);
+                                        cambiarInterfaz('ventas/admin-facturacion/index', {renderVista:'No'});
                                     });
                                 } else {
                                     // Insert fallido, mostrar mensaje de error

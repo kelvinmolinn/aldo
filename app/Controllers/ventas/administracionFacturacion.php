@@ -1107,11 +1107,6 @@ public function tablaFacturacion()
                                     <i class="fas fa-ban"></i> Errores de certificación
                                 </button>
                             </div>
-                            <div class="col-4">
-                                <button type= "button" class="btn btn-primary mb-1" onclick="certificarDTE(`' . $facturaId . '`)" data-toggle="tooltip" data-placement="top" title="Certificar DTE">
-                                    <i class="fas fa-save"></i> Certificar DTE
-                                </button>
-                            </div>
                         </div>
                     </b>
             ';
@@ -1429,22 +1424,41 @@ public function modalComplementoDTEOperacion() {
         }
     }
 
-/*public function certificarDTE()
+
+public function certificarDTE()
 {
     // Intentar obtener los valores desde la solicitud POST
     $facturaId = $this->request->getPost('facturaId');
-    //$sucursalId = $this->request->getPost('sucursalId');
-    // sucursalId lo traerá haciendo SELECT a fel_facturas (de ahi puede traer la fechaFactura y los otros campos)
-    // Verificar si los IDs requeridos están disponibles
+    $facturaDetalleId = $this->request->getPost('facturaDetalleId');
+    $retaceoDetalleId = $this->request->getPost('retaceoDetalleId'); 
+    
+    // Verificar si el ID de la factura está disponible
     if (!$facturaId) {
         return $this->response->setJSON([
             'success' => false,
-            'mensaje' => 'No se pudo obtener los IDs necesarios.',
-            'facturaId' => $facturaId,
-            'sucursalId' => $sucursalId,
-            'facturaDetalleId' => $facturaDetalleId
+            'mensaje' => 'No se pudo obtener el ID de la factura.',
         ]);
     }
+
+    // Obtener sucursalId y fechaEmision desde fel_facturas
+    $facturaModel = new fel_facturas();
+    $factura = $facturaModel
+        ->select('sucursalId, fechaEmision')
+        ->where('facturaId', $facturaId)
+        ->first();
+
+    // Verificar si la factura existe
+    if (!$factura) {
+        return $this->response->setJSON([
+            'success' => false,
+            'mensaje' => 'Factura no encontrada.',
+        ]);
+    }
+
+    // Extraer sucursalId y fechaEmision
+    $sucursalId = $factura['sucursalId'];
+    $fechaEmision = $factura['fechaEmision'];
+
     // Obtener el modelo para manejar los productos, existencias y costos
     $productosExistenciasModel = new inv_productos_existencias();
     $detalleModel = new fel_facturas_detalle();
@@ -1452,7 +1466,9 @@ public function modalComplementoDTEOperacion() {
     $productosInfoModel = new inv_productos();
     $comprasDetalleModel = new comp_compras_detalle();
     $retaceoDetalleModel = new comp_retaceo_detalle();
-    $productosInfoModel = new inv_productos(); // Nuevo modelo para obtener información de costos
+     $modelFacturaPago = new fel_facturas_pago();
+
+    
     // Obtener los detalles de los productos asociados a la factura
     $productosFactura = $detalleModel
         ->select('productoId, cantidadProducto, precioUnitarioVenta, porcentajeDescuento')
@@ -1503,10 +1519,33 @@ public function modalComplementoDTEOperacion() {
         } else {
             $costoUnitarioRetaceo = 0;
         }
+
         // Calcular valores para la entrada del Kardex
         $existenciaAntes = $productoExistencia['existenciaProducto'];
         $existenciaDespues = $existenciaAntes - $cantidadProducto;
         $precioVentaUnitarioConDescuento = $producto['precioUnitarioVenta'] * (1 - $producto['porcentajeDescuento'] / 100);
+
+                // Obtener el total a pagar para la reserva
+        $totalAPagar = $detalleModel
+            ->select('SUM(totalDetalleIVA) as totalAPagar')
+            ->where('facturaId', $facturaId)
+            ->where('flgElimina', 0)
+            ->first()['totalAPagar'];
+
+        // Obtener el total pagado para la reserva
+        $totalPagado = $modelFacturaPago
+            ->select('SUM(totalPago) as totalPagado')
+            ->where('facturaId', $facturaId)
+            ->where('flgElimina', 0)
+            ->first()['totalPagado'];
+
+        // Validar que el total pagado sea mayor o igual al total a pagar
+        if ($totalPagado < $totalAPagar) {
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'No se puede certificar el DTE. El total pagado es menor al total a pagar.'
+            ]);
+        }
 
         // Insertar en Kardex
         $modelKardex->insert([
@@ -1520,7 +1559,7 @@ public function modalComplementoDTEOperacion() {
             'costoUnitarioRetaceo' => $costoUnitarioRetaceo,
             'costoPromedio' => $costoPromedio,
             'precioVentaUnitario' => $precioVentaUnitarioConDescuento,
-            'fechaDocumento' => $factura['fechaEmision'],
+            'fechaDocumento' => $fechaEmision, // Usar la fechaEmision obtenida
             'fechaMovimiento' => date('Y-m-d H:i:s'),
             'tablaMovimiento' => 'fel_factura_detalle',
             'tablaMovimientoId' => $facturaDetalleId
@@ -1570,11 +1609,27 @@ public function modalComplementoDTEOperacion() {
         'success' => true,
         'mensaje' => 'Certificación de DTE exitosa'
     ]);
-}*/
-public function certificarDTE()
+}
+
+
+private function codigoGeneracion() {
+    if (function_exists('com_create_guid') === true) {
+        return trim(com_create_guid(), '{}');
+    }
+    
+    $data = PHP_MAJOR_VERSION < 7 ? openssl_random_pseudo_bytes(16) : random_bytes(16);
+    $data[6] = chr(ord($data[6]) & 0x0f | 0x40);    // Set version to 0100
+    $data[8] = chr(ord($data[8]) & 0x3f | 0x80);    // Set bits 6-7 to 10
+    
+    return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
+}
+
+public function certificarDTEError()
 {
     // Intentar obtener los valores desde la solicitud POST
     $facturaId = $this->request->getPost('facturaId');
+    $facturaDetalleId = $this->request->getPost('facturaDetalleId');
+    $retaceoDetalleId = $this->request->getPost('retaceoDetalleId'); 
     
     // Verificar si el ID de la factura está disponible
     if (!$facturaId) {
@@ -1667,6 +1722,7 @@ public function certificarDTE()
         $existenciaDespues = $existenciaAntes - $cantidadProducto;
         $precioVentaUnitarioConDescuento = $producto['precioUnitarioVenta'] * (1 - $producto['porcentajeDescuento'] / 100);
 
+        /*
         // Insertar en Kardex
         $modelKardex->insert([
             'tipoMovimiento' => 'Salida',
@@ -1689,6 +1745,7 @@ public function certificarDTE()
         $productosExistenciasModel->update($productoExistencia['productoExistenciaId'], [
             'existenciaProducto' => $existenciaDespues
         ]);
+        */
     }
 
     // Obtener datos de la sucursal
@@ -1707,7 +1764,7 @@ public function certificarDTE()
     $numeroControl = "DTE-{$codigoMH}-{$codEstablecimientoMH}-{$puntoVentaMH}" . str_pad($facturaId, 15, '0', STR_PAD_LEFT);
 
     // Generar codigoGeneracion usando la función codigo de generacion() y convertir a mayúsculas
-    $codigoGeneracion = strtoupper($this->codigoGeneracion());
+    $codigoGeneracion = strtoupper($this->codigoGeneracionError());
 
     // Simular selloRecibido y convertir a mayúsculas
     $selloRecibido = strtoupper("REC-" . bin2hex(random_bytes(10)) . "-MH");
@@ -1720,19 +1777,32 @@ public function certificarDTE()
         'codigoGeneracion' => $codigoGeneracion,
         'tipoTransmisionMHId' => 1,  // Valor estático según lo especificado
         'selloRecibido' => $selloRecibido,
-        'descripcionMensaje' => 'Recibido',
-        'estadoCertificacion' => 'Certificado'
+        'descripcionMensaje' => 'DOCUMENTO NO CUMPLE ESQUEMA JSON',
+        'estadoCertificacion' => 'Rechazado'
+    ]);
+
+
+    // Obtener el ID del insert recién hecho en fel_factura_certificacion
+    $facturaCertificacionId = $certificacionModel->getInsertID();
+
+    // Insertar en fel_facturas_certificacion_errores
+    $certificacionErroresModel = new fel_facturas_certificacion_errores();
+    $certificacionErroresModel->insert([
+        'facturaCertificacionId' => $facturaCertificacionId,
+        'codigoError' => 96,  // Sin comillas porque es un valor numérico
+        'descripcionError' => 'DOCUMENTO NO CUMPLE ESQUEMA JSON',
+        'obsError' => 'Campo #/receptor contiene un valor inválido'
     ]);
 
     // Retornar la respuesta exitosa
     return $this->response->setJSON([
         'success' => true,
-        'mensaje' => 'Certificación de DTE exitosa'
+        'mensaje' => 'Certificación con error'
     ]);
 }
 
 
-private function codigoGeneracion() {
+private function codigoGeneracionError() {
     if (function_exists('com_create_guid') === true) {
         return trim(com_create_guid(), '{}');
     }

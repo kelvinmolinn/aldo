@@ -306,6 +306,7 @@ $routes->group('ventas/admin-facturacion', function($routes) {
     $routes->post('tabla/complemento/dte', 'ventas\administracionFacturacion::tablaComplementoDTE');
     $routes->post('operacion/eliminar/complemento', 'ventas\administracionFacturacion::eliminarDTEComplemento');
     $routes->post('operacion/certificar/dte', 'ventas\administracionFacturacion::certificarDTE');
+    $routes->post('operacion/certificar/dteError', 'ventas\administracionFacturacion::certificarDTEError');
 
 
 
