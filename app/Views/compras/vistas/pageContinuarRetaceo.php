@@ -52,6 +52,9 @@
             Agregar compra
         </button>
     </div>
+
+    <input type="hidden" id="retaceoId" name="retaceoId" value="<?= $retaceoId; ?>">
+
     <div class="table-responsive">
         <table class="table table-hover" id="tablaContinuarRetaceo" style="width: 100%;">
             <thead>

@@ -10,6 +10,8 @@ use App\Models\comp_retaceo_detalle;
 use App\Models\comp_compras;
 use App\Models\comp_compras_detalle;
 use App\Models\inv_kardex;
+use App\Models\inv_productos_existencias;
+use App\Models\inv_productos;
 
 class administracionRetaceo extends Controller
 {
@@ -514,39 +516,57 @@ class administracionRetaceo extends Controller
     public function finalizarRetaceo(){
         $inv_kardex = new inv_kardex();
         $retaceoDetalle = new comp_retaceo_detalle();
-        
+        $inv_productos_existencias = new inv_productos_existencias();
+        $comprasDetalle = new comp_compras_detalle();
+        $invProductos = new inv_productos();
+
+        $retaceoId = $this->request->getPost('retaceoId');
+
         $datosRetaceoDetalle = $retaceoDetalle
-                                ->select('compraDetalleId')
-                                ->where('flgElimina', 0)
+                                ->select('comp_compras.sucursalId , comp_compras.fechaDocumento, comp_retaceo_detalle.cantidadProducto, comp_retaceo_detalle.compraDetalleId,comp_retaceo_detalle.costoUnitarioRetaceo')
+                                ->join('comp_compras_detalle','comp_compras_detalle.compraDetalleId = comp_retaceo_detalle.compraDetalleId')
+                                ->join('comp_compras', 'comp_compras.compraId = comp_compras_detalle.compraId')
+                                ->where('comp_retaceo_detalle.flgElimina', 0)
+                                ->where('comp_retaceo_detalle.retaceoId', $retaceoId)
                                 ->first();
 
-        SELECT
-            c.sucursalId AS sucursalId,
-            c.fechaDocumento AS fechaDocumento
-        FROM comp_retaceo_detalle rd
-        JOIN comp_compras_detalle cd ON cd.compraDetalleId = rd.compraDetalleId
-        JOIN comp_compras c ON c.compraId = cd.compraId
-        WHERE rd.retaceoId = 1 AND rd.flgElimina = 0
-        LIMIT 1
-        /*$datosRetaceoDetalle = $retaceoDetalle
-            ->select('sucursalId,fechaDocumento')
-            ->where('flgElimina', 0)
-            ->first();*/
+        $sucursal = $datosRetaceoDetalle['sucursalId'];
+
+        $productosExis = $inv_productos_existencias 
+                         ->select('productoExistenciaId,existenciaProducto')
+                         ->where('flgElimina', 0)
+                         ->where('sucursalId', $sucursal)
+                         //->where('productoId', 0)
+                         ->first();
+
+
+        $existenciaDespues = $productosExis['existenciaProducto'] + $datosRetaceoDetalle['cantidadProducto'];
+
+        $precioUnitarioFOB = $comprasDetalle
+                            ->selec('precioUnitario')
+                            ->where('flgElimina', 0)
+                            ->where('compraDetalleId',$datosRetaceoDetalle['compraDetalleId'])
+                            ->first();
+
+        $productos = $invProductos 
+                    ->select('CostoPromedio,precioVenta')
+                    ->where('flgElimina', 0)
+                    ->first();
 
         $data = [
             "tipoMovimiento"                => "Entrada",
             "descripcionMovimiento"         => "Entrada registrada desde el retaceo",
-            "productoExistenciaId"          => "",
-            "existenciaAntesMovimiento"     => "",
-            "cantidadMovimiento"            => "",
-            "existenciaDespuesMovimiento"   => "",
-            "costoUnitarioFOB"              => "",
-            "costoUnitarioRetaceo"          => "",
-            "costoPromedio"                 => "",
-            "precioVentaUnitario"           => "",
-            "fechaDocumento"                => "",
-            "fechaMovimiento"               => "",
-            "tablaMovimiento"               => "",
+            "productoExistenciaId"          => $productosExis['productoExistenciaId'],
+            "existenciaAntesMovimiento"     => $productosExis['existenciaProducto'],
+            "cantidadMovimiento"            => $datosRetaceoDetalle['cantidadProducto'],
+            "existenciaDespuesMovimiento"   => $existenciaDespues,
+            "costoUnitarioFOB"              => $precioUnitarioFOB['precioUnitario'],
+            "costoUnitarioRetaceo"          => $datosRetaceoDetalle['costoUnitarioRetaceo'],
+            "costoPromedio"                 => $productos['CostoPromedio'],
+            "precioVentaUnitario"           => $productos['precioVenta'],
+            "fechaDocumento"                => $datosRetaceoDetalle['fechaDocumento'],
+            "fechaMovimiento"               => date("Y-m-d H:i:s"),
+            "tablaMovimiento"               => "comp_retaceo_detalle",
             "tablaMovimientoId"             => "",
 
         ];
