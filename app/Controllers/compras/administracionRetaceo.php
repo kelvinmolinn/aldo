@@ -519,6 +519,15 @@ class administracionRetaceo extends Controller
                                 ->select('compraDetalleId')
                                 ->where('flgElimina', 0)
                                 ->first();
+
+        SELECT
+            c.sucursalId AS sucursalId,
+            c.fechaDocumento AS fechaDocumento
+        FROM comp_retaceo_detalle rd
+        JOIN comp_compras_detalle cd ON cd.compraDetalleId = rd.compraDetalleId
+        JOIN comp_compras c ON c.compraId = cd.compraId
+        WHERE rd.retaceoId = 1 AND rd.flgElimina = 0
+        LIMIT 1
         /*$datosRetaceoDetalle = $retaceoDetalle
             ->select('sucursalId,fechaDocumento')
             ->where('flgElimina', 0)
@@ -559,112 +568,4 @@ class administracionRetaceo extends Controller
             ]);
         }
     }
-
-    public function finalizarRetaceo()
-{
-    $inv_kardex = new inv_kardex();
-
-    // Obtener retaceoDetalleId desde la solicitud POST
-    $retaceoDetalleId = $this->request->getPost('retaceoDetalleId');
-
-    // Obtener retaceoDetalle usando el modelo
-    $retaceoModel = new RetaceoDetalleModel(); // Reemplaza con el nombre correcto de tu modelo
-    $retaceoDetalle = $retaceoModel->select('compraDetalleId, productoId, cantidadProducto, costoUnitarioRetaceo')
-                                   ->where('retaceoDetalleId', $retaceoDetalleId)
-                                   ->first();
-
-    if (!$retaceoDetalle) {
-        return $this->response->setJSON([
-            'success' => false,
-            'mensaje' => 'No se encontró el detalle de retaceo.'
-        ]);
-    }
-
-    // Obtener compraDetalleId usando el modelo
-    $comprasDetalleModel = new ComprasDetalleModel(); // Reemplaza con el nombre correcto de tu modelo
-    $compraDetalle = $comprasDetalleModel->select('sucursalId, fechaDocumento, precioUnitario')
-                                          ->where('compraDetalleId', $retaceoDetalle->compraDetalleId)
-                                          ->first();
-
-    if (!$compraDetalle) {
-        return $this->response->setJSON([
-            'success' => false,
-            'mensaje' => 'No se encontró el detalle de compra.'
-        ]);
-    }
-
-    // Validar o insertar productoExistenciaId en inv_productos_existencias usando el modelo
-    $productosExistenciasModel = new ProductosExistenciasModel(); // Reemplaza con el nombre correcto de tu modelo
-    $productoExistencia = $productosExistenciasModel->select('productoExistenciaId, existenciaProducto')
-                                                    ->where('sucursalId', $compraDetalle->sucursalId)
-                                                    ->where('productoId', $retaceoDetalle->productoId)
-                                                    ->first();
-
-    if (!$productoExistencia) {
-        // Insertar nuevo registro en inv_productos_existencias si no existe
-        $productosExistenciasModel->insert([
-            'sucursalId' => $compraDetalle->sucursalId,
-            'productoId' => $retaceoDetalle->productoId,
-            'existenciaProducto' => 0 // Suponiendo que empieza en 0
-        ]);
-        $productoExistenciaId = $productosExistenciasModel->insertID();
-        $existenciaAntesMovimiento = 0;
-    } else {
-        $productoExistenciaId = $productoExistencia->productoExistenciaId;
-        $existenciaAntesMovimiento = $productoExistencia->existenciaProducto;
-    }
-
-    // Calcular existenciaDespuesMovimiento
-    $cantidadMovimiento = $retaceoDetalle->cantidadProducto;
-    $existenciaDespuesMovimiento = $existenciaAntesMovimiento + $cantidadMovimiento;
-
-    // Obtener datos de costo y precio usando el modelo
-    $productosModel = new ProductosModel(); // Reemplaza con el nombre correcto de tu modelo
-    $producto = $productosModel->select('costoPromedio, precioVenta')
-                               ->where('productoId', $retaceoDetalle->productoId)
-                               ->first();
-
-    if (!$producto) {
-        return $this->response->setJSON([
-            'success' => false,
-            'mensaje' => 'No se encontró información del producto.'
-        ]);
-    }
-
-    // Preparar datos para insertar en inv_kardex
-    $data = [
-        "tipoMovimiento"            => "Entrada",
-        "descripcionMovimiento"     => "Entrada registrada automáticamente por retaceo",
-        "productoExistenciaId"      => $productoExistenciaId,
-        "existenciaAntesMovimiento" => $existenciaAntesMovimiento,
-        "cantidadMovimiento"        => $cantidadMovimiento,
-        "existenciaDespuesMovimiento" => $existenciaDespuesMovimiento,
-        "costoUnitarioFOB"          => $compraDetalle->precioUnitario,
-        "costoUnitarioRetaceo"      => $retaceoDetalle->costoUnitarioRetaceo,
-        "costoPromedio"             => $producto->costoPromedio,
-        "precioVentaUnitario"       => $producto->precioVenta,
-        "fechaDocumento"            => $compraDetalle->fechaDocumento,
-        "fechaMovimiento"           => date('Y-m-d H:i:s'),
-        "tablaMovimiento"           => "comp_retaceo_detalle",
-        "tablaMovimientoId"         => $retaceoDetalleId
-    ];
-
-    // Insertar datos en inv_kardex
-    $finRetaceo = $inv_kardex->insert($data);
-
-    if ($finRetaceo) {
-        // Si el insert fue exitoso, devuelve el último ID insertado
-        return $this->response->setJSON([
-            'success' => true,
-            'mensaje' => 'Se agregó al kardex desde el retaceo correctamente',
-            'kardexId' =>  $inv_kardex->insertID() 
-        ]);
-    } else {
-        // Si el insert falló, devuelve un mensaje de error
-        return $this->response->setJSON([
-            'success' => false,
-            'mensaje' => 'No se pudo insertar al kardex'
-        ]);
-    }
-}
 }
