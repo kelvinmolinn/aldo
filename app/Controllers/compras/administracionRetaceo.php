@@ -185,7 +185,8 @@ class administracionRetaceo extends Controller
         $data['variable'] = 0;
 
         $camposSession = [
-            'renderVista' => 'No'
+            'renderVista' => 'No',
+            'retaceoId'   => $retaceoId
         ];
         $session->set([
             'route'             => 'compras/admin-retaceo/vista/continuar/retaceo',
@@ -523,7 +524,7 @@ class administracionRetaceo extends Controller
         $retaceoId = $this->request->getPost('retaceoId');
 
         $datosRetaceoDetalle = $retaceoDetalle
-                                ->select('comp_compras.sucursalId , comp_compras.fechaDocumento, comp_retaceo_detalle.cantidadProducto, comp_retaceo_detalle.compraDetalleId,comp_retaceo_detalle.costoUnitarioRetaceo')
+                                ->select('comp_compras.sucursalId , comp_compras.fechaDocumento, comp_retaceo_detalle.cantidadProducto, comp_retaceo_detalle.compraDetalleId,comp_retaceo_detalle.costoUnitarioRetaceo,comp_compras_detalle.productoId')
                                 ->join('comp_compras_detalle','comp_compras_detalle.compraDetalleId = comp_retaceo_detalle.compraDetalleId')
                                 ->join('comp_compras', 'comp_compras.compraId = comp_compras_detalle.compraId')
                                 ->where('comp_retaceo_detalle.flgElimina', 0)
@@ -531,12 +532,13 @@ class administracionRetaceo extends Controller
                                 ->first();
 
         $sucursal = $datosRetaceoDetalle['sucursalId'];
+        $productoId = $datosRetaceoDetalle['productoId'];
 
         $productosExis = $inv_productos_existencias 
                          ->select('productoExistenciaId,existenciaProducto')
                          ->where('flgElimina', 0)
                          ->where('sucursalId', $sucursal)
-                         //->where('productoId', 0)
+                         ->where('productoId', $productoId)
                          ->first();
 
 

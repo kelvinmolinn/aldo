@@ -44,7 +44,7 @@
         </div>
 </form>
 <hr>
-<form id="frmContinuarRetaceo" method="post" action="<?php echo base_url('compras/admin-retaceo/operacion/finalizar/retaceo'); ?>">
+<form id="frmFinalizarRetaceo" method="post" action="<?php echo base_url('compras/admin-retaceo/operacion/finalizar/retaceo'); ?>">
         
     <div class="text-right mb-4">
         <button type= "button" id="btnNuevoProveedor" class="btn btn-primary estilo-btn" onclick="modalAgregarCompraRetaceo();">
@@ -215,6 +215,55 @@
                 error: function(xhr, status, error) {
                     // Manejar errores si los hay
                     console.error(xhr.responseText);
+                }
+            });
+        });
+
+        $("#frmFinalizarRetaceo").submit(function(event) {
+            event.preventDefault();
+            Swal.fire({
+                title: '¿Estás seguro que desea finalizar el retaceo de la compra?',
+                text: "Se finalizara el retaceo de la compra seleccionada.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, finalizar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: $(this).attr('action'), 
+                        type: $(this).attr('method'),
+                        data: $(this).serialize(),
+                        success: function(response) {
+                            console.log(response);
+                            if (response.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Retaceo finalizado con éxito',
+                                    text: response.mensaje
+                                }).then((result) => {
+
+                                    cambiarInterfaz(`compras/admin-retaceo/index`);
+                                    // Actualizar tabla de contactos
+                                    // Limpiar inputs con .val(null) o .val('')
+                                    
+                                });
+                            } else {
+                                // Insert fallido, mostrar mensaje de error
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: response.mensaje
+                                });
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            // Manejar errores si los hay
+                            console.error(xhr.responseText);
+                        }
+                    });
                 }
             });
         });
