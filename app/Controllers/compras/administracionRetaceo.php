@@ -555,6 +555,9 @@ class administracionRetaceo extends Controller
                     ->where('flgElimina', 0)
                     ->first();
 
+        /*foreach(){
+
+        }*/
         $data = [
             "tipoMovimiento"                => "Entrada",
             "descripcionMovimiento"         => "Entrada registrada desde el retaceo",

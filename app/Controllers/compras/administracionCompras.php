@@ -913,6 +913,29 @@ class administracionCompras extends Controller
 
         if($compras['flgRetaceo'] == "Si"){
             //aplica a retaceo
+            $dataCompraRetaceo = [
+                "estadoCompra"  => "Finalizada",
+                "obsCompra"     => $this->request->getPost('observacionFinalizarCompra')
+            ];
+    
+            // Insertar datos en la base de datos
+            $updateEstadoCompraRetaceo = $comp_compras->update($compraId,$dataCompraRetaceo);
+
+            if ($updateEstadoCompraRetaceo) {
+                // Si el insert fue exitoso, devuelve el último ID insertado
+                return $this->response->setJSON([
+                    'success' => true,
+                    'mensaje' => 'Estado Actualizado con exito',
+                    'compraId' =>  $compras['compraId'] 
+                ]);
+            } else {
+                // Si el insert falló, devuelve un mensaje de error
+                return $this->response->setJSON([
+                    'success' => false,
+                    'mensaje' => 'No se pudo actualizar el estado de de la compra'
+                ]);
+            }
+            //cambiarInterfaz(`compras/admin-retaceo/index`);
         }else{
             $comprasDetalle = $comp_compras_detalle 
                 ->select("compraDetalleId,productoId,cantidadProducto,precioUnitario")
