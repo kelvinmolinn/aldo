@@ -95,7 +95,7 @@ class administracionRetaceo extends Controller
             "fechaRetaceo"     => $this->request->getPost('fechaRetaceo'),
             "totalFlete"       => $this->request->getPost('fleteRetaceo'),
             "totalGastos"      => $this->request->getPost('GastosRetaceo'),
-            "obsRetaceo"       => $this->request->getPost('observacionRetaceo'),
+            //"obsRetaceo"       => $this->request->getPost('observacionRetaceo'),
             "estadoRetaceo"    => "Pendiente"
         ];
 
@@ -516,78 +516,114 @@ class administracionRetaceo extends Controller
 
     public function finalizarRetaceo(){
         $inv_kardex = new inv_kardex();
+        $comp_retaceo = new comp_retaceo();
         $retaceoDetalle = new comp_retaceo_detalle();
         $inv_productos_existencias = new inv_productos_existencias();
         $comprasDetalle = new comp_compras_detalle();
         $invProductos = new inv_productos();
+        $comp_compras = new comp_compras();
 
         $retaceoId = $this->request->getPost('retaceoId');
+        $observacionFinalizarRetaceo = $this->request->getPost('observacionFinalizarCompra');
 
         $datosRetaceoDetalle = $retaceoDetalle
-                                ->select('comp_compras.sucursalId , comp_compras.fechaDocumento, comp_retaceo_detalle.cantidadProducto, comp_retaceo_detalle.compraDetalleId,comp_retaceo_detalle.costoUnitarioRetaceo,comp_compras_detalle.productoId')
+                                ->select('comp_retaceo_detalle.retaceoDetalleId,comp_compras.sucursalId , comp_compras.fechaDocumento, comp_compras.compraId,comp_retaceo_detalle.cantidadProducto, comp_retaceo_detalle.compraDetalleId,comp_retaceo_detalle.costoUnitarioRetaceo,comp_compras_detalle.productoId')
                                 ->join('comp_compras_detalle','comp_compras_detalle.compraDetalleId = comp_retaceo_detalle.compraDetalleId')
                                 ->join('comp_compras', 'comp_compras.compraId = comp_compras_detalle.compraId')
                                 ->where('comp_retaceo_detalle.flgElimina', 0)
                                 ->where('comp_retaceo_detalle.retaceoId', $retaceoId)
+                                ->findAll();
+
+
+        foreach($datosRetaceoDetalle AS $detalle){
+
+            $sucursal = $detalle['sucursalId'];
+            $productoId = $detalle['productoId'];
+
+            $productosExis = $inv_productos_existencias 
+                             ->select('productoExistenciaId,existenciaProducto')
+                             ->where('flgElimina', 0)
+                             ->where('sucursalId', $sucursal)
+                             ->where('productoId', $productoId)
+                             ->first();
+
+            $precios = $comprasDetalle
+                                ->select('comp_compras_detalle.precioUnitario,inv_productos.CostoPromedio,inv_productos.precioVenta')
+                                ->join('inv_productos','inv_productos.productoId = comp_compras_detalle.productoId')
+                                ->where('comp_compras_detalle.flgElimina', 0)
+                                ->where('comp_compras_detalle.compraDetalleId',$detalle['compraDetalleId'])
+                                ->where('inv_productos.productoId', $productoId)
                                 ->first();
 
-        $sucursal = $datosRetaceoDetalle['sucursalId'];
-        $productoId = $datosRetaceoDetalle['productoId'];
+            if (!$productosExis) {
+                $dataInsert = [
+                    'sucursalId'         => $sucursal,
+                    'productoId'         => $productoId,
+                    'existenciaProducto' => 0
+                ];
 
-        $productosExis = $inv_productos_existencias 
-                         ->select('productoExistenciaId,existenciaProducto')
-                         ->where('flgElimina', 0)
-                         ->where('sucursalId', $sucursal)
-                         ->where('productoId', $productoId)
-                         ->first();
+                $productosExisId = $inv_productos_existencias->insert($dataInsert);
+                // Recuperar el ID del nuevo registro insertado
+                $productosExis = [
+                    'productoExistenciaId' => $productosExisId,
+                    'existenciaProducto'   => 0
+                ];
+            }
 
+            $existenciaDespues = $productosExis['existenciaProducto'] + $detalle['cantidadProducto'];
 
-        $existenciaDespues = $productosExis['existenciaProducto'] + $datosRetaceoDetalle['cantidadProducto'];
-
-        $precios = $comprasDetalle
-                            ->select('comp_compras_detalle.precioUnitario,inv_productos.CostoPromedio,inv_productos.precioVenta')
-                            ->join('inv_productos','inv_productos.productoId = comp_compras_detalle.productoId')
-                            ->where('comp_compras_detalle.flgElimina', 0)
-                            ->where('comp_compras_detalle.compraDetalleId',$datosRetaceoDetalle['compraDetalleId'])
-                            ->where('inv_productos.productoId', $productoId)
-                            ->first();
-
-        //foreach($datosRetaceoDetalle AS $datosRetaceoDetalle){
             $data = [
                 "tipoMovimiento"                => "Entrada",
                 "descripcionMovimiento"         => "Entrada registrada desde el retaceo",
                 "productoExistenciaId"          => $productosExis['productoExistenciaId'],
                 "existenciaAntesMovimiento"     => $productosExis['existenciaProducto'],
-                "cantidadMovimiento"            => $datosRetaceoDetalle['cantidadProducto'],
+                "cantidadMovimiento"            => $detalle['cantidadProducto'],
                 "existenciaDespuesMovimiento"   => $existenciaDespues,
                 "costoUnitarioFOB"              => $precios['precioUnitario'],
-                "costoUnitarioRetaceo"          => $datosRetaceoDetalle['costoUnitarioRetaceo'],
+                "costoUnitarioRetaceo"          => $detalle['costoUnitarioRetaceo'],
                 "costoPromedio"                 => $precios['CostoPromedio'],
                 "precioVentaUnitario"           => $precios['precioVenta'],
-                "fechaDocumento"                => $datosRetaceoDetalle['fechaDocumento'],
+                "fechaDocumento"                => $detalle['fechaDocumento'],
                 "fechaMovimiento"               => date("Y-m-d H:i:s"),
                 "tablaMovimiento"               => "comp_retaceo_detalle",
-                "tablaMovimientoId"             => "",
+                "tablaMovimientoId"             => $detalle['retaceoDetalleId'],
     
             ];
             // Insertar datos en la base de datos
             $finRetaceo = $inv_kardex->insert($data);
+
+            $data = [
+                'existenciaProducto'   => $existenciaDespues
+
+            ];
+            // Insertar datos en la base de datos
+            $operacionExistencia = $inv_productos_existencias->update($productosExis['productoExistenciaId'], $data);
     
-            if ($finRetaceo) {
-                // Si el insert fue exitoso, devuelve el último ID insertado
-                return $this->response->setJSON([
-                    'success' => true,
-                    'mensaje' => 'Se agrego al kardex desde el retaceo correctamente',
-                    'kardexId' =>  $inv_kardex->insertID() 
-                ]);
-            } else {
-                // Si el insert falló, devuelve un mensaje de error
-                return $this->response->setJSON([
-                    'success' => false,
-                    'mensaje' => 'No se pudo insertar al kardex'
-                ]);
-            }
-        //}
+        }
+
+            $data = [
+                'estadoRetaceo'     => "Finalizado",
+                'obsRetaceo'        => $observacionFinalizarRetaceo
+                
+            ];
+            // Insertar datos en la base de datos
+            $operacionEstadoRetaceo = $comp_retaceo->update($retaceoId, $data);
+
+
+        if ($operacionEstadoRetaceo) {
+            // Si el insert fue exitoso, devuelve el último ID insertado
+            return $this->response->setJSON([
+                'success' => true,
+                'mensaje' => 'Se agrego al kardex desde el retaceo correctamente',
+                'retaceoId' =>  $retaceoId 
+            ]);
+        } else {
+            // Si el insert falló, devuelve un mensaje de error
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'No se pudo insertar al kardex'
+            ]);
+        }
 
     }
 }

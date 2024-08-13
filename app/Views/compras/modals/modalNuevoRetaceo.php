@@ -38,14 +38,14 @@
                                     </div>
                             </div>
                     </div>
-                    <div class="row">
+                    <!--<div class="row">
                         <div class="col-md-12">
                             <div class="form-outline">
                                 <textarea name="observacionRetaceo" id="observacionRetaceo" class="form-control" style="width: 100%;" required></textarea>
                                 <label class="form-label" for="observacionRetaceo">Observación</label>
                             </div>
                         </div>    
-                    </div>
+                    </div>-->
                 </div>
                 <div class="modal-footer">
                     <button type="submit" id="btnguardarRetaceo" class="btn btn-primary">
