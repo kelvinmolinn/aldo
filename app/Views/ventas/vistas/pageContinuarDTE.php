@@ -237,8 +237,9 @@
                                         title: 'DTE con error!',
                                         text: response.mensaje
                                     }).then((result) => {
-                                        //$("#tablaContinuarDTE").DataTable().ajax.reload(null, false);
-                                        cambiarInterfaz('ventas/admin-facturacion/index', {renderVista:'No'});
+                                        $("#tablaContinuarDTE").DataTable().ajax.reload(null, false);
+                                        $("#tblError").DataTable().ajax.reload(null, false);
+                                       // cambiarInterfaz('ventas/admin-facturacion/index', {renderVista:'No'});
                                     });
                                 } else {
                                     // Insert fallido, mostrar mensaje de error
@@ -317,6 +318,27 @@
             }
         });
     }
+
+    function modalErrorDTE(facturaId, facturaCertificacionId) {
+        // Realizar una petición AJAX para obtener los datos del módulo por su ID
+        $.ajax({
+                url: '<?php echo base_url('ventas/admin-facturacion/form/error/dte'); ?>',
+                type: 'POST',
+                data: {facturaCertificacionId : facturaCertificacionId, facturaId : facturaId}, // Pasar el ID del módulo como parámetro
+                success: function(response) {
+                    // Insertar el contenido de la modal en el cuerpo de la modal
+                    $('#divModalContent').html(response);
+                    // Mostrar la modal
+                    $('#modalErrorDTE').modal('show');
+                    
+                },
+            error: function(xhr, status, error) {
+                // Manejar errores si los hay
+                console.error(xhr.responseText);
+            }
+        });
+    }
+
 
 
 

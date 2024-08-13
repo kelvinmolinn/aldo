@@ -297,7 +297,6 @@ $routes->group('ventas/admin-facturacion', function($routes) {
     $routes->post('operacion/eliminar/pago', 'ventas\administracionFacturacion::eliminarDTEPago');
     $routes->post('form/complemento/dte', 'ventas\administracionFacturacion::modalComplementoDTE');
     $routes->post('tabla/complemento/dte', 'ventas\administracionFacturacion::tablaComplementoDTE');
-    $routes->post('form/error/dte', 'ventas\administracionFacturacion::tablaErrorDTE');
     $routes->post('form/imprimir/dte', 'ventas\administracionFacturacion::imprimirDTE');
     $routes->post('form/concepto/dte', 'ventas\administracionFacturacion::modalConceptoDTE');
     $routes->post('concepto/dte', 'ventas\administracionFacturacion::operacionConceptoDTE');
@@ -307,6 +306,8 @@ $routes->group('ventas/admin-facturacion', function($routes) {
     $routes->post('operacion/eliminar/complemento', 'ventas\administracionFacturacion::eliminarDTEComplemento');
     $routes->post('operacion/certificar/dte', 'ventas\administracionFacturacion::certificarDTE');
     $routes->post('operacion/certificar/dteError', 'ventas\administracionFacturacion::certificarDTEError');
+    $routes->post('form/error/dte', 'ventas\administracionFacturacion::modalErrorDTE');
+    $routes->post('tabla/error/dte', 'ventas\administracionFacturacion::tablaErrorDTE');
 
 
 
