@@ -544,53 +544,50 @@ class administracionRetaceo extends Controller
 
         $existenciaDespues = $productosExis['existenciaProducto'] + $datosRetaceoDetalle['cantidadProducto'];
 
-        $precioUnitarioFOB = $comprasDetalle
-                            ->selec('precioUnitario')
-                            ->where('flgElimina', 0)
-                            ->where('compraDetalleId',$datosRetaceoDetalle['compraDetalleId'])
+        $precios = $comprasDetalle
+                            ->select('comp_compras_detalle.precioUnitario,inv_productos.CostoPromedio,inv_productos.precioVenta')
+                            ->join('inv_productos','inv_productos.productoId = comp_compras_detalle.productoId')
+                            ->where('comp_compras_detalle.flgElimina', 0)
+                            ->where('comp_compras_detalle.compraDetalleId',$datosRetaceoDetalle['compraDetalleId'])
+                            ->where('inv_productos.productoId', $productoId)
                             ->first();
 
-        $productos = $invProductos 
-                    ->select('CostoPromedio,precioVenta')
-                    ->where('flgElimina', 0)
-                    ->first();
+        //foreach($datosRetaceoDetalle AS $datosRetaceoDetalle){
+            $data = [
+                "tipoMovimiento"                => "Entrada",
+                "descripcionMovimiento"         => "Entrada registrada desde el retaceo",
+                "productoExistenciaId"          => $productosExis['productoExistenciaId'],
+                "existenciaAntesMovimiento"     => $productosExis['existenciaProducto'],
+                "cantidadMovimiento"            => $datosRetaceoDetalle['cantidadProducto'],
+                "existenciaDespuesMovimiento"   => $existenciaDespues,
+                "costoUnitarioFOB"              => $precios['precioUnitario'],
+                "costoUnitarioRetaceo"          => $datosRetaceoDetalle['costoUnitarioRetaceo'],
+                "costoPromedio"                 => $precios['CostoPromedio'],
+                "precioVentaUnitario"           => $precios['precioVenta'],
+                "fechaDocumento"                => $datosRetaceoDetalle['fechaDocumento'],
+                "fechaMovimiento"               => date("Y-m-d H:i:s"),
+                "tablaMovimiento"               => "comp_retaceo_detalle",
+                "tablaMovimientoId"             => "",
+    
+            ];
+            // Insertar datos en la base de datos
+            $finRetaceo = $inv_kardex->insert($data);
+    
+            if ($finRetaceo) {
+                // Si el insert fue exitoso, devuelve el último ID insertado
+                return $this->response->setJSON([
+                    'success' => true,
+                    'mensaje' => 'Se agrego al kardex desde el retaceo correctamente',
+                    'kardexId' =>  $inv_kardex->insertID() 
+                ]);
+            } else {
+                // Si el insert falló, devuelve un mensaje de error
+                return $this->response->setJSON([
+                    'success' => false,
+                    'mensaje' => 'No se pudo insertar al kardex'
+                ]);
+            }
+        //}
 
-        /*foreach(){
-
-        }*/
-        $data = [
-            "tipoMovimiento"                => "Entrada",
-            "descripcionMovimiento"         => "Entrada registrada desde el retaceo",
-            "productoExistenciaId"          => $productosExis['productoExistenciaId'],
-            "existenciaAntesMovimiento"     => $productosExis['existenciaProducto'],
-            "cantidadMovimiento"            => $datosRetaceoDetalle['cantidadProducto'],
-            "existenciaDespuesMovimiento"   => $existenciaDespues,
-            "costoUnitarioFOB"              => $precioUnitarioFOB['precioUnitario'],
-            "costoUnitarioRetaceo"          => $datosRetaceoDetalle['costoUnitarioRetaceo'],
-            "costoPromedio"                 => $productos['CostoPromedio'],
-            "precioVentaUnitario"           => $productos['precioVenta'],
-            "fechaDocumento"                => $datosRetaceoDetalle['fechaDocumento'],
-            "fechaMovimiento"               => date("Y-m-d H:i:s"),
-            "tablaMovimiento"               => "comp_retaceo_detalle",
-            "tablaMovimientoId"             => "",
-
-        ];
-        // Insertar datos en la base de datos
-        $finRetaceo = $inv_kardex->insert($data);
-
-        if ($finRetaceo) {
-            // Si el insert fue exitoso, devuelve el último ID insertado
-            return $this->response->setJSON([
-                'success' => true,
-                'mensaje' => 'Se agrego al kardex desde el retaceo correctamente',
-                'kardexId' =>  $inv_kardex->insertID() 
-            ]);
-        } else {
-            // Si el insert falló, devuelve un mensaje de error
-            return $this->response->setJSON([
-                'success' => false,
-                'mensaje' => 'No se pudo insertar al kardex'
-            ]);
-        }
     }
 }
