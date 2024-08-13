@@ -109,6 +109,7 @@
             }
         });
     }
+
     $(document).ready(function() {
 
     function EventoEnter(inputId) {
@@ -149,9 +150,9 @@
             "columnDefs": [
                 { "width": "5%", "targets": 0 },   
                 { "width": "30%", "targets": 1 }, 
-                { "width": "20%", "targets": 2 }, 
-                { "width": "25%", "targets": 3 }, 
-                { "width": "10%", "targets": 4 },
+                { "width": "15%", "targets": 2 }, 
+                { "width": "20%", "targets": 3 }, 
+                { "width": "20%", "targets": 4 },
                 { "width": "10%", "targets": 5 }
             ],
             "language": {
