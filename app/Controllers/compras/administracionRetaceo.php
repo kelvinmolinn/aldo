@@ -570,6 +570,10 @@ class administracionRetaceo extends Controller
                 ];
             }
 
+            // Aplicar formula de costo promedio y asignar esa variable a costopromedio de kardex
+            // Y luego, hacer update a inv_productos y actualizar el CostoPromedio de esa tabla al nuevo que se calculo
+            // NOTA: Aplicar esta formula y update en compras locales donde no se hace retaceo
+
             $existenciaDespues = $productosExis['existenciaProducto'] + $detalle['cantidadProducto'];
 
             $data = [

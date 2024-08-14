@@ -928,6 +928,7 @@ class administracionCompras extends Controller
                     'mensaje' => 'Estado Actualizado con exito',
                     'compraId' =>  $compras['compraId'] 
                 ]);
+                
             } else {
                 // Si el insert falló, devuelve un mensaje de error
                 return $this->response->setJSON([
@@ -983,6 +984,9 @@ class administracionCompras extends Controller
             
                         // Insertar datos en la base de datos
                         $productoExistenciaId = $inv_productos_existencias->insert($dataExistencias);
+
+                        // aplicar formula de costo promedio y asignar esa variable a kardex
+                        // hacer update a inv_productos a la columna CostoPromedio con la variable a la que se le aplicó la nueva formula
 
                     $dataKardexNuevo = [
                         "tipoMovimiento"                => "Entrada de la compra", 
