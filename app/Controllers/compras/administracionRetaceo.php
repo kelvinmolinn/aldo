@@ -527,12 +527,13 @@ class administracionRetaceo extends Controller
         $observacionFinalizarRetaceo = $this->request->getPost('observacionFinalizarCompra');
 
         $datosRetaceoDetalle = $retaceoDetalle
-                                ->select('comp_retaceo_detalle.retaceoDetalleId,comp_compras.sucursalId , comp_compras.fechaDocumento, comp_compras.compraId,comp_retaceo_detalle.cantidadProducto, comp_retaceo_detalle.compraDetalleId,comp_retaceo_detalle.costoUnitarioRetaceo,comp_compras_detalle.productoId')
-                                ->join('comp_compras_detalle','comp_compras_detalle.compraDetalleId = comp_retaceo_detalle.compraDetalleId')
-                                ->join('comp_compras', 'comp_compras.compraId = comp_compras_detalle.compraId')
-                                ->where('comp_retaceo_detalle.flgElimina', 0)
-                                ->where('comp_retaceo_detalle.retaceoId', $retaceoId)
-                                ->findAll();
+                            ->select('comp_retaceo_detalle.retaceoDetalleId,comp_compras.sucursalId , comp_compras.fechaDocumento, comp_compras.compraId,comp_retaceo_detalle.cantidadProducto, comp_retaceo_detalle.compraDetalleId,comp_retaceo_detalle.costoUnitarioRetaceo,comp_compras_detalle.productoId,comp_compras_detalle.precioUnitario,inv_productos.precioVenta,inv_productos.CostoPromedio')
+                            ->join('comp_compras_detalle','comp_compras_detalle.compraDetalleId = comp_retaceo_detalle.compraDetalleId')
+                            ->join('comp_compras', 'comp_compras.compraId = comp_compras_detalle.compraId')
+                            ->join('inv_productos','inv_productos.productoId = comp_compras_detalle.productoId')
+                            ->where('comp_retaceo_detalle.flgElimina', 0)
+                            ->where('comp_retaceo_detalle.retaceoId', $retaceoId)
+                            ->findAll();
 
 
         foreach($datosRetaceoDetalle AS $detalle){
@@ -547,13 +548,13 @@ class administracionRetaceo extends Controller
                              ->where('productoId', $productoId)
                              ->first();
 
-            $precios = $comprasDetalle
-                                ->select('comp_compras_detalle.precioUnitario,inv_productos.CostoPromedio,inv_productos.precioVenta')
+            /*$precios = $comprasDetalle
+                                ->select('comp_compras_detalle.precioUnitario,inv_productos.precioVenta')
                                 ->join('inv_productos','inv_productos.productoId = comp_compras_detalle.productoId')
                                 ->where('comp_compras_detalle.flgElimina', 0)
                                 ->where('comp_compras_detalle.compraDetalleId',$detalle['compraDetalleId'])
                                 ->where('inv_productos.productoId', $productoId)
-                                ->first();
+                                ->first();*/
 
             if (!$productosExis) {
                 $dataInsert = [
@@ -576,6 +577,20 @@ class administracionRetaceo extends Controller
 
             $existenciaDespues = $productosExis['existenciaProducto'] + $detalle['cantidadProducto'];
 
+            if($productosExis['existenciaProducto'] <= 0){
+
+                //$costoPromedio = 
+            
+            }else{
+                $costoTotalExistente = $productosExis['existenciaProducto'] * $detalle['CostoPromedio'];
+
+                $costoTotalNuevas = $detalle['cantidadProducto'] * $detalle['costoUnitarioRetaceo'];
+
+                $cantidadTotal = $productosExis['existenciaProducto'] + $detalle['costoUnitarioRetaceo']
+
+                $costoPromedio = ($costoTotalExistente + $costoTotalNuevas) / $cantidadTotal;
+            }
+
             $data = [
                 "tipoMovimiento"                => "Entrada",
                 "descripcionMovimiento"         => "Entrada registrada desde el retaceo",
@@ -583,10 +598,10 @@ class administracionRetaceo extends Controller
                 "existenciaAntesMovimiento"     => $productosExis['existenciaProducto'],
                 "cantidadMovimiento"            => $detalle['cantidadProducto'],
                 "existenciaDespuesMovimiento"   => $existenciaDespues,
-                "costoUnitarioFOB"              => $precios['precioUnitario'],
+                "costoUnitarioFOB"              => $detalle['precioUnitario'],
                 "costoUnitarioRetaceo"          => $detalle['costoUnitarioRetaceo'],
-                "costoPromedio"                 => $precios['CostoPromedio'],
-                "precioVentaUnitario"           => $precios['precioVenta'],
+                "costoPromedio"                 => $costoPromedio,
+                "precioVentaUnitario"           => $detalle['precioVenta'],
                 "fechaDocumento"                => $detalle['fechaDocumento'],
                 "fechaMovimiento"               => date("Y-m-d H:i:s"),
                 "tablaMovimiento"               => "comp_retaceo_detalle",

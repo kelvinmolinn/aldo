@@ -969,6 +969,20 @@ class administracionCompras extends Controller
                     ->where("productoId", $detalle['productoId'])
                     ->first();
 
+                   if($consultaInventario['existenciaProducto'] <= 0){
+
+                        //$costoPromedio = 
+                    
+                    }else{
+                        $costoTotalExistente = $consultaInventario['existenciaProducto'] * $consultaProveedor['CostoPromedio'];
+
+                        $costoTotalNuevas = $detalle['cantidadProducto'] * $detalle['precioUnitario'];
+
+                        $cantidadTotal = $consultaInventario['existenciaProducto'] + $detalle['precioUnitario']
+
+                        $costoPromedio = ($costoTotalExistente + $costoTotalNuevas) / $cantidadTotal;
+                    }
+                    
                 if($ExisteProducto == 0){
                     $operacion .= "Insert";
                     $existenciaAntes = 0;
@@ -997,7 +1011,7 @@ class administracionCompras extends Controller
                         "existenciaDespuesMovimiento"   => $existenciaDespues, 
                         "costoUnitarioFOB"              => $detalle['precioUnitario'], 
                         "costoUnitarioRetaceo"          => $detalle['precioUnitario'], 
-                        "costoPromedio"                 => $consultaProveedor['CostoPromedio'],
+                        "costoPromedio"                 => $costoPromedio,
                         "precioVentaUnitario"           => $consultaProveedor['precioVenta'],
                         "fechaDocumento"                => $compras['fechaDocumento'], 
                         "fechaMovimiento"               => date("Y-m-d"), 
@@ -1022,7 +1036,7 @@ class administracionCompras extends Controller
                         "existenciaDespuesMovimiento"   => $existenciaDespues, 
                         "costoUnitarioFOB"              => $detalle['precioUnitario'], 
                         "costoUnitarioRetaceo"          => $detalle['precioUnitario'], 
-                        "costoPromedio"                 => $consultaProveedor['CostoPromedio'],
+                        "costoPromedio"                 => $costoPromedio,
                         "precioVentaUnitario"           => $consultaProveedor['precioVenta'],
                         "fechaDocumento"                => $compras['fechaDocumento'], 
                         "fechaMovimiento"               => date("Y-m-d"), 
