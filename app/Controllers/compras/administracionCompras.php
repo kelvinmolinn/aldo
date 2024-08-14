@@ -971,7 +971,7 @@ class administracionCompras extends Controller
 
                    if($consultaInventario['existenciaProducto'] <= 0){
 
-                        //$costoPromedio = 
+                        $costoPromedio = $detalle['precioUnitario'];
                     
                     }else{
                         $costoTotalExistente = $consultaInventario['existenciaProducto'] * $consultaProveedor['CostoPromedio'];
@@ -982,7 +982,7 @@ class administracionCompras extends Controller
 
                         $costoPromedio = ($costoTotalExistente + $costoTotalNuevas) / $cantidadTotal;
                     }
-                    
+
                 if($ExisteProducto == 0){
                     $operacion .= "Insert";
                     $existenciaAntes = 0;

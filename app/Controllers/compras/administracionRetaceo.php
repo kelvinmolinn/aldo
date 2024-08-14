@@ -579,7 +579,7 @@ class administracionRetaceo extends Controller
 
             if($productosExis['existenciaProducto'] <= 0){
 
-                //$costoPromedio = 
+                $costoPromedio = $detalle['costoUnitarioRetaceo'];
             
             }else{
                 $costoTotalExistente = $productosExis['existenciaProducto'] * $detalle['CostoPromedio'];
