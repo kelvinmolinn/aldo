@@ -309,7 +309,7 @@ public function tablaFacturacion()
             $columna3 .= "<br><b>Obs Anulación:</b> " . $columna['obsAnulacion'];
         }
 
-        $columna4 = "<b>Cliente:</b> " . $columna['cliente'] . "<br><b>NRC:</b> " . $columna['nrcCliente'] . "<br><b>Dirección:</b> " . $columna['direccionCliente'];
+        $columna4 = "<b>Cliente:</b> " . $columna['cliente'] . "<br><b>NRC:</b> " . $columna['nrcCliente'] . "<br><b>Dirección:</b> " . $columna['direccionCliente']. "<br><b>Tipo DTE:</b> " . $columna['tipoDocumentoDTE'];
 
         // Inicializar variables para cálculos de totales
         $subtotal = 0;
@@ -2358,8 +2358,7 @@ private function codigoGeneracionError() {
             return $this->response->setJSON(array('data' => '', 'countMinima' => 0)); // No hay datos, devuelve un array vacío
         }
     }
-
-    public function invalidarDTE()
+/*    public function invalidarDTE()
 {
     // Intentar obtener los valores desde la solicitud POST
     $facturaId = $this->request->getPost('facturaId');
@@ -2568,6 +2567,207 @@ private function codigoInvalidarGeneracion() {
     
     return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
 }
+*/
+public function invalidarDTE()
+{
+    // Obtener los valores desde la solicitud POST
+    $facturaId = $this->request->getPost('facturaId');
+    $facturaDetalleId = $this->request->getPost('facturaDetalleId');
+    $retaceoDetalleId = $this->request->getPost('retaceoDetalleId'); 
+    
+    // Verificar si el ID de la factura está disponible
+    if (!$facturaId) {
+        return $this->response->setJSON([
+            'success' => false,
+            'mensaje' => 'No se pudo obtener el ID de la factura.',
+        ]);
+    }
+
+    // Obtener datos de la factura
+    $facturaModel = new fel_facturas();
+    $factura = $facturaModel
+        ->select('sucursalId, fechaEmision, tipoDTEId')
+        ->where('facturaId', $facturaId)
+        ->first();
+
+    // Verificar si la factura existe
+    if (!$factura) {
+        return $this->response->setJSON([
+            'success' => false,
+            'mensaje' => 'Factura no encontrada.',
+        ]);
+    }
+
+    // Extraer sucursalId, fechaEmision y tipoDTEId
+    $sucursalId = $factura['sucursalId'];
+    $fechaEmision = $factura['fechaEmision'];
+    $tipoDTEId = $factura['tipoDTEId'];
+
+    // Validar si se puede invalidar la factura
+    $fechaActual = new \DateTime(); // Fecha actual
+    $fechaEmisionDT = new \DateTime($fechaEmision); // Fecha de emisión
+
+    if ($tipoDTEId == 2) { // Tipo DTE = 2 (Crédito fiscal)
+        $intervalo = $fechaEmisionDT->diff($fechaActual);
+        if ($intervalo->days > 1) {
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'No se puede invalidar un Crédito Fiscal después de un día.'
+            ]);
+        }
+    } elseif ($tipoDTEId == 1) { // Tipo DTE = 1 (Factura)
+        $intervalo = $fechaEmisionDT->diff($fechaActual);
+        if ($intervalo->days > 90) {
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'No se puede invalidar una Factura después de 90 días.'
+            ]);
+        }
+    }
+
+    // Continuar con la invalidación como antes
+    $productosExistenciasModel = new inv_productos_existencias();
+    $detalleModel = new fel_facturas_detalle();
+    $modelKardex = new inv_kardex();
+    $productosInfoModel = new inv_productos();
+    $comprasDetalleModel = new comp_compras_detalle();
+    $retaceoDetalleModel = new comp_retaceo_detalle();
+    $modelFacturaPago = new fel_facturas_pago();
+
+    // Obtener los detalles de los productos asociados a la factura
+    $productosFactura = $detalleModel
+        ->select('productoId, cantidadProducto, precioUnitarioVenta, porcentajeDescuento')
+        ->where('facturaId', $facturaId)
+        ->where('flgElimina', 0)
+        ->findAll();
+
+    // Verificar si no se han agregado productos al detalle
+    if (empty($productosFactura)) {
+        return $this->response->setJSON([
+            'success' => false,
+            'mensaje' => 'No se puede invalidar el DTE. No se han agregado productos al detalle de la factura.'
+        ]);
+    }
+
+    foreach ($productosFactura as $producto) {
+        $productoId = $producto['productoId'];
+        $cantidadProducto = $producto['cantidadProducto'];
+   
+        // Obtener la existencia actual del producto en la sucursal
+        $productoExistencia = $productosExistenciasModel
+            ->select('productoExistenciaId, existenciaProducto')
+            ->where('sucursalId', $sucursalId)
+            ->where('productoId', $productoId)
+            ->where('flgElimina', 0)
+            ->first();
+
+        if (!$productoExistencia || $cantidadProducto > $productoExistencia['existenciaProducto']) {
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => "No hay existencias suficientes para el producto ID $productoId en la sucursal $sucursalId.",
+            ]);
+        }
+
+        // Obtener datos adicionales del producto
+        $productoInfo = $productosInfoModel->find($productoId);
+
+        // Obtener el costo FOB
+        $costoFOBResult = $comprasDetalleModel
+            ->select('precioUnitario')
+            ->where('productoId', $productoId)
+            ->where('flgElimina', 0)
+            ->orderBy('compraDetalleId', 'DESC')
+            ->first();
+        
+        $costoFOB = $costoFOBResult ? $costoFOBResult['precioUnitario'] : 0;
+
+        // Obtener el costo promedio y el precio de venta del producto
+        $costoPromedio = $productoInfo ? $productoInfo['CostoPromedio'] : 0;
+        $precioVentaUnitario = $productoInfo ? $productoInfo['precioVenta'] : 0;
+
+        // Verificar si se obtuvo retaceoDetalleId y obtener costo unitario retaceo
+        if ($retaceoDetalleId) {
+            $retaceoInfo = $retaceoDetalleModel->find($retaceoDetalleId);
+            $costoUnitarioRetaceo = $retaceoInfo ? $retaceoInfo['costoUnitarioRetaceo'] : 0;
+        } else {
+            $costoUnitarioRetaceo = 0;
+        }
+
+        // Calcular valores para la entrada del Kardex
+        $existenciaAntes = $productoExistencia['existenciaProducto'];
+        $existenciaDespues = $existenciaAntes + $cantidadProducto;
+        $precioVentaUnitarioConDescuento = $producto['precioUnitarioVenta'] * (1 - $producto['porcentajeDescuento'] / 100);
+
+        // Insertar en Kardex
+        $modelKardex->insert([
+            'tipoMovimiento' => 'Entrada',
+            'descripcionMovimiento' => "Entrada registrada por invalidación de DTE: $facturaId",
+            'productoExistenciaId' => $productoExistencia['productoExistenciaId'],
+            'existenciaAntesMovimiento' => $existenciaAntes,
+            'cantidadMovimiento' => $cantidadProducto,
+            'existenciaDespuesMovimiento' => $existenciaDespues,
+            'costoUnitarioFOB' => $costoFOB,
+            'costoUnitarioRetaceo' => $costoUnitarioRetaceo,
+            'costoPromedio' => $costoPromedio,
+            'precioVentaUnitario' => $precioVentaUnitarioConDescuento,
+            'fechaDocumento' => $fechaEmision, // Usar la fechaEmision obtenida
+            'fechaMovimiento' => date('Y-m-d H:i:s'),
+            'tablaMovimiento' => 'fel_factura',
+            'tablaMovimientoId' => $facturaDetalleId
+        ]);
+
+        // Actualizar la existencia en inv_productos_existencias
+        $productosExistenciasModel->update($productoExistencia['productoExistenciaId'], [
+            'existenciaProducto' => $existenciaDespues
+        ]);
+    }
+
+    // Obtener datos de la sucursal
+    $confSucursalModel = new conf_sucursales();
+    $sucursalData = $confSucursalModel->find($sucursalId);
+    $codEstablecimientoMH = $sucursalData['codEstablecimientoMH'];
+    $puntoVentaMH = $sucursalData['puntoVentaMH'];
+
+    // Obtener el codigoMH del tipo de DTE (asumimos que tienes $tipoDTEId)
+    $tipoDTEId = 1; // Asumimos un valor para $tipoDTEId, ajusta según tu necesidad
+    $tipoDTEModel = new cat_02_tipo_dte();
+    $tipoDTEData = $tipoDTEModel->find($tipoDTEId);
+    $codigoMH = $tipoDTEData['codigoMH'];
+
+    // Generar numeroControl
+    $numeroControl = "DTE-{$codigoMH}-{$codEstablecimientoMH}-{$puntoVentaMH}" . str_pad($facturaId, 15, '0', STR_PAD_LEFT);
+
+    // Generar codigoGeneracion usando la función codigo de generacion() y convertir a mayúsculas
+    $codigoGeneracion = strtoupper($this->codigoInvalidarGeneracion());
+
+    // Simular selloRecibido y convertir a mayúsculas
+    $selloRecibido = strtoupper("REC-" . bin2hex(random_bytes(10)) . "-MH");
+
+    // Insertar en fel_factura_certificacion
+    $certificacionModel = new fel_factura_certificacion();
+    $certificacionModel->insert([
+        'facturaId' => $facturaId,
+        'numeroControl' => $numeroControl,
+        'codigoGeneracion' => $codigoGeneracion,
+        'tipoTransmisionMHId' => 1,  // Valor estático según lo especificado
+        'selloRecibido' => $selloRecibido,
+        'descripcionMensaje' => 'Invalidado',
+        'estadoCertificacion' => 'Invalidado'
+    ]);
+
+    // Actualizar el estado de la reserva
+    $dataReservaEstado = [
+        'estadoFactura' => "Invalidado"
+    ];
+    $facturaModel->update($facturaId, $dataReservaEstado);
+
+    // Retornar la respuesta exitosa
+    return $this->response->setJSON([
+        'success' => true,
+        'mensaje' => 'Invalidación de DTE exitosa'
+    ]);
+}
+
 
 
     public function imprimirDTE(){
