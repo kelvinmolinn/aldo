@@ -308,6 +308,7 @@ $routes->group('ventas/admin-facturacion', function($routes) {
     $routes->post('operacion/certificar/dteError', 'ventas\administracionFacturacion::certificarDTEError');
     $routes->post('form/error/dte', 'ventas\administracionFacturacion::modalErrorDTE');
     $routes->post('tabla/error/dte', 'ventas\administracionFacturacion::tablaErrorDTE');
+    $routes->post('operacion/invalidar/dte', 'ventas\administracionFacturacion::invalidarDTE');
 
 
 

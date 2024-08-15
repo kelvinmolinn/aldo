@@ -90,6 +90,9 @@
             }
         });
     }
+
+
+
     function modalImprimirDTE() {
         // Realizar una petición AJAX para obtener los datos del módulo por su ID
         $.ajax({
@@ -108,6 +111,55 @@
                 console.error(xhr.responseText);
             }
         });
+    }
+            function  invalidarDTE(facturaId) {
+        //alert("Vamos a certificar " + id);
+            Swal.fire({
+                title: '¿Estás seguro que desea invalidar el DTE?',
+                text: "Se invalidará el DTE.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, invalidar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Si el usuario confirma, enviar la solicitud AJAX para certificar 
+                        $.ajax({
+                            url: '<?php echo base_url('ventas/admin-facturacion/operacion/invalidar/dte'); ?>',
+                            type: 'POST',
+                            data: {
+                               facturaId: facturaId
+                            },
+                            success: function(response) {
+                                console.log(response);
+                                if (response.success) {
+                                    Swal.fire({
+                                        icon: 'warning',
+                                        title: 'DTE con error!',
+                                        text: response.mensaje
+                                    }).then((result) => {
+                                        $("#tablaDTE").DataTable().ajax.reload(null, false);
+                                       // $("#tblError").DataTable().ajax.reload(null, false);
+                                       // cambiarInterfaz('ventas/admin-facturacion/index', {renderVista:'No'});
+                                    });
+                                } else {
+                                    // Insert fallido, mostrar mensaje de error
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Error',
+                                        text: response.mensaje
+                                    });
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                // Manejar errores si los hay
+                                console.error(xhr.responseText);
+                            }
+                        });
+                }
+            });
     }
 
     $(document).ready(function() {
