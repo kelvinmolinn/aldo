@@ -978,7 +978,7 @@ class administracionCompras extends Controller
 
                         $costoTotalNuevas = $detalle['cantidadProducto'] * $detalle['precioUnitario'];
 
-                        $cantidadTotal = $consultaInventario['existenciaProducto'] + $detalle['precioUnitario']
+                        $cantidadTotal = $consultaInventario['existenciaProducto'] + $detalle['precioUnitario'];
 
                         $costoPromedio = ($costoTotalExistente + $costoTotalNuevas) / $cantidadTotal;
                     }
@@ -1054,6 +1054,14 @@ class administracionCompras extends Controller
                         // Insertar datos en la base de datos
                         $updateProductosExistencias = $inv_productos_existencias->update($consultaInventario['productoExistenciaId'],$dataActualizarExistencias);
                 }
+
+                    $dataCostoPromedio = [
+                        "CostoPromedio"  => $costoPromedio
+                        ];
+            
+                        // Insertar datos en la base de datos
+                        $updateCostoPromedio = $inv_productos->update($detalle['productoId'],$dataCostoPromedio);
+            
             } // Cierre foreach
             $dataCompra = [
                 "estadoCompra"  => "Finalizada",

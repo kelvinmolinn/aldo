@@ -586,7 +586,7 @@ class administracionRetaceo extends Controller
 
                 $costoTotalNuevas = $detalle['cantidadProducto'] * $detalle['costoUnitarioRetaceo'];
 
-                $cantidadTotal = $productosExis['existenciaProducto'] + $detalle['costoUnitarioRetaceo']
+                $cantidadTotal = $productosExis['existenciaProducto'] + $detalle['costoUnitarioRetaceo'];
 
                 $costoPromedio = ($costoTotalExistente + $costoTotalNuevas) / $cantidadTotal;
             }
@@ -618,7 +618,14 @@ class administracionRetaceo extends Controller
             // Insertar datos en la base de datos
             $operacionExistencia = $inv_productos_existencias->update($productosExis['productoExistenciaId'], $data);
     
+            $dataCostoPromedio = [
+                "CostoPromedio"  => $costoPromedio
+                ];
+    
+                // Insertar datos en la base de datos
+                $invProductos->update($productoId,$dataCostoPromedio);
         }
+
 
             $data = [
                 'estadoRetaceo'     => "Finalizado",
