@@ -45,33 +45,60 @@ class administracionRetaceo extends Controller
         foreach($consultaRetaceo as $consultaRetaceo){
             $n++;
             // Aquí construye tus columnas
-            $columna1 = $n;
-            $columna2 = "<b>N° de retaceo: </b> ".$consultaRetaceo['numRetaceo'] . "<br>" . "<b>Factura(s): </b> " . "<br>" . "<b>Estado: </b> ".$consultaRetaceo ['estadoRetaceo'] . "<br>" . "<b>Total de productos: </b> ";
-    
-            $columna3 = "<b>Flete: </b> ". number_format($consultaRetaceo['totalFlete'], 2, ".", ",") . "<br>" . "<b>Gastos: </b> ". number_format($consultaRetaceo['totalGastos'], 2, ".", ",") . "<br>" . "<b>Costo total: </b> ";
+            if ($consultaRetaceo['estadoRetaceo'] == "Finalizado") {
+                $estadoRetaceo = "<span class='font-weight-bold text-success'>".$consultaRetaceo['estadoRetaceo']."</span>";
 
-            $jsonContinuarRetaceo = [
-                "retaceoId"      => $consultaRetaceo['retaceoId']
-            ];
-
-            $columna4 = '
-                            <button type= "button" class="btn btn-primary mb-1" onclick="cambiarInterfaz(`compras/admin-retaceo/vista/continuar/retaceo`,'.htmlspecialchars(json_encode($jsonContinuarRetaceo)).');" data-toggle="tooltip" data-placement="top" title="Continuar retaceo">
-                                <i class="fas fa-sync-alt"></i>
-                            </button>';
+                $columna1 = $n;
+                $columna2 = "<b>N° de retaceo: </b> ".$consultaRetaceo['numRetaceo'] . "<br>" . "<b>Factura(s): </b> " . "<br>" . "<b>Estado: </b> ".$estadoRetaceo . "<br>" . "<b>Total de productos: </b> ";
         
-    
-            $columna4 .= '
-                             <button type= "button" class="btn btn-danger mb-1" onclick="modalAnularRetaceo('.$consultaRetaceo["retaceoId"].')" data-toggle="tooltip" data-placement="top" title="Anular">
-                                <i class="fas fa-ban"></i>
-                            </button>
-                        ';
-    
-            $output['data'][] = array(
-                $columna1,
-                $columna2,
-                $columna3,
-                $columna4
-            );
+                $columna3 = "<b>Flete: </b> ". number_format($consultaRetaceo['totalFlete'], 2, ".", ",") . "<br>" . "<b>Gastos: </b> ". number_format($consultaRetaceo['totalGastos'], 2, ".", ",") . "<br>" . "<b>Costo total: </b> ";
+
+                $jsonContinuarRetaceo = [
+                    "retaceoId"      => $consultaRetaceo['retaceoId']
+                ];
+
+                $columna4 = '
+                                <button type= "button" class="btn btn-primary mb-1" onclick="cambiarInterfaz();" data-toggle="tooltip" data-placement="top" title="Ver retaceo">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>';
+        
+                $output['data'][] = array(
+                    $columna1,
+                    $columna2,
+                    $columna3,
+                    $columna4
+                );
+            }else{
+                $estadoRetaceo = "<span class='font-weight-bold text-warning'>".$consultaRetaceo['estadoRetaceo']."</span>";
+                
+                $columna1 = $n;
+                $columna2 = "<b>N° de retaceo: </b> ".$consultaRetaceo['numRetaceo'] . "<br>" . "<b>Factura(s): </b> " . "<br>" . "<b>Estado: </b> ".$estadoRetaceo . "<br>" . "<b>Total de productos: </b> ";
+        
+                $columna3 = "<b>Flete: </b> ". number_format($consultaRetaceo['totalFlete'], 2, ".", ",") . "<br>" . "<b>Gastos: </b> ". number_format($consultaRetaceo['totalGastos'], 2, ".", ",") . "<br>" . "<b>Costo total: </b> ";
+
+                $jsonContinuarRetaceo = [
+                    "retaceoId"      => $consultaRetaceo['retaceoId']
+                ];
+
+                $columna4 = '
+                                <button type= "button" class="btn btn-primary mb-1" onclick="cambiarInterfaz(`compras/admin-retaceo/vista/continuar/retaceo`,'.htmlspecialchars(json_encode($jsonContinuarRetaceo)).');" data-toggle="tooltip" data-placement="top" title="Continuar retaceo">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>';
+        
+                $columna4 .= '
+                                 <button type= "button" class="btn btn-danger mb-1" onclick="modalAnularRetaceo('.$consultaRetaceo["retaceoId"].')" data-toggle="tooltip" data-placement="top" title="Anular">
+                                    <i class="fas fa-ban"></i>
+                                </button>
+                            ';
+        
+                $output['data'][] = array(
+                    $columna1,
+                    $columna2,
+                    $columna3,
+                    $columna4
+                );
+            }
+
         }
         // Verifica si hay datos
         if ($n > 0) {

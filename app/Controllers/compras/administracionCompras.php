@@ -54,7 +54,9 @@ class administracionCompras extends Controller
                 ->join('cat_tipo_contribuyente','cat_tipo_contribuyente.tipoContribuyenteId = comp_proveedores.tipoContribuyenteId')
                 ->join('cat_02_tipo_dte','cat_02_tipo_dte.tipoDTEId = comp_compras.tipoDTEId')
                 ->join('cat_20_paises','cat_20_paises.paisId = comp_compras.paisId')
-                ->where('comp_compras.flgElimina', 0);
+                ->where('comp_compras.flgElimina', 0)
+                ->where('comp_compras.estadoCompra', 'Finalizada')
+                ->where('comp_compras.estadoCompra', 'Pendiente');
 
         if($numFactura != "") {
             $consultaCompras->like('comp_compras.numFactura', $numFactura);
