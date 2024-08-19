@@ -354,7 +354,7 @@ public function tablaFacturacion()
         } elseif ($columna['estadoFactura'] === 'Certificado') {
             $columna6 = '
 
-                <button class="btn btn-info mb-1" onclick="modalVerReserva(`' . $columna['facturaId'] . '`);" data-toggle="tooltip" data-placement="top" title="Ver DTE">
+                <button class="btn btn-info mb-1" onclick="modalVerDTE(`' . $columna['facturaId'] . '`);" data-toggle="tooltip" data-placement="top" title="Ver DTE">
                     <i class="fas fa-eye"></i><span> </span>
                 </button>
 
@@ -376,7 +376,7 @@ public function tablaFacturacion()
         }elseif ($columna['estadoFactura'] === 'Invalidado') {
             $columna6 = '
 
-                <button class="btn btn-info mb-1" onclick="modalVerReserva(`' . $columna['facturaId'] . '`);" data-toggle="tooltip" data-placement="top" title="Ver DTE">
+                <button class="btn btn-info mb-1" onclick="modalVerDTE(`' . $columna['facturaId'] . '`);" data-toggle="tooltip" data-placement="top" title="Ver DTE">
                     <i class="fas fa-eye"></i><span> </span>
                 </button>';
         }  else {
@@ -2774,4 +2774,172 @@ public function invalidarDTE()
         $data['variable'] = 0;
         return view('ventas/modals/modalImprimirDTE', $data);
     }
+
+    public function modalVerDTE(){
+    $data["facturaId"] = $this->request->getPost('facturaId');
+
+        return view('ventas/modals/modalVerDTE', $data);
+    }
+
+public function tablaVerDTE(){
+    $facturaId = $this->request->getPost('facturaId');
+    $mostrarDTE = new fel_facturas_detalle();
+    $datos = $mostrarDTE
+    ->select('fel_facturas_detalle.facturaDetalleId,fel_facturas_detalle.facturaId,fel_facturas_detalle.cantidadProducto,fel_facturas_detalle.productoId,fel_facturas_detalle.conceptoProducto,fel_facturas_detalle.precioUnitario,fel_facturas_detalle.precioUnitarioIVA,fel_facturas_detalle.porcentajeDescuento,fel_facturas_detalle.descuentoTotal,fel_facturas_detalle.precioUnitarioVenta,fel_facturas_detalle.precioUnitarioVentaIVA,fel_facturas_detalle.ivaUnitario,fel_facturas_detalle.ivaTotal,fel_facturas_detalle.totalDetalle,fel_facturas_detalle.totalDetalleIVA,inv_productos.productoId, inv_productos.producto,inv_productos.codigoProducto,cat_14_unidades_medida.unidadMedida')
+    ->join('inv_productos', 'inv_productos.productoId = fel_facturas_detalle.productoId')
+    ->join('cat_14_unidades_medida', 'cat_14_unidades_medida.unidadMedidaId = inv_productos.unidadMedidaId')
+    ->join('fel_facturas', 'fel_facturas.facturaId = fel_facturas_detalle.facturaId')
+    ->where('fel_facturas_detalle.flgElimina', 0)
+    ->where('fel_facturas_detalle.facturaId', $facturaId)
+    ->findAll();
+
+    $output['data'] = array();
+    $n = 1;
+
+    $subtotal = 0;
+    $ivaTotal = 0;
+    $totalAPagar = 0;
+    $descuentos = 0;
+
+    foreach ($datos as $columna) {
+        $columna1 = $n;
+        $conceptoTexto = !empty($columna['conceptoProducto']) ? "<br><b>Concepto :</b> " . $columna['producto'] . " ( " . $columna['conceptoProducto'] . " )" : "";
+        $columna2 = "<b>Producto:</b> " . $columna['producto'] . "<br><b>Código :</b> " . $columna['codigoProducto'] . $conceptoTexto;
+        $columna3 = "<b>sin IVA: </b> $" . number_format($columna['precioUnitario'], 2, '.', ',') . "<br><b>Con IVA: </b> $" . number_format($columna['precioUnitarioIVA'], 2, '.', ',');
+        $columna4 = "<b>Procentaje: </b> " . number_format($columna['porcentajeDescuento'], 2, '.', ',') . "%" . "<br><b>Total :</b> $" . number_format($columna['descuentoTotal'], 2, '.', ',');
+        $columna5 = "<b>Sin IVA: </b> $" . number_format($columna['precioUnitarioVenta'], 2, '.', ',') . "<br><b>Con IVA: </b> $" . number_format($columna['precioUnitarioVentaIVA'], 2, '.', ',');
+        $columna6 = " <b>Cantidad: </b> " . $columna['cantidadProducto'] . " (" . $columna['unidadMedida'] . ")";
+        $columna7 = "<b>unitario: </b> $" . number_format($columna['ivaUnitario'], 2, '.', ',') . "<br><b>total: </b> $" . number_format($columna['ivaTotal'], 2, '.', ',');
+        $columna8 = "<b>Sin IVA: </b> $" . number_format($columna['totalDetalle'], 2, '.', ',') . "<br><b>Con IVA: </b> $" . number_format($columna['totalDetalleIVA'], 2, '.', ',');
+
+        $columna9 = '
+            <button class="btn btn-primary mb-1" onclick="modalProductoDTE(' . $columna['facturaDetalleId'] . ', `editar`);" data-toggle="tooltip" data-placement="top" title="Editar" disabled>
+                <i class="fas fa-pen"></i>
+            </button>
+
+            <button class="btn btn-info mb-1" onclick="modalConceptoDTE(' . $columna['facturaDetalleId'] . ', `editar`);" data-toggle="tooltip" data-placement="top" title="Concepto" disabled>
+                <i class="fas fa-clipboard-list"></i>
+            </button>
+
+            <button class="btn btn-danger mb-1" onclick="eliminarDTE(' . $columna['facturaDetalleId'] . ');" data-toggle="tooltip" data-placement="top" title="Eliminar" disabled>
+                <i class="fas fa-trash"></i>
+            </button>
+        ';
+
+        $output['data'][] = array(
+            $columna1,
+            $columna2,
+            $columna3,
+            $columna4,
+            $columna5,
+            $columna6,
+            $columna7,
+            $columna8,
+            $columna9
+        );
+
+        $subtotal += $columna['totalDetalle'];
+        $ivaTotal += $columna['ivaTotal'];
+        $totalAPagar += $columna['totalDetalleIVA'];
+        $descuentos += ($columna['precioUnitario'] - $columna['precioUnitarioVenta']) * $columna['cantidadProducto'];
+
+        $n++;
+    }
+
+    $DTEPago = new fel_facturas_pago();
+    $pagosReserva = $DTEPago
+    ->select('COUNT(*) as numeroPagos, SUM(totalPago) as totalPagado')
+    ->where('facturaId', $facturaId)
+    ->where('flgElimina', 0)
+    ->first();
+
+    $numeroPagos = $pagosReserva['numeroPagos'];
+    $totalPagado = $pagosReserva['totalPagado'] ?? 0;
+
+    $totalPagadoClass = ($totalPagado < $totalAPagar) ? 'text-danger' : 'text-success';
+    $botonTexto = ($totalPagado < $totalAPagar) ? 'Pagos (' . $numeroPagos . ')' : 'Pagado';
+    $botonClase = ($totalPagado < $totalAPagar) ? 'btn-primary' : 'btn-success';
+
+    // Nueva consulta para contar los errores de certificación
+    $DTEErrores = new fel_facturas_certificacion_errores();
+    $erroresCertificacion = $DTEErrores
+    ->join('fel_factura_certificacion', 'fel_factura_certificacion.facturaCertificacionId = fel_facturas_certificacion_errores.facturaCertificacionId')
+    ->where('fel_factura_certificacion.facturaId', $facturaId)
+    ->countAllResults();
+
+    if ($n > 1) {
+        $output['footer'] = array(
+            '',
+            '',
+            ''
+        );
+
+        $output['footerTotales'] = '
+            <div class="row text-right">
+                <div class="col-8">
+                    <b> Subtotal (=) :</b>
+                </div>
+                <div class="col-4">
+                    $ ' . number_format($subtotal, 2, '.', ',') . '
+                </div>
+            </div>
+            <div class="row text-right">
+                <div class="col-8">
+                    <b>Descuentos (-) :</b>
+                </div>
+                <div class="col-4">
+                    $ ' . number_format($descuentos, 2, '.', ',') . '
+                </div>
+            </div>
+            <div class="row text-right">
+                <div class="col-8">
+                    <b>IVA (+) :</b>
+                </div>
+                <div class="col-4">
+                    $ ' . number_format($ivaTotal, 2, '.', ',') . '
+                </div>
+            </div>
+            <div class="row text-right">
+                <div class="col-8">
+                    <b>Total a pagar (=) :</b>
+                </div>
+                <div class="col-4">
+                    <b>$ ' . number_format($totalAPagar, 2, '.', ',') . ' </b>
+                </div>
+            </div>
+            <div class="row text-right">
+                <div class="col-8">
+                    <b>Total pagado:</b>
+                </div>
+                <div class="col-4">
+                    <b class="' . $totalPagadoClass . '">$ ' . number_format($totalPagado, 2, '.', ',') . ' </b>
+                </div>
+            </div>
+            <div class="row text-right">
+                <div class="col-12">
+                    <button type="button" class="btn ' . $botonClase . ' mb-1" onclick="modalPagoDTE(`' . $facturaId . '`, `editar`)" data-toggle="tooltip" data-placement="top" title="Pagos" disabled>
+                        <i class="fas fa-hand-holding-usd"></i> ' . $botonTexto . '
+                    </button>
+                </div>
+            </div>
+
+            <div class="row text-right">
+                <div class="col-4">
+                    <button type= "button" class="btn btn-primary mb-1" onclick="modalComplementoDTE(`' . $facturaId . '`, `editar`)" data-toggle="tooltip" data-placement="top" title="Complementos" disabled>
+                        <i class="fas fa-clipboard-list"></i> Complementos
+                    </button>
+                </div>
+                <div class="col-4">
+                    <button type= "button" class="btn btn-danger mb-1" onclick="modalErrorDTE(`' . $facturaId . '`)" data-toggle="tooltip" data-placement="top" title="Error de certificación" disabled>
+                        <i class="fas fa-ban"></i> Errores de certificación (' . $erroresCertificacion . ')
+                    </button>
+                </div>
+            </div>
+        ';
+        return $this->response->setJSON($output);
+    } else {
+        return $this->response->setJSON(array('data' => '', 'footer' => ''));
+    }
+}
+
 }
