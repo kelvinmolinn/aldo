@@ -310,7 +310,9 @@ $routes->group('ventas/admin-facturacion', function($routes) {
     $routes->post('tabla/error/dte', 'ventas\administracionFacturacion::tablaErrorDTE');
     $routes->post('operacion/invalidar/dte', 'ventas\administracionFacturacion::invalidarDTE');
     $routes->post('form/ver/dte', 'ventas\administracionFacturacion::modalVerDTE');
-     $routes->post('tabla/ver/dte', 'ventas\administracionFacturacion::tablaVerDTE');
+    $routes->post('tabla/ver/dte', 'ventas\administracionFacturacion::tablaVerDTE');
+    $routes->post('form/ver/json', 'ventas\administracionFacturacion::modalVerJSON');
+    $routes->post('tabla/ver/json', 'ventas\administracionFacturacion::tablaVerJSON');
 
 
 

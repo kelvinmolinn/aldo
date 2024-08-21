@@ -366,7 +366,7 @@ public function tablaFacturacion()
                     <i class="fas fa-file-alt"></i>
                 </button>
 
-                <button class="btn btn-info mb-1" onclick="modalVerReserva(`' . $columna['facturaId'] . '`);" data-toggle="tooltip" data-placement="top" title="Ver JSON">
+                <button class="btn btn-info mb-1" onclick="modalVerJSON(`' . $columna['facturaId'] . '`);" data-toggle="tooltip" data-placement="top" title="Ver JSON">
                     <i class="fas fa-file-code"></i><span> </span>
                 </button>
                 
@@ -2954,14 +2954,11 @@ public function tablaVerDTE(){
     }
 }
 
-public function verJSON(){
-    $data["facturaId"] = $this->request->getPost('facturaId');
+    public function modalverJSON(){
+        $data["facturaId"] = $this->request->getPost('facturaId');
 
-        return view('ventas/modals/modalVerJSON', $data);
-    }
+            return view('ventas/modals/modalVerJSON', $data);
+        }
 
     
-//xd
-//otro cambio para probar el git 
-
 }
