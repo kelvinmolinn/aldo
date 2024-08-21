@@ -2954,4 +2954,13 @@ public function tablaVerDTE(){
     }
 }
 
+public function verJSON(){
+    $data["facturaId"] = $this->request->getPost('facturaId');
+
+        return view('ventas/modals/modalVerJSON', $data);
+    }
+
+    
+
+
 }
