@@ -391,7 +391,7 @@ class administracionRetaceo extends Controller
 
         $compraRetaceo = $this->request->getPost('selectCompraRetaceo');
         $retaceoId = $this->request->getPost('retaceoId');
-
+//FF
 
         $compDetalle = $compraDetalle
         ->select("compraDetalleId,compraId,cantidadProducto,precioUnitario")
