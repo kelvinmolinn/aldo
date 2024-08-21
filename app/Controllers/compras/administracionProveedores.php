@@ -167,7 +167,46 @@ class administracionProveedores extends Controller
         
         $proveedor = new comp_proveedores();
 
+        $nrc                = $this->request->getPost('nrc');
+        $numDocumento       = $this->request->getPost('numeroDocumento');
+        $nombreProveedor    = $this->request->getPost('nombreProveedor');
+        
+        $errores = [];
 
+        // Verificar si ya existe un proveedor con el mismo nombre
+        $existeNombre = $proveedor->where('proveedor', $nombreProveedor)
+                                  ->where('proveedorId !=', $proveedorId) // Ignora el proveedor actual en caso de actualización
+                                  ->first();
+    
+        if ($existeNombre) {
+            $errores[] = 'Ya existe un proveedor con el mismo nombre.';
+        }
+    
+        // Verificar si ya existe un proveedor con el mismo NRC
+        $existeNRC = $proveedor->where('ncrProveedor', $nrc)
+                               ->where('proveedorId !=', $proveedorId) // Ignora el proveedor actual en caso de actualización
+                               ->first();
+    
+        if ($existeNRC) {
+            $errores[] = 'Ya existe un proveedor con el mismo NRC.';
+        }
+    
+        // Verificar si ya existe un proveedor con el mismo número de documento de identificación
+        $existeDocumento = $proveedor->where('numDocumentoIdentificacion', $numDocumento)
+                                     ->where('proveedorId !=', $proveedorId) // Ignora el proveedor actual en caso de actualización
+                                     ->first();
+    
+        if ($existeDocumento) {
+            $errores[] = 'Ya existe un proveedor con el mismo número de documento de identificación.';
+        }
+    
+        // Si existen errores, devolverlos en el mensaje de error
+        if (!empty($errores)) {
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => implode(' ', $errores) // Unimos los mensajes en un solo string
+            ]);
+        }
         $data = [
             'tipoProveedorOrigen'           => $this->request->getPost('selectTipoProveedor'),
             'tipoPersonaId'                 => $this->request->getPost('selectTipoPersona'),
