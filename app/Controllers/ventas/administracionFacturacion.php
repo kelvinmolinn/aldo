@@ -34,6 +34,8 @@ use App\Models\fel_facturas_certificacion_errores;
 use App\Models\fel_factura_certificacion;
 use App\Models\conf_empleados;
 use App\Models\cat_02_tipo_dte;
+use App\Models\fel_cliente_contacto;
+
 
 
 
@@ -369,7 +371,8 @@ public function tablaFacturacion()
                 <button class="btn btn-info mb-1" onclick="modalVerJSON(`' . $columna['facturaId'] . '`);" data-toggle="tooltip" data-placement="top" title="Ver JSON">
                     <i class="fas fa-file-code"></i><span> </span>
                 </button>
-                
+
+              
                 <button type="button" class="btn btn-danger mb-1" onclick="invalidarDTE(' . $columna['facturaId'] . ')" data-toggle="tooltip" data-placement="top" title="Invalidar DTE">
                     <i class="fas fa-ban"></i>
                 </button>';
@@ -2960,5 +2963,93 @@ public function tablaVerDTE(){
             return view('ventas/modals/modalVerJSON', $data);
         }
 
-    
+public function tablaVerJSON() {
+    $facturaId = $this->request->getPost('facturaId');
+
+    // Modelos para realizar las consultas
+    $certificacionModel = new fel_factura_certificacion();
+    $clienteModel = new fel_clientes();
+    $contactoModel = new fel_cliente_contacto();
+    $detalleModel = new fel_facturas_detalle();
+
+    // Obtener datos de la certificación
+    $certificacion = $certificacionModel
+        ->select('numeroControl, codigoGeneracion, tipoTransmisionMHId, fhAgrega, selloRecibido')
+        ->where('facturaId', $facturaId)
+        ->first();
+
+    // Verificar si se encontró la certificación
+    if (!$certificacion) {
+        return $this->response->setJSON(['error' => 'No se encontró la certificación'], 404);
+    }
+
+    // Obtener datos del cliente (receptor)
+    $cliente = $clienteModel
+        ->select('clienteId, numDocumentoIdentificacion, cliente, direccionCliente, actividadEconomicaId')
+        ->where('clienteId', function($query) use ($facturaId) {
+            $query->select('clienteId')
+                  ->from('fel_facturas')
+                  ->where('facturaId', $facturaId)
+                  ->limit(1);
+        })
+        ->first();
+
+    // Obtener datos de contacto del cliente
+    $contacto = $contactoModel
+        ->select('contactoCliente')
+        ->where('clienteId', $cliente['clienteId'])
+        ->first();
+
+    // Obtener detalles de la factura (cuerpo del documento)
+    $detalles = $detalleModel
+        ->select('cantidadProducto, codigoProducto, tipoItemMHId, precioUnitario, precioUnitarioIVA, ivaTotal, precioUnitarioVenta, totalDetalleIVA')
+        ->where('facturaId', $facturaId)
+        ->findAll();
+
+    // Construir el JSON
+    $data = [
+        "identificacion" => [
+            "version" => 1,
+            "ambiente" => "01",
+            "tipoDte" => "01",
+            "numeroControl" => $certificacion['numeroControl'],
+            "codigoGeneracion" => strtoupper($certificacion['codigoGeneracion']),
+            "tipoModelo" => 1,
+            "tipoOperacion" => 1,
+            "tipoContingencia" => null,
+            "motivoContin" => null,
+            "fecEmi" => date('Y-m-d', strtotime($certificacion['fhAgrega'])),
+            "horEmi" => date('H:i:s', strtotime($certificacion['fhAgrega'])),
+            "tipoMoneda" => "USD"
+        ],
+        "receptor" => [
+            "tipoDocumento" => "36",
+            "numDocumento" => $cliente['numDocumentoIdentificacion'],
+            "nombre" => $cliente['cliente'],
+            "codActividad" => $cliente['actividadEconomicaId'],
+            "direccion" => [
+                "departamento" => "11",  
+                "municipio" => "21",
+                "complemento" => $cliente['direccionCliente']
+            ],
+            "telefono" => $contacto['contactoCliente'],
+            
+        ],
+        "cuerpoDocumento" => array_map(function($detalle) {
+            return [
+                "cantidad" => $detalle['cantidadProducto'],
+                "codigo" => $detalle['codigoProducto'],
+                "tipoItem" => $detalle['tipoItemMHId'],
+                "descripcion" => 0,
+                "precioUni" => $detalle['precioUnitario'],
+                "ventaGravada" => $detalle['totalDetalleIVA'],
+                "ivaItem" => $detalle['ivaTotal']
+            ];
+        }, $detalles)
+    ];
+
+    return $this->response->setJSON($data);
+}
+
+
 }

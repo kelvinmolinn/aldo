@@ -103,6 +103,8 @@
                     $('#divModalContent').html(response);
                     // Mostrar la modal
                     $('#modalVerJSON').modal('show');
+                 
+
                     
                 },
             error: function(xhr, status, error) {
