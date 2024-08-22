@@ -360,7 +360,7 @@ public function tablaFacturacion()
                     <i class="fas fa-eye"></i><span> </span>
                 </button>
 
-                <button type="button" class="btn btn-primary mb-1" onclick="modalImprimirDTE()" data-toggle="tooltip" data-placement="top" title="Imprimir DTE">
+                <button type="button" class="btn btn-primary mb-1" onclick="modalImprimirDTE('. $columna['facturaId'] .')" data-toggle="tooltip" data-placement="top" title="Imprimir DTE">
                     <i class="fas fa-print"></i>
                 </button>
 

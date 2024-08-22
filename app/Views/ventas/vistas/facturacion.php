@@ -146,26 +146,29 @@
             });
         }
 
-
-    function modalImprimirDTE() {
-        // Realizar una petición AJAX para obtener los datos del módulo por su ID
+    function modalImprimirDTE(facturaId) {
         $.ajax({
-                url: '<?php echo base_url('ventas/admin-facturacion/form/imprimir/dte'); ?>',
-                type: 'POST',
-                data: {}, // Pasar el ID del módulo como parámetro
-                success: function(response) {
-                    // Insertar el contenido de la modal en el cuerpo de la modal
-                    $('#divModalContent').html(response);
-                    // Mostrar la modal
-                    $('#modalImprimirDTE').modal('show');
-                    
-                },
+            url: '<?php echo base_url('ventas/admin-facturacion/form/imprimir/dte'); ?>',
+            type: 'POST',
+            data: { facturaId: facturaId }, // Pasar el ID de la factura como parámetro
+            success: function(response) {
+                // Insertar el contenido de la modal en el cuerpo de la modal
+                $('#divModalContent').html(response);
+
+                // Asumimos que el modal ya tiene un iframe con el ID `pdfFrame`
+                var pdfUrl = '<?php echo base_url("ventas/admin-facturacion/pdf/generate"); ?>' + '?facturaId=' + facturaId;
+                $('#pdfFrame').attr('src', pdfUrl);
+
+                // Mostrar la modal
+                $('#modalImprimirDTE').modal('show');
+            },
             error: function(xhr, status, error) {
                 // Manejar errores si los hay
                 console.error(xhr.responseText);
             }
         });
     }
+
     function  invalidarDTE(facturaId) {
         //alert("Vamos a certificar " + id);
             Swal.fire({

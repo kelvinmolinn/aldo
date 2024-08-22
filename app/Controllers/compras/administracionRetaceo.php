@@ -376,9 +376,9 @@ class administracionRetaceo extends Controller
     public function modalAgregarDAI(){
         $data['variable'] = 0;
 
-        $data['numDocumento']   = $this->request->getPost('numDocumento');
-        $data['codigoProducto'] = $this->request->getPost('codigoProducto');
-        $data['producto']       = $this->request->getPost('producto');
+        $data['numDocumento']           = $this->request->getPost('numDocumento');
+        $data['codigoProducto']         = $this->request->getPost('codigoProducto');
+        $data['producto']               = $this->request->getPost('producto');
         $data['retaceoDetalleId']       = $this->request->getPost('retaceoDetalleId');
 
         return view('compras/modals/modalAgregarDAI', $data);
