@@ -1,4 +1,4 @@
-<form id="frmModal" method="post" action="<?php echo base_url(''); ?>">
+<form id="frmModal" method="post" action="<?php echo base_url('ventas/admin-facturacion/pdf/generate'); ?>">
     <div id="modalImprimirDTE" class="modal" tabindex="-1" data-backdrop="static" data-keyboard="false">
         <div class="modal-dialog  modal-xl">
             <div class="modal-content">
@@ -7,53 +7,11 @@
                 </div>
                 <div class="modal-body">
                     <div class="row mb-4">
-                        
+                        <button type= "submit" id="btnPDF" class="btn btn-primary estilo-btn mb-4">
+                            <i class="fas fa-save"></i>
+                                PDF
+                        </button>
                     </div>
-                    <div class="row mb-4">
-                        
-                    </div> 
-                    <div class="row mb-4">
-                        
-                    </div>
-                    <div class="row mb-4">
-                    </div>
-                    <div class="row mb-4">
-                    </div> 
-                    <div class="row mb-4">
-                    </div>      
-                    <div class="row mb-4">
-                    </div> 
-                    <div class="row mb-4">
-                    </div> 
-                    <div class="row mb-4">
-                    </div> 
-                    <div class="row mb-4">
-                    </div> 
-                    <div class="row mb-4">
-                    </div> 
-                    <div class="row mb-4">
-                    </div> 
-                    <div class="row mb-4">
-                    </div> 
-                    <div class="row mb-4">
-                    </div> 
-                    <div class="row mb-4">
-                    </div> 
-                    <div class="row mb-4">
-                    </div> 
-                    <div class="row mb-4">
-                    </div> 
-                    <div class="row mb-4">
-                    </div> 
-                    <div class="row mb-4">
-                    </div> 
-                    <div class="row mb-4">
-                    </div> 
-                    <div class="row mb-4">
-                    </div> 
-                    <div class="row mb-4">
-                    </div> 
-
                              
                 </div>
                 
@@ -70,14 +28,6 @@
 
 <script>
     $(document).ready(function() {
-        $("#selectSucursal").select2({
-            placeholder: "Sucursal",
-            dropdownParent: $('#modalImprimirDTE')
-        });
-        $("#selectDTEImprimir").select2({
-            placeholder: "DTE a imprimir",
-            dropdownParent: $('#modalImprimirDTE')
-        });
 
     });
 </script>

@@ -166,7 +166,7 @@
             }
         });
     }
-            function  invalidarDTE(facturaId) {
+    function  invalidarDTE(facturaId) {
         //alert("Vamos a certificar " + id);
             Swal.fire({
                 title: '¿Estás seguro que desea invalidar el DTE?',
