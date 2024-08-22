@@ -3017,7 +3017,7 @@ public function tablaVerJSON() {
     $data = [
         "identificacion"        => [
             "version"           => 1,
-            "ambiente"          => "01",
+            "ambiente"          => "0",
             "tipoDte"           => $factura['tipoDTEId'], // tipoDTEId de la tabla fel_facturas
             "numeroControl"     => $certificacion['numeroControl'],
             "codigoGeneracion"  => strtoupper($certificacion['codigoGeneracion']),
@@ -3046,29 +3046,29 @@ public function tablaVerJSON() {
             
         ],
         "receptor" => [
-            "tipoDocumento"     => $cliente['documentoIdentificacionId'],
-            "numDocumento"      => $cliente['numDocumentoIdentificacion'],
-            "nombre"            => $cliente['cliente'],
-            "codActividad"      => $cliente['actividadEconomicaId'],
-            "direccion"         => [
-                "departamento"  => $cliente['paisCiudadId'],  
-                "municipio"     => $cliente['paisEstadoId'],
-                "complemento"   => $cliente['direccionCliente']
+            "tipoDocumento"         => $cliente['documentoIdentificacionId'],
+            "numDocumento"          => $cliente['numDocumentoIdentificacion'],
+            "nombre"                => $cliente['cliente'],
+            "codActividad"          => $cliente['actividadEconomicaId'],
+            "direccion"             => [
+                "departamento"      => $cliente['paisCiudadId'],  
+                "municipio"         => $cliente['paisEstadoId'],
+                "complemento"       => $cliente['direccionCliente']
             ],
-            "telefono"          => $contacto['contactoCliente'],
-            
+            "telefono"              => $contacto['contactoCliente'],
+            "correo"                => $contacto['contactoCliente'],
         ],
-        "cuerpoDocumento"       => array_map(function($detalle) {
+        "cuerpoDocumento"           => array_map(function($detalle) {
             return [
-                "cantidad"      => $detalle['cantidadProducto'],
-                "numeroDocumento"=> null,
-                "codigo"        => $detalle['codigoProducto'],
-                "tipoItem"      => $detalle['tipoItemMHId'],
-                "descripcion"   => 0,
-                "precioUni"     => $detalle['precioUnitario'],
-                "montoDescu"    => $detalle['descuentoTotal'],
-                "ventaGravada"  => $detalle['totalDetalleIVA'],
-                "ivaItem"       => $detalle['ivaTotal']
+                "cantidad"          => $detalle['cantidadProducto'],
+                "numeroDocumento"   => null,
+                "codigo"            => $detalle['codigoProducto'],
+                "tipoItem"          => $detalle['tipoItemMHId'],
+                "descripcion"       => 0,
+                "precioUni"         => $detalle['precioUnitario'],
+                "montoDescu"        => $detalle['descuentoTotal'],
+                "ventaGravada"      => $detalle['totalDetalleIVA'],
+                "ivaItem"           => $detalle['ivaTotal']
             ];
         }, $detalles)
     ];
