@@ -3,6 +3,8 @@
 namespace App\Controllers\ventas\Reportes;
 require_once(APPPATH . 'Libraries/fpdf/fpdf.php');
 
+use App\Models\fel_factura_certificacion;
+
 use CodeIgniter\Controller;
 use FPDF;
 
@@ -44,10 +46,25 @@ class indexReporte extends Controller
 
     public function generate(){
 
-        
+        $facturaCertificacion = new fel_factura_certificacion();
 
         $pdf = new PDF();
 
+        $facturaId = isset($_GET['facturaId']) ? intval($_GET['facturaId']) : 0;
+
+        $datosDte = $facturaCertificacion
+            ->select('DATE_FORMAT(fel_facturas.fechaEmision, "%d-%m-%Y") as fechaEmision ,fel_facturas.horaEmision,fel_factura_certificacion.numeroControl,fel_factura_certificacion.codigoGeneracion,fel_factura_certificacion.selloRecibido')
+            ->join('fel_facturas','fel_facturas.facturaId = fel_factura_certificacion.facturaId')
+            ->where('fel_factura_certificacion.flgElimina', 0)
+            ->where('fel_factura_certificacion.facturaId', $facturaId)
+            ->where('fel_factura_certificacion.estadoCertificacion','Certificado')
+            ->first();
+
+        $codGeneracion = $datosDte['codigoGeneracion'];
+        $numControl = $datosDte['numeroControl'];
+        $sello = $datosDte['selloRecibido'];
+        $fechaEmision = $datosDte['fechaEmision'];
+        $horaEmision = $datosDte['horaEmision'];
         //$x = 100;
         //$xx = 131;
         // Agregar una página
@@ -61,7 +78,7 @@ class indexReporte extends Controller
         $pdf->Cell(190,10,utf8_decode('Código de generación: '),0,0,'L');
         $pdf->SetFont('Arial', '', 8);
         $pdf->SetX(131);
-        $pdf->Cell(190,10,utf8_decode('8929B407-1C01-4165-93EA-1349074AE05F'),0,0,'L');
+        $pdf->Cell(190,10,utf8_decode($codGeneracion),0,0,'L');
         
         $pdf->SetY(15);
         $pdf->SetX(100);
@@ -70,7 +87,7 @@ class indexReporte extends Controller
         $pdf->Cell(190,10,utf8_decode('Sello recepción: '),0,0,'L');
         $pdf->SetFont('Arial', '', 8);
         $pdf->SetX(131);
-        $pdf->Cell(190,10,utf8_decode('2024491690B8E8FA498C82DB72A28E4FC6C1ZLTO'),0,0,'L');
+        $pdf->Cell(190,10,utf8_decode($sello),0,0,'L');
 
         $pdf->SetY(18);
         $pdf->SetX(100);
@@ -79,7 +96,7 @@ class indexReporte extends Controller
         $pdf->Cell(190,10,utf8_decode('Número de control: '),0,0,'L');
         $pdf->SetFont('Arial', '', 8);
         $pdf->SetX(131);
-        $pdf->Cell(190,10,utf8_decode('DTE-01-B001P001-000000000000001'),0,0,'L');
+        $pdf->Cell(190,10,utf8_decode($numControl),0,0,'L');
 
         $pdf->SetY(21);
         $pdf->SetX(100);
@@ -88,9 +105,18 @@ class indexReporte extends Controller
         $pdf->Cell(190,10,utf8_decode('Fecha de emisión: '),0,0,'L');
         $pdf->SetFont('Arial', '', 8);
         $pdf->SetX(131);
-        $pdf->Cell(190,10,utf8_decode('26/07/2024'),0,0,'L');
+        $pdf->Cell(190,10,utf8_decode($fechaEmision),0,0,'L');
 
         $pdf->SetY(24);
+        $pdf->SetX(100);
+
+        $pdf->SetFont('Arial', 'B', 8);
+        $pdf->Cell(190,10,utf8_decode('Hora de emisión: '),0,0,'L');
+        $pdf->SetFont('Arial', '', 8);
+        $pdf->SetX(131);
+        $pdf->Cell(190,10,utf8_decode($horaEmision),0,0,'L');
+
+        $pdf->SetY(27);
         $pdf->SetX(100);
 
         $pdf->SetFont('Arial', 'B', 8);
@@ -99,7 +125,7 @@ class indexReporte extends Controller
         $pdf->SetX(131);
         $pdf->Cell(190,10,utf8_decode('Normal'),0,0,'L');
 
-        $pdf->SetY(27);
+        $pdf->SetY(30);
         $pdf->SetX(100);
 
         $pdf->SetFont('Arial', 'B', 8);
@@ -107,7 +133,6 @@ class indexReporte extends Controller
         $pdf->SetFont('Arial', '', 8);
         $pdf->SetX(131);
         $pdf->Cell(190,10,utf8_decode('Billetes y monedas'),0,0,'L');
-
 
         $pdf->SetFont('Arial', 'B', 8);
         $pdf->SetY(12);
