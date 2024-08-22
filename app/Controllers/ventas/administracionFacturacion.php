@@ -2967,10 +2967,17 @@ public function tablaVerJSON() {
     $facturaId = $this->request->getPost('facturaId');
 
     // Modelos para realizar las consultas
+    $facturaModel = new fel_facturas();  // Modelo para la tabla fel_facturas
     $certificacionModel = new fel_factura_certificacion();
     $clienteModel = new fel_clientes();
     $contactoModel = new fel_cliente_contacto();
     $detalleModel = new fel_facturas_detalle();
+
+        // Obtener datos de la factura
+        $factura = $facturaModel
+        ->select('tipoDTEId, fechaEmision, horaEmision')
+        ->where('facturaId', $facturaId)
+        ->first();
 
     // Obtener datos de la certificación
     $certificacion = $certificacionModel
@@ -2985,7 +2992,7 @@ public function tablaVerJSON() {
 
     // Obtener datos del cliente (receptor)
     $cliente = $clienteModel
-        ->select('clienteId, numDocumentoIdentificacion, cliente, direccionCliente, actividadEconomicaId')
+        ->select('clienteId,tipoPersonaId,nrcCliente,documentoIdentificacionId,clienteComercial, numDocumentoIdentificacion, cliente, direccionCliente, actividadEconomicaId,tipoContribuyenteId,paisId,paisCiudadId,paisEstadoId')
         ->where('clienteId', function($query) use ($facturaId) {
             $query->select('clienteId')
                   ->from('fel_facturas')
@@ -3002,48 +3009,66 @@ public function tablaVerJSON() {
 
     // Obtener detalles de la factura (cuerpo del documento)
     $detalles = $detalleModel
-        ->select('cantidadProducto, codigoProducto, tipoItemMHId, precioUnitario, precioUnitarioIVA, ivaTotal, precioUnitarioVenta, totalDetalleIVA')
+        ->select('cantidadProducto, codigoProducto,porcentajeDescuento,descuentoTotal, tipoItemMHId, precioUnitario, precioUnitarioIVA, ivaTotal, precioUnitarioVenta, totalDetalleIVA')
         ->where('facturaId', $facturaId)
         ->findAll();
 
     // Construir el JSON
     $data = [
-        "identificacion" => [
-            "version" => 1,
-            "ambiente" => "01",
-            "tipoDte" => "01",
-            "numeroControl" => $certificacion['numeroControl'],
-            "codigoGeneracion" => strtoupper($certificacion['codigoGeneracion']),
-            "tipoModelo" => 1,
-            "tipoOperacion" => 1,
-            "tipoContingencia" => null,
-            "motivoContin" => null,
-            "fecEmi" => date('Y-m-d', strtotime($certificacion['fhAgrega'])),
-            "horEmi" => date('H:i:s', strtotime($certificacion['fhAgrega'])),
-            "tipoMoneda" => "USD"
+        "identificacion"        => [
+            "version"           => 1,
+            "ambiente"          => "01",
+            "tipoDte"           => $factura['tipoDTEId'], // tipoDTEId de la tabla fel_facturas
+            "numeroControl"     => $certificacion['numeroControl'],
+            "codigoGeneracion"  => strtoupper($certificacion['codigoGeneracion']),
+            "tipoModelo"        => 1,
+            "tipoOperacion"     => 1,
+            "tipoContingencia"  => null,
+            "motivoContin"      => null,
+            "fecEmi"            => date('Y-m-d', strtotime($certificacion['fhAgrega'])),
+            "horEmi"            => date('H:i:s', strtotime($certificacion['fhAgrega'])),
+            "tipoMoneda"        => "USD"
         ],
-        "receptor" => [
-            "tipoDocumento" => "36",
-            "numDocumento" => $cliente['numDocumentoIdentificacion'],
-            "nombre" => $cliente['cliente'],
-            "codActividad" => $cliente['actividadEconomicaId'],
-            "direccion" => [
-                "departamento" => "11",  
-                "municipio" => "21",
-                "complemento" => $cliente['direccionCliente']
+        "emisor" => [
+            "nit"               => "03863624-1",
+            "nrc"               => "329956-5",
+            "nombre"            => "BELTRAN. ABIGAIL ELIZABETH",
+            "codActividad"      => 502,
+            "descActividad"     =>"VENTA AL POR MENOR DE OTROS PRODUCTOS N.C.P",
+            "nombreComercial"   =>"ALDO GAMES STORE",
+            "direccion"         => [
+                "departamento"  => 6,  
+                "municipio"     => 214,
+                "complemento"   => "POLIG. B, RES. LOS ELISEOS #9, SAN SALVADOR, SAN SALVADOR"
             ],
-            "telefono" => $contacto['contactoCliente'],
+            "telefono"          => "79221469",
+            "correo"          => "aldogamesstore@gmail.com",
             
         ],
-        "cuerpoDocumento" => array_map(function($detalle) {
+        "receptor" => [
+            "tipoDocumento"     => $cliente['documentoIdentificacionId'],
+            "numDocumento"      => $cliente['numDocumentoIdentificacion'],
+            "nombre"            => $cliente['cliente'],
+            "codActividad"      => $cliente['actividadEconomicaId'],
+            "direccion"         => [
+                "departamento"  => $cliente['paisCiudadId'],  
+                "municipio"     => $cliente['paisEstadoId'],
+                "complemento"   => $cliente['direccionCliente']
+            ],
+            "telefono"          => $contacto['contactoCliente'],
+            
+        ],
+        "cuerpoDocumento"       => array_map(function($detalle) {
             return [
-                "cantidad" => $detalle['cantidadProducto'],
-                "codigo" => $detalle['codigoProducto'],
-                "tipoItem" => $detalle['tipoItemMHId'],
-                "descripcion" => 0,
-                "precioUni" => $detalle['precioUnitario'],
-                "ventaGravada" => $detalle['totalDetalleIVA'],
-                "ivaItem" => $detalle['ivaTotal']
+                "cantidad"      => $detalle['cantidadProducto'],
+                "numeroDocumento"=> null,
+                "codigo"        => $detalle['codigoProducto'],
+                "tipoItem"      => $detalle['tipoItemMHId'],
+                "descripcion"   => 0,
+                "precioUni"     => $detalle['precioUnitario'],
+                "montoDescu"    => $detalle['descuentoTotal'],
+                "ventaGravada"  => $detalle['totalDetalleIVA'],
+                "ivaItem"       => $detalle['ivaTotal']
             ];
         }, $detalles)
     ];

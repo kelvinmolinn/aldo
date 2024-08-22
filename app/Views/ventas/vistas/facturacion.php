@@ -103,9 +103,6 @@
                     $('#divModalContent').html(response);
                     // Mostrar la modal
                     $('#modalVerJSON').modal('show');
-                 
-
-                    
                 },
             error: function(xhr, status, error) {
                 // Manejar errores si los hay
@@ -132,7 +129,22 @@
             }
         });
     }
-
+    function cargarJSON(facturaId) {
+            $.ajax({
+                url: '<?php echo base_url('ventas/admin-facturacion/tabla/ver/json'); ?>', // URL correcta
+                type: 'POST',
+                data: { facturaId: facturaId }, // Enviar el facturaId como parámetro
+                success: function(response) {
+                    // Formatear y mostrar el JSON en el modal
+                    $('#jsonContent').text(JSON.stringify(response, null, 4));
+                    //$('#modalVerJSON').modal('show');
+                },
+                error: function(xhr, status, error) {
+                    // Manejar errores si los hay
+                    console.error('Error al cargar el JSON:', xhr.responseText);
+                }
+            });
+        }
 
 
     function modalImprimirDTE() {
