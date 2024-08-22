@@ -3042,7 +3042,7 @@ public function tablaVerJSON() {
                 "complemento"   => "POLIG. B, RES. LOS ELISEOS #9, SAN SALVADOR, SAN SALVADOR"
             ],
             "telefono"          => "79221469",
-            "correo"          => "aldogamesstore@gmail.com",
+            "correo"            => "aldogamesstore@gmail.com",
             
         ],
         "receptor" => [
