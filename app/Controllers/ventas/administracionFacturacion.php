@@ -273,7 +273,7 @@ public function tablaFacturacion()
     $facturaId = $this->request->getPost('facturaId');
     $mostrarDTE = new fel_facturas();
     $datos = $mostrarDTE
-        ->select('fel_facturas.facturaId, fel_facturas.fechaEmision, fel_facturas.obsAnulacion, fel_facturas.estadoFactura, 
+        ->select('fel_facturas.facturaId, DATE_FORMAT(fel_facturas.fechaEmision, "%d/%m/%Y") as fechaEmision, fel_facturas.obsAnulacion, fel_facturas.estadoFactura, 
                   conf_sucursales.sucursalId, conf_sucursales.sucursal, 
                   fel_clientes.clienteId, fel_clientes.cliente, fel_clientes.nrcCliente, fel_clientes.numDocumentoIdentificacion, fel_clientes.direccionCliente, 
                   conf_empleados.empleadoId, conf_empleados.primerNombre, conf_empleados.primerApellido, 
