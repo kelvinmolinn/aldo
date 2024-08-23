@@ -2963,6 +2963,7 @@ public function tablaVerDTE(){
             return view('ventas/modals/modalVerJSON', $data);
         }
 
+/*
 public function tablaVerJSON() {
     $facturaId = $this->request->getPost('facturaId');
 
@@ -2973,8 +2974,138 @@ public function tablaVerJSON() {
     $contactoModel = new fel_cliente_contacto();
     $detalleModel = new fel_facturas_detalle();
 
-        // Obtener datos de la factura
-        $factura = $facturaModel
+    // Obtener datos de la factura
+    $factura = $facturaModel
+        ->select('tipoDTEId, fechaEmision, horaEmision')
+        ->where('facturaId', $facturaId)
+        ->first();
+
+    // Obtener datos de la certificación
+    $certificacion = $certificacionModel
+        ->select('numeroControl, codigoGeneracion, tipoTransmisionMHId, fhAgrega, selloRecibido')
+        ->where('facturaId', $facturaId)
+        ->first();
+
+    // Verificar si se encontró la certificación
+    if (!$certificacion) {
+        return $this->response->setJSON(['error' => 'No se encontró la certificación'], 404);
+    }
+
+    // Obtener datos del cliente (receptor)
+    $cliente = $clienteModel
+        ->select('clienteId, tipoPersonaId, nrcCliente, documentoIdentificacionId, clienteComercial, numDocumentoIdentificacion, cliente, direccionCliente, actividadEconomicaId, tipoContribuyenteId, paisId, paisCiudadId, paisEstadoId')
+        ->where('clienteId', function($query) use ($facturaId) {
+            $query->select('clienteId')
+                  ->from('fel_facturas')
+                  ->where('facturaId', $facturaId)
+                  ->limit(1);
+        })
+        ->first();
+
+    // Obtener el teléfono del cliente (tipoContactoId = 1)
+    $telefono = $contactoModel
+        ->select('contactoCliente')
+        ->where('clienteId', $cliente['clienteId'])
+        ->where('tipoContactoId', 1)
+        ->first();
+
+    // Obtener el correo electrónico del cliente (tipoContactoId = 2)
+    $correo = $contactoModel
+        ->select('contactoCliente')
+        ->where('clienteId', $cliente['clienteId'])
+        ->where('tipoContactoId', 2)
+        ->first();
+
+    // Obtener detalles de la factura (cuerpo del documento) con JOIN a la tabla inv_productos
+    $detalles = $detalleModel
+        ->select('fel_facturas_detalle.cantidadProducto, fel_facturas_detalle.codigoProducto, fel_facturas_detalle.porcentajeDescuento, fel_facturas_detalle.descuentoTotal, fel_facturas_detalle.tipoItemMHId, fel_facturas_detalle.precioUnitario, fel_facturas_detalle.precioUnitarioIVA, fel_facturas_detalle.ivaTotal,fel_facturas_detalle.ivaUnitario, fel_facturas_detalle.precioUnitarioVenta, fel_facturas_detalle.totalDetalleIVA, inv_productos.producto, inv_productos.descripcionProducto, inv_productos.unidadMedidaId')
+        ->join('inv_productos', 'inv_productos.productoId = fel_facturas_detalle.productoId')
+        ->where('fel_facturas_detalle.facturaId', $facturaId)
+        ->findAll();
+
+
+    // Construir el JSON
+    $data = [
+        "identificacion" => [
+            "version" => 1,
+            "ambiente" => "0",
+            "tipoDte" => $factura['tipoDTEId'], // tipoDTEId de la tabla fel_facturas
+            "numeroControl" => $certificacion['numeroControl'],
+            "codigoGeneracion" => strtoupper($certificacion['codigoGeneracion']),
+            "tipoModelo" => 1,
+            "tipoOperacion" => 1,
+            "tipoContingencia" => null,
+            "motivoContin" => null,
+            "fecEmi" => date('Y-m-d', strtotime($certificacion['fhAgrega'])),
+            "horEmi" => date('H:i:s', strtotime($certificacion['fhAgrega'])),
+            "tipoMoneda" => "USD"
+        ],
+        "emisor" => [
+            "nit" => "03863624-1",
+            "nrc" => "329956-5",
+            "nombre" => "BELTRAN. ABIGAIL ELIZABETH",
+            "codActividad" => 502,
+            "descActividad" => "VENTA AL POR MENOR DE OTROS PRODUCTOS N.C.P",
+            "nombreComercial" => "ALDO GAMES STORE",
+            "direccion" => [
+                "departamento" => 6,  
+                "municipio" => 214,
+                "complemento" => "POLIG. B, RES. LOS ELISEOS #9, SAN SALVADOR, SAN SALVADOR"
+            ],
+            "telefono" => "79221469",
+            "correo" => "aldogamesstore@gmail.com"
+        ],
+        "receptor" => [
+            "tipoDocumento" => $cliente['documentoIdentificacionId'],
+            "numDocumento" => $cliente['numDocumentoIdentificacion'],
+            "nombre" => $cliente['cliente'],
+            "codActividad" => $cliente['actividadEconomicaId'],
+            "direccion" => [
+                "departamento" => $cliente['paisCiudadId'],  
+                "municipio" => $cliente['paisEstadoId'],
+                "complemento" => $cliente['direccionCliente']
+            ],
+            "telefono" => $telefono ? $telefono['contactoCliente'] : null,
+            "correo" => $correo ? $correo['contactoCliente'] : null,
+        ],
+        "cuerpoDocumento" => array_map(function($detalle) {
+            return [
+                "cantidad" => $detalle['cantidadProducto'],
+                "numeroDocumento" => null,
+                "codigo" => $detalle['codigoProducto'],
+                "codTributo" => null,
+                "tipoItem" => $detalle['tipoItemMHId'],
+                "uniMedida" => $detalle['unidadMedidaId'],
+                "descripcion" => $detalle['producto'],
+                "precioUni" => $detalle['precioUnitario'],
+                "montoDescu" => $detalle['descuentoTotal'],
+                "ventaNoSuj" => 0,
+                "ventaExenta" => 0,
+                "ventaGravada" => $detalle['totalDetalleIVA'],
+                "tributo" => null,
+                "ivaItem" => $detalle['ivaUnitario']
+            ];
+        }, $detalles)
+    ];
+
+    return $this->response->setJSON($data);
+}
+
+*/
+/*
+public function tablaVerJSON() {
+    $facturaId = $this->request->getPost('facturaId');
+
+    // Modelos para realizar las consultas
+    $facturaModel = new fel_facturas();
+    $certificacionModel = new fel_factura_certificacion();
+    $clienteModel = new fel_clientes();
+    $contactoModel = new fel_cliente_contacto();
+    $detalleModel = new fel_facturas_detalle();
+    $pagoModel = new fel_facturas_pago();  // Nuevo modelo para pagos
+
+    // Obtener datos de la factura
+    $factura = $facturaModel
         ->select('tipoDTEId, fechaEmision, horaEmision')
         ->where('facturaId', $facturaId)
         ->first();
@@ -3002,79 +3133,445 @@ public function tablaVerJSON() {
         ->first();
 
     // Obtener datos de contacto del cliente
-    $contacto = $contactoModel
-        ->select('contactoCliente')
+    $contactos = $contactoModel
+        ->select('tipoContactoId, contactoCliente')
         ->where('clienteId', $cliente['clienteId'])
-        ->first();
+        ->findAll();
+
+    $telefono = null;
+    $correo = null;
+    foreach ($contactos as $contacto) {
+        if ($contacto['tipoContactoId'] == 1) {
+            $telefono = $contacto['contactoCliente'];
+        } elseif ($contacto['tipoContactoId'] == 2) {
+            $correo = $contacto['contactoCliente'];
+        }
+    }
 
     // Obtener detalles de la factura (cuerpo del documento)
     $detalles = $detalleModel
-        ->select('cantidadProducto, codigoProducto,porcentajeDescuento,descuentoTotal, tipoItemMHId, precioUnitario, precioUnitarioIVA, ivaTotal, precioUnitarioVenta, totalDetalleIVA')
+        ->select('cantidadProducto, codigoProducto, porcentajeDescuento, descuentoTotal, tipoItemMHId, precioUnitario, precioUnitarioIVA, ivaTotal, precioUnitarioVenta, totalDetalle, totalDetalleIVA')
         ->where('facturaId', $facturaId)
         ->findAll();
 
+    // Calcular los totales del resumen
+    $totalGravada = 0;
+    $totalIva = 0;
+    $totalDescu = 0;
+    $porcentajeDescuento = 0;
+
+    foreach ($detalles as $detalle) {
+        $totalGravada += $detalle['totalDetalle'];
+        $totalIva += $detalle['ivaTotal'];
+        $totalDescu += $detalle['descuentoTotal'];
+    }
+
+    // Calcular porcentaje de descuento
+    if ($totalGravada > 0) {
+        $porcentajeDescuento = ($totalDescu / $totalGravada) * 100;
+    }
+
+    // Obtener pagos
+    $pagos = $pagoModel
+        ->select('formaPagoMHId as codigo, totalPago as montoPago')
+        ->where('facturaId', $facturaId)
+        ->findAll();
+
+    $pagosData = array_map(function($pago) {
+        return [
+            "codigo" => $pago['codigo'],
+            "montoPago" => number_format($pago['montoPago'], 2, '.', ','),
+            "referencia" => null,
+            "plazo" => "01",
+            "periodo" => null
+        ];
+    }, $pagos);
+
     // Construir el JSON
     $data = [
-        "identificacion"        => [
-            "version"           => 1,
-            "ambiente"          => "0",
-            "tipoDte"           => $factura['tipoDTEId'], // tipoDTEId de la tabla fel_facturas
-            "numeroControl"     => $certificacion['numeroControl'],
-            "codigoGeneracion"  => strtoupper($certificacion['codigoGeneracion']),
-            "tipoModelo"        => 1,
-            "tipoOperacion"     => 1,
-            "tipoContingencia"  => null,
-            "motivoContin"      => null,
-            "fecEmi"            => date('Y-m-d', strtotime($certificacion['fhAgrega'])),
-            "horEmi"            => date('H:i:s', strtotime($certificacion['fhAgrega'])),
-            "tipoMoneda"        => "USD"
+        "identificacion" => [
+            "version" => 1,
+            "ambiente" => "0",
+            "tipoDte" => $factura['tipoDTEId'],
+            "numeroControl" => $certificacion['numeroControl'],
+            "codigoGeneracion" => strtoupper($certificacion['codigoGeneracion']),
+            "tipoModelo" => 1,
+            "tipoOperacion" => 1,
+            "tipoContingencia" => null,
+            "motivoContin" => null,
+            "fecEmi" => date('Y-m-d', strtotime($factura['fechaEmision'])),
+            "horEmi" => $factura['horaEmision'],
+            "tipoMoneda" => "USD"
         ],
         "emisor" => [
-            "nit"               => "03863624-1",
-            "nrc"               => "329956-5",
-            "nombre"            => "BELTRAN. ABIGAIL ELIZABETH",
-            "codActividad"      => 502,
-            "descActividad"     =>"VENTA AL POR MENOR DE OTROS PRODUCTOS N.C.P",
-            "nombreComercial"   =>"ALDO GAMES STORE",
-            "direccion"         => [
-                "departamento"  => 6,  
-                "municipio"     => 214,
-                "complemento"   => "POLIG. B, RES. LOS ELISEOS #9, SAN SALVADOR, SAN SALVADOR"
+            // Información del emisor...
+            "nit" => "03863624-1",
+            "nrc" => "329956-5",
+            "nombre" => "BELTRAN. ABIGAIL ELIZABETH",
+            "codActividad" => 502,
+            "descActividad" => "VENTA AL POR MENOR DE OTROS PRODUCTOS N.C.P",
+            "nombreComercial" => "ALDO GAMES STORE",
+            "direccion" => [
+                "departamento" => 6,  
+                "municipio" => 214,
+                "complemento" => "POLIG. B, RES. LOS ELISEOS #9, SAN SALVADOR, SAN SALVADOR"
             ],
-            "telefono"          => "79221469",
-            "correo"            => "aldogamesstore@gmail.com",
-            
+            "telefono" => "79221469",
+            "correo" => "aldogamesstore@gmail.com"
         ],
         "receptor" => [
-            "tipoDocumento"         => $cliente['documentoIdentificacionId'],
-            "numDocumento"          => $cliente['numDocumentoIdentificacion'],
-            "nombre"                => $cliente['cliente'],
-            "codActividad"          => $cliente['actividadEconomicaId'],
-            "direccion"             => [
-                "departamento"      => $cliente['paisCiudadId'],  
-                "municipio"         => $cliente['paisEstadoId'],
-                "complemento"       => $cliente['direccionCliente']
+            "tipoDocumento" => $cliente['documentoIdentificacionId'],
+            "numDocumento" => $cliente['numDocumentoIdentificacion'],
+            "nombre" => $cliente['cliente'],
+            "codActividad" => $cliente['actividadEconomicaId'],
+            "direccion" => [
+                "departamento" => $cliente['paisCiudadId'],
+                "municipio" => $cliente['paisEstadoId'],
+                "complemento" => $cliente['direccionCliente']
             ],
-            "telefono"              => $contacto['contactoCliente'],
-            "correo"                => $contacto['contactoCliente'],
+            "telefono" => $telefono,
+            "correo" => $correo
         ],
-        "cuerpoDocumento"           => array_map(function($detalle) {
+        "cuerpoDocumento" => array_map(function($detalle) {
             return [
-                "cantidad"          => $detalle['cantidadProducto'],
-                "numeroDocumento"   => null,
-                "codigo"            => $detalle['codigoProducto'],
-                "tipoItem"          => $detalle['tipoItemMHId'],
-                "descripcion"       => 0,
-                "precioUni"         => $detalle['precioUnitario'],
-                "montoDescu"        => $detalle['descuentoTotal'],
-                "ventaGravada"      => $detalle['totalDetalleIVA'],
-                "ivaItem"           => $detalle['ivaTotal']
+                "cantidad" => $detalle['cantidadProducto'],
+                "numeroDocumento" => null,
+                "codigo" => $detalle['codigoProducto'],
+                "tipoItem" => $detalle['tipoItemMHId'],
+                "descripcion" => "Producto", // Aquí podrías agregar una descripción más detallada si es necesario
+                "precioUni" => number_format($detalle['precioUnitario'], 2, '.', ','),
+                "montoDescu" => number_format($detalle['descuentoTotal'], 2, '.', ','),
+                "ventaGravada" => number_format($detalle['totalDetalleIVA'], 2, '.', ','),
+                "ivaItem" => number_format($detalle['ivaTotal'], 2, '.', ',')
             ];
-        }, $detalles)
+        }, $detalles),
+        "resumen" => [
+            "totalNoSuj" => 0,
+            "totalExenta" => 0,
+            "totalGravada" => number_format($totalGravada, 2, '.', ','),
+            "subTotalVentas" => number_format($totalGravada, 2, '.', ','),
+            "descuNoSuj" => 0,
+            "descuExenta" => 0,
+            "descuGravada" => 0,
+            "porcentajeDescuento" => number_format($porcentajeDescuento, 2, '.', ','),
+            "totalDescu" => number_format($totalDescu, 2, '.', ','),
+            "tributos" => null,
+            "subTotal" => number_format($totalGravada, 2, '.', ','),
+            "ivaRete1" => 0,
+            "reteRenta" => 0,
+            "montoTotalOperacion" => number_format($totalGravada, 2, '.', ','),
+            "totalNoGravado" => 0,
+            "totalPagar" => number_format($totalGravada + $totalIva - $totalDescu, 2, '.', ','),
+            "totalLetras" => "Doscientos Noventa y ocho 21/100 USD", // Puedes generar esta parte dinámicamente
+            "totalIva" => number_format($totalIva, 2, '.', ','),
+            "saldoFavor" => 0,
+            "condicionOperacion" => 1,
+            "pagos" => $pagosData,
+            "numPagoElectronico" => null
+        ]
     ];
 
     return $this->response->setJSON($data);
 }
 
+*/
 
+public function tablaVerJSON() {
+    $facturaId = $this->request->getPost('facturaId');
+
+    // Modelos para realizar las consultas
+    $facturaModel = new fel_facturas();
+    $certificacionModel = new fel_factura_certificacion();
+    $clienteModel = new fel_clientes();
+    $contactoModel = new fel_cliente_contacto();
+    $detalleModel = new fel_facturas_detalle();
+    $pagoModel = new fel_facturas_pago();
+
+    // Obtener datos de la factura
+    $factura = $facturaModel
+        ->select('tipoDTEId, fechaEmision, horaEmision')
+        ->where('facturaId', $facturaId)
+        ->first();
+
+    // Obtener datos de la certificación
+    $certificacion = $certificacionModel
+        ->select('numeroControl, codigoGeneracion, tipoTransmisionMHId, fhAgrega, selloRecibido')
+        ->where('facturaId', $facturaId)
+        ->first();
+
+    // Verificar si se encontró la certificación
+    if (!$certificacion) {
+        return $this->response->setJSON(['error' => 'No se encontró la certificación'], 404);
+    }
+
+    // Obtener datos del cliente (receptor)
+    $cliente = $clienteModel
+        ->select('clienteId, tipoPersonaId, nrcCliente, documentoIdentificacionId, clienteComercial, numDocumentoIdentificacion, cliente, direccionCliente, actividadEconomicaId, tipoContribuyenteId, paisId, paisCiudadId, paisEstadoId')
+        ->where('clienteId', function($query) use ($facturaId) {
+            $query->select('clienteId')
+                  ->from('fel_facturas')
+                  ->where('facturaId', $facturaId)
+                  ->limit(1);
+        })
+        ->first();
+
+    // Obtener datos de contacto del cliente
+    $contactos = $contactoModel
+        ->select('tipoContactoId, contactoCliente')
+        ->where('clienteId', $cliente['clienteId'])
+        ->findAll();
+
+    $telefono = null;
+    $correo = null;
+    foreach ($contactos as $contacto) {
+        if ($contacto['tipoContactoId'] == 1) {
+            $telefono = $contacto['contactoCliente'];
+        } elseif ($contacto['tipoContactoId'] == 2) {
+            $correo = $contacto['contactoCliente'];
+        }
+    }
+
+    // Obtener detalles de la factura (cuerpo del documento)
+    $detalles = $detalleModel
+        ->select('cantidadProducto, codigoProducto, porcentajeDescuento, descuentoTotal, tipoItemMHId, precioUnitario, precioUnitarioIVA, ivaTotal, precioUnitarioVenta, totalDetalle, totalDetalleIVA')
+        ->where('facturaId', $facturaId)
+        ->findAll();
+
+    // Calcular los totales del resumen
+    $totalGravada = 0;
+    $totalIva = 0;
+    $totalDescu = 0;
+    $porcentajeDescuento = 0;
+
+    foreach ($detalles as $detalle) {
+        $totalGravada += $detalle['totalDetalle'];
+        $totalIva += $detalle['ivaTotal'];
+        $totalDescu += $detalle['descuentoTotal'];
+    }
+
+    // Calcular porcentaje de descuento
+    if ($totalGravada > 0) {
+        $porcentajeDescuento = ($totalDescu / $totalGravada) * 100;
+    }
+
+    // Obtener pagos
+    $pagos = $pagoModel
+        ->select('formaPagoMHId as codigo, totalPago as montoPago')
+        ->where('facturaId', $facturaId)
+        ->findAll();
+
+    $pagosData = array_map(function($pago) {
+        return [
+            "codigo" => $pago['codigo'],
+            "montoPago" => number_format($pago['montoPago'], 2, '.', ','),
+            "referencia" => null,
+            "plazo" => "01",
+            "periodo" => null
+        ];
+    }, $pagos);
+
+    // Generar total en letras
+    $totalEnLetras = $this->numeroALetras($totalGravada + $totalIva - $totalDescu);
+
+    // Determinar el tipo de JSON según el tipoDTEId
+    if ($factura['tipoDTEId'] == 1) {
+        // JSON para tipoDTEId = 1
+        $data = [
+            "identificacion" => [
+            "version" => 1,
+            "ambiente" => "00",
+            "tipoDte" => $factura['tipoDTEId'], // tipoDTEId de la tabla fel_facturas
+            "numeroControl" => $certificacion['numeroControl'],
+            "codigoGeneracion" => strtoupper($certificacion['codigoGeneracion']),
+            "tipoModelo" => 1,
+            "tipoOperacion" => 1,
+            "tipoContingencia" => null,
+            "motivoContin" => null,
+            "fecEmi" => date('Y-m-d', strtotime($factura['fechaEmision'])),
+            "horEmi" => date('H:i:s', strtotime($factura['horaEmision'])),
+            "tipoMoneda" => "USD"
+        ],
+        "emisor" => [
+            "nit" => "03863624-1",
+            "nrc" => "329956-5",
+            "nombre" => "BELTRAN. ABIGAIL ELIZABETH",
+            "codActividad" => 502,
+            "descActividad" => "VENTA AL POR MENOR DE OTROS PRODUCTOS N.C.P",
+            "nombreComercial" => "ALDO GAMES STORE",
+            "direccion" => [
+                "departamento" => 6,
+                "municipio" => 214,
+                "complemento" => "POLIG. B, RES. LOS ELISEOS #9, SAN SALVADOR, SAN SALVADOR"
+            ],
+            "telefono" => "79221469",
+            "correo" => "aldogamesstore@gmail.com",
+        ],
+        "receptor" => [
+            "tipoDocumento" => $cliente['documentoIdentificacionId'],
+            "numDocumento" => $cliente['numDocumentoIdentificacion'],
+            "nombre" => $cliente['cliente'],
+            "codActividad" => $cliente['actividadEconomicaId'],
+            "direccion" => [
+                "departamento" => $cliente['paisCiudadId'],
+                "municipio" => $cliente['paisEstadoId'],
+                "complemento" => $cliente['direccionCliente']
+            ],
+            "telefono" => $telefono,
+            "correo" => $correo,
+        ],
+        "cuerpoDocumento" => array_map(function($detalle) {
+            return [
+                "cantidad" => $detalle['cantidadProducto'],
+                "numeroDocumento" => null,
+                "codigo" => $detalle['codigoProducto'],
+                "tipoItem" => $detalle['tipoItemMHId'],
+                "descripcion" => 0, // Deberías completar la descripción si es necesario
+                "precioUni" => $detalle['precioUnitario'],
+                "montoDescu" => $detalle['descuentoTotal'],
+                "ventaGravada" => $detalle['totalDetalleIVA'],
+                "ivaItem" => $detalle['ivaTotal']
+            ];
+        }, $detalles),
+        "resumen" => [
+            "totalNoSuj" => 0,
+            "totalExenta" => 0,
+            "totalGravada" => number_format($totalGravada, 2, '.', ','),
+            "subTotalVentas" => number_format($totalGravada, 2, '.', ','),
+            "descuNoSuj" => 0,
+            "descuExenta" => 0,
+            "descuGravada" => number_format($totalDescu, 2, '.', ','),
+            "porcentajeDescuento" => number_format($porcentajeDescuento, 2, '.', ','),
+            "totalDescu" => number_format($totalDescu, 2, '.', ','),
+            "tributos" => null,
+            "subTotal" => number_format($totalGravada, 2, '.', ','),
+            "ivaRete1" => 0,
+            "reteRenta" => 0,
+            "montoTotalOperacion" => number_format($totalGravada + $totalIva - $totalDescu, 2, '.', ','),
+            "totalNoGravado" => 0,
+            "totalPagar" => number_format($totalGravada + $totalIva - $totalDescu, 2, '.', ','),
+            "totalLetras" => $totalEnLetras,
+            "totalIva" => number_format($totalIva, 2, '.', ','),
+            "saldoFavor" => 0,
+            "condicionOperacion" => 1,
+            "pagos" => $pagosData,
+            "numPagoElectronico" => null
+        ]
+        ];
+    } elseif ($factura['tipoDTEId'] == 2) {
+        // JSON para tipoDTEId = 2
+        $data = [
+            "identificacion" => [
+                "version" => 1,
+                "ambiente" => "00",
+                "tipoDte" =>  $factura['tipoDTEId'],
+                "numeroControl" => $certificacion['numeroControl'],
+                "codigoGeneracion" => strtoupper($certificacion['codigoGeneracion']),
+                "tipoModelo" => 1,
+                "tipoOperacion" => 1,
+                "tipoContingencia" => null,
+                "motivoContin" => null,
+                "fecEmi" => date('Y-m-d', strtotime($factura['fechaEmision'])),
+                "horEmi" => date('H:i:s', strtotime($factura['horaEmision'])),
+                "tipoMoneda" => "USD"
+            ],
+            "emisor" => [
+                "nit" => "03863624-1",
+                "nrc" => "329956-5",
+                "nombre" => "BELTRAN. ABIGAIL ELIZABETH",
+                "codActividad" => 502,
+                "descActividad" => "VENTA AL POR MENOR DE OTROS PRODUCTOS N.C.P",
+                "nombreComercial" => "ALDO GAMES STORE",
+                "direccion" => [
+                    "departamento" => 6,
+                    "municipio" => 214,
+                    "complemento" => "POLIG. B, RES. LOS ELISEOS #9, SAN SALVADOR, SAN SALVADOR"
+                ],
+                "telefono" => "79221469",
+                "correo" => "aldogamesstore@gmail.com",
+            ],
+            "receptor" => [
+                "nit" => $cliente['numDocumentoIdentificacion'],
+                "nrc" => $cliente['nrcCliente'],
+                "nombre" => $cliente['cliente'],
+                "codActividad" => $cliente['actividadEconomicaId'],
+                "descActividad" => "Cría de aves de corral y producción de huevos",
+                "nombreComercial" => $cliente['clienteComercial'],
+                "direccion" => [
+                    "departamento" => $cliente['paisCiudadId'],
+                    "municipio" => $cliente['paisEstadoId'],
+                    "complemento" => $cliente['direccionCliente']
+                ],
+                "telefono" => $telefono,
+                "correo" => $correo,
+            ],
+            "cuerpoDocumento" => array_map(function($detalle) {
+                return [
+                    "numItem" => 1, // Este valor se debería incrementar con cada elemento
+                    "tipoItem" => 1, // Asumiendo que todos los items tienen el mismo tipo
+                    "numeroDocumento" => null,
+                    "cantidad" => $detalle['cantidadProducto'],
+                    "codigo" => $detalle['codigoProducto'],
+                    "uniMedida" => 59, // Unidad de medida asumida como estática
+                    "descripcion" => "Descripción del producto", // Completar la descripción
+                    "precioUni" => $detalle['precioUnitario'],
+                    "montoDescu" => $detalle['descuentoTotal'],
+                    "ventaNoSuj" => 0,
+                    "ventaExenta" => 0,
+                    "ventaGravada" => $detalle['totalDetalleIVA'],
+                    "tributos" => ["20"], // Tributos asumidos
+                    "psv" => 0,
+                    "noGravado" => 0
+                ];
+            }, $detalles),
+            "resumen" => [
+                "totalNoSuj" => 0,
+                "totalExenta" => 0,
+                "totalGravada" => number_format($totalGravada, 2, '.', ','),
+                "subTotalVentas" => number_format($totalGravada, 2, '.', ','),
+                "descuNoSuj" => 0,
+                "descuExenta" => 0,
+                "descuGravada" => number_format($totalDescu, 2, '.', ','),
+                "porcentajeDescuento" => number_format($porcentajeDescuento, 2, '.', ','),
+                "totalDescu" => number_format($totalDescu, 2, '.', ','),
+                "tributos" => [
+                    [
+                        "codigo" => "20",
+                        "descripcion" => "Impuesto al Valor Agregado 13%",
+                        "valor" => number_format($totalIva, 2, '.', ',')
+                    ]
+                ],
+                "subTotal" => number_format($totalGravada, 2, '.', ','),
+                "ivaPerci1" => 17.5,
+                "ivaRete1" => 0,
+                "reteRenta" => 0,
+                "montoTotalOperacion" => number_format($totalGravada + $totalIva - $totalDescu, 2, '.', ','),
+                "totalNoGravado" => 0,
+                "totalPagar" => number_format($totalGravada + $totalIva - $totalDescu, 2, '.', ','),
+                "totalLetras" => $totalEnLetras,
+                "saldoFavor" => 0,
+                "condicionOperacion" => 1,
+                "pagos" => $pagosData,
+                "numPagoElectronico" => null
+            ]
+        ];
+    }
+
+    return $this->response->setJSON($data);
+}
+
+// Función para convertir números a letras
+private function numeroALetras($numero) {
+    $formatter = new \NumberFormatter("es", \NumberFormatter::SPELLOUT);
+    $entero = floor($numero);
+    $fraccion = round(($numero - $entero) * 100);
+
+    $texto = $formatter->format($entero);
+    $texto .= " dólares";
+
+    if ($fraccion > 0) {
+        $texto .= " con " . $formatter->format($fraccion) . " centavos";
+    }
+
+    return ucfirst($texto);
+}
 }
