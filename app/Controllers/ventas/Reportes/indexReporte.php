@@ -55,11 +55,14 @@ class indexReporte extends Controller
         $facturaId = isset($_GET['facturaId']) ? intval($_GET['facturaId']) : 0;
 
         $datosDte = $felFactura
-            ->select('cat_04_tipo_transmision.tipoTransmision,cat_17_forma_pago.formaPago,DATE_FORMAT(fel_facturas.fechaEmision, "%d/%m/%Y") as fechaEmision ,fel_facturas.horaEmision,fel_factura_certificacion.numeroControl,fel_factura_certificacion.codigoGeneracion,fel_factura_certificacion.selloRecibido')
+            ->select('cat_04_tipo_transmision.tipoTransmision,cat_17_forma_pago.formaPago,DATE_FORMAT(fel_facturas.fechaEmision, "%d/%m/%Y") as fechaEmision ,fel_facturas.horaEmision,fel_factura_certificacion.numeroControl,fel_factura_certificacion.codigoGeneracion,fel_factura_certificacion.selloRecibido,fel_clientes.cliente,fel_clientes.direccionCliente,fel_clientes.numDocumentoIdentificacion,fel_clientes.nrcCliente,cat_19_actividad_economica.actividadEconomica,fel_cliente_contacto.contactoCliente,fel_cliente_contacto.tipoContactoId')
             ->join('fel_factura_certificacion','fel_factura_certificacion.facturaId = fel_facturas.facturaId')
             ->join('cat_04_tipo_transmision','cat_04_tipo_transmision.tipoTransmisionMHId = fel_factura_certificacion.tipoTransmisionMHId')
             ->join('fel_facturas_pago','fel_facturas_pago.facturaId = fel_facturas.facturaId')
             ->join('cat_17_forma_pago','cat_17_forma_pago.formaPagoMHId = fel_facturas_pago.formaPagoMHId')
+            ->join('fel_clientes','fel_clientes.clienteId = fel_facturas.clienteId')
+            ->join('cat_19_actividad_economica','cat_19_actividad_economica.actividadEconomicaId = fel_clientes.actividadEconomicaId')
+            ->join('fel_cliente_contacto', 'fel_cliente_contacto.clienteId = fel_clientes.clienteId')
             ->where('fel_facturas.flgElimina', 0)
             ->where('fel_facturas.facturaId', $facturaId)
             ->where('fel_facturas.estadoFactura','Certificado')
@@ -73,11 +76,15 @@ class indexReporte extends Controller
         $horaEmision = $datosDte['horaEmision'];
         $formaPago = $datosDte['formaPago'];
         $tipoTransmision = $datosDte['tipoTransmision'];
+        $cliente = $datosDte['cliente'];
+        $actividad = $datosDte['actividadEconomica'];
+        $direccionCliente = $datosDte['direccionCliente'];
+        $numeroIdentificacion = $datosDte['numDocumentoIdentificacion'];
+        $nrc = $datosDte['nrcCliente'];
 
-        $datosReceptor = $felClientes
-            ->select('cliente')
-            ->where('flgElimina', 0)
-            ->first(); 
+        $telefono = $datosDte['contactoCliente'];
+        $correo = "";
+
         //$x = 100;
         //$xx = 131;
         // Agregar una página
@@ -207,7 +214,7 @@ class indexReporte extends Controller
         $pdf->SetFont('Arial','',8);
 
         $pdf->SetXY(22,63);
-        $pdf->Cell(190,5,utf8_decode('Prueba '),0,0,'L');
+        $pdf->Cell(190,5,utf8_decode($cliente),0,0,'L');
 
         $pdf->SetFont('Arial','B',8);
         $pdf->SetXY(10,67);
@@ -215,7 +222,7 @@ class indexReporte extends Controller
         $pdf->SetFont('Arial','',8);
 
         $pdf->SetXY(24,67);
-        $pdf->Cell(190,5,utf8_decode('Prueba '),0,0,'L');
+        $pdf->Cell(190,5,utf8_decode($actividad),0,0,'L');
 
         $pdf->SetFont('Arial','B',8);
         $pdf->SetXY(10,71);
@@ -223,7 +230,7 @@ class indexReporte extends Controller
         $pdf->SetFont('Arial','',8);
 
         $pdf->SetXY(24,71);
-        $pdf->Cell(190,5,utf8_decode('Prueba '),0,0,'L');
+        $pdf->Cell(190,5,utf8_decode($direccionCliente),0,0,'L');
 
         $pdf->SetFont('Arial','B',8);
         $pdf->SetXY(100,63);
@@ -231,7 +238,7 @@ class indexReporte extends Controller
 
         $pdf->SetFont('Arial','',8);
         $pdf->SetXY(125,63);
-        $pdf->Cell(190,5,utf8_decode('000'),0,0,'L');
+        $pdf->Cell(190,5,utf8_decode($numeroIdentificacion),0,0,'L');
 
         $pdf->SetFont('Arial','B',8);
         $pdf->SetXY(100,67);
@@ -239,7 +246,7 @@ class indexReporte extends Controller
 
         $pdf->SetFont('Arial','',8);
         $pdf->SetXY(108,67);
-        $pdf->Cell(190,5,utf8_decode('222'),0,0,'L');
+        $pdf->Cell(190,5,utf8_decode($nrc),0,0,'L');
 
         $pdf->SetFont('Arial','B',8);
         $pdf->SetXY(100,71);
@@ -247,7 +254,7 @@ class indexReporte extends Controller
 
         $pdf->SetFont('Arial','',8);
         $pdf->SetXY(114,71);
-        $pdf->Cell(190,5,utf8_decode('222'),0,0,'L');
+        $pdf->Cell(190,5,utf8_decode($telefono),0,0,'L');
 
         $pdf->SetFont('Arial','B',8);
         $pdf->SetXY(100,75);
@@ -255,7 +262,7 @@ class indexReporte extends Controller
 
         $pdf->SetFont('Arial','',8);
         $pdf->SetXY(111,75);
-        $pdf->Cell(190,5,utf8_decode('222'),0,0,'L');
+        $pdf->Cell(190,5,utf8_decode($correo),0,0,'L');
 
         $pdf->Ln(23);
         $pdf->SetFont('Arial','B',8);
