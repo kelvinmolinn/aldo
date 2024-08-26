@@ -1310,7 +1310,7 @@ public function tablaContinuarDTE() {
 
         $subtotal += $columna['totalDetalle'];
         $ivaTotal += $columna['ivaTotal'];
-        $totalAPagar += $columna['totalDetalleIVA'];
+       $totalAPagar += number_format($columna['totalDetalleIVA'], 2, '.', ',');
         $descuentos += ($columna['precioUnitario'] - $columna['precioUnitarioVenta']) * $columna['cantidadProducto'];
 
         $n++;
@@ -1720,200 +1720,7 @@ public function modalComplementoDTEOperacion() {
         }
     }
 
-/*
-public function certificarDTE()
-{
-    // Intentar obtener los valores desde la solicitud POST
-    $facturaId = $this->request->getPost('facturaId');
-    $facturaDetalleId = $this->request->getPost('facturaDetalleId');
-    $retaceoDetalleId = $this->request->getPost('retaceoDetalleId'); 
-    
-    // Verificar si el ID de la factura está disponible
-    if (!$facturaId) {
-        return $this->response->setJSON([
-            'success' => false,
-            'mensaje' => 'No se pudo obtener el ID de la factura.',
-        ]);
-    }
 
-    // Obtener sucursalId y fechaEmision desde fel_facturas
-    $facturaModel = new fel_facturas();
-    $factura = $facturaModel
-        ->select('sucursalId, fechaEmision')
-        ->where('facturaId', $facturaId)
-        ->first();
-
-    // Verificar si la factura existe
-    if (!$factura) {
-        return $this->response->setJSON([
-            'success' => false,
-            'mensaje' => 'Factura no encontrada.',
-        ]);
-    }
-
-    // Extraer sucursalId y fechaEmision
-    $sucursalId = $factura['sucursalId'];
-    $fechaEmision = $factura['fechaEmision'];
-
-    // Obtener el modelo para manejar los productos, existencias y costos
-    $productosExistenciasModel = new inv_productos_existencias();
-    $detalleModel = new fel_facturas_detalle();
-    $modelKardex = new inv_kardex();
-    $productosInfoModel = new inv_productos();
-    $comprasDetalleModel = new comp_compras_detalle();
-    $retaceoDetalleModel = new comp_retaceo_detalle();
-     $modelFacturaPago = new fel_facturas_pago();
-
-    
-    // Obtener los detalles de los productos asociados a la factura
-    $productosFactura = $detalleModel
-        ->select('productoId, cantidadProducto, precioUnitarioVenta, porcentajeDescuento')
-        ->where('facturaId', $facturaId)
-        ->where('flgElimina', 0)
-        ->findAll();
-
-    foreach ($productosFactura as $producto) {
-        $productoId = $producto['productoId'];
-        $cantidadProducto = $producto['cantidadProducto'];
-   
-        // Obtener la existencia actual del producto en la sucursal
-        $productoExistencia = $productosExistenciasModel
-            ->select('productoExistenciaId, existenciaProducto')
-            ->where('sucursalId', $sucursalId)
-            ->where('productoId', $productoId)
-            ->where('flgElimina', 0)
-            ->first();
-
-        if (!$productoExistencia || $cantidadProducto > $productoExistencia['existenciaProducto']) {
-            return $this->response->setJSON([
-                'success' => false,
-                'mensaje' => "No hay existencias suficientes para el producto ID $productoId en la sucursal $sucursalId.",
-            ]);
-        }
-
-        // Obtener datos adicionales del producto
-        $productoInfo = $productosInfoModel->find($productoId);
-
-        // Obtener el costo FOB
-        $costoFOBResult = $comprasDetalleModel
-            ->select('precioUnitario')
-            ->where('productoId', $productoId)
-            ->where('flgElimina', 0)
-            ->orderBy('compraDetalleId', 'DESC')
-            ->first();
-        
-        $costoFOB = $costoFOBResult ? $costoFOBResult['precioUnitario'] : 0;
-
-        // Obtener el costo promedio y el precio de venta del producto
-        $costoPromedio = $productoInfo ? $productoInfo['CostoPromedio'] : 0;
-        $precioVentaUnitario = $productoInfo ? $productoInfo['precioVenta'] : 0;
-
-        // Verificar si se obtuvo retaceoDetalleId y obtener costo unitario retaceo
-        if ($retaceoDetalleId) {
-            $retaceoInfo = $retaceoDetalleModel->find($retaceoDetalleId);
-            $costoUnitarioRetaceo = $retaceoInfo ? $retaceoInfo['costoUnitarioRetaceo'] : 0;
-        } else {
-            $costoUnitarioRetaceo = 0;
-        }
-
-        // Calcular valores para la entrada del Kardex
-        $existenciaAntes = $productoExistencia['existenciaProducto'];
-        $existenciaDespues = $existenciaAntes - $cantidadProducto;
-        $precioVentaUnitarioConDescuento = $producto['precioUnitarioVenta'] * (1 - $producto['porcentajeDescuento'] / 100);
-
-                // Obtener el total a pagar para la reserva
-        $totalAPagar = $detalleModel
-            ->select('SUM(totalDetalleIVA) as totalAPagar')
-            ->where('facturaId', $facturaId)
-            ->where('flgElimina', 0)
-            ->first()['totalAPagar'];
-
-        // Obtener el total pagado para la reserva
-        $totalPagado = $modelFacturaPago
-            ->select('SUM(totalPago) as totalPagado')
-            ->where('facturaId', $facturaId)
-            ->where('flgElimina', 0)
-            ->first()['totalPagado'];
-
-        // Validar que el total pagado sea mayor o igual al total a pagar
-        if ($totalPagado < $totalAPagar) {
-            return $this->response->setJSON([
-                'success' => false,
-                'mensaje' => 'No se puede certificar el DTE. El total pagado es menor al total a pagar.'
-            ]);
-        }
-
-        // Insertar en Kardex
-        $modelKardex->insert([
-            'tipoMovimiento' => 'Salida',
-            'descripcionMovimiento' => "Salida registrada por emisión de DTE: $facturaId",
-            'productoExistenciaId' => $productoExistencia['productoExistenciaId'],
-            'existenciaAntesMovimiento' => $existenciaAntes,
-            'cantidadMovimiento' => $cantidadProducto,
-            'existenciaDespuesMovimiento' => $existenciaDespues,
-            'costoUnitarioFOB' => $costoFOB,
-            'costoUnitarioRetaceo' => $costoUnitarioRetaceo,
-            'costoPromedio' => $costoPromedio,
-            'precioVentaUnitario' => $precioVentaUnitarioConDescuento,
-            'fechaDocumento' => $fechaEmision, // Usar la fechaEmision obtenida
-            'fechaMovimiento' => date('Y-m-d H:i:s'),
-            'tablaMovimiento' => 'fel_factura_detalle',
-            'tablaMovimientoId' => $facturaDetalleId
-        ]);
-
-        // Actualizar la existencia en inv_productos_existencias
-        $productosExistenciasModel->update($productoExistencia['productoExistenciaId'], [
-            'existenciaProducto' => $existenciaDespues
-        ]);
-    }
-
-    // Obtener datos de la sucursal
-    $confSucursalModel = new conf_sucursales();
-    $sucursalData = $confSucursalModel->find($sucursalId);
-    $codEstablecimientoMH = $sucursalData['codEstablecimientoMH'];
-    $puntoVentaMH = $sucursalData['puntoVentaMH'];
-
-    // Obtener el codigoMH del tipo de DTE (asumimos que tienes $tipoDTEId)
-    $tipoDTEId = 1; // Asumimos un valor para $tipoDTEId, ajusta según tu necesidad
-    $tipoDTEModel = new cat_02_tipo_dte();
-    $tipoDTEData = $tipoDTEModel->find($tipoDTEId);
-    $codigoMH = $tipoDTEData['codigoMH'];
-
-    // Generar numeroControl
-    $numeroControl = "DTE-{$codigoMH}-{$codEstablecimientoMH}-{$puntoVentaMH}" . str_pad($facturaId, 15, '0', STR_PAD_LEFT);
-
-    // Generar codigoGeneracion usando la función codigo de generacion() y convertir a mayúsculas
-    $codigoGeneracion = strtoupper($this->codigoGeneracion());
-
-    // Simular selloRecibido y convertir a mayúsculas
-    $selloRecibido = strtoupper("REC-" . bin2hex(random_bytes(10)) . "-MH");
-
-    // Insertar en fel_factura_certificacion
-    $certificacionModel = new fel_factura_certificacion();
-    $certificacionModel->insert([
-        'facturaId' => $facturaId,
-        'numeroControl' => $numeroControl,
-        'codigoGeneracion' => $codigoGeneracion,
-        'tipoTransmisionMHId' => 1,  // Valor estático según lo especificado
-        'selloRecibido' => $selloRecibido,
-        'descripcionMensaje' => 'Recibido',
-        'estadoCertificacion' => 'Certificado'
-    ]);
-
-
-        // Actualizar el estado de la reserva
-        $dataReservaEstado = [
-            'estadoFactura' => "Certificado"
-        ];
-        $facturaModel->update($facturaId, $dataReservaEstado);
-
-    // Retornar la respuesta exitosa
-    return $this->response->setJSON([
-        'success' => true,
-        'mensaje' => 'Certificación de DTE exitosa'
-    ]);
-}
-*/
 public function certificarDTE()
 {
     // Intentar obtener los valores desde la solicitud POST
@@ -2021,27 +1828,31 @@ public function certificarDTE()
         $existenciaDespues = $existenciaAntes - $cantidadProducto;
         $precioVentaUnitarioConDescuento = $producto['precioUnitarioVenta'] * (1 - $producto['porcentajeDescuento'] / 100);
 
-        // Obtener el total a pagar para la reserva
-        $totalAPagar = $detalleModel
-            ->select('SUM(totalDetalleIVA) as totalAPagar')
-            ->where('facturaId', $facturaId)
-            ->where('flgElimina', 0)
-            ->first()['totalAPagar'];
+            // Obtener el total a pagar para la reserva
+            $totalAPagar = $detalleModel
+                ->select('SUM(totalDetalleIVA) as totalAPagar')
+                ->where('facturaId', $facturaId)
+                ->where('flgElimina', 0)
+                ->first()['totalAPagar'];
 
-        // Obtener el total pagado para la reserva
-        $totalPagado = $modelFacturaPago
-            ->select('SUM(totalPago) as totalPagado')
-            ->where('facturaId', $facturaId)
-            ->where('flgElimina', 0)
-            ->first()['totalPagado'];
+            // Obtener el total pagado 
+            $totalPagado = $modelFacturaPago
+                ->select('SUM(totalPago) as totalPagado')
+                ->where('facturaId', $facturaId)
+                ->where('flgElimina', 0)
+                ->first()['totalPagado'];
 
-        // Validar que el total pagado sea mayor o igual al total a pagar
-        if ($totalPagado < $totalAPagar) {
-            return $this->response->setJSON([
-                'success' => false,
-                'mensaje' => 'No se puede certificar el DTE. El total pagado es menor al total a pagar.'
-            ]);
-        }
+            // Asegurarse de que ambos valores tengan dos decimales
+            $totalAPagar = round($totalAPagar, 2);
+            $totalPagado = round($totalPagado, 2);
+
+            // Validar que el total pagado sea mayor o igual al total a pagar
+            if ($totalPagado < $totalAPagar) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'mensaje' => 'No se puede certificar el DTE. El total pagado es menor al total a pagar.'
+                ]);
+            }
 
         // Insertar en Kardex
         $modelKardex->insert([
@@ -2361,216 +2172,7 @@ private function codigoGeneracionError() {
             return $this->response->setJSON(array('data' => '', 'countMinima' => 0)); // No hay datos, devuelve un array vacío
         }
     }
-/*    public function invalidarDTE()
-{
-    // Intentar obtener los valores desde la solicitud POST
-    $facturaId = $this->request->getPost('facturaId');
-    $facturaDetalleId = $this->request->getPost('facturaDetalleId');
-    $retaceoDetalleId = $this->request->getPost('retaceoDetalleId'); 
-    
-    // Verificar si el ID de la factura está disponible
-    if (!$facturaId) {
-        return $this->response->setJSON([
-            'success' => false,
-            'mensaje' => 'No se pudo obtener el ID de la factura.',
-        ]);
-    }
 
-    // Obtener sucursalId y fechaEmision desde fel_facturas
-    $facturaModel = new fel_facturas();
-    $factura = $facturaModel
-        ->select('sucursalId, fechaEmision')
-        ->where('facturaId', $facturaId)
-        ->first();
-
-    // Verificar si la factura existe
-    if (!$factura) {
-        return $this->response->setJSON([
-            'success' => false,
-            'mensaje' => 'Factura no encontrada.',
-        ]);
-    }
-
-    // Extraer sucursalId y fechaEmision
-    $sucursalId = $factura['sucursalId'];
-    $fechaEmision = $factura['fechaEmision'];
-
-    // Obtener el modelo para manejar los productos, existencias y costos
-    $productosExistenciasModel = new inv_productos_existencias();
-    $detalleModel = new fel_facturas_detalle();
-    $modelKardex = new inv_kardex();
-    $productosInfoModel = new inv_productos();
-    $comprasDetalleModel = new comp_compras_detalle();
-    $retaceoDetalleModel = new comp_retaceo_detalle();
-    $modelFacturaPago = new fel_facturas_pago();
-
-    // Obtener los detalles de los productos asociados a la factura
-    $productosFactura = $detalleModel
-        ->select('productoId, cantidadProducto, precioUnitarioVenta, porcentajeDescuento')
-        ->where('facturaId', $facturaId)
-        ->where('flgElimina', 0)
-        ->findAll();
-
-    // Verificar si no se han agregado productos al detalle
-    if (empty($productosFactura)) {
-        return $this->response->setJSON([
-            'success' => false,
-            'mensaje' => 'No se puede certificar el DTE. No se han agregado productos al detalle de la factura.'
-        ]);
-    }
-
-    foreach ($productosFactura as $producto) {
-        $productoId = $producto['productoId'];
-        $cantidadProducto = $producto['cantidadProducto'];
-   
-        // Obtener la existencia actual del producto en la sucursal
-        $productoExistencia = $productosExistenciasModel
-            ->select('productoExistenciaId, existenciaProducto')
-            ->where('sucursalId', $sucursalId)
-            ->where('productoId', $productoId)
-            ->where('flgElimina', 0)
-            ->first();
-
-        if (!$productoExistencia || $cantidadProducto > $productoExistencia['existenciaProducto']) {
-            return $this->response->setJSON([
-                'success' => false,
-                'mensaje' => "No hay existencias suficientes para el producto ID $productoId en la sucursal $sucursalId.",
-            ]);
-        }
-
-        // Obtener datos adicionales del producto
-        $productoInfo = $productosInfoModel->find($productoId);
-
-        // Obtener el costo FOB
-        $costoFOBResult = $comprasDetalleModel
-            ->select('precioUnitario')
-            ->where('productoId', $productoId)
-            ->where('flgElimina', 0)
-            ->orderBy('compraDetalleId', 'DESC')
-            ->first();
-        
-        $costoFOB = $costoFOBResult ? $costoFOBResult['precioUnitario'] : 0;
-
-        // Obtener el costo promedio y el precio de venta del producto
-        $costoPromedio = $productoInfo ? $productoInfo['CostoPromedio'] : 0;
-        $precioVentaUnitario = $productoInfo ? $productoInfo['precioVenta'] : 0;
-
-        // Verificar si se obtuvo retaceoDetalleId y obtener costo unitario retaceo
-        if ($retaceoDetalleId) {
-            $retaceoInfo = $retaceoDetalleModel->find($retaceoDetalleId);
-            $costoUnitarioRetaceo = $retaceoInfo ? $retaceoInfo['costoUnitarioRetaceo'] : 0;
-        } else {
-            $costoUnitarioRetaceo = 0;
-        }
-
-        // Calcular valores para la entrada del Kardex
-        $existenciaAntes = $productoExistencia['existenciaProducto'];
-        $existenciaDespues = $existenciaAntes + $cantidadProducto;
-        $precioVentaUnitarioConDescuento = $producto['precioUnitarioVenta'] * (1 - $producto['porcentajeDescuento'] / 100);
-
-        // Obtener el total a pagar para la reserva
-        $totalAPagar = $detalleModel
-            ->select('SUM(totalDetalleIVA) as totalAPagar')
-            ->where('facturaId', $facturaId)
-            ->where('flgElimina', 0)
-            ->first()['totalAPagar'];
-
-        // Obtener el total pagado para la reserva
-        $totalPagado = $modelFacturaPago
-            ->select('SUM(totalPago) as totalPagado')
-            ->where('facturaId', $facturaId)
-            ->where('flgElimina', 0)
-            ->first()['totalPagado'];
-
-        // Validar que el total pagado sea mayor o igual al total a pagar
-        if ($totalPagado < $totalAPagar) {
-            return $this->response->setJSON([
-                'success' => false,
-                'mensaje' => 'No se puede certificar el DTE. El total pagado es menor al total a pagar.'
-            ]);
-        }
-
-        // Insertar en Kardex
-        $modelKardex->insert([
-            'tipoMovimiento' => 'Entrada',
-            'descripcionMovimiento' => "Entrada registrada por invalidación de DTE: $facturaId",
-            'productoExistenciaId' => $productoExistencia['productoExistenciaId'],
-            'existenciaAntesMovimiento' => $existenciaAntes,
-            'cantidadMovimiento' => $cantidadProducto,
-            'existenciaDespuesMovimiento' => $existenciaDespues,
-            'costoUnitarioFOB' => $costoFOB,
-            'costoUnitarioRetaceo' => $costoUnitarioRetaceo,
-            'costoPromedio' => $costoPromedio,
-            'precioVentaUnitario' => $precioVentaUnitarioConDescuento,
-            'fechaDocumento' => $fechaEmision, // Usar la fechaEmision obtenida
-            'fechaMovimiento' => date('Y-m-d H:i:s'),
-            'tablaMovimiento' => 'fel_factura',
-            'tablaMovimientoId' => $facturaDetalleId
-        ]);
-
-        // Actualizar la existencia en inv_productos_existencias
-        $productosExistenciasModel->update($productoExistencia['productoExistenciaId'], [
-            'existenciaProducto' => $existenciaDespues
-        ]);
-    }
-
-    // Obtener datos de la sucursal
-    $confSucursalModel = new conf_sucursales();
-    $sucursalData = $confSucursalModel->find($sucursalId);
-    $codEstablecimientoMH = $sucursalData['codEstablecimientoMH'];
-    $puntoVentaMH = $sucursalData['puntoVentaMH'];
-
-    // Obtener el codigoMH del tipo de DTE (asumimos que tienes $tipoDTEId)
-    $tipoDTEId = 1; // Asumimos un valor para $tipoDTEId, ajusta según tu necesidad
-    $tipoDTEModel = new cat_02_tipo_dte();
-    $tipoDTEData = $tipoDTEModel->find($tipoDTEId);
-    $codigoMH = $tipoDTEData['codigoMH'];
-
-    // Generar numeroControl
-    $numeroControl = "DTE-{$codigoMH}-{$codEstablecimientoMH}-{$puntoVentaMH}" . str_pad($facturaId, 15, '0', STR_PAD_LEFT);
-
-    // Generar codigoGeneracion usando la función codigo de generacion() y convertir a mayúsculas
-    $codigoGeneracion = strtoupper($this->codigoInvalidarGeneracion());
-
-    // Simular selloRecibido y convertir a mayúsculas
-    $selloRecibido = strtoupper("REC-" . bin2hex(random_bytes(10)) . "-MH");
-
-    // Insertar en fel_factura_certificacion
-    $certificacionModel = new fel_factura_certificacion();
-    $certificacionModel->insert([
-        'facturaId' => $facturaId,
-        'numeroControl' => $numeroControl,
-        'codigoGeneracion' => $codigoGeneracion,
-        'tipoTransmisionMHId' => 1,  // Valor estático según lo especificado
-        'selloRecibido' => $selloRecibido,
-        'descripcionMensaje' => 'Invalidado',
-        'estadoCertificacion' => 'Invalidado'
-    ]);
-
-    // Actualizar el estado de la reserva
-    $dataReservaEstado = [
-        'estadoFactura' => "Invalidado"
-    ];
-    $facturaModel->update($facturaId, $dataReservaEstado);
-
-    // Retornar la respuesta exitosa
-    return $this->response->setJSON([
-        'success' => true,
-        'mensaje' => 'Invalidación de DTE exitosa'
-    ]);
-}
-private function codigoInvalidarGeneracion() {
-    if (function_exists('com_create_guid') === true) {
-        return trim(com_create_guid(), '{}');
-    }
-    
-    $data = PHP_MAJOR_VERSION < 7 ? openssl_random_pseudo_bytes(16) : random_bytes(16);
-    $data[6] = chr(ord($data[6]) & 0x0f | 0x40);    // Set version to 0100
-    $data[8] = chr(ord($data[8]) & 0x3f | 0x80);    // Set bits 6-7 to 10
-    
-    return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
-}
-*/
 public function invalidarDTE()
 {
     // Obtener los valores desde la solicitud POST
@@ -3280,7 +2882,7 @@ public function tablaVerJSON() {
     $facturaId = $this->request->getPost('facturaId');
 
     // Modelos para realizar las consultas
-    $facturaModel = new fel_facturas();
+    $facturaModel = new fel_facturas(); 
     $certificacionModel = new fel_factura_certificacion();
     $clienteModel = new fel_clientes();
     $contactoModel = new fel_cliente_contacto();
@@ -3315,26 +2917,24 @@ public function tablaVerJSON() {
         })
         ->first();
 
-    // Obtener datos de contacto del cliente
-    $contactos = $contactoModel
-        ->select('tipoContactoId, contactoCliente')
+    // Obtener teléfono y correo electrónico
+    $telefono = $contactoModel
+        ->select('contactoCliente')
         ->where('clienteId', $cliente['clienteId'])
-        ->findAll();
+        ->where('tipoContactoId', 1)
+        ->first();
 
-    $telefono = null;
-    $correo = null;
-    foreach ($contactos as $contacto) {
-        if ($contacto['tipoContactoId'] == 1) {
-            $telefono = $contacto['contactoCliente'];
-        } elseif ($contacto['tipoContactoId'] == 2) {
-            $correo = $contacto['contactoCliente'];
-        }
-    }
+    $correo = $contactoModel
+        ->select('contactoCliente')
+        ->where('clienteId', $cliente['clienteId'])
+        ->where('tipoContactoId', 2)
+        ->first();
 
     // Obtener detalles de la factura (cuerpo del documento)
     $detalles = $detalleModel
-        ->select('cantidadProducto, codigoProducto, porcentajeDescuento, descuentoTotal, tipoItemMHId, precioUnitario, precioUnitarioIVA, ivaTotal, precioUnitarioVenta, totalDetalle, totalDetalleIVA')
-        ->where('facturaId', $facturaId)
+        ->select('fel_facturas_detalle.cantidadProducto, fel_facturas_detalle.codigoProducto, fel_facturas_detalle.porcentajeDescuento, fel_facturas_detalle.descuentoTotal, fel_facturas_detalle.tipoItemMHId, fel_facturas_detalle.precioUnitario, fel_facturas_detalle.precioUnitarioIVA, fel_facturas_detalle.ivaTotal, fel_facturas_detalle.ivaUnitario, fel_facturas_detalle.precioUnitarioVenta, fel_facturas_detalle.totalDetalleIVA, inv_productos.producto, inv_productos.descripcionProducto, inv_productos.unidadMedidaId')
+        ->join('inv_productos', 'inv_productos.productoId = fel_facturas_detalle.productoId')
+        ->where('fel_facturas_detalle.facturaId', $facturaId)
         ->findAll();
 
     // Calcular los totales del resumen
@@ -3344,7 +2944,7 @@ public function tablaVerJSON() {
     $porcentajeDescuento = 0;
 
     foreach ($detalles as $detalle) {
-        $totalGravada += $detalle['totalDetalle'];
+        $totalGravada += $detalle['precioUnitario'] * $detalle['cantidadProducto'];
         $totalIva += $detalle['ivaTotal'];
         $totalDescu += $detalle['descuentoTotal'];
     }
@@ -3376,11 +2976,22 @@ public function tablaVerJSON() {
     // Determinar el tipo de JSON según el tipoDTEId
     if ($factura['tipoDTEId'] == 1) {
         // JSON para tipoDTEId = 1
-        $data = [
-            "identificacion" => [
+        $data = $this->generarJSONTipo1($factura, $certificacion, $cliente, $telefono, $correo, $detalles, $totalGravada, $totalIva, $totalDescu, $porcentajeDescuento, $totalEnLetras, $pagosData);
+    } elseif ($factura['tipoDTEId'] == 2) {
+        // JSON para tipoDTEId = 2
+        $data = $this->generarJSONTipo2($factura, $certificacion, $cliente, $telefono, $correo, $detalles, $totalGravada, $totalIva, $totalDescu, $porcentajeDescuento, $totalEnLetras, $pagosData);
+    }
+
+    return $this->response->setJSON($data);
+}
+
+// Método para generar el JSON para tipoDTEId = 1
+private function generarJSONTipo1($factura, $certificacion, $cliente, $telefono, $correo, $detalles, $totalGravada, $totalIva, $totalDescu, $porcentajeDescuento, $totalEnLetras, $pagosData) {
+    return [
+        "identificacion" => [
             "version" => 1,
-            "ambiente" => "00",
-            "tipoDte" => $factura['tipoDTEId'], // tipoDTEId de la tabla fel_facturas
+            "ambiente" => "0",
+            "tipoDte" => $factura['tipoDTEId'],
             "numeroControl" => $certificacion['numeroControl'],
             "codigoGeneracion" => strtoupper($certificacion['codigoGeneracion']),
             "tipoModelo" => 1,
@@ -3404,7 +3015,7 @@ public function tablaVerJSON() {
                 "complemento" => "POLIG. B, RES. LOS ELISEOS #9, SAN SALVADOR, SAN SALVADOR"
             ],
             "telefono" => "79221469",
-            "correo" => "aldogamesstore@gmail.com",
+            "correo" => "aldogamesstore@gmail.com"
         ],
         "receptor" => [
             "tipoDocumento" => $cliente['documentoIdentificacionId'],
@@ -3416,20 +3027,25 @@ public function tablaVerJSON() {
                 "municipio" => $cliente['paisEstadoId'],
                 "complemento" => $cliente['direccionCliente']
             ],
-            "telefono" => $telefono,
-            "correo" => $correo,
+            "telefono" => $telefono ? $telefono['contactoCliente'] : null,
+            "correo" => $correo ? $correo['contactoCliente'] : null,
         ],
         "cuerpoDocumento" => array_map(function($detalle) {
             return [
                 "cantidad" => $detalle['cantidadProducto'],
                 "numeroDocumento" => null,
                 "codigo" => $detalle['codigoProducto'],
+                "codTributo" => null,
                 "tipoItem" => $detalle['tipoItemMHId'],
-                "descripcion" => 0, // Deberías completar la descripción si es necesario
+                "uniMedida" => $detalle['unidadMedidaId'],
+                "descripcion" => $detalle['producto'],
                 "precioUni" => $detalle['precioUnitario'],
                 "montoDescu" => $detalle['descuentoTotal'],
+                "ventaNoSuj" => 0,
+                "ventaExenta" => 0,
                 "ventaGravada" => $detalle['totalDetalleIVA'],
-                "ivaItem" => $detalle['ivaTotal']
+                "tributo" => null,
+                "ivaItem" => $detalle['ivaUnitario']
             ];
         }, $detalles),
         "resumen" => [
@@ -3456,108 +3072,106 @@ public function tablaVerJSON() {
             "pagos" => $pagosData,
             "numPagoElectronico" => null
         ]
-        ];
-    } elseif ($factura['tipoDTEId'] == 2) {
-        // JSON para tipoDTEId = 2
-        $data = [
-            "identificacion" => [
-                "version" => 1,
-                "ambiente" => "00",
-                "tipoDte" =>  $factura['tipoDTEId'],
-                "numeroControl" => $certificacion['numeroControl'],
-                "codigoGeneracion" => strtoupper($certificacion['codigoGeneracion']),
-                "tipoModelo" => 1,
-                "tipoOperacion" => 1,
-                "tipoContingencia" => null,
-                "motivoContin" => null,
-                "fecEmi" => date('Y-m-d', strtotime($factura['fechaEmision'])),
-                "horEmi" => date('H:i:s', strtotime($factura['horaEmision'])),
-                "tipoMoneda" => "USD"
-            ],
-            "emisor" => [
-                "nit" => "03863624-1",
-                "nrc" => "329956-5",
-                "nombre" => "BELTRAN. ABIGAIL ELIZABETH",
-                "codActividad" => 502,
-                "descActividad" => "VENTA AL POR MENOR DE OTROS PRODUCTOS N.C.P",
-                "nombreComercial" => "ALDO GAMES STORE",
-                "direccion" => [
-                    "departamento" => 6,
-                    "municipio" => 214,
-                    "complemento" => "POLIG. B, RES. LOS ELISEOS #9, SAN SALVADOR, SAN SALVADOR"
-                ],
-                "telefono" => "79221469",
-                "correo" => "aldogamesstore@gmail.com",
-            ],
-            "receptor" => [
-                "nit" => $cliente['numDocumentoIdentificacion'],
-                "nrc" => $cliente['nrcCliente'],
-                "nombre" => $cliente['cliente'],
-                "codActividad" => $cliente['actividadEconomicaId'],
-                "descActividad" => "Cría de aves de corral y producción de huevos",
-                "nombreComercial" => $cliente['clienteComercial'],
-                "direccion" => [
-                    "departamento" => $cliente['paisCiudadId'],
-                    "municipio" => $cliente['paisEstadoId'],
-                    "complemento" => $cliente['direccionCliente']
-                ],
-                "telefono" => $telefono,
-                "correo" => $correo,
-            ],
-            "cuerpoDocumento" => array_map(function($detalle) {
-                return [
-                    "numItem" => 1, // Este valor se debería incrementar con cada elemento
-                    "tipoItem" => 1, // Asumiendo que todos los items tienen el mismo tipo
-                    "numeroDocumento" => null,
-                    "cantidad" => $detalle['cantidadProducto'],
-                    "codigo" => $detalle['codigoProducto'],
-                    "uniMedida" => 59, // Unidad de medida asumida como estática
-                    "descripcion" => "Descripción del producto", // Completar la descripción
-                    "precioUni" => $detalle['precioUnitario'],
-                    "montoDescu" => $detalle['descuentoTotal'],
-                    "ventaNoSuj" => 0,
-                    "ventaExenta" => 0,
-                    "ventaGravada" => $detalle['totalDetalleIVA'],
-                    "tributos" => ["20"], // Tributos asumidos
-                    "psv" => 0,
-                    "noGravado" => 0
-                ];
-            }, $detalles),
-            "resumen" => [
-                "totalNoSuj" => 0,
-                "totalExenta" => 0,
-                "totalGravada" => number_format($totalGravada, 2, '.', ','),
-                "subTotalVentas" => number_format($totalGravada, 2, '.', ','),
-                "descuNoSuj" => 0,
-                "descuExenta" => 0,
-                "descuGravada" => number_format($totalDescu, 2, '.', ','),
-                "porcentajeDescuento" => number_format($porcentajeDescuento, 2, '.', ','),
-                "totalDescu" => number_format($totalDescu, 2, '.', ','),
-                "tributos" => [
-                    [
-                        "codigo" => "20",
-                        "descripcion" => "Impuesto al Valor Agregado 13%",
-                        "valor" => number_format($totalIva, 2, '.', ',')
-                    ]
-                ],
-                "subTotal" => number_format($totalGravada, 2, '.', ','),
-                "ivaPerci1" => 17.5,
-                "ivaRete1" => 0,
-                "reteRenta" => 0,
-                "montoTotalOperacion" => number_format($totalGravada + $totalIva - $totalDescu, 2, '.', ','),
-                "totalNoGravado" => 0,
-                "totalPagar" => number_format($totalGravada + $totalIva - $totalDescu, 2, '.', ','),
-                "totalLetras" => $totalEnLetras,
-                "saldoFavor" => 0,
-                "condicionOperacion" => 1,
-                "pagos" => $pagosData,
-                "numPagoElectronico" => null
-            ]
-        ];
-    }
-
-    return $this->response->setJSON($data);
+    ];
 }
+
+// Método para generar el JSON para tipoDTEId = 2
+private function generarJSONTipo2($factura, $certificacion, $cliente, $telefono, $correo, $detalles, $totalGravada, $totalIva, $totalDescu, $porcentajeDescuento, $totalEnLetras, $pagosData) {
+    return [
+        "identificacion" => [
+            "version" => 3,
+            "ambiente" => "01",
+            "tipoDte" => "02",
+            "numeroControl" => $certificacion['numeroControl'],
+            "codigoGeneracion" => strtoupper($certificacion['codigoGeneracion']),
+            "tipoModelo" => 1,
+            "tipoOperacion" => 1,
+            "tipoContingencia" => null,
+            "motivoContin" => null,
+            "fecEmi" => date('Y-m-d', strtotime($factura['fechaEmision'])),
+            "horEmi" => date('H:i:s', strtotime($factura['horaEmision'])),
+            "tipoMoneda" => "USD"
+        ],
+        "emisor" => [
+            "nit" => "03863624-1",
+            "nrc" => "329956-5",
+            "nombre" => "BELTRAN. ABIGAIL ELIZABETH",
+            "codActividad" => 502,
+            "descActividad" => "VENTA AL POR MENOR DE OTROS PRODUCTOS N.C.P",
+            "nombreComercial" => "ALDO GAMES STORE",
+            "direccion" => [
+                "departamento" => 6,
+                "municipio" => 214,
+                "complemento" => "POLIG. B, RES. LOS ELISEOS #9, SAN SALVADOR, SAN SALVADOR"
+            ],
+            "telefono" => "79221469",
+            "correo" => "aldogamesstore@gmail.com"
+        ],
+        "receptor" => [
+            "nit" => $cliente['numDocumentoIdentificacion'],
+            "nrc" => $cliente['nrcCliente'],
+            "nombre" => $cliente['cliente'],
+            "codActividad" => $cliente['actividadEconomicaId'],
+            "descActividad" => "Cría de aves de corral y producción de huevos",
+            "nombreComercial" => $cliente['clienteComercial'],
+            "direccion" => [
+                "departamento" => $cliente['paisCiudadId'],
+                "municipio" => $cliente['paisEstadoId'],
+                "complemento" => $cliente['direccionCliente']
+            ],
+            "telefono" => $telefono ? $telefono['contactoCliente'] : null,
+            "correo" => $correo ? $correo['contactoCliente'] : null,
+        ],
+        "cuerpoDocumento" => array_map(function($detalle) {
+            return [
+                "numItem" => 1,
+                "tipoItem" => $detalle['tipoItemMHId'],
+                "numeroDocumento" => null,
+                "cantidad" => $detalle['cantidadProducto'],
+                "codigo" => $detalle['codigoProducto'],
+                "uniMedida" => $detalle['unidadMedidaId'],
+                "descripcion" => $detalle['producto'],
+                "precioUni" => $detalle['precioUnitario'],
+                "montoDescu" => $detalle['descuentoTotal'],
+                "ventaGravada" => $detalle['totalDetalleIVA'],
+                "tributos" => ["20"], // Tributos asumidos
+                "psv" => 0,
+                "noGravado" => 0
+            ];
+        }, $detalles),
+        "resumen" => [
+            "totalNoSuj" => 0,
+            "totalExenta" => 0,
+            "totalGravada" => number_format($totalGravada, 2, '.', ','),
+            "subTotalVentas" => number_format($totalGravada, 2, '.', ','),
+            "descuNoSuj" => 0,
+            "descuExenta" => 0,
+            "descuGravada" => number_format($totalDescu, 2, '.', ','),
+            "porcentajeDescuento" => number_format($porcentajeDescuento, 2, '.', ','),
+            "totalDescu" => number_format($totalDescu, 2, '.', ','),
+            "tributos" => [
+                [
+                    "codigo" => "20",
+                    "descripcion" => "Impuesto al Valor Agregado 13%",
+                    "valor" => number_format($totalIva, 2, '.', ',')
+                ]
+            ],
+            "subTotal" => number_format($totalGravada, 2, '.', ','),
+            "ivaPerci1" => 17.5,
+            "ivaRete1" => 0,
+            "reteRenta" => 0,
+            "montoTotalOperacion" => number_format($totalGravada + $totalIva - $totalDescu, 2, '.', ','),
+            "totalNoGravado" => 0,
+            "totalPagar" => number_format($totalGravada + $totalIva - $totalDescu, 2, '.', ','),
+            "totalLetras" => $totalEnLetras,
+            "saldoFavor" => 0,
+            "condicionOperacion" => 1,
+            "pagos" => $pagosData,
+            "numPagoElectronico" => null
+        ]
+    ];
+}
+
 
 // Función para convertir números a letras
 private function numeroALetras($numero) {
