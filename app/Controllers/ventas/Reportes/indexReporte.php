@@ -271,6 +271,38 @@ class indexReporte extends Controller
         $pdf->SetFillColor(154, 193, 229);
         $pdf->Cell(190,5,utf8_decode('Cuerpo del documento'),1,0,'L', true);
 
+        $pdf->SetFont('Arial','B',8);
+        $pdf->SetXY(10,85);
+        $pdf->Cell(190,5,utf8_decode('#'),0,0,'L');
+
+        $pdf->SetFont('Arial','',8);
+        $pdf->SetXY(10,94);
+        $pdf->Cell(5,5,utf8_decode('#'),0,0,'L');
+
+        $pdf->SetFont('Arial','B',8);
+        $pdf->SetXY(15,85);
+        $pdf->Cell(190,5,utf8_decode('Cantidad'),0,0,'L');
+
+        $pdf->SetFont('Arial','',8);
+        $pdf->SetXY(15,94);
+        $pdf->Cell(15,5,utf8_decode('#'),0,0,'R');
+
+        $pdf->SetFont('Arial', 'B', 8);
+        $pdf->SetXY(30, 86);
+        $pdf->MultiCell(20, 3, utf8_decode('Unidad de medida'), 0, 'L');
+        
+        $pdf->SetFont('Arial', '', 8);
+        $pdf->SetXY(20,94); // Esto posiciona la siguiente celda justo debajo del último MultiCell
+        $pdf->Cell(20, 5, utf8_decode('#'), 0, 0, 'R');
+
+        $pdf->SetFont('Arial','B',8);
+        $pdf->SetXY(15,85);
+        $pdf->Cell(190,5,utf8_decode('Código'),0,0,'L');
+
+        $pdf->SetFont('Arial','',8);
+        $pdf->SetXY(15,94);
+        $pdf->Cell(15,5,utf8_decode('#'),0,0,'R');
+
         $this->response->setHeader('Content-Type', 'application/pdf');
   
         $pdf->Output();
