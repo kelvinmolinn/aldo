@@ -4,7 +4,9 @@ namespace App\Controllers\ventas\Reportes;
 require_once(APPPATH . 'Libraries/fpdf/fpdf.php');
 
 use App\Models\fel_facturas;
+use App\Models\fel_facturas_detalle;
 use App\Models\fel_clientes;
+use App\Models\fel_cliente_contacto;
 
 use CodeIgniter\Controller;
 use FPDF;
@@ -48,14 +50,16 @@ class indexReporte extends Controller
     public function generate(){
 
         $felFactura = new fel_facturas();
+        $felFacturaDetalle = new fel_facturas_detalle();
         $felClientes = new fel_clientes();
+        $felClienteContacto = new fel_cliente_contacto();
 
         $pdf = new PDF();
 
         $facturaId = isset($_GET['facturaId']) ? intval($_GET['facturaId']) : 0;
 
         $datosDte = $felFactura
-            ->select('cat_04_tipo_transmision.tipoTransmision,cat_17_forma_pago.formaPago,DATE_FORMAT(fel_facturas.fechaEmision, "%d/%m/%Y") as fechaEmision ,fel_facturas.horaEmision,fel_factura_certificacion.numeroControl,fel_factura_certificacion.codigoGeneracion,fel_factura_certificacion.selloRecibido,fel_clientes.cliente,fel_clientes.direccionCliente,fel_clientes.numDocumentoIdentificacion,fel_clientes.nrcCliente,cat_19_actividad_economica.actividadEconomica,fel_cliente_contacto.contactoCliente,fel_cliente_contacto.tipoContactoId')
+            ->select('cat_04_tipo_transmision.tipoTransmision,cat_17_forma_pago.formaPago,DATE_FORMAT(fel_facturas.fechaEmision, "%d/%m/%Y") as fechaEmision ,fel_facturas.horaEmision,fel_factura_certificacion.numeroControl,fel_factura_certificacion.codigoGeneracion,fel_factura_certificacion.selloRecibido,fel_clientes.cliente,fel_clientes.direccionCliente,fel_clientes.numDocumentoIdentificacion,fel_clientes.nrcCliente,cat_19_actividad_economica.actividadEconomica,fel_clientes.clienteId')
             ->join('fel_factura_certificacion','fel_factura_certificacion.facturaId = fel_facturas.facturaId')
             ->join('cat_04_tipo_transmision','cat_04_tipo_transmision.tipoTransmisionMHId = fel_factura_certificacion.tipoTransmisionMHId')
             ->join('fel_facturas_pago','fel_facturas_pago.facturaId = fel_facturas.facturaId')
@@ -67,6 +71,18 @@ class indexReporte extends Controller
             ->where('fel_facturas.facturaId', $facturaId)
             ->where('fel_facturas.estadoFactura','Certificado')
             ->where('fel_factura_certificacion.estadoCertificacion','Certificado')
+            ->first();
+
+        $telefono = $felClienteContacto
+            ->select('contactoCliente')
+            ->where('clienteId', $datosDte['clienteId'])
+            ->where('tipoContactoId', 1)
+            ->first();
+    
+        $correo = $felClienteContacto
+            ->select('contactoCliente')
+            ->where('clienteId', $datosDte['clienteId'])
+            ->where('tipoContactoId', 2)
             ->first();
 
         $codGeneracion = $datosDte['codigoGeneracion'];
@@ -82,8 +98,9 @@ class indexReporte extends Controller
         $numeroIdentificacion = $datosDte['numDocumentoIdentificacion'];
         $nrc = $datosDte['nrcCliente'];
 
-        $telefono = $datosDte['contactoCliente'];
-        $correo = "";
+        
+        $telefonoCliente = isset($telefono['contactoCliente']) ? $telefono['contactoCliente'] : '';
+        $correoCliente = $correo['contactoCliente'];;
 
         //$x = 100;
         //$xx = 131;
@@ -254,7 +271,7 @@ class indexReporte extends Controller
 
         $pdf->SetFont('Arial','',8);
         $pdf->SetXY(114,71);
-        $pdf->Cell(190,5,utf8_decode($telefono),0,0,'L');
+        $pdf->Cell(190,5,utf8_decode($telefonoCliente),0,0,'L');
 
         $pdf->SetFont('Arial','B',8);
         $pdf->SetXY(100,75);
@@ -262,7 +279,7 @@ class indexReporte extends Controller
 
         $pdf->SetFont('Arial','',8);
         $pdf->SetXY(111,75);
-        $pdf->Cell(190,5,utf8_decode($correo),0,0,'L');
+        $pdf->Cell(190,5,utf8_decode($correoCliente),0,0,'L');
 
         $pdf->Ln(23);
         $pdf->SetFont('Arial','B',8);
@@ -276,32 +293,66 @@ class indexReporte extends Controller
         $pdf->Cell(190,5,utf8_decode('#'),0,0,'L');
 
         $pdf->SetFont('Arial','',8);
-        $pdf->SetXY(10,94);
+        $pdf->SetXY(10,95);
         $pdf->Cell(5,5,utf8_decode('#'),0,0,'L');
 
         $pdf->SetFont('Arial','B',8);
-        $pdf->SetXY(15,85);
+        $pdf->SetXY(20,85);
         $pdf->Cell(190,5,utf8_decode('Cantidad'),0,0,'L');
 
         $pdf->SetFont('Arial','',8);
-        $pdf->SetXY(15,94);
-        $pdf->Cell(15,5,utf8_decode('#'),0,0,'R');
+        $pdf->SetXY(20,95);
+        $pdf->Cell(15,5,utf8_decode('#'),0,0,'C');
 
         $pdf->SetFont('Arial', 'B', 8);
-        $pdf->SetXY(30, 86);
+        $pdf->SetXY(40, 86);
         $pdf->MultiCell(20, 3, utf8_decode('Unidad de medida'), 0, 'L');
         
         $pdf->SetFont('Arial', '', 8);
-        $pdf->SetXY(20,94); // Esto posiciona la siguiente celda justo debajo del último MultiCell
-        $pdf->Cell(20, 5, utf8_decode('#'), 0, 0, 'R');
+        $pdf->SetXY(40,95); 
+        $pdf->Cell(15, 5, utf8_decode('#'), 0, 0, 'R');
 
         $pdf->SetFont('Arial','B',8);
-        $pdf->SetXY(15,85);
+        $pdf->SetXY(65,85);
         $pdf->Cell(190,5,utf8_decode('Código'),0,0,'L');
 
         $pdf->SetFont('Arial','',8);
-        $pdf->SetXY(15,94);
+        $pdf->SetXY(65,94);
         $pdf->Cell(15,5,utf8_decode('#'),0,0,'R');
+
+        $pdf->SetFont('Arial','B',8);
+        $pdf->SetXY(85,85);
+        $pdf->Cell(190,5,utf8_decode('Descripción'),0,0,'L');
+
+        $pdf->SetFont('Arial','',8);
+        $pdf->SetXY(85,94);
+        $pdf->Cell(15,5,utf8_decode('#'),0,0,'R');
+
+        $pdf->SetFont('Arial','B',8);
+        $pdf->SetXY(115,86);
+        $pdf->MultiCell(20, 3, utf8_decode('Precio unitario'), 0, 'L');
+
+        $pdf->SetFont('Arial','',8);
+        $pdf->SetXY(115,94);
+        $pdf->Cell(15,5,utf8_decode('#'),0,0,'R');
+
+        $pdf->SetFont('Arial','B',8);
+        $pdf->SetXY(140,86);
+        $pdf->MultiCell(20, 3, utf8_decode('Descuentos por item'), 0, 'L');
+
+        $pdf->SetFont('Arial','',8);
+        $pdf->SetXY(140,94);
+        $pdf->Cell(15,5,utf8_decode('#'),0,0,'R');
+
+        $pdf->SetFont('Arial','B',8);
+        $pdf->SetXY(170 ,86);
+        $pdf->MultiCell(20, 3, utf8_decode('Ventas gravadas'), 0, 'L');
+
+        $pdf->SetFont('Arial','',8);
+        $pdf->SetXY(170,94);
+        $pdf->Cell(15,5,utf8_decode('#'),0,0,'R');
+
+        //$pdf->Cell(190,5,utf8_decode('Precio unitario'),0,0,'L');
 
         $this->response->setHeader('Content-Type', 'application/pdf');
   

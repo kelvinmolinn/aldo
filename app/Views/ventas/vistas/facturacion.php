@@ -2,6 +2,10 @@
 <hr>
 <div class="row mb-4">
     <div class="col-md-12 text-right">
+        <button type= "button" id="btnActivarContingencia" class="btn btn-primary estilo-btn" onclick="">
+            <i class="fas fa-save"></i>
+            Activar contingencia DTE
+        </button>
         <button type= "button" id="btnNuevaReserva" class="btn btn-primary estilo-btn" onclick="modalEmitirDTE()">
             <i class="fas fa-save"></i>
             Emitir DTE
