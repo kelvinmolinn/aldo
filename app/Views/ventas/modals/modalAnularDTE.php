@@ -35,52 +35,52 @@
 <script>
     $(document).ready(function() {
 
-                $("#frmModal").submit(function(event) {
+        $("#frmModal").submit(function(event) {
             event.preventDefault();
             Swal.fire({
-            title: '¿Estás seguro que desea anular el DTE?',
-            text: "Se anulara el DTE seleccionado.",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Anular',
-            cancelButtonText: 'Cancelar'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                $.ajax({
-                    url: $(this).attr('action'), 
-                    type: $(this).attr('method'),
-                    data: $(this).serialize(),
-                    success: function(response) {
-                        console.log(response);
-                        if (response.success) {
-                            // Insert exitoso, ocultar modal y mostrar mensaje
-                            $('#modalAnularDTE').modal('hide');
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'DTE anulado con éxito',
-                                text: response.mensaje
-                            }).then((result) => {
-                                $("#tablaDTE").DataTable().ajax.reload(null, false);
+                title: '¿Estás seguro que desea anular el DTE?',
+                text: "Se anulara el DTE seleccionado.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Anular',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: $(this).attr('action'), 
+                        type: $(this).attr('method'),
+                        data: $(this).serialize(),
+                        success: function(response) {
+                            console.log(response);
+                            if (response.success) {
+                                // Insert exitoso, ocultar modal y mostrar mensaje
+                                $('#modalAnularDTE').modal('hide');
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'DTE anulado con éxito',
+                                    text: response.mensaje
+                                }).then((result) => {
+                                    $("#tablaDTE").DataTable().ajax.reload(null, false);
 
-                            });
-                        } else {
-                            // Insert fallido, mostrar mensaje de error
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: response.mensaje
-                            });
+                                });
+                            } else {
+                                // Insert fallido, mostrar mensaje de error
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: response.mensaje
+                                });
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            // Manejar errores si los hay
+                            console.error(xhr.responseText);
                         }
-                    },
-                    error: function(xhr, status, error) {
-                        // Manejar errores si los hay
-                        console.error(xhr.responseText);
-                    }
-                });
-            }
-        });
+                    });
+                }
+            });
 
         });
     });

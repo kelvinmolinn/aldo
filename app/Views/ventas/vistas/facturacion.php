@@ -2,11 +2,26 @@
 <hr>
 <div class="row mb-4">
     <div class="col-md-12 text-right">
-        <button type= "button" id="btnActivarContingencia" class="btn btn-primary estilo-btn" onclick="">
-            <i class="fas fa-save"></i>
-            Activar contingencia DTE
+        <?php
+             if($activarContingencia['valorParametrizacion'] == 1){
+        ?>
+        <form id="frmActivarContingencia" method="post" action="<?php echo base_url(''); ?>" class="d-inline">
+            <button type= "submit" id="btnActivarContingencia" class="btn btn-warning estilo-btn" onclick="">
+                <i class="fas fa-wrench"></i> 
+                Contingencia DTE
+            </button>
+        </form>
+        <?php 
+             }else{
+        ?>
+        <button type= "button" id="btnActivarContingencia" class="btn btn-danger estilo-btn d-inline" onclick="">
+            <i class="fas fa-wrench"></i> 
+            Finalizar Contingencia DTE
         </button>
-        <button type= "button" id="btnNuevaReserva" class="btn btn-primary estilo-btn" onclick="modalEmitirDTE()">
+        <?php 
+             }
+        ?>
+        <button type= "button" id="btnNuevaReserva" class="btn btn-primary estilo-btn d-inline" onclick="modalEmitirDTE()">
             <i class="fas fa-save"></i>
             Emitir DTE
         </button>
@@ -225,30 +240,78 @@
 
     $(document).ready(function() {
 
-    function EventoEnter(inputId) {
-        $('#' + inputId).on('keypress', function(event) {
-            if (event.key === 'Enter') {
-                event.preventDefault(); // Evita el comportamiento por defecto
-                $('#btnBuscarCompra').click(); // Simula el clic en el botón
+        function EventoEnter(inputId) {
+            $('#' + inputId).on('keypress', function(event) {
+                if (event.key === 'Enter') {
+                    event.preventDefault(); // Evita el comportamiento por defecto
+                    $('#btnBuscarCompra').click(); // Simula el clic en el botón
+                }
+            });
+        }
+        EventoEnter('filtroNumReserva');
+        EventoEnter('filtroFechaReserva');
+        EventoEnter('filtroClienteReserva');
+        
+
+        $('input, textarea').on('focus', function() {
+            $(this).addClass('active');
+        });
+
+        // Remover clase 'active' si el input está vacío al perder el foco
+        $('input, textarea').on('blur', function() {
+            if ($(this).val().trim() === '') {
+                $(this).removeClass('active');
             }
         });
-    }
-    EventoEnter('filtroNumReserva');
-    EventoEnter('filtroFechaReserva');
-    EventoEnter('filtroClienteReserva');
-    
-
-    $('input, textarea').on('focus', function() {
-        $(this).addClass('active');
-    });
-
-    // Remover clase 'active' si el input está vacío al perder el foco
-    $('input, textarea').on('blur', function() {
-        if ($(this).val().trim() === '') {
-            $(this).removeClass('active');
-        }
-    });
         tituloVentana("Facturación");
+
+        $("#frmActivarContingencia").submit(function(event) {
+            event.preventDefault();
+            Swal.fire({
+                title: '¿Está seguro que desea habilitar la contingencia de DTE?',
+                text: "Se habilitará la contingencia para la certificación de DTE.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Habilitar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: $(this).attr('action'), 
+                        type: $(this).attr('method'),
+                        data: $(this).serialize(),
+                        success: function(response) {
+                            console.log(response);
+                            if (response.success) {
+                                // Insert exitoso, ocultar modal y mostrar mensaje
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Contingencia habilitada',
+                                    text: response.mensaje
+                                }).then((result) => {
+                                    $("#tablaDTE").DataTable().ajax.reload(null, false);
+
+                                });
+                            } else {
+                                // Insert fallido, mostrar mensaje de error
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: response.mensaje
+                                });
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            // Manejar errores si los hay
+                            console.error(xhr.responseText);
+                        }
+                    });
+                }
+            });
+
+        });
 
         $('#tablaDTE').DataTable({
             "ajax": {

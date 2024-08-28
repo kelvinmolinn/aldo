@@ -43,9 +43,17 @@ class administracionFacturacion extends Controller
 {
     //ESTE CONTROLLERS ES DE PERMISOS 
     public function index(){
+        $parametrizacion = new conf_parametrizaciones();
+
         $session = session();
 
         $data['variable'] = 0;
+
+        $data['activarContingencia'] = $parametrizacion
+                ->select('valorParametrizacion')
+                ->where('flgElimina', 0)
+                ->where('parametrizacionId', 6)
+                ->first();
 
         $camposSession = [
             'renderVista' => 'No'
@@ -54,7 +62,11 @@ class administracionFacturacion extends Controller
             'route'             => 'ventas/admin-facturacion/index',
             'camposSession'     => json_encode($camposSession)
         ]);
+
+
+
         return view('ventas/vistas/facturacion', $data);
+
     }
 
     public function modalEmitirDTE(){

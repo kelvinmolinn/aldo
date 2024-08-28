@@ -119,7 +119,7 @@
             placeholder: "Forma pago"
         });
 
-                $("#frmModal").submit(function(event) {
+        $("#frmModal").submit(function(event) {
             event.preventDefault();
             $.ajax({
                 url: $(this).attr('action'), 
