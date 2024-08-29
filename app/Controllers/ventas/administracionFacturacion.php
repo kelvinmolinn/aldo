@@ -3185,19 +3185,46 @@ private function generarJSONTipo2($factura, $certificacion, $cliente, $telefono,
 }
 
 
-// Función para convertir números a letras
-private function numeroALetras($numero) {
-    $formatter = new \NumberFormatter("es", \NumberFormatter::SPELLOUT);
-    $entero = floor($numero);
-    $fraccion = round(($numero - $entero) * 100);
+    // Función para convertir números a letras
+    private function numeroALetras($numero) {
+        $formatter = new \NumberFormatter("es", \NumberFormatter::SPELLOUT);
+        $entero = floor($numero);
+        $fraccion = round(($numero - $entero) * 100);
 
-    $texto = $formatter->format($entero);
-    $texto .= " dólares";
+        $texto = $formatter->format($entero);
+        $texto .= " dólares";
 
-    if ($fraccion > 0) {
-        $texto .= " con " . $formatter->format($fraccion) . " centavos";
+        if ($fraccion > 0) {
+            $texto .= " con " . $formatter->format($fraccion) . " centavos";
+        }
+
+        return ucfirst($texto);
     }
 
-    return ucfirst($texto);
-}
+    public function activarContingencia(){
+        $parametrizacion = new conf_parametrizaciones();
+        
+        $data = [
+            'valorParametrizacion'   => 2
+
+        ];
+            // Insertar datos en la base de datos
+            $operacionContingencia = $parametrizacion->update(6, $data);
+
+        if ($operacionContingencia) {
+            // Si el insert fue exitoso, devuelve el último ID insertado
+            return $this->response->setJSON([
+                'success' => true,
+                'mensaje' => 'Contingencia activada con éxito.',
+                'parametrizacionId' => 6
+            ]);
+        } else {
+            // Si el insert falló, devuelve un mensaje de error
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'No se pudo activar la contingencia'
+            ]);
+        }
+
+    }
 }

@@ -288,7 +288,7 @@ $routes->group('ventas/admin-facturacion', function($routes) {
     $routes->post('vista/continuar/dte', 'ventas\administracionFacturacion::vistaContinuarDTE');
     $routes->post('operacion/actualizar/dte', 'ventas\administracionFacturacion::vistaActualizarDTEOperacion');
     $routes->post('modal/nuevo/dte', 'ventas\administracionFacturacion::modalNuevoProductoDTE'); 
-     $routes->post('operacion/guardar/NuevoDTE', 'ventas\administracionFacturacion::modalNuevoDTEOperacion');
+    $routes->post('operacion/guardar/NuevoDTE', 'ventas\administracionFacturacion::modalNuevoDTEOperacion');
     $routes->post('tabla/continuar/dte', 'ventas\administracionFacturacion::tablaContinuarDTE');
     $routes->post('operacion/eliminar/dte', 'ventas\administracionFacturacion::eliminarDTE');
     $routes->post('form/pago/dte', 'ventas\administracionFacturacion::modalPagoDTE');
@@ -313,6 +313,7 @@ $routes->group('ventas/admin-facturacion', function($routes) {
     $routes->post('tabla/ver/dte', 'ventas\administracionFacturacion::tablaVerDTE');
     $routes->post('form/ver/json', 'ventas\administracionFacturacion::modalVerJSON');
     $routes->post('tabla/ver/json', 'ventas\administracionFacturacion::tablaVerJSON');
+    $routes->post('activar/contingencia', 'ventas\administracionFacturacion::activarContingencia');
 
     $routes->get('pdf/generate', 'ventas\reportes\indexReporte::generate');
 

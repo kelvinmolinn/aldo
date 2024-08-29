@@ -5,7 +5,7 @@
         <?php
              if($activarContingencia['valorParametrizacion'] == 1){
         ?>
-        <form id="frmActivarContingencia" method="post" action="<?php echo base_url(''); ?>" class="d-inline">
+        <form id="frmActivarContingencia" method="post" action="<?php echo base_url('ventas/admin-facturacion/activar/contingencia'); ?>" class="d-inline">
             <button type= "submit" id="btnActivarContingencia" class="btn btn-warning estilo-btn" onclick="">
                 <i class="fas fa-wrench"></i> 
                 Contingencia DTE
@@ -291,7 +291,8 @@
                                     title: 'Contingencia habilitada',
                                     text: response.mensaje
                                 }).then((result) => {
-                                    $("#tablaDTE").DataTable().ajax.reload(null, false);
+
+                                    cambiarInterfaz(`ventas/admin-facturacion/index`);
 
                                 });
                             } else {
