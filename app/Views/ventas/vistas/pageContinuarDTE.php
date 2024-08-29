@@ -98,14 +98,26 @@
     <div class="row mb-4 mt-4">
         <div class="col-md-12">
             <div class="text-right">
-                <button type="submit" id="btnFinalizarReserva" class="btn btn-danger" onclick="certificarDTEError();">
+                <?php if ($contingencia == 1){
+                ?>
+                <button type="submit" id="btnCertificarError" class="btn btn-danger" onclick="certificarDTEError();">
                     <i class="fas fa-save"></i>
                     Certificar DTE con error
                 </button>
-                <button type="submit" id="btnFinalizarReserva" class="btn btn-primary" onclick="certificarDTE();">
+                <button type="submit" id="btnCertificarDTE" class="btn btn-primary" onclick="certificarDTE();">
                     <i class="fas fa-save"></i>
                     Certificar DTE
                 </button>
+                <?php 
+                    }else{
+                ?>
+                <button type="submit" id="btnCertificarDTE" class="btn btn-primary" onclick="">
+                    <i class="fas fa-save"></i>
+                    Finalizar DTE en contingencia
+                </button>
+                <?php
+                    }
+                ?>
             </div>
         </div>
 

@@ -177,6 +177,7 @@ class administracionFacturacion extends Controller
 
 public function tablaFacturacion()
 {
+
     $facturaId = $this->request->getPost('facturaId');
     $mostrarDTE = new fel_facturas();
     $datos = $mostrarDTE
@@ -232,7 +233,13 @@ public function tablaFacturacion()
             ->where('facturaId', $columna['facturaId'])
             ->where('flgElimina', 0)
             ->findAll();
-
+            $parametrizacion = new conf_parametrizaciones();
+        
+            $contingenciaActivada = $parametrizacion
+                      ->select('valorParametrizacion')
+                      ->where('flgElimina', 0)
+                      ->where('parametrizacionId', 6)
+                      ->first();
         // Calcular los totales
         foreach ($detallesFactura as $detalle) {
             $subtotal += $detalle['totalDetalle'];
@@ -246,11 +253,17 @@ public function tablaFacturacion()
                   . "<b>(+)IVA:</b> $ " . number_format($ivaTotal, 2, '.', ',') . "<br>"
                   . "<b>(-)Descuentos:</b> $ " . number_format($descuentos, 2, '.', ',') . "<br>"
                   . "<b>(=)Total a Pagar:</b> $ " . number_format($totalAPagar, 2, '.', ',');
+        
+
 
         if ($columna['estadoFactura'] === 'Pendiente') {
+
+
             $jsonActualizarReserva = [
-                "facturaId" => $columna['facturaId']
+                "facturaId"     => $columna['facturaId'],
+                "contingencia"  => $contingenciaActivada['valorParametrizacion']
             ];
+
             $columna6 = '
                 <button class="btn btn-primary mb-1" onclick="cambiarInterfaz(`ventas/admin-facturacion/vista/continuar/dte`, ' . htmlspecialchars(json_encode($jsonActualizarReserva)) . ');" data-toggle="tooltip" data-placement="top" title="Continuar DTE">
                     <i class="fas fa-sync-alt"></i> <span> </span>
@@ -361,7 +374,7 @@ public function tablaFacturacion()
     {
         $session = session();
         $facturaId = $this->request->getPost('facturaId');
-
+        $contingencia = $this->request->getPost('contingencia');
         $camposSession = [
             'renderVista' => 'No',
             'facturaId'    => $facturaId
@@ -372,6 +385,7 @@ public function tablaFacturacion()
         ]);
 
         $data['facturaId'] = $facturaId;
+        $data['contingencia'] = $contingencia;
         $mostrarSalida = new fel_facturas();
         
         $sucursales = new conf_sucursales();
