@@ -14,7 +14,7 @@
         <?php 
              }else{
         ?>
-        <button type= "button" id="btnActivarContingencia" class="btn btn-danger estilo-btn d-inline" onclick="">
+        <button type= "button" id="btnActivarContingencia" class="btn btn-danger estilo-btn d-inline" onclick="modalFinalizarContingencia();">
             <i class="fas fa-wrench"></i> 
             Finalizar Contingencia DTE
         </button>
@@ -71,6 +71,24 @@
     </table>
 </div>
 <script>
+    function modalFinalizarContingencia(){
+        $.ajax({
+            url: '<?php echo base_url('ventas/admin-facturacion/form/finalizar/contingencia'); ?>',
+            type: 'POST',
+            data: {}, // Pasar el ID del módulo como parámetro
+            success: function(response) {
+                // Insertar el contenido de la modal en el cuerpo de la modal
+                $('#divModalContent').html(response);
+                // Mostrar la modal
+                $('#modalFinalizarContingencia').modal('show');
+                
+            },
+            error: function(xhr, status, error) {
+                // Manejar errores si los hay
+                console.error(xhr.responseText);
+            }
+        });
+    }
     function modalEmitirDTE(facturaId) {
         // Realizar una petición AJAX para obtener los datos del módulo por su ID
         $.ajax({
@@ -91,7 +109,7 @@
         });
     }
 
-        function modalVerDTE(facturaId) {
+    function modalVerDTE(facturaId) {
         // Realizar una petición AJAX para obtener los datos del módulo por su ID
         $.ajax({
                 url: '<?php echo base_url('ventas/admin-facturacion/form/ver/dte'); ?>',

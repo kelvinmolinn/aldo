@@ -33,7 +33,7 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-outline">
-                                <input type="text" id="precioUnitario" name="precioUnitario" class="form-control number-input active " placeholder="Precio Unitario"  value="<?= $campos['precioUnitario']; ?>"  readonly required>
+                                <input type="text" id="precioUnitario" name="precioUnitario" class="form-control number-input active "  value="<?= $campos['precioUnitario']; ?>"  readonly required>
                                 <label class="form-label" for="precioUnitario">Precio Unitario</label>
                                 <input type="hidden" name="hiddenPrecioUnitario" id="hiddenPrecioUnitario">
                             </div>

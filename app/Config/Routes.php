@@ -314,6 +314,8 @@ $routes->group('ventas/admin-facturacion', function($routes) {
     $routes->post('form/ver/json', 'ventas\administracionFacturacion::modalVerJSON');
     $routes->post('tabla/ver/json', 'ventas\administracionFacturacion::tablaVerJSON');
     $routes->post('activar/contingencia', 'ventas\administracionFacturacion::activarContingencia');
+    $routes->post('operacion/certificar/contingencia/dte', 'ventas\administracionFacturacion::certificarContingenciaDTE');
+    $routes->post('form/finalizar/contingencia','ventas\administracionFacturacion::modalFinalizarContingencia');
 
     $routes->get('pdf/generate', 'ventas\reportes\indexReporte::generate');
 

@@ -111,7 +111,7 @@
                 <?php 
                     }else{
                 ?>
-                <button type="submit" id="btnCertificarDTE" class="btn btn-primary" onclick="">
+                <button type="submit" id="btnCertificarDTE" class="btn btn-primary" onclick="certificarContingenciaDTE();">
                     <i class="fas fa-save"></i>
                     Finalizar DTE en contingencia
                 </button>
@@ -172,7 +172,7 @@
             });
     }
 
-        function  certificarDTE() {
+    function  certificarDTE() {
         //alert("Vamos a certificar " + id);
             Swal.fire({
                 title: '¿Estás seguro que desea certificar el DTE?',
@@ -221,7 +221,55 @@
             });
     }
 
-            function  certificarDTEError() {
+    function  certificarContingenciaDTE() {
+        //alert("Vamos a certificar " + id);
+            Swal.fire({
+                title: '¿Estás seguro que desea certificar el DTE?',
+                text: "Se certificará el DTE.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, Certificar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Si el usuario confirma, enviar la solicitud AJAX para certificar 
+                        $.ajax({
+                            url: '<?php echo base_url('ventas/admin-facturacion/operacion/certificar/contingencia/dte'); ?>',
+                            type: 'POST',
+                            data: {
+                               facturaId : '<?= $facturaId; ?>'
+                            },
+                            success: function(response) {
+                                console.log(response);
+                                if (response.success) {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'DTE certificado en contingencia con Éxito!',
+                                        text: response.mensaje
+                                    }).then((result) => {
+                                        //$("#tablaContinuarDTE").DataTable().ajax.reload(null, false);
+                                        cambiarInterfaz('ventas/admin-facturacion/index', {renderVista:'No'});
+                                    });
+                                } else {
+                                    // Insert fallido, mostrar mensaje de error
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Error',
+                                        text: response.mensaje
+                                    });
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                // Manejar errores si los hay
+                                console.error(xhr.responseText);
+                            }
+                        });
+                }
+            });
+    }
+    function  certificarDTEError() {
         //alert("Vamos a certificar " + id);
             Swal.fire({
                 title: '¿Estás seguro que desea certificar el DTE?',
@@ -271,7 +319,7 @@
             });
     }
 
-        function modalPagoDTE(facturaId) {
+    function modalPagoDTE(facturaId) {
         // Realizar una petición AJAX para obtener los datos del módulo por su ID
         $.ajax({
                 url: '<?php echo base_url('ventas/admin-facturacion/form/pago/dte'); ?>',
@@ -291,7 +339,7 @@
         });
     }
 
-            function modalConceptoDTE(facturaDetalleId) {
+    function modalConceptoDTE(facturaDetalleId) {
         // Realizar una petición AJAX para obtener los datos del módulo por su ID
         $.ajax({
                 url: '<?php echo base_url('ventas/admin-facturacion/form/concepto/dte'); ?>',
@@ -311,7 +359,7 @@
         });
     }
 
-                function modalComplementoDTE(facturaId, facturaComplementoId) {
+    function modalComplementoDTE(facturaId, facturaComplementoId) {
         // Realizar una petición AJAX para obtener los datos del módulo por su ID
         $.ajax({
                 url: '<?php echo base_url('ventas/admin-facturacion/form/complemento/dte'); ?>',
