@@ -7,21 +7,21 @@
                 </div>
                 <div class="modal-body">
 
-                <div class= "table-responsive">
-                    <table id="tblError" name = "tblError" class="table table-hover" style="width: 100%;">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Descripción Error</th>
-                                <th>Observación Error</th>
-                                <th>Codigo Error</th>
-                                <th>Fecha</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        </tbody>
-                    </table>
-                </div>
+                    <div class= "table-responsive">
+                        <table id="tblError" name = "tblError" class="table table-hover" style="width: 100%;">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Descripción Error</th>
+                                    <th>Observación Error</th>
+                                    <th>Codigo Error</th>
+                                    <th>Fecha</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">

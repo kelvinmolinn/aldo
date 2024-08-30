@@ -71,6 +71,7 @@ class indexReporte extends Controller
             ->where('fel_facturas.facturaId', $facturaId)
             ->where('fel_facturas.estadoFactura','Certificado')
             ->where('fel_factura_certificacion.estadoCertificacion','Certificado')
+            ->where('fel_factura_certificacion.estadoCertificacion','Contingencia')
             ->first();
 
         $telefono = $felClienteContacto
@@ -100,7 +101,7 @@ class indexReporte extends Controller
 
         
         $telefonoCliente = isset($telefono['contactoCliente']) ? $telefono['contactoCliente'] : '';
-        $correoCliente = $correo['contactoCliente'];;
+        $correoCliente = $correo['contactoCliente'];
 
         //$x = 100;
         //$xx = 131;
