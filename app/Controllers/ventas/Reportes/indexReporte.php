@@ -70,8 +70,6 @@ class indexReporte extends Controller
             ->where('fel_facturas.flgElimina', 0)
             ->where('fel_facturas.facturaId', $facturaId)
             ->where('fel_facturas.estadoFactura','Certificado')
-            ->where('fel_factura_certificacion.estadoCertificacion','Certificado')
-            ->where('fel_factura_certificacion.estadoCertificacion','Contingencia')
             ->first();
 
         $telefono = $felClienteContacto

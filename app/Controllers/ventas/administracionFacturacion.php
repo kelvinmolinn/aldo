@@ -2628,8 +2628,114 @@ private function generarJSONTipo2($factura, $certificacion, $cliente, $telefono,
 
     public function modalFinalizarContingencia(){
         $data['variable'] = 0;
-        
+        $facturaId = $this->request->getPost('facturaId');
+
+        $data['facturaId'] = $facturaId;
+
         return view('ventas/modals/modalFinalizarContingencia', $data);
+    }
+
+    public function tablaContingenciaFacturacion(){
+        $facturaId = $this->request->getPost('facturaId');
+        $mostrarDTE = new fel_facturas();
+        $datos = $mostrarDTE
+            ->select('fel_facturas.facturaId, DATE_FORMAT(fel_facturas.fechaEmision, "%d/%m/%Y") as fechaEmision, fel_facturas.obsAnulacion, fel_facturas.estadoFactura, 
+                      conf_sucursales.sucursalId, conf_sucursales.sucursal, 
+                      fel_clientes.clienteId, fel_clientes.cliente, fel_clientes.nrcCliente, fel_clientes.numDocumentoIdentificacion, fel_clientes.direccionCliente, 
+                      conf_empleados.empleadoId, conf_empleados.primerNombre, conf_empleados.primerApellido, 
+                      cat_02_tipo_dte.tipoDTEId, cat_02_tipo_dte.tipoDocumentoDTE,
+                      fel_factura_certificacion.codigoGeneracion, fel_factura_certificacion.numeroControl')
+            ->join('conf_sucursales', 'conf_sucursales.sucursalId = fel_facturas.sucursalId')
+            ->join('fel_clientes', 'fel_clientes.clienteId = fel_facturas.clienteId')
+            ->join('conf_empleados', 'conf_empleados.empleadoId = fel_facturas.empleadoIdVendedor')
+            ->join('cat_02_tipo_dte', 'cat_02_tipo_dte.tipoDTEId = fel_facturas.tipoDTEId')
+            ->join('fel_factura_certificacion', 'fel_factura_certificacion.facturaId = fel_facturas.facturaId', 'left')
+            ->where('fel_facturas.flgElimina', 0)
+            ->where('fel_factura_certificacion.estadoCertificacion', 'Contingencia')
+            ->orderBy('fel_factura_certificacion.facturaCertificacionId', 'DESC')
+            ->limit(1)  // Agrega el límite aquí
+            ->findAll();
+
+        $output['data'] = array();
+        $n = 1;
+
+        foreach ($datos as $columna) {
+            $estadoClase = '';
+            if ($columna['estadoFactura'] === 'Pendiente') {
+                $estadoClase = 'badge badge-secondary';
+            } elseif ($columna['estadoFactura'] === 'Certificado') {
+                $estadoClase = 'badge badge-success';
+            } elseif ($columna['estadoFactura'] === 'Anulado') {
+                $estadoClase = 'badge badge-danger';
+            } elseif ($columna['estadoFactura'] === 'Invalidado') {
+                $estadoClase = 'badge badge-danger';
+            }
+
+            $columna2 = "<b>Sucursal:</b> " . $columna['sucursal'] . "<br><b>Vendedor:</b> " . $columna['primerNombre'] . " " . $columna['primerApellido'] . "<br><b>Código de generación:</b> " . $columna['codigoGeneracion'] . "<br><b>Número de control:</b> " . $columna['numeroControl'];
+
+            $columna3 = "<b>Fecha:</b> " . $columna['fechaEmision'] . "<br><b>Estado:</b> <span class='" . $estadoClase . "'>" . $columna['estadoFactura'] . "</span>";
+            if ($columna['estadoFactura'] === 'Anulado') {
+                $columna3 .= "<br><b>Obs Anulación:</b> " . $columna['obsAnulacion'];
+            }
+
+            $columna4 = "<b>Cliente:</b> " . $columna['cliente'] . "<br><b>NRC:</b> " . $columna['nrcCliente'] . "<br><b>Dirección:</b> " . $columna['direccionCliente']. "<br><b>Tipo DTE:</b> " . $columna['tipoDocumentoDTE'];
+
+            // Inicializar variables para cálculos de totales
+            $subtotal = 0;
+            $ivaTotal = 0;
+            $totalAPagar = 0;
+            $descuentos = 0;
+
+            // Obtener los detalles de la factura
+            $detalleModel = new fel_facturas_detalle();
+            $detallesFactura = $detalleModel
+                ->where('facturaId', $columna['facturaId'])
+                ->where('flgElimina', 0)
+                ->findAll();
+                $parametrizacion = new conf_parametrizaciones();
+            
+                $contingenciaActivada = $parametrizacion
+                          ->select('valorParametrizacion')
+                          ->where('flgElimina', 0)
+                          ->where('parametrizacionId', 6)
+                          ->first();
+            // Calcular los totales
+            foreach ($detallesFactura as $detalle) {
+                $subtotal += $detalle['totalDetalle'];
+                $ivaTotal += $detalle['ivaTotal'];
+                $totalAPagar += $detalle['totalDetalleIVA'];
+                $descuentos += ($detalle['precioUnitario'] - $detalle['precioUnitarioVenta']) * $detalle['cantidadProducto'];
+            }
+
+            // Añadir los totales en la columna 5
+            $columna5 = "<b>(=)Subtotal:</b> $ " . number_format($subtotal, 2, '.', ',') . "<br>"
+                      . "<b>(+)IVA:</b> $ " . number_format($ivaTotal, 2, '.', ',') . "<br>"
+                      . "<b>(-)Descuentos:</b> $ " . number_format($descuentos, 2, '.', ',') . "<br>"
+                      . "<b>(=)Total a Pagar:</b> $ " . number_format($totalAPagar, 2, '.', ',');
+        
+
+            $output['data'][] = array(
+                $n,
+                $columna2,
+                $columna3,
+                $columna4,
+                $columna5
+            );
+
+            $n++;
+        }
+
+        if ($n > 1) {
+            return $this->response->setJSON($output);
+        } else {
+            return $this->response->setJSON(array('data' => '')); // No hay datos, devuelve un array vacío
+        }
+    }
+
+    public function operacionCertificarContingencia(){
+        $facturaId = $this->request->getPost('facturaId');
+
+        
     }
 
 }

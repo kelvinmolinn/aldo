@@ -71,11 +71,11 @@
     </table>
 </div>
 <script>
-    function modalFinalizarContingencia(){
+    function modalFinalizarContingencia(facturaId){
         $.ajax({
             url: '<?php echo base_url('ventas/admin-facturacion/form/finalizar/contingencia'); ?>',
             type: 'POST',
-            data: {}, // Pasar el ID del módulo como parámetro
+            data: {facturaId: facturaId}, // Pasar el ID del módulo como parámetro
             success: function(response) {
                 // Insertar el contenido de la modal en el cuerpo de la modal
                 $('#divModalContent').html(response);

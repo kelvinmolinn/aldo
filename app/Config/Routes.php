@@ -316,6 +316,8 @@ $routes->group('ventas/admin-facturacion', function($routes) {
     $routes->post('activar/contingencia', 'ventas\administracionFacturacion::activarContingencia');
     $routes->post('operacion/certificar/contingencia/dte', 'ventas\administracionFacturacion::certificarContingenciaDTE');
     $routes->post('form/finalizar/contingencia','ventas\administracionFacturacion::modalFinalizarContingencia');
+    $routes->post('tabla/contingencia/facturacion', 'ventas\administracionFacturacion::tablaContingenciaFacturacion');
+    $routes->post('operacion/contingencia/certificar', 'ventas\administracionFacturacion::operacionCertificarContingencia');
 
     $routes->get('pdf/generate', 'ventas\reportes\indexReporte::generate');
 
