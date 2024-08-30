@@ -17,7 +17,7 @@
                         </div>
                         <div class="col-10">
                             <div id="divModalContent">
-                                <iframe id="pdfFrame" src="" width="100%" height="698px"></iframe>
+                                <iframe id="pdfFrame" src="" width="100%" height="500px"></iframe>
                             </div> 
                         </div>
                     </div>
