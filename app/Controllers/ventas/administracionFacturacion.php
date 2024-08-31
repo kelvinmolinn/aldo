@@ -35,6 +35,8 @@ use App\Models\fel_factura_certificacion;
 use App\Models\conf_empleados;
 use App\Models\cat_02_tipo_dte;
 use App\Models\fel_cliente_contacto;
+use App\Models\fel_factura_contingencia;
+use App\Models\fel_factura_contingencia_detalle;
 
 
 
@@ -2733,6 +2735,7 @@ private function generarJSONTipo2($factura, $certificacion, $cliente, $telefono,
     }
 
     public function operacionCertificarContingencia(){
+        $felFacturaContingencia = new fel_factura_contingencia();
         $facturaId = $this->request->getPost('facturaId');
 
         
