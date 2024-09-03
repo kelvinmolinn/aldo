@@ -1,4 +1,4 @@
-<form id="frmModal" method="post" action="">
+<form id="frmModal" method="post" action="ventas/admin-facturacion/operacion/contingencia/certificar">
     <div id="modalFinalizarContingencia" class="modal fade modal-fullscreen" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
         <div class="modal-dialog  modal-xl">
             <div class="modal-content">
@@ -23,8 +23,10 @@
                         <div class="col-md-4">
                             <div class="form-select-control">
                                 <select name="tipoContingenciaId" id="tipoContingenciaId" class="form-control" style="width: 100%;" required>
-                                    <option value=""></option>
-                                    <option value="1">Prueba</option>
+                                    <option></option>
+                                    <?php foreach ($selectTipoContingencia as $selectTipoContingencia) { ?>
+                                        <option value="<?php echo $selectTipoContingencia['tipoContingenciaId']; ?>"><?php echo $selectTipoContingencia['tipoContingencia']; ?></option>
+                                    <?php } ?>
                                 </select>
                             </div>
                         </div>
@@ -85,6 +87,55 @@
         $("#tipoContingenciaId").select2({
             placeholder: 'Tipo contingencia',
             dropdownParent: $('#modalFinalizarContingencia')
+        });
+
+        $("#frmModal").submit(function(event) {
+            event.preventDefault();
+            Swal.fire({
+                title: '¿Estás seguro que desea certificar los DTE en estado contingencia?',
+                text: "Se certificaran todos los DTE.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Anular',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: $(this).attr('action'), 
+                        type: $(this).attr('method'),
+                        data: $(this).serialize(),
+                        success: function(response) {
+                            console.log(response);
+                            if (response.success) {
+                                // Insert exitoso, ocultar modal y mostrar mensaje
+                                $('#modalFinalizarContingencia').modal('hide');
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'DTE certificados con éxito',
+                                    text: response.mensaje
+                                }).then((result) => {
+                                    cambiarInterfaz('ventas/admin-facturacion/index', {renderVista:'No'});
+
+                                });
+                            } else {
+                                // Insert fallido, mostrar mensaje de error
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: response.mensaje
+                                });
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            // Manejar errores si los hay
+                            console.error(xhr.responseText);
+                        }
+                    });
+                }
+            });
+
         });
 
         $('#tablaContingencia').DataTable({

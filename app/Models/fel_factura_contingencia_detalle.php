@@ -51,16 +51,6 @@ class fel_factura_contingencia_detalle extends Model
         
                 return $data;
             }
-        
-            public function existeCliente($cliente, $clienteId)
-    {
-        // Realizar una consulta para verificar si el producto ya existe en la base de datos
-        $resultado = $this->where('cliente', $cliente)
-        ->where('flgElimina', 0)
-        ->whereNotIn('clienteId', [$clienteId])->countAllResults();
-
-        return $resultado > 0; // Devuelve true si el producto existe, false en caso contrario
-    }
 
         
 

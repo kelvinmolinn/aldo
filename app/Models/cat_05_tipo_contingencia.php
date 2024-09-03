@@ -4,12 +4,12 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class fel_facturas_complemento extends Model
+class cat_05_tipo_contingencia extends Model
 {
-    protected $table = 'fel_facturas_complemento';
-    protected $primaryKey = 'facturaComplementoId'; // si el nombre de la clave primaria es diferente
+    protected $table = 'cat_05_tipo_contingencia';
+    protected $primaryKey = 'tipoContingenciaId'; // si el nombre de la clave primaria es diferente
 
-    protected $allowedFields = ['facturaComplementoId', 'facturaId', 'tipoComplemento', 'complementoFactura', 'fhEdita', 'fhAgrega', 'usuarioIdEdita', 'usuarioIdAgrega', 'flgElimina', 'fhElimina', 'usuarioIdElimina'];
+    protected $allowedFields = ['tipoContingenciaId', 'tipoContingencia', 'codigoMH', 'fhEdita', 'fhAgrega', 'usuarioIdEdita', 'usuarioIdAgrega', 'flgElimina', 'fhElimina', 'usuarioIdElimina'];
 
             //Agregar desde aqui
 
@@ -51,16 +51,6 @@ class fel_facturas_complemento extends Model
         
                 return $data;
             }
-        
-    public function existeCliente($cliente, $clienteId)
-    {
-        // Realizar una consulta para verificar si el producto ya existe en la base de datos
-        $resultado = $this->where('cliente', $cliente)
-        ->where('flgElimina', 0)
-        ->whereNotIn('clienteId', [$clienteId])->countAllResults();
-
-        return $resultado > 0; // Devuelve true si el producto existe, false en caso contrario
-    }
 
         
 

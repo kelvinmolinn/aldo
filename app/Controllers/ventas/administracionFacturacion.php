@@ -37,7 +37,7 @@ use App\Models\cat_02_tipo_dte;
 use App\Models\fel_cliente_contacto;
 use App\Models\fel_factura_contingencia;
 use App\Models\fel_factura_contingencia_detalle;
-
+use App\Models\cat_05_tipo_contingencia;
 
 
 
@@ -2629,7 +2629,15 @@ private function generarJSONTipo2($factura, $certificacion, $cliente, $telefono,
     }
 
     public function modalFinalizarContingencia(){
+        $cat05TipoContingencia = new cat_05_tipo_contingencia();
+
         $data['variable'] = 0;
+        
+        $data['selectTipoContingencia'] = $cat05TipoContingencia
+            ->select('tipoContingenciaId,tipoContingencia')
+            ->where('flgElimina', 0)
+            ->findAll();
+
         $facturaId = $this->request->getPost('facturaId');
 
         $data['facturaId'] = $facturaId;
@@ -2736,8 +2744,47 @@ private function generarJSONTipo2($factura, $certificacion, $cliente, $telefono,
 
     public function operacionCertificarContingencia(){
         $felFacturaContingencia = new fel_factura_contingencia();
-        $facturaId = $this->request->getPost('facturaId');
+        $felFacturaContingenciaDetalle = new fel_factura_contingencia_detalle();
 
+        $facturaId          = $this->request->getPost('facturaId');
+        $fechaInicio        = $this->request->getPost('fechaInicio');
+        $horaInicio         = $this->request->getPost('horaInicio');
+        $tipoContingenciaId = $this->request->getPost('tipoContingenciaId');
+        $fechaFin           = $this->request->getPost('fechaFin');
+        $horaFin            = $this->request->getPost('horaFin');
+        $motivoContingencia = $this->request->getPost('motivoContingencia');
+        
+        $data = [
+            'fechaInicio'           => $fechaInicio,
+            'horaInicio'            => $horaInicio,
+            'fechaFin'              => $fechaFin,
+            'horaFin'               => $horaFin,
+            'tipoContingenciaId'    => $tipoContingenciaId,
+            'motivoContingencia'    => $motivoContingencia
+        
+        ];
+
+        $operacionContingencia = $felFacturaContingencia->insert($data);
+
+        $dataContingenciaDetalle = [
+            'facturaContingenciaId' => $fechaInicio,
+            'facturaId'             => $horaInicio
+        ];
+
+        $operacionContingenciaDetalle = $felFacturaContingenciaDetalle->insert($dataContingenciaDetalle);
+
+        if ($operacionContingencia) {
+            return $this->response->setJSON([
+                'success' => true,
+                'mensaje' => 'Contingencia desactivada con éxito',
+                'facturaContingenciaId' => $felFacturaContingencia->insertID()
+            ]);
+        } else {
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'No se pudo finalizar la contingencia'
+            ]);
+        }
         
     }
 
