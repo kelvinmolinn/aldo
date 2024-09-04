@@ -321,9 +321,14 @@ $routes->group('ventas/admin-facturacion', function($routes) {
 
     $routes->get('contingencia', 'ventas\reportes\indexReporte::generate');
 
-    //CONTINGENCIA
 
-    $routes->post('contingencia', 'ventas\administracionFacturacion::indexContingencia');
+});
+
+$routes->group('ventas/admin-contingencia', function($routes) {
+
+    $routes->post('contingencia', 'ventas\administracionContingencia::indexContingencia');
+    $routes->post('tabla/ver/contingencia', 'ventas\administracionContingencia::tablaContingencias');
+    $routes->post('form/ver/dte/contingencia','ventas\administracionContingencia::modalDTEContingencia');
 
 
 });

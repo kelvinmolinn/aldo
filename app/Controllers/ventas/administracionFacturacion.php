@@ -345,7 +345,7 @@ public function tablaFacturacion()
         return view('ventas/modals/modalAnularDTE', $data);
     }
 
-        public function operacionAnularDTE(){
+    public function operacionAnularDTE(){
         $anularDTE = new fel_facturas();
         
             $facturaId = $this->request->getPost('facturaId');
