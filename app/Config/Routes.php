@@ -319,7 +319,12 @@ $routes->group('ventas/admin-facturacion', function($routes) {
     $routes->post('tabla/contingencia/facturacion', 'ventas\administracionFacturacion::tablaContingenciaFacturacion');
     $routes->post('operacion/contingencia/certificar', 'ventas\administracionFacturacion::operacionCertificarContingencia');
 
-    $routes->get('pdf/generate', 'ventas\reportes\indexReporte::generate');
+    $routes->get('contingencia', 'ventas\reportes\indexReporte::generate');
+
+    //CONTINGENCIA
+
+    $routes->post('contingencia', 'ventas\administracionFacturacion::indexContingencia');
+
 
 });
 

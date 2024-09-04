@@ -52,6 +52,8 @@
                         </div>
                     </div>
                 </div>
+                <hr>
+                <h4>DTE emitidos en contingencia</h4>
                     <div class="table-responsive">
                         <table class="table table-hover" id="tablaContingencia" style="width: 100%;">
                             <thead>
@@ -98,7 +100,7 @@
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
-                confirmButtonText: 'Anular',
+                confirmButtonText: 'Si, certificar',
                 cancelButtonText: 'Cancelar'
             }).then((result) => {
                 if (result.isConfirmed) {
@@ -113,7 +115,7 @@
                                 $('#modalFinalizarContingencia').modal('hide');
                                 Swal.fire({
                                     icon: 'success',
-                                    title: 'DTE certificados con éxito',
+                                    title: 'DTE en contingencia certificados con éxito',
                                     text: response.mensaje
                                 }).then((result) => {
                                     cambiarInterfaz('ventas/admin-facturacion/index', {renderVista:'No'});

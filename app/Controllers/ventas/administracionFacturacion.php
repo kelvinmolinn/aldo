@@ -2659,31 +2659,21 @@ private function generarJSONTipo2($factura, $certificacion, $cliente, $telefono,
             ->join('fel_clientes', 'fel_clientes.clienteId = fel_facturas.clienteId')
             ->join('conf_empleados', 'conf_empleados.empleadoId = fel_facturas.empleadoIdVendedor')
             ->join('cat_02_tipo_dte', 'cat_02_tipo_dte.tipoDTEId = fel_facturas.tipoDTEId')
-            ->join('fel_factura_certificacion', 'fel_factura_certificacion.facturaId = fel_facturas.facturaId', 'left')
+            ->join('fel_factura_certificacion', 'fel_factura_certificacion.facturaId = fel_facturas.facturaId')
             ->where('fel_facturas.flgElimina', 0)
             ->where('fel_factura_certificacion.estadoCertificacion', 'Contingencia')
             ->orderBy('fel_factura_certificacion.facturaCertificacionId', 'DESC')
-            ->limit(1)  // Agrega el límite aquí
             ->findAll();
 
         $output['data'] = array();
         $n = 1;
 
         foreach ($datos as $columna) {
-            $estadoClase = '';
-            if ($columna['estadoFactura'] === 'Pendiente') {
-                $estadoClase = 'badge badge-secondary';
-            } elseif ($columna['estadoFactura'] === 'Certificado') {
-                $estadoClase = 'badge badge-success';
-            } elseif ($columna['estadoFactura'] === 'Anulado') {
-                $estadoClase = 'badge badge-danger';
-            } elseif ($columna['estadoFactura'] === 'Invalidado') {
-                $estadoClase = 'badge badge-danger';
-            }
+            $estadoClase = 'badge badge-warning';
 
             $columna2 = "<b>Sucursal:</b> " . $columna['sucursal'] . "<br><b>Vendedor:</b> " . $columna['primerNombre'] . " " . $columna['primerApellido'] . "<br><b>Código de generación:</b> " . $columna['codigoGeneracion'] . "<br><b>Número de control:</b> " . $columna['numeroControl'];
 
-            $columna3 = "<b>Fecha:</b> " . $columna['fechaEmision'] . "<br><b>Estado:</b> <span class='" . $estadoClase . "'>" . $columna['estadoFactura'] . "</span>";
+            $columna3 = "<b>Fecha:</b> " . $columna['fechaEmision'] . "<br><b>Estado:</b> <span class='" . $estadoClase . "'>Contingencia</span>";
             if ($columna['estadoFactura'] === 'Anulado') {
                 $columna3 .= "<br><b>Obs Anulación:</b> " . $columna['obsAnulacion'];
             }
@@ -2743,6 +2733,10 @@ private function generarJSONTipo2($factura, $certificacion, $cliente, $telefono,
     }
 
     public function operacionCertificarContingencia(){
+        $mostrarDTE = new fel_facturas();
+        $felFacturaCertificacion = new fel_factura_certificacion();
+        $confParametrizaciones = new conf_parametrizaciones();
+
         $felFacturaContingencia = new fel_factura_contingencia();
         $felFacturaContingenciaDetalle = new fel_factura_contingencia_detalle();
 
@@ -2764,20 +2758,44 @@ private function generarJSONTipo2($factura, $certificacion, $cliente, $telefono,
         
         ];
 
-        $operacionContingencia = $felFacturaContingencia->insert($data);
+        $facturaContingenciaId = $felFacturaContingencia->insert($data);
 
-        $dataContingenciaDetalle = [
-            'facturaContingenciaId' => $fechaInicio,
-            'facturaId'             => $horaInicio
+        $dteContingencia = $mostrarDTE
+            ->select('fel_facturas.facturaId')
+            ->join('fel_factura_certificacion', 'fel_factura_certificacion.facturaId = fel_facturas.facturaId', 'left')
+            ->where('fel_facturas.flgElimina', 0)
+            ->where('fel_factura_certificacion.estadoCertificacion', 'Contingencia')
+            //->orderBy('fel_factura_certificacion.facturaCertificacionId', 'DESC')
+            ->findAll();
+
+        foreach ($dteContingencia as $contingencia) {
+            $dataContingenciaDetalle = [
+                'facturaContingenciaId' => $facturaContingenciaId,
+                'facturaId'             => $contingencia['facturaId']
+            ];
+
+            $operacionContingenciaDetalle = $felFacturaContingenciaDetalle->insert($dataContingenciaDetalle);
+
+            // Update a fel_factura_certificacion para cambiarle el estado
+            $dataEstadoFactura = [
+                'estadoCertificacion'  => 'Certificado'
+            ];
+
+            $operacionEstadofactura = $felFacturaCertificacion->update($contingencia['facturaId'],$dataEstadoFactura);
+        }
+
+        $dataFinalizarContingencia = [
+            'valorParametrizacion' => 1
         ];
 
-        $operacionContingenciaDetalle = $felFacturaContingenciaDetalle->insert($dataContingenciaDetalle);
+        $operacionFinalizarContingencia = $confParametrizaciones->update(6,$dataFinalizarContingencia);
+        // Update para cerrar la contingencia
 
-        if ($operacionContingencia) {
+        if ($facturaContingenciaId) {
             return $this->response->setJSON([
                 'success' => true,
-                'mensaje' => 'Contingencia desactivada con éxito',
-                'facturaContingenciaId' => $felFacturaContingencia->insertID()
+                'mensaje' => 'Contingencia finalizada con éxito',
+                'facturaContingenciaId' => $facturaContingenciaId
             ]);
         } else {
             return $this->response->setJSON([
@@ -2786,6 +2804,24 @@ private function generarJSONTipo2($factura, $certificacion, $cliente, $telefono,
             ]);
         }
         
+    }
+
+    public function indexContingencia(){
+        $session = session();
+
+        $data['variable'] = 0;
+
+        $camposSession = [
+            'renderVista' => 'No'
+        ];
+        $session->set([
+            'route'             => 'ventas/admin-facturacion/contingencia',
+            'camposSession'     => json_encode($camposSession)
+        ]);
+
+
+
+        return view('ventas/vistas/contingencia', $data);
     }
 
 }
