@@ -3,28 +3,34 @@
         <div class="modal-dialog  modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title"> DTE certificados en contingencia 
+                    <h5 class="modal-title"> DTE certificados en contingencia  
                 </div>
                 <div class="modal-body">
                     <div class="row mb-4">
                         <div class="col-md-4">
+                            <label>Fecha inicio: </label> <?= $fechaInicio;?>
+
+                        </div>
+                        <div class="col-md-4">
+                        <label>Hora inicio: </label> <?= $horaInicio;?>
                             
                         </div>
                         <div class="col-md-4">
-                            
-                        </div>
-                        <div class="col-md-4">
+                        <label>Tipo contingencia: </label> <?= $tipoContingencia;?>
                             
                         </div>
                     </div>
                     <div class="row mb-4">
                         <div class="col-md-4">
-                        
+                        <label>Fecha fin: </label> <?= $fechaFin;?>
+
                         </div>
                         <div class="col-md-4">
+                        <label>Hora fin: </label> <?= $horaFin;?>
         
                         </div>
                         <div class="col-md-4">
+                        <label>Motivo: </label> <?= $motivoContingencia;?>
         
                         </div>
                     </div>
@@ -63,10 +69,10 @@
         $('#tablaContingenciaHistorial').DataTable({
             "ajax": {
                 "method": "POST",
-                "url": '<?php echo base_url(''); ?>',
+                "url": '<?php echo base_url('ventas/admin-contingencia/tabla/dte/contingencia'); ?>',
                 "data": function() { 
                     return {
-                        x:''
+                        facturaContingenciaId: <?= $facturaContingenciaId;?>
                     }
                 }
             },

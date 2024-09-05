@@ -2760,11 +2760,10 @@ private function generarJSONTipo2($factura, $certificacion, $cliente, $telefono,
 
         $facturaContingenciaId = $felFacturaContingencia->insert($data);
 
-        $dteContingencia = $mostrarDTE
-            ->select('fel_facturas.facturaId')
-            ->join('fel_factura_certificacion', 'fel_factura_certificacion.facturaId = fel_facturas.facturaId', 'left')
-            ->where('fel_facturas.flgElimina', 0)
-            ->where('fel_factura_certificacion.estadoCertificacion', 'Contingencia')
+        $dteContingencia = $felFacturaCertificacion
+            ->select('facturaCertificacionId, facturaId')
+            ->where('flgElimina', 0)
+            ->where('estadoCertificacion', 'Contingencia')
             //->orderBy('fel_factura_certificacion.facturaCertificacionId', 'DESC')
             ->findAll();
 
@@ -2781,7 +2780,7 @@ private function generarJSONTipo2($factura, $certificacion, $cliente, $telefono,
                 'estadoCertificacion'  => 'Certificado'
             ];
 
-            $operacionEstadofactura = $felFacturaCertificacion->update($contingencia['facturaId'],$dataEstadoFactura);
+            $operacionEstadofactura = $felFacturaCertificacion->update($contingencia['facturaCertificacionId'], $dataEstadoFactura);
         }
 
         $dataFinalizarContingencia = [
@@ -2791,7 +2790,7 @@ private function generarJSONTipo2($factura, $certificacion, $cliente, $telefono,
         $operacionFinalizarContingencia = $confParametrizaciones->update(6,$dataFinalizarContingencia);
         // Update para cerrar la contingencia
 
-        if ($facturaContingenciaId) {
+        if ($operacionFinalizarContingencia) {
             return $this->response->setJSON([
                 'success' => true,
                 'mensaje' => 'Contingencia finalizada con éxito',
@@ -2804,24 +2803,6 @@ private function generarJSONTipo2($factura, $certificacion, $cliente, $telefono,
             ]);
         }
         
-    }
-
-    public function indexContingencia(){
-        $session = session();
-
-        $data['variable'] = 0;
-
-        $camposSession = [
-            'renderVista' => 'No'
-        ];
-        $session->set([
-            'route'             => 'ventas/admin-facturacion/contingencia',
-            'camposSession'     => json_encode($camposSession)
-        ]);
-
-
-
-        return view('ventas/vistas/contingencia', $data);
     }
 
 }

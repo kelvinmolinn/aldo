@@ -16,12 +16,12 @@
     </table>
 </div>
 <script>
-    function modalVerDTEContingencia(facturaContingenciaId) {
+    function modalVerDTEContingencia(jsonData) {
         // Realizar una petición AJAX para obtener los datos del módulo por su ID
         $.ajax({
                 url: '<?php echo base_url('ventas/admin-contingencia/form/ver/dte/contingencia'); ?>',
                 type: 'POST',
-                data: {facturaContingenciaId: facturaContingenciaId}, // Pasar el ID del módulo como parámetro
+                data: jsonData, // Pasar el ID del módulo como parámetro
                 success: function(response) {
                     // Insertar el contenido de la modal en el cuerpo de la modal
                     $('#divModalContent').html(response);
