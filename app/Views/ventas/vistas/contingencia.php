@@ -35,6 +35,27 @@
             }
         });
     }
+
+    function modalVerJSONContingencia(jsonData) {
+        // Realizar una petición AJAX para obtener los datos del módulo por su ID
+        $.ajax({
+                url: '<?php echo base_url('ventas/admin-contingencia/form/ver/json/contingencia'); ?>',
+                type: 'POST',
+                data: jsonData, // Pasar el ID del módulo como parámetro
+                success: function(response) {
+                    // Insertar el contenido de la modal en el cuerpo de la modal
+                    $('#divModalContent').html(response);
+                    // Mostrar la modal
+                    $('#modalVerJSONContingencia').modal('show');
+                    
+                },
+            error: function(xhr, status, error) {
+                // Manejar errores si los hay
+                console.error(xhr.responseText);
+            }
+        });
+    }
+
     $(document).ready(function() {
         tituloVentana("Historial de contingencias");
 

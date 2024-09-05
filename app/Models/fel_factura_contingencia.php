@@ -9,7 +9,7 @@ class fel_factura_contingencia extends Model
     protected $table = 'fel_factura_contingencia';
     protected $primaryKey = 'facturaContingenciaId'; // si el nombre de la clave primaria es diferente
 
-    protected $allowedFields = ['facturaContingenciaId', 'fechaInicio', 'horaInicio', 'fechaFin', 'horaFin', 'tipoContingenciaId', 'motivoContingencia', 'fhEdita', 'fhAgrega', 'usuarioIdEdita', 'usuarioIdAgrega', 'flgElimina', 'fhElimina', 'usuarioIdElimina'];
+    protected $allowedFields = ['facturaContingenciaId', 'codigoGeneracion','fechaInicio', 'horaInicio', 'fechaFin', 'horaFin', 'tipoContingenciaId', 'motivoContingencia', 'fhEdita', 'fhAgrega', 'usuarioIdEdita', 'usuarioIdAgrega', 'flgElimina', 'fhElimina', 'usuarioIdElimina'];
 
             //Agregar desde aqui
 

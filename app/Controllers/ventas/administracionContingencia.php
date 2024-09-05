@@ -35,9 +35,9 @@ class administracionContingencia extends Controller
                             ->join('cat_05_tipo_contingencia', 'cat_05_tipo_contingencia.tipoContingenciaId = fel_factura_contingencia.tipoContingenciaId')
                             ->where('fel_factura_contingencia.flgElimina',0)
                             ->findAll();
-        $n = 0;
+        $n = 1;
         foreach ($mostrarTablaContingencia as $columna) {
-            $n++;
+            
 
             $columna1 = "<b>Fecha inicio:</b> " . $columna['fechaInicio'] . "<br><b>Hora inicio:</b> " . $columna['horaInicio'];
 
@@ -60,8 +60,12 @@ class administracionContingencia extends Controller
                         <i class="fas fa-eye"></i><span> </span>
                     </button>';
 
+            $jsonContingencia = [
+                "facturaContingenciaId" => $columna['facturaContingenciaId']
+            ];
+
             $columna4 .= '
-                    <button class="btn btn-info mb-1" onclick="" data-toggle="tooltip" data-placement="top" title="Ver json contingencia">
+                    <button class="btn btn-info mb-1" onclick="modalVerJSONContingencia('.htmlspecialchars(json_encode($jsonContingencia)).')" data-toggle="tooltip" data-placement="top" title="Ver json contingencia">
                         <i class="fas fa-file-code"></i><span> </span>
                     </button>';
 
@@ -73,6 +77,7 @@ class administracionContingencia extends Controller
                 $columna3,
                 $columna4
             );
+            $n++;
         }
 
 
@@ -184,8 +189,51 @@ class administracionContingencia extends Controller
             return $this->response->setJSON(array('data' => '')); // No hay datos, devuelve un array vacío
         }
     }
+    public function modalverJSONContingencia(){
+        $data["facturaContingenciaId"] = $this->request->getPost('facturaContingenciaId');
 
-    public function jsonContingencia(){
+        return view('ventas/modals/modalVerJSONContingencia', $data);
+    }
+    public function verJsonContingencia(){
 
     }
+    private function generarJSONContingencia() {
+        return [
+            "identificacion"=> [
+                "version"=> 3,
+                "ambiente"=> "00",
+                "codigoGeneracion"=> "Generado en controller",
+                "fTransmision"=> "date de PHP",
+                "hTransmision"=> "date de PHP"
+            ],
+            "emisor" => [
+                "nit"=> "03863624-1",
+                "nrc" => "329956-5",
+                "nombre"=> "Aldo Games Store",
+                "nombreResponsable"=> "BELTRAN. ABIGAIL ELIZABETH",
+                "tipoDocResponsable"=> "13",
+                "numeroDocResponsable"=> "03863624-1",
+                "tipoEstablecimiento"=> "01",
+                "codEstableMH" => null,
+                "codPuntoVenta" => null,
+                "telefono" => "79221469",
+                "correo" => "aldogamesstore@gmail.com"
+            ],
+            "detalleDTE" => [
+                "noItem"=> 1,
+                "codigoGeneracion"=> "codigo generado del DTE que ya se emitió y finalizó",
+                "tipoDoc"=> "codMH de tipoDTEId"
+            ],
+            "motivo" => [
+                "fInicio"=> "Input date de cuando comenzó la contingencia",
+                "fFin"=> "Input date de cuando terminó la contingencia",
+                "hInicio"=> "Input de hora de cuando comenzó la contingencia",
+                "hFin"=> "Input de hora de cuando finalizó la contingencia",
+                "tipoContingencia"=> "Revisar CAT- de Contingencia y mostrar un Select con las 5 option de ese catalogo",
+                "motivoContingencia"=> "textarea que digiten el motivo de por qué esa contingencia"
+            ]          
+        ];
+    }
+
+
 }
