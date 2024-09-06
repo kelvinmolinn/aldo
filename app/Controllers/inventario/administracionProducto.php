@@ -144,9 +144,18 @@ class AdministracionProducto extends Controller
                     </button>
                 ';
             } else {
-                $columna5 = "";
+                $columna5 = '<button class="btn btn-info mb-1" onclick="modalExistenciaProducto(`'.$columna['productoId'].'`);" data-toggle="tooltip" data-placement="top" title="Existencias de producto">
+                        <span></span>
+                        <i class="fas fa-box-open"></i>
+                    </button>';
             }
-
+            $columna5 .= '
+                <button class="btn btn-secondary mb-1 " onclick="modalKardexProducto(`'.$columna['productoId'].'`);" data-toggle="tooltip" data-placement="top" title="Kardex por producto">
+                    <span></span>
+                    <i class="fas fa-list-alt"></i>
+                </button>
+            ';
+  
             if ($columna['estadoProducto'] == 'Activo') {
                 $columna5 .= '
                     <button class="btn btn-primary mb-1 " onclick="modalProducto(`'.$columna['productoId'].'`, `editar`);" data-toggle="tooltip" data-placement="top" title="Editar producto">
@@ -765,5 +774,148 @@ class AdministracionProducto extends Controller
         return $this->response->setJSON(array('data' => '', 'countMinima' => 0)); // No hay datos, devuelve un array vacío
     }
 }
+/*
+    public function modalAdministracionKardexProducto()
+    { 
+        $data["productoId"] = $this->request->getPost('productoId');
+    
+        return view('inventario/modals/modalAdministracionKardexProducto', $data);
+    }
+
+    public function tablaKardexProducto()
+    {
+        // Obtener el ID del producto desde la solicitud POST
+        $productoId = $this->request->getPost('productoId');
+
+        // Crear la instancia del modelo inv_kardex
+        $mostrarKardex = new inv_kardex();
+
+        // Ejecutar la consulta para obtener los datos de Kardex junto con la sucursal
+        $datos = $mostrarKardex
+            ->select('conf_sucursales.sucursal, inv_kardex.tipoMovimiento, inv_kardex.descripcionMovimiento, 
+                      inv_kardex.existenciaAntesMovimiento, inv_kardex.cantidadMovimiento, inv_kardex.existenciaDespuesMovimiento, 
+                      inv_kardex.fechaMovimiento')
+            ->join('inv_productos_existencias', 'inv_productos_existencias.productoExistenciaId = inv_kardex.productoExistenciaId')
+            ->join('conf_sucursales', 'conf_sucursales.sucursalId = inv_productos_existencias.sucursalId')
+            ->where('inv_kardex.flgElimina', 0)
+            ->where('inv_productos_existencias.productoId', $productoId)
+            ->orderBy('inv_kardex.existenciaDespuesMovimiento', 'ASC') // Orden ascendente por fechaMovimiento
+            ->findAll();
+
+        // Inicializar el array de salida
+        $output['data'] = array();
+        $n = 1; // Contador de filas
+
+        // Recorrer los datos obtenidos
+        foreach ($datos as $columna) {
+
+
+            // Construir las columnas con los datos de kardex
+            $columna1 = $n;
+            $columna2 = "<b>Sucursal:</b> " . $columna['sucursal'];
+            $columna3 = "<b>Movimiento:</b> " . $columna['tipoMovimiento'] . '<br>' .
+                        "<small>" . $columna['descripcionMovimiento'] . "</small>";
+            $columna4 = "<b>Existencia antes:</b> " . $columna['existenciaAntesMovimiento'];
+            $columna5 = "<b>Cantidad:</b> " . $columna['cantidadMovimiento'];
+            $columna6 = "<b>Existencia después:</b> " . $columna['existenciaDespuesMovimiento'];
+            $columna7 = "<b>Fecha:</b> " . $columna['fechaMovimiento'];
+
+            // Agregar la fila al array de salida
+            $output['data'][] = array(
+                $columna1,
+                $columna2,
+                $columna3,
+                $columna4,
+                $columna5,
+                $columna6,
+                $columna7
+            );
+
+            $n++; // Incrementar contador de filas
+        }
+
+        // Verificar si se obtuvieron datos
+        if ($n > 1) {
+            return $this->response->setJSON($output);
+        } else {
+            return $this->response->setJSON(array('data' => '')); // Si no hay datos, devolver array vacío
+        }
+    }
+    */
+   public function modalAdministracionKardexProducto()
+{
+    $data["productoId"] = $this->request->getPost('productoId');
+
+    // Obtener la lista de sucursales
+    $sucursalModel = new conf_sucursales();
+    $data["sucursales"] = $sucursalModel->select('sucursalId, sucursal')->findAll();
+    
+    return view('inventario/modals/modalAdministracionKardexProducto', $data);
+}
+public function tablaKardexProducto()
+{
+    // Obtener el ID del producto y la sucursal desde la solicitud POST
+    $productoId = $this->request->getPost('productoId');
+    $sucursalId = $this->request->getPost('sucursalId'); // Nueva variable
+
+    // Crear la instancia del modelo inv_kardex
+    $mostrarKardex = new inv_kardex();
+
+    // Ejecutar la consulta para obtener los datos de Kardex junto con la sucursal
+    $datos = $mostrarKardex
+        ->select('conf_sucursales.sucursal, inv_kardex.tipoMovimiento, inv_kardex.descripcionMovimiento, 
+                  inv_kardex.existenciaAntesMovimiento, inv_kardex.cantidadMovimiento, inv_kardex.existenciaDespuesMovimiento, 
+                  inv_kardex.fechaMovimiento')
+        ->join('inv_productos_existencias', 'inv_productos_existencias.productoExistenciaId = inv_kardex.productoExistenciaId')
+        ->join('conf_sucursales', 'conf_sucursales.sucursalId = inv_productos_existencias.sucursalId')
+        ->where('inv_kardex.flgElimina', 0)
+        ->where('inv_productos_existencias.productoId', $productoId);
+
+    // Si se seleccionó una sucursal específica, añadir el filtro
+    if (!empty($sucursalId)) {
+        $datos->where('inv_productos_existencias.sucursalId', $sucursalId);
+    }
+
+    // Orden ascendente por fechaMovimiento
+    $datos = $datos->orderBy('inv_kardex.existenciaDespuesMovimiento', 'ASC')->findAll();
+
+    // Inicializar el array de salida
+    $output['data'] = array();
+    $n = 1; // Contador de filas
+
+    // Recorrer los datos obtenidos
+    foreach ($datos as $columna) {
+        // Construir las columnas con los datos de kardex
+        $columna1 = $n;
+        $columna2 = "<b>Sucursal:</b> " . $columna['sucursal'];
+        $columna3 = "<b>Movimiento:</b> " . $columna['tipoMovimiento'] . '<br>' .
+                    "<small>" . $columna['descripcionMovimiento'] . "</small>";
+        $columna4 = "<b>Existencia antes:</b> " . $columna['existenciaAntesMovimiento'];
+        $columna5 = "<b>Cantidad:</b> " . $columna['cantidadMovimiento'];
+        $columna6 = "<b>Existencia después:</b> " . $columna['existenciaDespuesMovimiento'];
+        $columna7 = "<b>Fecha:</b> " . $columna['fechaMovimiento'];
+
+        // Agregar la fila al array de salida
+        $output['data'][] = array(
+            $columna1,
+            $columna2,
+            $columna3,
+            $columna4,
+            $columna5,
+            $columna6,
+            $columna7
+        );
+
+        $n++; // Incrementar contador de filas
+    }
+
+    // Verificar si se obtuvieron datos
+    if ($n > 1) {
+        return $this->response->setJSON($output);
+    } else {
+        return $this->response->setJSON(array('data' => '')); // Si no hay datos, devolver array vacío
+    }
+}
+
 
 }

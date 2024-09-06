@@ -149,6 +149,9 @@ $routes->group('inventario/admin-producto', function($routes) {
     $routes->post('operacion/guardar/existencia', 'inventario\AdministracionProducto::modalExistenciaOperacion');
     $routes->post('operacion/guardar/precio', 'inventario\AdministracionProducto::modalPrecioOperacion');
     $routes->post('operacion/estado/usuario', 'inventario\AdministracionProducto::ActivarDesactivar');
+    $routes->post('form5/kardexProducto', 'inventario\AdministracionProducto::modalAdministracionKardexProducto');
+    $routes->post('tabla/kardexProducto',  'inventario\AdministracionProducto::tablaKardexProducto');
+
     //
 });
 
