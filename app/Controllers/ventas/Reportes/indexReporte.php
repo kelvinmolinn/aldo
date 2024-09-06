@@ -287,6 +287,8 @@ class indexReporte extends Controller
         $pdf->SetFillColor(154, 193, 229);
         $pdf->Cell(190,5,utf8_decode('Cuerpo del documento'),1,0,'L', true);
 
+        //AQUI INICIA
+        
         $pdf->SetFont('Arial','B',8);
         $pdf->SetXY(10,85);
         $pdf->Cell(190,5,utf8_decode('#'),0,0,'L');

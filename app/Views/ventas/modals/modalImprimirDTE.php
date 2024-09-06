@@ -17,7 +17,7 @@
                         </div>
                         <div class="col-10">
                             <div id="divModalContent">
-                                <iframe id="pdfFrame" src="" width="100%" height="670px"></iframe>
+                                <iframe id="pdfFrame" src="" width="100%"></iframe>
                             </div> 
                         </div>
                     </div>
@@ -32,9 +32,30 @@
 
 <script>
     $(document).ready(function() {
+        function ajustarAlturaModal() {
+            var alturaModal = $('#modalImprimirDTE .modal-dialog').height(); // Obtener la altura del modal
+            var alturaModalHeader = $('#modalImprimirDTE .modal-header').outerHeight(); // Obtener la altura del header del modal
+            var alturaModalFooter = $('#modalImprimirDTE .modal-footer').outerHeight(); // Obtener la altura del footer del modal
 
+            // Calcular la altura disponible para el iframe dentro del modal
+            var alturaDisponible = alturaModal - alturaModalHeader - alturaModalFooter - 30; // Ajuste de margen
+            $('#pdfFrame').height(alturaDisponible);
+        }
+
+        // Ajustar altura al mostrar el modal
+        $('#modalImprimirDTE').on('shown.bs.modal', function () {
+            ajustarAlturaModal();
+        });
+
+        // Ajustar altura si el tamaño de la ventana cambia mientras el modal está abierto
+        $(window).resize(function() {
+            if ($('#modalImprimirDTE').is(':visible')) {
+                ajustarAlturaModal();
+            }
+        });
     });
 </script>
+
 
 
 
