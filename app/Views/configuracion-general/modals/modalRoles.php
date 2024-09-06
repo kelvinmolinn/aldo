@@ -18,7 +18,8 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div class="form-outline">
-                                <input type="text" id="nombreRol" name="nombreRol" class="form-control " placeholder="Rol" value="<?= $campos['rol']; ?>" required>
+                                <input type="text" id="nombreRol" name="nombreRol" class="form-control " value="<?= $campos['rol']; ?>" required>
+                                <label class="form-label" for="nombreRol">Rol</label>
                             </div>
                         </div>
                     </div>

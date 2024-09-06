@@ -18,12 +18,14 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-outline">
-                                <input type="text" Id="modulo" name="modulo" class="form-control " placeholder="Módulo" value="<?= $campos['modulo']; ?>" required>
+                                <input type="text" Id="modulo" name="modulo" class="form-control " value="<?= $campos['modulo']; ?>" required>
+                                <label class="form-label" for="modulo">Módulo</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-outline">
-                                <input type="text" class="form-control " id="iconoModulo" name="iconoModulo" placeholder="Icono" value="<?= ($operacion == 'editar' ? $campos["iconoModulo"] : 'fas fa-'); ?>" required>
+                                <input type="text" class="form-control " id="iconoModulo" name="iconoModulo" value="<?= ($operacion == 'editar' ? $campos["iconoModulo"] : 'fas fa-'); ?>" required>
+                                <label class="form-label" for="iconoModulo">Icono</label>
                             </div>
                         </div>
                     </div>

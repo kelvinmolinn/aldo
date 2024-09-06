@@ -12,16 +12,17 @@
                     <div class="row">
                         <div class="col-md-4">
                             <div class="form-outline">
-                                <input type="text" Id="duiUsuario" name="duiUsuario" class="form-control" placeholder="DUI" value="<?= $campos['dui']; ?>" required>
+                                <input type="text" Id="duiUsuario" name="duiUsuario" class="form-control" value="<?= $campos['dui']; ?>" required>
+                                <label class="form-label" for="duiUsuario">DUI</label>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-outline">
                                 <div class="input-fiel">
-                                    <input type="date" class="form-control" id="fechaUsuario" name="fechaUsuario" placeholder="Fecha de nacimiento" value="<?= $campos['fechaNacimiento']; ?>"  required>
+                                    <input type="date" class="form-control" id="fechaUsuario" name="fechaUsuario" value="<?= $campos['fechaNacimiento']; ?>"  required>
+                                    <label class="form-label" for="fechaUsuario">Fecha de nacimiento</label>
                                 </div>
                             </div>
-                            <small>Fecha de nacimiento</small>
                         </div>
                         <div class="col-md-4">
                             <div class="form-select-control">
@@ -36,24 +37,28 @@
                     <div class="row mt-4">
                         <div class="col-md-6">
                             <div class="form-outline">
-                                <input type="text" id="primerNombreUsuario" name="primerNombreUsuario" class="form-control" placeholder="Primer nombre" value="<?= $campos['primerNombre']; ?>" required>
+                                <input type="text" id="primerNombreUsuario" name="primerNombreUsuario" class="form-control" value="<?= $campos['primerNombre']; ?>" required>
+                                <label class="form-label" for="primerNombreUsuario">Primer nombre</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-outline">
-                                <input type="text" id="segundoNombreUsuario" name="segundoNombreUsuario" class="form-control" placeholder="Segundo nombre" value="<?= $campos['segundoNombre']; ?>">
+                                <input type="text" id="segundoNombreUsuario" name="segundoNombreUsuario" class="form-control" value="<?= $campos['segundoNombre']; ?>">
+                                <label class="form-label" for="segundoNombreUsuario">Segundo nombre</label>
                             </div>
                         </div>
                     </div>
                     <div class="row mt-4">
                         <div class="col-md-6">
                             <div class="form-outline">
-                                <input type="text" id="primerApellidoUsuario" name="primerApellidoUsuario" class="form-control" placeholder="Primer apellido" value="<?= $campos['primerApellido']; ?>" required>
+                                <input type="text" id="primerApellidoUsuario" name="primerApellidoUsuario" class="form-control" value="<?= $campos['primerApellido']; ?>" required>
+                                <label class="form-label" for="primerApellidoUsuario">Primer apellido</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-outline">
                                 <input type="text" id="segundoApellidoUsuario" name="segundoApellidoUsuario" class="form-control" placeholder="Segundo apellido" value="<?= $campos['segundoApellido']; ?>">
+                                <label class="form-label" for="segundoApellidoUsuario">Segundo apellido</label>
                             </div>
                         </div>
                     </div>
@@ -73,7 +78,8 @@
                     <div class="row mt-4" id="divCorreoUsuario">
                         <div class="col-md-6">
                             <div class="form-outline">
-                                <input type="email" id="correoUsuario" name="correoUsuario" class="form-control" placeholder="Correo electrónico"  value="<?= $campos['correo']; ?>">
+                                <input type="email" id="correoUsuario" name="correoUsuario" class="form-control" value="<?= $campos['correo']; ?>">
+                                <label class="form-label" for="correoUsuario">Correo electrónico</label>
                             </div>
                         </div>
                         <div class="col-md-6">

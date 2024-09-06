@@ -12,17 +12,20 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-outline">
-                                <input type="text" Id="menu" name="menu" class="form-control " placeholder="Menú" value="<?= $campos['menu']; ?>" required>
+                                <input type="text" Id="menu" name="menu" class="form-control " value="<?= $campos['menu']; ?>" required>
+                                <label class="form-label" for="menu">Menú</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-outline">
-                                <input type="text" class="form-control " id="iconoMenu" name="iconoMenu" placeholder="Icono" value="<?= ($operacion == 'editar' ? $campos["iconoMenu"] : 'fas fa-'); ?>" required>
+                                <input type="text" class="form-control " id="iconoMenu" name="iconoMenu" value="<?= ($operacion == 'editar' ? $campos["iconoMenu"] : 'fas fa-'); ?>" required>
+                                <label class="form-label" for="iconoMenu">Icono</label>
                             </div>
                         </div>
                         <div class="col-md-12 mt-4">
                             <div class="form-outline">
-                                <input type="text" class="form-control " id="urlMenu" name="urlMenu" placeholder="Ruta del menú" value="<?= ($operacion == 'editar' ? $campos["urlMenu"] : ''); ?>" required>
+                                <input type="text" class="form-control " id="urlMenu" name="urlMenu" value="<?= ($operacion == 'editar' ? $campos["urlMenu"] : ''); ?>" required>
+                                <label class="form-label" for="urlMenu">Ruta del menú</label>
                             </div>
                         </div>
                     </div>
