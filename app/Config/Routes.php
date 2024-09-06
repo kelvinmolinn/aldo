@@ -332,6 +332,7 @@ $routes->group('ventas/admin-contingencia', function($routes) {
     $routes->post('form/ver/dte/contingencia','ventas\administracionContingencia::modalDTEContingencia');
     $routes->post('tabla/dte/contingencia','ventas\administracionContingencia::tablaDTEContingencia');
     $routes->post('form/ver/json/contingencia','ventas\administracionContingencia::modalverJSONContingencia');
+    $routes->post('tabla/ver/json/contingencia','ventas\administracionContingencia::verJsonContingencia');
     
 
 

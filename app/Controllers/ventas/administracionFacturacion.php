@@ -2799,6 +2799,8 @@ private function generarJSONTipo2($factura, $certificacion, $cliente, $telefono,
                 'success' => true,
                 'mensaje' => 'Contingencia finalizada con éxito',
                 'facturaContingenciaId' => $facturaContingenciaId
+/*              'fechaEmision' => date('Y-m-d'),
+                'horaEmision'  => date('H:i:s')*/
             ]);
         } else {
             return $this->response->setJSON([

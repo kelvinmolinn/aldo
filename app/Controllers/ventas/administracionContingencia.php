@@ -195,22 +195,48 @@ class administracionContingencia extends Controller
         return view('ventas/modals/modalVerJSONContingencia', $data);
     }
     public function verJsonContingencia(){
+        $felFacturaContingenciaDetalle = new fel_factura_contingencia_detalle();
+        $felFacturaContingencia = new fel_factura_contingencia();
 
+        $facturaContingenciaId = $this->request->getPost('facturaContingenciaId');
+
+        $contingencia = $felFacturaContingencia
+        ->select('fel_factura_contingencia.codigoGeneracion,fel_factura_contingencia.fechaInicio,fel_factura_contingencia.horaInicio,fel_factura_contingencia.fechaFin,fel_factura_contingencia.horaFin,cat_05_tipo_contingencia.tipoContingencia,fel_factura_contingencia.motivoContingencia')
+        ->join('cat_05_tipo_contingencia', 'cat_05_tipo_contingencia.tipoContingenciaId = fel_factura_contingencia.tipoContingenciaId')
+        ->where('fel_factura_contingencia.flgElimina', 0)
+        ->where('fel_factura_contingencia.facturaContingenciaId', $facturaContingenciaId)
+        ->first();  
+
+        $datos = $felFacturaContingenciaDetalle
+        ->select('fel_factura_certificacion.codigoGeneracion,cat_02_tipo_dte.codigoMH')
+        ->join('fel_facturas', 'fel_facturas.facturaId = fel_factura_contingencia_detalle.facturaId')
+        ->join('fel_factura_certificacion', 'fel_factura_certificacion.facturaId = fel_facturas.facturaId')
+        ->join('cat_02_tipo_dte', 'cat_02_tipo_dte.tipoDTEId = fel_facturas.tipoDTEId')
+        ->where('fel_factura_contingencia_detalle.flgElimina', 0)
+        ->where('fel_factura_contingencia_detalle.facturaContingenciaId', $facturaContingenciaId)
+        ->findAll();
+        
+        $n = count($datos); 
+        //$n = 0;
+        
+        $data = $this->generarJSONContingencia($contingencia,$datos);
+
+        return $this->response->setJSON($data);
     }
-    private function generarJSONContingencia() {
+    private function generarJSONContingencia($contingencia,$datos) {
         return [
             "identificacion"=> [
                 "version"=> 3,
                 "ambiente"=> "00",
-                "codigoGeneracion"=> "Generado en controller",
-                "fTransmision"=> "date de PHP",
-                "hTransmision"=> "date de PHP"
+                "codigoGeneracion"=> $contingencia['codigoGeneracion'],
+                "fTransmision"=> date('Y-m-d', strtotime($contingencia['fechaInicio'])),
+                "hTransmision"=> date('H:i:s', strtotime($contingencia['horaInicio']))
             ],
             "emisor" => [
                 "nit"=> "03863624-1",
                 "nrc" => "329956-5",
                 "nombre"=> "Aldo Games Store",
-                "nombreResponsable"=> "BELTRAN. ABIGAIL ELIZABETH",
+                "nombreResponsable"=> "BELTRAN ABIGAIL ELIZABETH",
                 "tipoDocResponsable"=> "13",
                 "numeroDocResponsable"=> "03863624-1",
                 "tipoEstablecimiento"=> "01",
@@ -219,18 +245,20 @@ class administracionContingencia extends Controller
                 "telefono" => "79221469",
                 "correo" => "aldogamesstore@gmail.com"
             ],
-            "detalleDTE" => [
-                "noItem"=> 1,
-                "codigoGeneracion"=> "codigo generado del DTE que ya se emitió y finalizó",
-                "tipoDoc"=> "codMH de tipoDTEId"
-            ],
+            "detalleDTE" => array_map(function($detalles,$n){
+                return[
+                    "noItem"=> $n + 1,
+                    "codigoGeneracion"=> $detalles['codigoGeneracion'],
+                    "tipoDoc"=> $detalles['codigoMH']
+                ];
+            }, $datos, array_keys($datos)),
             "motivo" => [
-                "fInicio"=> "Input date de cuando comenzó la contingencia",
-                "fFin"=> "Input date de cuando terminó la contingencia",
-                "hInicio"=> "Input de hora de cuando comenzó la contingencia",
-                "hFin"=> "Input de hora de cuando finalizó la contingencia",
-                "tipoContingencia"=> "Revisar CAT- de Contingencia y mostrar un Select con las 5 option de ese catalogo",
-                "motivoContingencia"=> "textarea que digiten el motivo de por qué esa contingencia"
+                "fInicio"           => $contingencia['fechaInicio'],
+                "fFin"              => $contingencia['fechaFin'],
+                "hInicio"           => $contingencia['horaInicio'],
+                "hFin"              => $contingencia['horaFin'],
+                "tipoContingencia"  => $contingencia['tipoContingencia'],
+                "motivoContingencia"=> $contingencia['motivoContingencia']
             ]          
         ];
     }

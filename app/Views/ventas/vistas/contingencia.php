@@ -55,7 +55,22 @@
             }
         });
     }
-
+    function cargarJSONContingencia(facturaContingenciaId) {
+        $.ajax({
+            url: '<?php echo base_url('ventas/admin-contingencia/tabla/ver/json/contingencia'); ?>', // URL correcta
+            type: 'POST',
+            data: { facturaContingenciaId: facturaContingenciaId }, // Enviar el facturaId como parámetro
+            success: function(response) {
+                // Formatear y mostrar el JSON en el modal
+                $('#jsonContent').text(JSON.stringify(response, null, 4));
+                //$('#modalVerJSON').modal('show');
+            },
+            error: function(xhr, status, error) {
+                // Manejar errores si los hay
+                console.error('Error al cargar el JSON:', xhr.responseText);
+            }
+        });
+    }
     $(document).ready(function() {
         tituloVentana("Historial de contingencias");
 
