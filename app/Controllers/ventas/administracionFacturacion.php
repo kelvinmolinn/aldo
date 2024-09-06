@@ -2821,4 +2821,54 @@ private function generarJSONTipo2($factura, $certificacion, $cliente, $telefono,
         return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
     }
 
+    public function modalNotaCredito(){
+        // Cargar el modelos
+        $sucursalesModel = new conf_sucursales();
+        $data['sucursales'] = $sucursalesModel->where('flgElimina', 0)->findAll();
+
+        $clientesModel = new fel_clientes();
+        $data['clientes'] = $clientesModel->where('flgElimina', 0)->findAll();
+
+        $empleadosModel = new conf_empleados();
+        $data['empleados'] = $empleadosModel->where('flgElimina', 0)->findAll();
+
+        $tipoDTEModel = new cat_02_tipo_dte();
+        $data['tipoDTE'] = $tipoDTEModel->where('flgElimina', 0)->findAll();
+
+        $operacion = $this->request->getPost('operacion');
+        $data['sucursalId'] = $this->request->getPost('sucursalId');
+        $data['clienteId'] = $this->request->getPost('clienteId');
+        $data['empleadoId'] = $this->request->getPost('empleadoId');
+        $data['tipoDTEId'] = $this->request->getPost('tipoDTEId');
+
+        if($operacion == 'editar') {
+            $facturaId = $this->request->getPost('facturaId');
+            $DTEProducto = new fel_facturas();
+
+            // seleccionar solo los campos que estan en la modal (solo los input y select)
+            $data['campos'] = $producto->select('fel_facturas.facturaId,fel_facturas.fechaEmision,fel_facturas.obsAnulacion,fel_facturas.estadoFactura,conf_sucursales.sucursalId,conf_sucursales.sucursal,fel_clientes.clienteId,fel_clientes.cliente,conf_empleados.empleadoId,conf_empleados.primerNombre,conf_empleados.primerApellido,cat_02_tipo_dte.tipoDTEId,cat_02_tipo_dte.tipoDocumentoDTE')
+            ->join('conf_sucursales', 'conf_sucursales.sucursalId = fel_facturas.sucursalId')
+            ->join('fel_clientes', 'fel_clientes.clienteId = fel_facturas.clienteId')
+            ->join('conf_empleados', 'conf_empleados.empleadoId = fel_facturas.empleadoIdVendedor')
+            ->join('cat_02_tipo_dte', 'cat_02_tipo_dte.tipoDTEId = fel_facturas.tipoDTEId')
+            ->where('fel_facturas.flgElimina', 0)
+            ->where('fel_facturas.facturaId', $facturaId)
+            ->first();
+        } else {
+
+            // formar los campos que estan en la modal (input y select) con el nombre equivalente en la BD
+            $data['campos'] = [
+                'facturaId'              => 0,
+                'sucursalId'             => '',
+                'tipoDTEId'              => '',
+                'fechaEmision'           => '',
+                'clienteId'              => '',
+                'empleadoIdVendedor'     => ''
+
+            ];
+        }
+        $data['operacion'] = $operacion;
+        return view('ventas/modals/modalNotaCredito', $data);
+    }
+
 }

@@ -2,6 +2,10 @@
 <hr>
 <div class="row mb-4">
     <div class="col-md-12 text-right">
+        <button type= "button" id="btnNuevaReserva" class="btn btn-secondary estilo-btn d-inline" onclick="modalNotaCredito()">
+            <i class="fas fa-file-alt"></i>
+            Nota de crédito
+        </button>
         <?php
              if($activarContingencia['valorParametrizacion'] == 1){
         ?>
@@ -100,6 +104,26 @@
                     $('#divModalContent').html(response);
                     // Mostrar la modal
                     $('#modalEmitirDTE').modal('show');
+                    
+                },
+            error: function(xhr, status, error) {
+                // Manejar errores si los hay
+                console.error(xhr.responseText);
+            }
+        });
+    }
+
+    function modalNotaCredito(facturaId) {
+        // Realizar una petición AJAX para obtener los datos del módulo por su ID
+        $.ajax({
+                url: '<?php echo base_url('ventas/admin-facturacion/form/notaCredito/dte'); ?>',
+                type: 'POST',
+                data: {facturaId: facturaId}, // Pasar el ID del módulo como parámetro
+                success: function(response) {
+                    // Insertar el contenido de la modal en el cuerpo de la modal
+                    $('#divModalContent').html(response);
+                    // Mostrar la modal
+                    $('#modalNotaCredito').modal('show');
                     
                 },
             error: function(xhr, status, error) {
