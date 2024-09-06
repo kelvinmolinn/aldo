@@ -24,8 +24,8 @@
                                     <th>#</th>
                                     <th>Sucursal</th>
                                     <th>Descripción y tipo de movimiento</th>
-                                    <th>Cantidad movimiento</th>
                                     <th>Cantidad Antes</th>
+                                    <th>Cantidad movimiento</th>
                                     <th>Cantidad despues</th>
                                     <th>Fecha del movimiento</th>
                                 </tr>
