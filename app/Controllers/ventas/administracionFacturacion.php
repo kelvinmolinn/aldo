@@ -38,6 +38,8 @@ use App\Models\fel_cliente_contacto;
 use App\Models\fel_factura_contingencia;
 use App\Models\fel_factura_contingencia_detalle;
 use App\Models\cat_05_tipo_contingencia;
+use App\Models\cat_07_tipo_generacion_documento;
+use App\Models\fel_factura_relacionada;
 
 
 
