@@ -40,7 +40,7 @@ class PDF extends FPDF
         // Arial italic 8
         $this->SetFont('Arial','I',8);
         // Número de página
-        $this->Cell(0,10,'Page '.$this->PageNo().'/{nb}',0,0,'C');
+        $this->Cell(0,10,'Página '.$this->PageNo().'/{nb}',0,0,'C');
     }
 }
 
@@ -55,6 +55,7 @@ class indexReporte extends Controller
         $felClienteContacto = new fel_cliente_contacto();
 
         $pdf = new PDF();
+        $pdf->AliasNbPages();
 
         $facturaId = isset($_GET['facturaId']) ? intval($_GET['facturaId']) : 0;
 
@@ -293,66 +294,56 @@ class indexReporte extends Controller
         $pdf->SetXY(10,85);
         $pdf->Cell(190,5,utf8_decode('#'),0,0,'L');
 
-        $pdf->SetFont('Arial','',8);
-        $pdf->SetXY(10,95);
-        $pdf->Cell(5,5,utf8_decode('#'),0,0,'L');
-
-        $pdf->SetFont('Arial','B',8);
         $pdf->SetXY(20,85);
         $pdf->Cell(190,5,utf8_decode('Cantidad'),0,0,'L');
 
-        $pdf->SetFont('Arial','',8);
-        $pdf->SetXY(20,95);
-        $pdf->Cell(15,5,utf8_decode('#'),0,0,'C');
-
-        $pdf->SetFont('Arial', 'B', 8);
         $pdf->SetXY(40, 86);
         $pdf->MultiCell(20, 3, utf8_decode('Unidad de medida'), 0, 'L');
         
-        $pdf->SetFont('Arial', '', 8);
-        $pdf->SetXY(40,95); 
-        $pdf->Cell(15, 5, utf8_decode('#'), 0, 0, 'R');
-
-        $pdf->SetFont('Arial','B',8);
         $pdf->SetXY(65,85);
         $pdf->Cell(190,5,utf8_decode('Código'),0,0,'L');
 
-        $pdf->SetFont('Arial','',8);
-        $pdf->SetXY(65,94);
-        $pdf->Cell(15,5,utf8_decode('#'),0,0,'R');
-
-        $pdf->SetFont('Arial','B',8);
         $pdf->SetXY(85,85);
         $pdf->Cell(190,5,utf8_decode('Descripción'),0,0,'L');
 
-        $pdf->SetFont('Arial','',8);
-        $pdf->SetXY(85,94);
-        $pdf->Cell(15,5,utf8_decode('#'),0,0,'R');
-
-        $pdf->SetFont('Arial','B',8);
         $pdf->SetXY(115,86);
         $pdf->MultiCell(20, 3, utf8_decode('Precio unitario'), 0, 'L');
 
-        $pdf->SetFont('Arial','',8);
-        $pdf->SetXY(115,94);
-        $pdf->Cell(15,5,utf8_decode('#'),0,0,'R');
-
-        $pdf->SetFont('Arial','B',8);
         $pdf->SetXY(140,86);
         $pdf->MultiCell(20, 3, utf8_decode('Descuentos por item'), 0, 'L');
 
-        $pdf->SetFont('Arial','',8);
-        $pdf->SetXY(140,94);
-        $pdf->Cell(15,5,utf8_decode('#'),0,0,'R');
-
-        $pdf->SetFont('Arial','B',8);
         $pdf->SetXY(170 ,86);
         $pdf->MultiCell(20, 3, utf8_decode('Ventas gravadas'), 0, 'L');
 
         $pdf->SetFont('Arial','',8);
-        $pdf->SetXY(170,94);
-        $pdf->Cell(15,5,utf8_decode('#'),0,0,'R');
-
+        $alturaDetalle = 95;
+        for ($i=0; $i < 5; $i++) { 
+            $pdf->SetXY(10,$alturaDetalle);
+            $pdf->Cell(5,5,utf8_decode('#'),0,0,'L');
+    
+            $pdf->SetXY(20,$alturaDetalle);
+            $pdf->Cell(15,5,utf8_decode('Cantidad'),0,0,'C');
+    
+            $pdf->SetXY(40,$alturaDetalle); 
+            $pdf->Cell(15, 5, utf8_decode('UDM'), 0, 0, 'R');
+    
+            $pdf->SetXY(65,$alturaDetalle);
+            $pdf->Cell(15,5,utf8_decode('COd'),0,0,'R');
+    
+            $pdf->SetXY(85,$alturaDetalle);
+            $pdf->Cell(15,5,utf8_decode('Descrip.'),0,0,'R');
+    
+            $pdf->SetXY(115,$alturaDetalle);
+            $pdf->Cell(15,5,utf8_decode('Unit'),0,0,'R');
+    
+            $pdf->SetXY(140,$alturaDetalle);
+            $pdf->Cell(15,5,utf8_decode('desc'),0,0,'R');
+    
+            $pdf->SetXY(170,$alturaDetalle);
+            $pdf->Cell(15,5,utf8_decode('Grav'),0,0,'R');
+            $alturaDetalle += 5;
+        }
+        // Despues dibujar los totales  aqui abajo
         //$pdf->Cell(190,5,utf8_decode('Precio unitario'),0,0,'L');
 
         $this->response->setHeader('Content-Type', 'application/pdf');
