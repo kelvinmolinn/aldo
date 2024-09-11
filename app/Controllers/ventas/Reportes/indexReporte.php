@@ -21,7 +21,10 @@ class PDF extends FPDF
         // Movernos a la derecha
         $this->Cell(1);
         // Título
-        $this->Image('../assets/plugins/img/aldo_game_store2.png', 11, 10, 30);
+        if ($this->PageNo() == 1) { // Verifica si es la primera página
+            // Logo
+            $this->Image('../assets/plugins/img/aldo_game_store2.png', 11, 10, 30);
+        }
 
         $this->SetX(50);
         $this->SetFillColor(154, 193, 229);
@@ -40,7 +43,7 @@ class PDF extends FPDF
         // Arial italic 8
         $this->SetFont('Arial','I',8);
         // Número de página
-        $this->Cell(0,10,'Página '.$this->PageNo().'/{nb}',0,0,'C');
+        $this->Cell(0,10,utf8_decode('Página ').$this->PageNo().'/{nb}',0,0,'C');
     }
 }
 
@@ -101,6 +104,15 @@ class indexReporte extends Controller
         
         $telefonoCliente = isset($telefono['contactoCliente']) ? $telefono['contactoCliente'] : '';
         $correoCliente = $correo['contactoCliente'];
+
+
+        $datosDteProductos = $felFacturaDetalle
+        ->select('fel_facturas_detalle.codigoProducto,fel_facturas_detalle.cantidadProducto,cat_14_unidades_medida.abreviaturaUnidadMedida')
+        ->join('inv_productos','inv_productos.productoId = fel_facturas_detalle.productoId')
+        ->join('cat_14_unidades_medida','cat_14_unidades_medida.unidadMedidaId = inv_productos.unidadMedidaId')
+        ->where('fel_facturas_detalle.flgElimina', 0)
+        ->where('fel_facturas_detalle.facturaId', $facturaId)
+        ->findAll();
 
         //$x = 100;
         //$xx = 131;
@@ -316,33 +328,151 @@ class indexReporte extends Controller
         $pdf->MultiCell(20, 3, utf8_decode('Ventas gravadas'), 0, 'L');
 
         $pdf->SetFont('Arial','',8);
+
         $alturaDetalle = 95;
-        for ($i=0; $i < 5; $i++) { 
+        $espacioDisponible = 270; // Altura total disponible en la página (restando encabezados y pies de página)
+        $alturaFila = 5;  // Altura de cada fila
+        $n = 0;
+        foreach($datosDteProductos AS $datosProductos) {             
+            $n++;
+            if ($alturaDetalle + $alturaFila > $espacioDisponible) {
+                $pdf->AddPage();
+                
+                // Volver a imprimir los títulos de las columnas
+                $pdf->SetFont('Arial','B',8);
+                $pdf->SetXY(10,10); // Ajusta la posición inicial en la nueva página
+                $pdf->Cell(190,5,utf8_decode('Cuerpo del documento'),1,0,'L', true);
+                
+                $pdf->SetFont('Arial','B',8);
+                $pdf->SetXY(10,15);
+                $pdf->Cell(190,5,utf8_decode('#'),0,0,'L');
+                
+                $pdf->SetXY(20,15);
+                $pdf->Cell(190,5,utf8_decode('Cantidad'),0,0,'L');
+                
+                $pdf->SetXY(40, 16);
+                $pdf->MultiCell(20, 3, utf8_decode('Unidad de medida'), 0, 'L');
+                
+                $pdf->SetXY(65,15);
+                $pdf->Cell(190,5,utf8_decode('Código'),0,0,'L');
+                
+                $pdf->SetXY(85,15);
+                $pdf->Cell(190,5,utf8_decode('Descripción'),0,0,'L');
+                
+                $pdf->SetXY(115,16);
+                $pdf->MultiCell(20, 3, utf8_decode('Precio unitario'), 0, 'L');
+                
+                $pdf->SetXY(140,16);
+                $pdf->MultiCell(20, 3, utf8_decode('Descuentos por item'), 0, 'L');
+                
+                $pdf->SetXY(170,16);
+                $pdf->MultiCell(20, 3, utf8_decode('Ventas gravadas'), 0, 'L');
+
+                // Reiniciar la posición de `alturaDetalle` para la nueva página
+                $alturaDetalle = 25;  // Ajustar según el espacio que ocupan los títulos
+                $pdf->SetFont('Arial','',8);
+            }
+
             $pdf->SetXY(10,$alturaDetalle);
-            $pdf->Cell(5,5,utf8_decode('#'),0,0,'L');
-    
+            $pdf->Cell(5,5,utf8_decode($n),0,0,'L');
+
             $pdf->SetXY(20,$alturaDetalle);
-            $pdf->Cell(15,5,utf8_decode('Cantidad'),0,0,'C');
-    
+            $pdf->Cell(15,5,utf8_decode($datosProductos['cantidadProducto']),0,0,'C');
+
             $pdf->SetXY(40,$alturaDetalle); 
-            $pdf->Cell(15, 5, utf8_decode('UDM'), 0, 0, 'R');
-    
+            $pdf->Cell(15, 5, utf8_decode($datosProductos['abreviaturaUnidadMedida']), 0, 0, 'R');
+
             $pdf->SetXY(65,$alturaDetalle);
-            $pdf->Cell(15,5,utf8_decode('COd'),0,0,'R');
-    
+            $pdf->Cell(15,5,utf8_decode($datosProductos['codigoProducto']),0,0,'R');
+
             $pdf->SetXY(85,$alturaDetalle);
-            $pdf->Cell(15,5,utf8_decode('Descrip.'),0,0,'R');
-    
+            $pdf->Cell(15,5,utf8_decode('Descripción'),0,0,'R');
+
             $pdf->SetXY(115,$alturaDetalle);
             $pdf->Cell(15,5,utf8_decode('Unit'),0,0,'R');
-    
+
             $pdf->SetXY(140,$alturaDetalle);
-            $pdf->Cell(15,5,utf8_decode('desc'),0,0,'R');
-    
+            $pdf->Cell(15,5,utf8_decode('Desc'),0,0,'R');
+
             $pdf->SetXY(170,$alturaDetalle);
             $pdf->Cell(15,5,utf8_decode('Grav'),0,0,'R');
-            $alturaDetalle += 5;
+            
+            // Incrementar altura para la siguiente fila
+            $alturaDetalle += $alturaFila;
         }
+        $pdf->Line(10, $alturaDetalle, 200, $alturaDetalle);        
+
+        $pdf->SetFont('Arial','B',8);
+        $pdf->SetXY(10,$alturaDetalle);
+        $pdf->Cell(190,5,utf8_decode('Complemento:'),0,0,'L');
+
+        $pdf->SetXY(115,$alturaDetalle);
+        $pdf->Cell(15,5, utf8_decode('Total operaciones'), 0, 0, 'L');
+
+        $pdf->SetXY(155,$alturaDetalle);
+        $pdf->Cell(15,5, utf8_decode('Gravadas:'), 0, 0, 'L');
+
+        $alturaDetalle += 5;
+        
+        $pdf->SetXY(115,$alturaDetalle);
+        $pdf->Cell(15,5, utf8_decode('Sumatoria de venta:'), 0, 0, 'L');
+        
+        $pdf->SetFont('Arial','',8);
+        $pdf->SetXY(170,$alturaDetalle);
+        $pdf->Cell(30,5,utf8_decode('0.00'),0,0,'R');
+        $pdf->SetX(170);
+        $pdf->Cell(30,5,utf8_decode('$'),0,0,'L');
+
+        $alturaDetalle += 5;
+        
+        $pdf->SetFont('Arial','B',8);
+        $pdf->SetXY(115,$alturaDetalle);
+        $pdf->Cell(15,5, utf8_decode('IVA retenido:'), 0, 0, 'L');
+        
+        $pdf->SetFont('Arial','',8);
+        $pdf->SetXY(170,$alturaDetalle);
+        $pdf->Cell(30,5,utf8_decode('10,000.00'),0,0,'R');
+        $pdf->SetX(170);
+        $pdf->Cell(30,5,utf8_decode('$'),0,0,'L');
+
+        
+        $alturaDetalle += 5;
+        
+        $pdf->SetFont('Arial','B',8);
+        $pdf->SetXY(115,$alturaDetalle);
+        $pdf->Cell(15,5, utf8_decode('Subtotal:'), 0, 0, 'L');
+        
+        $pdf->SetFont('Arial','',8);
+        $pdf->SetXY(170,$alturaDetalle);
+        $pdf->Cell(30,5,utf8_decode('10,000.00'),0,0,'R');
+        $pdf->SetX(170);
+        $pdf->Cell(30,5,utf8_decode('$'),0,0,'L');
+        
+        $alturaDetalle += 5;
+        
+        $pdf->SetFont('Arial','B',8);
+        $pdf->SetXY(115,$alturaDetalle);
+        $pdf->Cell(15,5, utf8_decode('Monto total de la operación:'), 0, 0, 'L');
+        
+        $pdf->SetFont('Arial','',8);
+        $pdf->SetXY(170,$alturaDetalle);
+        $pdf->Cell(30,5,utf8_decode('10,000.00'),0,0,'R');
+        $pdf->SetX(170);
+        $pdf->Cell(30,5,utf8_decode('$'),0,0,'L');
+
+        $alturaDetalle += 5;
+        $pdf->Line(115, $alturaDetalle, 200, $alturaDetalle);
+        
+        $pdf->SetFont('Arial','B',8);
+        $pdf->SetXY(115,$alturaDetalle);
+        $pdf->Cell(15,5, utf8_decode('Total a pagar:'), 0, 0, 'L');
+        
+        $pdf->SetFont('Arial','',8);
+        $pdf->SetXY(170,$alturaDetalle);
+        $pdf->Cell(30,5,utf8_decode('10,000.00'),0,0,'R');
+        $pdf->SetX(170);
+        $pdf->Cell(30,5,utf8_decode('$'),0,0,'L');
+        
         // Despues dibujar los totales  aqui abajo
         //$pdf->Cell(190,5,utf8_decode('Precio unitario'),0,0,'L');
 
