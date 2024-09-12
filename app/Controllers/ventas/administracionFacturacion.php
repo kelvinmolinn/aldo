@@ -2100,6 +2100,8 @@ private function codigoInvalidarGeneracion() {
 
     public function imprimirDTE(){
         $data['variable'] = 0;
+        $data["facturaId"] = $this->request->getPost('facturaId');
+
         return view('ventas/modals/modalImprimirDTE', $data);
     }
 

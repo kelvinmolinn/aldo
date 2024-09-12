@@ -7,6 +7,7 @@ use App\Models\fel_facturas;
 use App\Models\fel_facturas_detalle;
 use App\Models\fel_clientes;
 use App\Models\fel_cliente_contacto;
+use App\Models\fel_facturas_complemento;
 
 use CodeIgniter\Controller;
 use FPDF;
@@ -52,6 +53,7 @@ class indexReporte extends Controller
         $felFacturaDetalle = new fel_facturas_detalle();
         $felClientes = new fel_clientes();
         $felClienteContacto = new fel_cliente_contacto();
+        $felFacturasComplemento = new fel_facturas_complemento();
 
         $pdf = new PDF();
         $pdf->AliasNbPages();
@@ -103,13 +105,21 @@ class indexReporte extends Controller
 
 
         $datosDteProductos = $felFacturaDetalle
-        ->select('fel_facturas_detalle.codigoProducto,fel_facturas_detalle.cantidadProducto,cat_14_unidades_medida.abreviaturaUnidadMedida,inv_productos.producto,fel_facturas_detalle.precioUnitario,fel_facturas_detalle.porcentajeDescuento')
+        ->select('fel_facturas_detalle.facturaId, fel_facturas_detalle.codigoProducto,fel_facturas_detalle.cantidadProducto,cat_14_unidades_medida.abreviaturaUnidadMedida,inv_productos.producto,fel_facturas_detalle.precioUnitario,fel_facturas_detalle.porcentajeDescuento,fel_facturas_detalle.precioUnitarioIVA,fel_facturas_detalle.totalDetalleIVA')
         ->join('inv_productos','inv_productos.productoId = fel_facturas_detalle.productoId')
         ->join('cat_14_unidades_medida','cat_14_unidades_medida.unidadMedidaId = inv_productos.unidadMedidaId')
         ->where('fel_facturas_detalle.flgElimina', 0)
         ->where('fel_facturas_detalle.facturaId', $facturaId)
         ->findAll();
 
+        $datosDteComplementos = $felFacturasComplemento
+        ->select('complementoFactura')
+        ->where('flgElimina', 0)
+        ->where('facturaId', $facturaId)
+        ->first();
+
+        $complemento =  isset($datosDteComplementos['complementoFactura']) ? $datosDteComplementos['complementoFactura'] : '';
+        
         //$x = 100;
         //$xx = 131;
         // Agregar una página
@@ -305,28 +315,28 @@ class indexReporte extends Controller
         
         $pdf->SetFont('Arial','B',8);
         $pdf->SetXY(10,85);
-        $pdf->Cell(10,6,utf8_decode('#'),1,0,'L');
+        $pdf->Cell(10,6,utf8_decode('#'),0,0,'C');
 
         $pdf->SetXY(20,85);
-        $pdf->Cell(20,6,utf8_decode('Cantidad'),1,0,'L');
+        $pdf->Cell(20,6,utf8_decode('Cantidad'),0,0,'C');
 
         $pdf->SetXY(40, 85);
-        $pdf->MultiCell(20, 3, utf8_decode('Unidad de medida'), 1, 'L');
+        $pdf->MultiCell(20, 3, utf8_decode('Unidad de medida'), 0, 'C');
         
         $pdf->SetXY(60,85);
-        $pdf->Cell(20,6,utf8_decode('Código'),1,0,'L');
+        $pdf->Cell(20,6,utf8_decode('Código'),0,0,'C');
 
         $pdf->SetXY(80,85);
-        $pdf->Cell(35,6,utf8_decode('Descripción'),1,0,'L');
+        $pdf->Cell(35,6,utf8_decode('Descripción'),0,0,'C');
 
         $pdf->SetXY(115,85);
-        $pdf->MultiCell(25, 6, utf8_decode('Precio unitario'), 1, 'L');
+        $pdf->MultiCell(25, 6, utf8_decode('Precio unitario'), 0, 'C');
 
         $pdf->SetXY(140,85);
-        $pdf->MultiCell(30, 6, utf8_decode('Descuentos por item'), 1, 'L');
+        $pdf->MultiCell(30, 6, utf8_decode('Descuentos por item'), 0, 'C');
 
         $pdf->SetXY(170 ,85);
-        $pdf->MultiCell(30, 6, utf8_decode('Ventas gravadas'), 1, 'L');
+        $pdf->MultiCell(30, 6, utf8_decode('Ventas gravadas'), 0, 'C');
 
         $pdf->SetFont('Arial','',8);
 
@@ -335,6 +345,11 @@ class indexReporte extends Controller
         $alturaFila = 5;  // Altura de cada fila
         $n = 0;
 
+        $ventasTotales = 0;
+        $ivaRetenido = 0;
+        $subTotal = 0;
+        $montoTotalOperacion = 0;
+        $totaPagar = 0;
         //for ($i=0; $i < 40; $i++) { 
             foreach($datosDteProductos AS $datosProductos) {             
                 $n++;
@@ -348,57 +363,70 @@ class indexReporte extends Controller
                     
                     $pdf->SetFont('Arial','B',8);
                     $pdf->SetXY(10,15);
-                    $pdf->Cell(190,5,utf8_decode('#'),0,0,'L');
+                    $pdf->Cell(10,6,utf8_decode('#'),0,0,'C');
                     
                     $pdf->SetXY(20,15);
-                    $pdf->Cell(190,5,utf8_decode('Cantidad'),0,0,'L');
+                    $pdf->Cell(20,6,utf8_decode('Cantidad'),0,0,'C');
                     
-                    $pdf->SetXY(40, 16);
-                    $pdf->MultiCell(20, 3, utf8_decode('Unidad de medida'), 0, 'L');
+                    $pdf->SetXY(40, 15);
+                    $pdf->MultiCell(20, 3, utf8_decode('Unidad de medida'), 0, 'C');
                     
-                    $pdf->SetXY(65,15);
-                    $pdf->Cell(190,5,utf8_decode('Código'),0,0,'L');
+                    $pdf->SetXY(60,15);
+                    $pdf->Cell(20,6,utf8_decode('Código'),0,0,'C');
                     
-                    $pdf->SetXY(85,15);
-                    $pdf->Cell(190,5,utf8_decode('Descripción'),0,0,'L');
+                    $pdf->SetXY(80,15);
+                    $pdf->Cell(35,6,utf8_decode('Descripción'),0,0,'C');
                     
-                    $pdf->SetXY(115,16);
-                    $pdf->MultiCell(20, 3, utf8_decode('Precio unitario'), 0, 'L');
+                    $pdf->SetXY(115,15);
+                    $pdf->MultiCell(25, 6, utf8_decode('Precio unitario'), 0, 'C');
                     
-                    $pdf->SetXY(140,16);
-                    $pdf->MultiCell(20, 3, utf8_decode('Descuentos por item'), 0, 'L');
+                    $pdf->SetXY(140,15);
+                    $pdf->MultiCell(30, 6, utf8_decode('Descuentos por item'), 0, 'C');
                     
-                    $pdf->SetXY(170,16);
-                    $pdf->MultiCell(20, 3, utf8_decode('Ventas gravadas'), 0, 'L');
+                    $pdf->SetXY(170,15);
+                    $pdf->MultiCell(30, 6, utf8_decode('Ventas gravadas'), 0, 'C');
     
                     // Reiniciar la posición de `alturaDetalle` para la nueva página
                     $alturaDetalle = 25;  // Ajustar según el espacio que ocupan los títulos
                     $pdf->SetFont('Arial','',8);
                 }
-    
+                
+                $ventasTotales += $datosProductos['totalDetalleIVA'];
+                $ivaRetenido = 0.00;
+                $subTotal += $datosProductos['totalDetalleIVA'];
+                $montoTotalOperacion += $datosProductos['totalDetalleIVA'];
+                $totaPagar += $datosProductos['totalDetalleIVA'];
+
+
                 $pdf->SetXY(10,$alturaDetalle);
-                $pdf->Cell(5,5,utf8_decode($n),1,0,'L');
+                $pdf->Cell(10,5,utf8_decode($n),0,0,'L');
     
                 $pdf->SetXY(20,$alturaDetalle);
-                $pdf->Cell(15,5,utf8_decode($datosProductos['cantidadProducto']),1,0,'C');
+                $pdf->Cell(20,5,utf8_decode($datosProductos['cantidadProducto']),0,0,'C');
     
                 $pdf->SetXY(40,$alturaDetalle); 
-                $pdf->Cell(15, 5, utf8_decode($datosProductos['abreviaturaUnidadMedida']), 1, 0, 'R');
+                $pdf->Cell(20, 5, utf8_decode($datosProductos['abreviaturaUnidadMedida']), 0, 0, 'C');
     
-                $pdf->SetXY(65,$alturaDetalle);
-                $pdf->Cell(15,5,utf8_decode($datosProductos['codigoProducto']),1,0,'R');
+                $pdf->SetXY(60,$alturaDetalle);
+                $pdf->Cell(20,5,utf8_decode($datosProductos['codigoProducto']),0,0,'C');
     
-                $pdf->SetXY(85,$alturaDetalle);
-                $pdf->Cell(20,5,utf8_decode($datosProductos['producto']),1,0,'R');
+                $pdf->SetXY(80,$alturaDetalle);
+                $pdf->Cell(35,5,utf8_decode($datosProductos['producto']),0,0,'C');
     
                 $pdf->SetXY(115,$alturaDetalle);
-                $pdf->Cell(20,5,utf8_decode(number_format($datosProductos['precioUnitario'], 2, '.', ',')),1,0,'R');
+                $pdf->Cell(25,5,utf8_decode(number_format($datosProductos['precioUnitarioIVA'], 2, '.', ',')),0,0,'R');
+                $pdf->SetXY(115,$alturaDetalle);
+                $pdf->Cell(25,5,utf8_decode("$"),0,0,'L');
     
                 $pdf->SetXY(140,$alturaDetalle);
-                $pdf->Cell(20,5,utf8_decode(number_format($datosProductos['porcentajeDescuento'], 2, '.', ',')),1,0,'R');
-    
+                $pdf->Cell(30,5,utf8_decode(number_format($datosProductos['porcentajeDescuento'], 2, '.', ',')),0,0,'R');
+                $pdf->SetXY(140,$alturaDetalle);
+                $pdf->Cell(30,5,utf8_decode("%"),0,0,'L');
+
                 $pdf->SetXY(170,$alturaDetalle);
-                $pdf->Cell(20,5,utf8_decode(number_format($datosProductos['precioUnitario'], 2, '.', ',')),1,0,'R');
+                $pdf->Cell(30,5,utf8_decode(number_format($datosProductos['totalDetalleIVA'], 2, '.', ',')),0,0,'R');
+                $pdf->SetXY(170,$alturaDetalle);
+                $pdf->Cell(30,5,utf8_decode("$"),0,0,'L');
                 
                 // Incrementar altura para la siguiente fila
                 $alturaDetalle += $alturaFila;
@@ -413,35 +441,40 @@ class indexReporte extends Controller
 
         $pdf->SetFont('Arial','B',8);
         $pdf->SetXY(10,$alturaDetalle);
-        $pdf->Cell(190,5,utf8_decode('Complemento:'),0,0,'L');
+        $pdf->MultiCell(70, 6, utf8_decode('Complemento:'), 0, 'L');
 
+        $pdf->SetFont('Arial','',8);
+        $pdf->SetXY(30,$alturaDetalle);
+        $pdf->MultiCell(50,6, utf8_decode($complemento), 0, 'L');
+
+        $pdf->SetFont('Arial','B',8);
         $pdf->SetXY(115,$alturaDetalle);
-        $pdf->Cell(15,5, utf8_decode('Total operaciones'), 0, 0, 'L');
+        $pdf->Cell(30,5, utf8_decode('Total operaciones'), 0, 0, 'L');
 
         $pdf->SetXY(155,$alturaDetalle);
-        $pdf->Cell(15,5, utf8_decode('Gravadas:'), 0, 0, 'L');
+        $pdf->Cell(20,5, utf8_decode('Gravadas:'), 0, 0, 'L');
 
         $alturaDetalle += 5;
         
         $pdf->SetXY(115,$alturaDetalle);
-        $pdf->Cell(15,5, utf8_decode('Sumatoria de venta:'), 0, 0, 'L');
+        $pdf->Cell(30,5, utf8_decode('Sumatoria de venta:'), 0, 0, 'L');
+        
+        $pdf->SetFont('Arial','',8);
+        $pdf->SetXY(170,$alturaDetalle);
+        $pdf->Cell(30,5,utf8_decode(number_format($ventasTotales, 2, '.', ',')),0,0,'R');
+        $pdf->SetXY(170,$alturaDetalle);
+        $pdf->Cell(30,5,utf8_decode('$'),0,0,'L');
+
+        $alturaDetalle += 5;
+        
+        $pdf->SetFont('Arial','B',8);
+        $pdf->SetXY(115,$alturaDetalle);
+        $pdf->Cell(30,5, utf8_decode('IVA retenido:'), 0, 0, 'L');
         
         $pdf->SetFont('Arial','',8);
         $pdf->SetXY(170,$alturaDetalle);
         $pdf->Cell(30,5,utf8_decode('0.00'),0,0,'R');
-        $pdf->SetX(170);
-        $pdf->Cell(30,5,utf8_decode('$'),0,0,'L');
-
-        $alturaDetalle += 5;
-        
-        $pdf->SetFont('Arial','B',8);
-        $pdf->SetXY(115,$alturaDetalle);
-        $pdf->Cell(15,5, utf8_decode('IVA retenido:'), 0, 0, 'L');
-        
-        $pdf->SetFont('Arial','',8);
         $pdf->SetXY(170,$alturaDetalle);
-        $pdf->Cell(30,5,utf8_decode('10,000.00'),0,0,'R');
-        $pdf->SetX(170);
         $pdf->Cell(30,5,utf8_decode('$'),0,0,'L');
 
         
@@ -449,24 +482,24 @@ class indexReporte extends Controller
         
         $pdf->SetFont('Arial','B',8);
         $pdf->SetXY(115,$alturaDetalle);
-        $pdf->Cell(15,5, utf8_decode('Subtotal:'), 0, 0, 'L');
+        $pdf->Cell(30,5, utf8_decode('Subtotal:'), 0, 0, 'L');
         
         $pdf->SetFont('Arial','',8);
         $pdf->SetXY(170,$alturaDetalle);
-        $pdf->Cell(30,5,utf8_decode('10,000.00'),0,0,'R');
-        $pdf->SetX(170);
+        $pdf->Cell(30,5,utf8_decode(number_format($subTotal, 2, '.', ',')),0,0,'R');
+        $pdf->SetXY(170,$alturaDetalle);
         $pdf->Cell(30,5,utf8_decode('$'),0,0,'L');
         
         $alturaDetalle += 5;
         
         $pdf->SetFont('Arial','B',8);
         $pdf->SetXY(115,$alturaDetalle);
-        $pdf->Cell(15,5, utf8_decode('Monto total de la operación:'), 0, 0, 'L');
+        $pdf->Cell(40,5, utf8_decode('Monto total de la operación:'), 0, 0, 'L');
         
         $pdf->SetFont('Arial','',8);
         $pdf->SetXY(170,$alturaDetalle);
-        $pdf->Cell(30,5,utf8_decode('10,000.00'),0,0,'R');
-        $pdf->SetX(170);
+        $pdf->Cell(30,5,utf8_decode(number_format($montoTotalOperacion, 2, '.', ',')),0,0,'R');
+        $pdf->SetXY(170,$alturaDetalle);
         $pdf->Cell(30,5,utf8_decode('$'),0,0,'L');
 
         $alturaDetalle += 5;
@@ -474,12 +507,11 @@ class indexReporte extends Controller
         
         $pdf->SetFont('Arial','B',8);
         $pdf->SetXY(115,$alturaDetalle);
-        $pdf->Cell(15,5, utf8_decode('Total a pagar:'), 0, 0, 'L');
+        $pdf->Cell(30,5, utf8_decode('Total a pagar:'), 0, 0, 'L');
         
-        $pdf->SetFont('Arial','',8);
         $pdf->SetXY(170,$alturaDetalle);
-        $pdf->Cell(30,5,utf8_decode('10,000.00'),0,0,'R');
-        $pdf->SetX(170);
+        $pdf->Cell(30,5,utf8_decode(number_format($totaPagar, 2, '.', ',')),0,0,'R');
+        $pdf->SetXY(170,$alturaDetalle);
         $pdf->Cell(30,5,utf8_decode('$'),0,0,'L');
         
         // Despues dibujar los totales  aqui abajo

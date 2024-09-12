@@ -11,7 +11,7 @@
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-2">
-                            <button id="btnEnviarCorreo" type="button" class="btn btn-primary btn-sm" onclick="enviarDTE(1);">
+                            <button id="btnEnviarCorreo" type="button" class="btn btn-primary btn-sm" onclick="enviarDTE(<?= $facturaId; ?>);">
                                 <i class="fas fa-envelope-open-text"></i> Enviar correo
                             </button>                            
                         </div>
@@ -31,11 +31,11 @@
 </form>
 
 <script>
-    function enviarDTE(facturaId) {
+    function enviarDTE(id) {
         $.ajax({
             url: '<?php echo base_url('correos/envio/dte'); ?>', // URL correcta
             type: 'POST',
-            data: { facturaId: facturaId }, // Enviar el facturaId como parámetro
+            data: { facturaId: id }, // Enviar el facturaId como parámetro
             success: function(response) {
                 Swal.fire({
                     icon: 'success',
