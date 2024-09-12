@@ -39,15 +39,7 @@ class correos extends Controller
         //$email->setTo('kelvinmolinn@gmail.com');
         $email->setTo($datosCliente['contactoCliente']);
         $email->setSubject('ALDO GAMES STORE - DTE-'.$datosCodGeneracion['codigoGeneracion']);
-        // Generar el contenido del mensaje
-        $message = 'Estimado cliente: '.$datosCliente['cliente'].', le compartimos su DTE: '.$datosCliente['tipoDocumentoDTE'].'. <br><br> Gracias por su compra.<hr><b>Nota: </b>Por favor no conteste a este correo porque fue generado automaticamente.';
-
-        // Depuración: Verifica el contenido del mensaje
-        echo '<pre>';
-        echo htmlspecialchars($message);
-        echo '</pre>';
-
-        $email->setMessage($message);
+        $email->setMessage('Estimado cliente: '.$datosCliente['cliente'].', le compartimos su DTE: '.$datosCliente['tipoDocumentoDTE'].'. <br><br> Gracias por su compra.<hr><b>Nota: </b>Por favor no conteste a este correo porque fue generado automaticamente.');
 
         
        $pdfUrl = base_url('ventas/admin-facturacion/pdf/generate?facturaId=' . $facturaId);
