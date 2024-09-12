@@ -2822,7 +2822,7 @@ private function generarJSONTipo2($factura, $certificacion, $cliente, $telefono,
         
         return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
     }
-
+    /*
     public function modalNotaCredito(){
         // Cargar el modelos
         $sucursalesModel = new conf_sucursales();
@@ -2872,5 +2872,93 @@ private function generarJSONTipo2($factura, $certificacion, $cliente, $telefono,
         $data['operacion'] = $operacion;
         return view('ventas/modals/modalNotaCredito', $data);
     }
+    */
+    public function modalNotaCredito() {
+        // Cargar el modelos
+        $sucursalesModel = new conf_sucursales();
+        $data['sucursales'] = $sucursalesModel->where('flgElimina', 0)->findAll();
+    
+        $clientesModel = new fel_clientes();
+        $data['clientes'] = $clientesModel->where('flgElimina', 0)->findAll();
+    
+        $empleadosModel = new conf_empleados();
+        $data['empleados'] = $empleadosModel->where('flgElimina', 0)->findAll();
+    
+        $tipoDTEModel = new cat_02_tipo_dte();
+        $data['tipoDTE'] = $tipoDTEModel->where('flgElimina', 0)->findAll();
+    
+        // Obtener créditos fiscales (DTE tipo Crédito Fiscal y estado Certificado)
+        $facturaModel = new fel_facturas();
+        $data['creditosFiscales'] = $facturaModel
+            ->select('fel_facturas.facturaId, fel_factura_certificacion.numeroControl')  // Seleccionar numeroControl desde fel_factura_certificacion
+            ->join('fel_factura_certificacion', 'fel_factura_certificacion.facturaId = fel_facturas.facturaId')
+            ->where('fel_facturas.tipoDTEId', '2')  // Crédito Fiscal
+            ->where('fel_factura_certificacion.estadoCertificacion', 'Certificado')
+            ->whereNotIn('fel_facturas.facturaId', function($query) {
+                $query->select('facturaIdRelacionada')
+                    ->from('fel_factura_relacionada');
+            })
+            ->findAll();
+
+    
+        $operacion = $this->request->getPost('operacion');
+        $data['operacion'] = $operacion;
+    
+        if ($operacion == 'editar') {
+            // Si es editar, cargar los datos de la factura
+            $facturaId = $this->request->getPost('facturaId');
+            $data['campos'] = $facturaModel
+                ->select('fel_facturas.facturaId, fel_facturas.fechaEmision, fel_facturas.obsAnulacion, fel_facturas.estadoFactura, conf_sucursales.sucursalId, fel_clientes.clienteId, conf_empleados.empleadoId, cat_02_tipo_dte.tipoDTEId')
+                ->join('conf_sucursales', 'conf_sucursales.sucursalId = fel_facturas.sucursalId')
+                ->join('fel_clientes', 'fel_clientes.clienteId = fel_facturas.clienteId')
+                ->join('conf_empleados', 'conf_empleados.empleadoId = fel_facturas.empleadoIdVendedor')
+                ->join('cat_02_tipo_dte', 'cat_02_tipo_dte.tipoDTEId = fel_facturas.tipoDTEId')
+                ->where('fel_facturas.facturaId', $facturaId)
+                ->first();
+        } else {
+            // Si es nuevo, inicializar los campos vacíos
+            $data['campos'] = [
+                'facturaId' => 0,
+                'sucursalId' => '',
+                'tipoDTEId' => '',
+                'fechaEmision' => '',
+                'clienteId' => '',
+                'empleadoIdVendedor' => '',
+            ];
+        }
+    
+        return view('ventas/modals/modalNotaCredito', $data);
+    }
+    public function obtenerCreditoFiscal() {
+        $facturaId = $this->request->getPost('facturaId');
+    
+        // Modelo de factura
+        $facturaModel = new fel_facturas();
+        
+        // Obtener los datos de la factura junto con los datos necesarios
+        $factura = $facturaModel
+            ->select('fel_facturas.sucursalId, fel_facturas.tipoDTEId, fel_facturas.clienteId, fel_facturas.empleadoIdVendedor, conf_sucursales.sucursal, fel_clientes.cliente, conf_empleados.primerNombre, conf_empleados.primerApellido, cat_02_tipo_dte.tipoDocumentoDTE')
+            ->join('conf_sucursales', 'conf_sucursales.sucursalId = fel_facturas.sucursalId')
+            ->join('fel_clientes', 'fel_clientes.clienteId = fel_facturas.clienteId')
+            ->join('conf_empleados', 'conf_empleados.empleadoId = fel_facturas.empleadoIdVendedor')
+            ->join('cat_02_tipo_dte', 'cat_02_tipo_dte.tipoDTEId = fel_facturas.tipoDTEId')
+            ->where('fel_facturas.facturaId', $facturaId)
+            ->first();
+    
+        // Verificar si existe la factura
+        if (!$factura) {
+            return $this->response->setJSON(['error' => 'Factura no encontrada'], 404);
+        }
+    
+        // Enviar la respuesta con los datos
+        return $this->response->setJSON([
+            'sucursal'  => $factura['sucursal'],
+            'tipoDTE'   => $factura['tipoDocumentoDTE'],
+            'cliente'   => $factura['cliente'],
+            'vendedor'  => $factura['primerNombre'] . ' ' . $factura['primerApellido']
+        ]);
+    }
+    
+        
 
 }
