@@ -11,7 +11,7 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title"> Emitir DTE <?php echo ($operacion == 'editar' ? 'Editar DTE' : 'Nuevo DTE');?></h5>
+                    <h5 class="modal-title"> Emitir nota de crédito <?php echo ($operacion == 'editar' ? 'Editar DTE' : '');?></h5>
                 </div>
                 <div class="modal-body">
                     <div class="row">
