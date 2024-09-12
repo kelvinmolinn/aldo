@@ -1062,7 +1062,7 @@ $erroresCertificacion = $DTEErrores
                     <b> Subtotal (=) :</b>
                 </div>
                 <div class="col-4">
-                    $ ' . number_format($subtotal, 2, '.', ',') . '
+                    $ ' . number_format($subtotal + $descuentos, 2, '.', ',') . '
                 </div>
             </div>
             <div class="row text-right">
