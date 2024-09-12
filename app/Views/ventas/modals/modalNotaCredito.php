@@ -18,7 +18,7 @@
                         <!-- Select de Crédito Fiscal -->
                         <div class="col-md-4">
                             <div class="form-select-control">
-                                <label for="creditoFiscalId">Crédito Fiscal</label>
+                               
                                 <select name="creditoFiscalId" id="creditoFiscalId" class="form-control" style="width: 100%;">
                                     <option value="">Seleccione un crédito fiscal</option>
                                     <?php foreach ($creditosFiscales as $credito) : ?>
@@ -27,35 +27,38 @@
                                 </select>
                             </div>
                         </div>
-
                         <!-- Input para Sucursal (readonly) -->
                         <div class="col-md-4">
-                            <label for="sucursal">Sucursal</label>
-                            <input type="text" id="sucursal" name="sucursal" class="form-control" readonly>
+                            <div class="form-outline">
+                                <input type="text" id="sucursal" name="sucursal" class="form-control" value="Sucursal" readonly>
+                                <label class="form-label" for="sucursal">Sucursal</label>
+                            </div>
                         </div>
-
                         <!-- Input para Tipo DTE (readonly) -->
                         <div class="col-md-4">
-                            <label for="tipoDTE">Tipo DTE</label>
-                            <input type="text" id="tipoDTE" name="tipoDTE" class="form-control" readonly>
+                            <div class="form-outline">
+                                <input type="text" id="tipoDTE" name="tipoDTE" class="form-control" value="Tipo DTE" readonly>
+                                <label class="form-label" for="tipoDTE">Tipo DTE</label>
+                            </div>
                         </div>
                     </div>
-
                     <div class="row mt-4">
                         <!-- Input para Cliente (readonly) -->
                         <div class="col-md-6">
-                            <label for="cliente">Cliente</label>
-                            <input type="text" id="cliente" name="cliente" class="form-control" readonly>
+                            <div class="form-outline">
+                                <input type="text" id="cliente" name="cliente" class="form-control" value="Cliente" readonly>
+                                <label class="form-label" for="cliente">Cliente</label>
+                            </div>
                         </div>
-
                         <!-- Input para Vendedor (readonly) -->
                         <div class="col-md-6">
-                            <label for="vendedor">Vendedor</label>
-                            <input type="text" id="vendedor" name="vendedor" class="form-control" readonly>
+                            <div class="form-outline">
+                                <input type="text" id="vendedor" name="vendedor" class="form-control" value="Vendedor" readonly>
+                                <label class="form-label" for="vendedor">Vendedor</label>
+                            </div>
                         </div>
                     </div>
                 </div>
-
                 <div class="modal-footer">
                     <button type="submit" id="btnguardarCliente" class="btn btn-primary">
                         <i class="fas fa-save"></i>
