@@ -11,7 +11,7 @@
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-2">
-                            <button id="btnEnviarCorreo" type="button" class="btn btn-primary btn-sm">
+                            <button id="btnEnviarCorreo" type="button" class="btn btn-primary btn-sm" onclick="enviarDTE(1);">
                                 <i class="fas fa-envelope-open-text"></i> Enviar correo
                             </button>                            
                         </div>
@@ -31,6 +31,24 @@
 </form>
 
 <script>
+    function enviarDTE(facturaId) {
+        $.ajax({
+            url: '<?php echo base_url('correos/envio/dte'); ?>', // URL correcta
+            type: 'POST',
+            data: { facturaId: facturaId }, // Enviar el facturaId como parámetro
+            success: function(response) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Correo enviado con éxito',
+                    text: 'El DTE se envió con éxito'
+                });
+            },
+            error: function(xhr, status, error) {
+                // Manejar errores si los hay
+                console.error('Error al cargar el JSON:', xhr.responseText);
+            }
+        });
+    }
     $(document).ready(function() {
         function ajustarAlturaModal() {
             var alturaModal = $('#modalImprimirDTE .modal-dialog').height(); // Obtener la altura del modal

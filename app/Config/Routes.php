@@ -342,6 +342,10 @@ $routes->group('ventas/admin-contingencia', function($routes) {
 
 });
 
+$routes->group('correos', function($routes) {
+    $routes->post('envio/dte', 'ventas\correos::enviarCorreo');
+});
+
 $routes->group("select", function($routes) {
     $routes->post('catalogos-hacienda/actividad-economica', 'select\selectCatalogosMH::selectActividadEconomica');
     $routes->post('catalogos-hacienda/paises-departamentos', 'select\selectCatalogosMH::selectPaisDepartamento');
