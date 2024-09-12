@@ -1,9 +1,9 @@
 <?php
-    if ($operacion == "editar") {
-        $mensajeAlerta = "DTE actualizado con éxito";
-    } else {
-        $mensajeAlerta = "DTE agregado con éxito";
-    }
+if ($operacion == "editar") {
+    $mensajeAlerta = "DTE actualizado con éxito";
+} else {
+    $mensajeAlerta = "DTE agregado con éxito";
+}
 ?>
 <form id="frmModal" method="post" action="<?php echo base_url('ventas/admin-facturacion/operacion/guardar/NuevoDTE'); ?>">
     <div id="modalProductosDTE" class="modal" tabindex="-1" data-backdrop="static" data-keyboard="false">
@@ -33,7 +33,7 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-outline">
-                                <input type="text" id="precioUnitario" name="precioUnitario" class="form-control number-input active "  value="0.00"  readonly required>
+                                <input type="text" id="precioUnitario" name="precioUnitario" class="form-control number-input active" value="0.00" readonly required>
                                 <label class="form-label" for="precioUnitario">Precio Unitario</label>
                                 <input type="hidden" name="hiddenPrecioUnitario" id="hiddenPrecioUnitario">
                             </div>
@@ -45,13 +45,13 @@
                     <div class="row mb-4"> 
                         <div class="col-md-4">
                             <div class="form-outline">
-                                <input type="number" id="porcentajeDescuento" name="porcentajeDescuento" class="form-control active number-input" min="0" max="25"  value="<?= $campos['porcentajeDescuento']; ?>" required >
+                                <input type="number" id="porcentajeDescuento" name="porcentajeDescuento" class="form-control active number-input" min="0" max="25" value="<?= $campos['porcentajeDescuento']; ?>" required >
                                 <label class="form-label" for="porcentajeDescuento">Porcentaje de descuento</label>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-outline">
-                                <input type="number" id="precioUnitarioVenta" name="precioUnitarioVenta" class="form-control active number-input" min="0" value="0.00" readonly required >
+                                <input type="number" id="precioUnitarioVenta" name="precioUnitarioVenta" class="form-control active number-input" min="0" value="0.00" readonly required>
                                 <label class="form-label" for="precioUnitarioVenta">Precio de venta</label>
                             </div>
                             <div class="text-right">
@@ -68,6 +68,23 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Mostrar el IVA Unitario y Total -->
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <div class="form-outline">
+                                <input type="text" id="ivaUnitario" name="ivaUnitario" class="form-control number-input active" value="0.00" readonly required>
+                                <label class="form-label" for="ivaUnitario">IVA Unitario</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-outline">
+                                <input type="text" id="ivaTotal" name="ivaTotal" class="form-control number-input active" value="0.00" readonly required>
+                                <label class="form-label" for="ivaTotal">IVA Total</label>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
                 <div class="modal-footer">
                     <button type="submit" id="btnguardarprodutos" class="btn btn-primary">
@@ -85,7 +102,6 @@
 </form>
 
 <script>
-    // Evitar la entrada de 'e', 'E', '+', y '-' en los campos de número
     document.querySelectorAll('.number-input').forEach(function(input) {
         input.addEventListener('keydown', function(event) {
             if (event.key === 'e' || event.key === 'E' || event.key === '-' || event.key === '+') {
@@ -118,7 +134,6 @@
             });
         });
 
-        // Calcular precios cuando cambie el valor de cantidadProducto, porcentajeDescuento, o precioUnitario
         $('#cantidadProducto, #porcentajeDescuento, #precioUnitario').on('input change', actualizarPrecios);
 
         function actualizarPrecios() {
@@ -130,21 +145,23 @@
             var precioUnitarioVenta = precioUnitario * (1 - (porcentajeDescuento / 100));
             $('#precioUnitarioVenta').val(precioUnitarioVenta.toFixed(2));
 
-            // Calcular el precio unitario de venta con IVA
+            // Calcular el IVA unitario y total
             var ivaPorcentaje = 13; // Suponiendo un IVA del 13%
-            var ivaPrecioUnitario = (precioUnitario * ivaPorcentaje) / 100;
-            var precioUnitarioIVA = precioUnitario + ivaPrecioUnitario;
-            $('#precioUnitarioIVA').text(precioUnitarioIVA.toFixed(2));
-
             var ivaVenta = (precioUnitarioVenta * ivaPorcentaje) / 100;
             var precioUnitarioVentaIVA = precioUnitarioVenta + ivaVenta;
+
+            // Calcular IVA unitario y total
+            var ivaUnitario = precioUnitarioVentaIVA - precioUnitarioVenta;
+            var ivaTotal = ivaUnitario * cantidadProducto;
+
             $('#precioUnitarioVentaIVA').text(precioUnitarioVentaIVA.toFixed(2));
+            $('#ivaUnitario').val(ivaUnitario.toFixed(2));
+            $('#ivaTotal').val(ivaTotal.toFixed(2));
 
             // Calcular el total de la reserva
             var totalDetalle = precioUnitarioVenta * cantidadProducto;
             $('#totalDetalle').val(totalDetalle.toFixed(2));
 
-            // Calcular el total de la reserva con IVA
             var totalDetalleIVA = precioUnitarioVentaIVA * cantidadProducto;
             $('#totalDetalleIVA').text(totalDetalleIVA.toFixed(2));
         }
@@ -181,6 +198,6 @@
 
         // Inicializar precios al cargar el formulario
         actualizarPrecios();
-         $("#productoId").val(<?= $campos["productoId"]; ?>).trigger('change'); 
+        $("#productoId").val(<?= $campos["productoId"]; ?>).trigger('change'); 
     });
 </script>

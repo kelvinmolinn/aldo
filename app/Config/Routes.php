@@ -323,6 +323,7 @@ $routes->group('ventas/admin-facturacion', function($routes) {
     $routes->post('operacion/contingencia/certificar', 'ventas\administracionFacturacion::operacionCertificarContingencia');
     $routes->post('form/notaCredito/dte', 'ventas\administracionFacturacion::modalNotaCredito');
     $routes->post('obtener/credito-fiscal', 'ventas\administracionFacturacion::obtenerCreditoFiscal');
+    $routes->post('operacion/guardar/notaCredito', 'ventas\administracionFacturacion::modalNotaCreditoperacion');
 
     $routes->get('pdf/generate', 'ventas\reportes\indexReporte::generate');
 

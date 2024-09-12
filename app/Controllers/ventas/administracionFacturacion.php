@@ -536,7 +536,7 @@ public function tablaFacturacion()
  
     }
 
-
+/*
     public function modalNuevoDTEOperacion()
 {
     $operacion = $this->request->getPost('operacion');
@@ -767,6 +767,196 @@ public function tablaFacturacion()
                     'mensaje' => 'No se pudo insertar el DTE'
                 ]);
             }
+        }
+    }
+}
+*/
+public function modalNuevoDTEOperacion()
+{
+    $operacion = $this->request->getPost('operacion');
+    $facturaDetalleId = $this->request->getPost('facturaDetalleId');
+    $model = new fel_facturas_detalle();
+    $sucursalModel = new fel_facturas();  
+    $facturaId = $this->request->getPost('facturaId');
+    $productoId = $this->request->getPost('productoId');
+    $precioUnitario = $this->request->getPost('hiddenPrecioUnitario');
+    $cantidadProducto = $this->request->getPost('cantidadProducto');
+    $porcentajeDescuento = $this->request->getPost('porcentajeDescuento');
+
+    // Consulta para traer el 13% de la parametrización
+    $porcentajeIva = new conf_parametrizaciones();
+    $IVA = $porcentajeIva 
+        ->select("valorParametrizacion")
+        ->where("flgElimina", 0)
+        ->where("parametrizacionId", 1)
+        ->first();
+
+    // Calcular IVA y precios
+    $IvaCalcular = ($precioUnitario * $IVA['valorParametrizacion']) / 100;
+    $precioUnitarioIVA = $precioUnitario + $IvaCalcular;
+    $ivaTotal = $IvaCalcular * $cantidadProducto;
+    $precioUnitarioVenta = $precioUnitario * (1 - ($porcentajeDescuento / 100));
+    $IvaVentaCalcular = ($precioUnitarioVenta * $IVA['valorParametrizacion']) / 100;
+    $precioUnitarioVentaIVA = $precioUnitarioVenta + $IvaVentaCalcular;
+    $totalDetalle = $precioUnitarioVenta * $cantidadProducto;
+    $totalDetalleIVA = $precioUnitarioVentaIVA * $cantidadProducto;
+
+    // Calcular el IVA unitario y total
+    $ivaUnitario = $precioUnitarioVentaIVA - $precioUnitarioVenta;
+    $ivaTotal = $ivaUnitario * $cantidadProducto;
+
+    // Calcular el descuento total para la factura
+    $descuentoTotal = $precioUnitario * ($porcentajeDescuento / 100) * $cantidadProducto;
+
+    // Obtener sucursalId de fel_facturas 
+    $dteData = $sucursalModel->find($facturaId);
+    $sucursalId = $dteData['sucursalId'];  
+    $tipoItemMHId = 1; // Valor por defecto para tipoItemMHId
+
+    // Obtener la existencia actual del producto en la sucursal
+    $productosExistenciasModel = new inv_productos_existencias();
+    $productoExistencia = $productosExistenciasModel->select('existenciaProducto')
+                ->where('flgElimina', 0)
+                ->where('sucursalId', $sucursalId)
+                ->where('productoId', $productoId)
+                ->first();
+
+    if (!$productoExistencia) {
+        return $this->response->setJSON([
+            'success' => false,
+            'mensaje' => 'Producto no encontrado'
+        ]);
+    }
+
+    $existenciaActual = $productoExistencia['existenciaProducto'];
+
+    // Obtener el codigoProducto desde inv_productos
+    $productosModel = new inv_productos();
+    $producto = $productosModel->select('codigoProducto')
+                ->where('productoId', $productoId)
+                ->first();
+
+    if (!$producto) {
+        return $this->response->setJSON([
+            'success' => false,
+            'mensaje' => 'Código de producto no encontrado'
+        ]);
+    }
+
+    $codigoProducto = $producto['codigoProducto'];
+
+    // Verificar si el producto ya está en la reserva
+    $detalleActual = $model->select('cantidadProducto, precioUnitario, porcentajeDescuento, productoId')
+                            ->where('flgElimina', 0)
+                            ->where('facturaId', $facturaId)
+                            ->where('facturaDetalleId', $facturaDetalleId)
+                            ->first();
+
+    if ($operacion == 'editar' && $facturaDetalleId) {
+        // Edición de DTE existente
+        $detalleActualEditar = $model->select('cantidadProducto, productoId')
+                                     ->where('flgElimina', 0)
+                                     ->where('facturaId', $facturaId)
+                                     ->where('facturaDetalleId', $facturaDetalleId)
+                                     ->first();
+
+        if (!$detalleActualEditar) {
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'Detalle de la factura no encontrado'
+            ]);
+        }
+
+        $cantidadProductoAnterior = $detalleActualEditar['cantidadProducto'];
+        $productoIdAnterior = $detalleActualEditar['productoId'];
+        
+        if ($productoId != $productoIdAnterior || ($cantidadProducto - $cantidadProductoAnterior) > $existenciaActual) {
+            if ($cantidadProducto > $existenciaActual) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'mensaje' => 'No hay existencias suficientes para realizar el DTE'
+                ]);
+            }
+        }
+
+        // Actualizar los valores basados en la nueva cantidad y producto
+        $precioUnitarioVenta = $precioUnitario * (1 - ($porcentajeDescuento / 100));
+        $precioUnitarioVentaIVA = $precioUnitarioVenta + $IvaVentaCalcular;
+        $totalDetalle = $precioUnitarioVenta * $cantidadProducto;
+        $totalDetalleIVA = $precioUnitarioVentaIVA * $cantidadProducto;
+
+        $data = [
+            'productoId'                => $productoId,
+            'cantidadProducto'          => $cantidadProducto,
+            'precioUnitario'            => $precioUnitario,
+            'porcentajeDescuento'       => $porcentajeDescuento,
+            'precioUnitarioIVA'         => $precioUnitarioIVA,
+            'ivaUnitario'               => $ivaUnitario,
+            'ivaTotal'                  => $ivaTotal,
+            'precioUnitarioVenta'       => $precioUnitarioVenta,
+            'precioUnitarioVentaIVA'    => $precioUnitarioVentaIVA,
+            'totalDetalle'              => $totalDetalle,
+            'totalDetalleIVA'           => $totalDetalleIVA,
+            'codigoProducto'            => $codigoProducto,
+            'tipoItemMHId'              => $tipoItemMHId,
+            'descuentoTotal'            => $descuentoTotal
+        ];
+
+        $operacionDTE = $model->update($facturaDetalleId, $data);
+        
+        if ($operacionDTE) {
+            return $this->response->setJSON([
+                'success' => true,
+                'mensaje' => 'DTE actualizado correctamente',
+                'facturaDetalleId' => $facturaDetalleId
+            ]);
+        } else {
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'No se pudo actualizar el DTE'
+            ]);
+        }
+    } else {
+        // Insertar nuevo DTE
+        if ($cantidadProducto > $existenciaActual) {
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'No hay existencias suficientes para realizar la reserva'
+            ]);
+        }
+
+        // Insertar nuevo detalle
+        $data = [
+            'productoId'                => $productoId,
+            'cantidadProducto'          => $cantidadProducto,
+            'precioUnitario'            => $precioUnitario,
+            'facturaId'                 => $facturaId,
+            'porcentajeDescuento'       => $porcentajeDescuento,
+            'precioUnitarioIVA'         => $precioUnitarioIVA,
+            'ivaUnitario'               => $ivaUnitario,
+            'ivaTotal'                  => $ivaTotal,
+            'precioUnitarioVenta'       => $precioUnitarioVenta,
+            'precioUnitarioVentaIVA'    => $precioUnitarioVentaIVA,
+            'totalDetalle'              => $totalDetalle,
+            'totalDetalleIVA'           => $totalDetalleIVA,
+            'codigoProducto'            => $codigoProducto,
+            'tipoItemMHId'              => $tipoItemMHId,
+            'descuentoTotal'            => $descuentoTotal
+        ];
+
+        $operacionDTE = $model->insert($data);
+
+        if ($operacionDTE) {
+            return $this->response->setJSON([
+                'success' => true,
+                'mensaje' => 'DTE agregado correctamente',
+                'facturaDetalleId' => $model->insertID()
+            ]);
+        } else {
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'No se pudo insertar el DTE'
+            ]);
         }
     }
 }
@@ -2894,6 +3084,7 @@ private function generarJSONTipo2($factura, $certificacion, $cliente, $telefono,
             ->join('fel_factura_certificacion', 'fel_factura_certificacion.facturaId = fel_facturas.facturaId')
             ->where('fel_facturas.tipoDTEId', '2')  // Crédito Fiscal
             ->where('fel_factura_certificacion.estadoCertificacion', 'Certificado')
+            //->where('fel_factura_certificacion.estadoCertificacion', 'Pendiente')
             ->whereNotIn('fel_facturas.facturaId', function($query) {
                 $query->select('facturaIdRelacionada')
                     ->from('fel_factura_relacionada');
@@ -2929,36 +3120,125 @@ private function generarJSONTipo2($factura, $certificacion, $cliente, $telefono,
     
         return view('ventas/modals/modalNotaCredito', $data);
     }
-    public function obtenerCreditoFiscal() {
-        $facturaId = $this->request->getPost('facturaId');
+public function obtenerCreditoFiscal() {
+    $facturaId = $this->request->getPost('facturaId');
+
+    // Modelo de factura
+    $facturaModel = new fel_facturas();
     
-        // Modelo de factura
-        $facturaModel = new fel_facturas();
-        
-        // Obtener los datos de la factura junto con los datos necesarios
-        $factura = $facturaModel
-            ->select('fel_facturas.sucursalId, fel_facturas.tipoDTEId, fel_facturas.clienteId, fel_facturas.empleadoIdVendedor, conf_sucursales.sucursal, fel_clientes.cliente, conf_empleados.primerNombre, conf_empleados.primerApellido, cat_02_tipo_dte.tipoDocumentoDTE')
-            ->join('conf_sucursales', 'conf_sucursales.sucursalId = fel_facturas.sucursalId')
-            ->join('fel_clientes', 'fel_clientes.clienteId = fel_facturas.clienteId')
-            ->join('conf_empleados', 'conf_empleados.empleadoId = fel_facturas.empleadoIdVendedor')
-            ->join('cat_02_tipo_dte', 'cat_02_tipo_dte.tipoDTEId = fel_facturas.tipoDTEId')
-            ->where('fel_facturas.facturaId', $facturaId)
+    // Obtener los datos de la factura junto con los datos necesarios
+    $factura = $facturaModel
+        ->select('fel_facturas.sucursalId, conf_sucursales.sucursal, fel_facturas.tipoDTEId, cat_02_tipo_dte.tipoDocumentoDTE as tipoDTE, fel_facturas.clienteId, fel_clientes.cliente, fel_facturas.empleadoIdVendedor, conf_empleados.primerNombre, conf_empleados.primerApellido')
+        ->join('conf_sucursales', 'conf_sucursales.sucursalId = fel_facturas.sucursalId')
+        ->join('fel_clientes', 'fel_clientes.clienteId = fel_facturas.clienteId')
+        ->join('conf_empleados', 'conf_empleados.empleadoId = fel_facturas.empleadoIdVendedor')
+        ->join('cat_02_tipo_dte', 'cat_02_tipo_dte.tipoDTEId = fel_facturas.tipoDTEId')
+        ->where('fel_facturas.facturaId', $facturaId)
+        ->first();
+
+    // Verificar si existe la factura
+    if (!$factura) {
+        return $this->response->setJSON(['error' => 'Factura no encontrada'], 404);
+    }
+
+    // Enviar la respuesta con los datos
+    return $this->response->setJSON([
+        'sucursalId'  => $factura['sucursalId'],
+        'sucursal'    => $factura['sucursal'],
+        'tipoDTEId'   => $factura['tipoDTEId'],
+        'tipoDTE'     => $factura['tipoDTE'],
+        'clienteId'   => $factura['clienteId'],
+        'cliente'     => $factura['cliente'],
+        'empleadoIdVendedor' => $factura['empleadoIdVendedor'],
+        'vendedor'    => $factura['primerNombre'] . ' ' . $factura['primerApellido']
+    ]);
+}
+
+public function modalNotaCreditoperacion()
+{
+    // Continuar con la operación de inserción o actualización en la base de datos
+    $operacion = $this->request->getPost('operacion');
+    $facturaId = $this->request->getPost('facturaId');
+    $creditoFiscalId = $this->request->getPost('creditoFiscalId');  // ID del Crédito Fiscal relacionado
+    $tipoGeneracionDocumentoId = 2;  // Establecer tipoGeneracionDocumentoId fijo como 1
+
+    $model = new fel_facturas();
+    $modelParametrizaciones = new conf_parametrizaciones();
+    $modelCondicion = new cat_16_condicion_pago();
+    $modelFacturaRelacionada = new fel_factura_relacionada();  // Modelo para la tabla fel_factura_relacionada
+    $modelCreditoFiscal = new fel_facturas();  // Modelo para obtener los datos del crédito fiscal
+
+    // Obtener valores requeridos
+    $porcentajeIVA = $modelParametrizaciones->select('valorParametrizacion')
+        ->where('flgElimina', 0)
+        ->where('parametrizacionId', 1)
+        ->first();
+
+    $condicionFacturaMHId = $modelCondicion->select('condicionFacturaMHId')
+        ->where('flgElimina', 0)
+        ->where('condicionFacturaMHId', 1)
+        ->first();
+
+    // Datos para la tabla fel_facturas
+    $dataFactura = [
+        'sucursalId'           => $this->request->getPost('sucursalId'),
+        'fechaEmision'         => date('Y-m-d'),
+        'horaEmision'          => date('H:i'),
+        'clienteId'            => $this->request->getPost('clienteId'),
+        'empleadoIdVendedor'   => $this->request->getPost('empleadoIdVendedor'),
+        'tipoDTEId'            => 4,  // Nota de Crédito
+        'porcentajeIVA'        => $porcentajeIVA['valorParametrizacion'],
+        'condicionFacturaMHId' => $condicionFacturaMHId['condicionFacturaMHId'],
+        'estadoFactura'        => "Pendiente"
+    ];
+
+    if ($operacion == 'editar') {
+        $operacionDTE = $model->update($this->request->getPost('facturaId'), $dataFactura);
+        $facturaId = $this->request->getPost('facturaId'); // Usar el ID de la factura si es edición
+    } else {
+        // Insertar datos en la tabla fel_facturas
+        $operacionDTE = $model->insert($dataFactura);
+        $facturaId = $model->insertID(); // Obtener el ID del nuevo registro
+    }
+
+    if ($operacionDTE) {
+        // Obtener los datos del crédito fiscal seleccionado (fecha y hora de emisión)
+        $creditoFiscal = $modelCreditoFiscal
+            ->select('fechaEmision, horaEmision')
+            ->where('facturaId', $creditoFiscalId)
             ->first();
-    
-        // Verificar si existe la factura
-        if (!$factura) {
-            return $this->response->setJSON(['error' => 'Factura no encontrada'], 404);
-        }
-    
-        // Enviar la respuesta con los datos
+
+        // Insertar en la tabla fel_factura_relacionada
+        $dataRelacionada = [
+            'facturaId'                 => $facturaId,  // ID de la nota de crédito recién insertada
+            'facturaIdRelacionada'      => $creditoFiscalId,  // ID del crédito fiscal relacionado
+            'tipoDTEId'                 => 4,  // Nota de Crédito
+            'tipoGeneracionDocumentoId' => $tipoGeneracionDocumentoId,
+            'numeroDocumentoRelacionada'=> $creditoFiscalId,  // Número de control del crédito fiscal relacionado
+            'fechaEmisionRelacionada'   => $creditoFiscal['fechaEmision'],  // Fecha de emisión del crédito fiscal
+            'horaEmisionRelacionada'    => $creditoFiscal['horaEmision'],  // Hora de emisión del crédito fiscal
+        ];
+
+        // Insertar en la tabla fel_factura_relacionada
+        $modelFacturaRelacionada->insert($dataRelacionada);
+
+        // Si ambas operaciones son exitosas
         return $this->response->setJSON([
-            'sucursal'  => $factura['sucursal'],
-            'tipoDTE'   => $factura['tipoDocumentoDTE'],
-            'cliente'   => $factura['cliente'],
-            'vendedor'  => $factura['primerNombre'] . ' ' . $factura['primerApellido']
+            'success' => true,
+            'mensaje' => 'DTE ' . ($operacion == 'editar' ? 'actualizado' : 'agregado') . ' correctamente',
+            'facturaId' => $facturaId
+        ]);
+    } else {
+        // Si el insert falló, devuelve un mensaje de error
+        return $this->response->setJSON([
+            'success' => false,
+            'mensaje' => 'No se pudo insertar el DTE'
         ]);
     }
+}
+
     
+
         
 
 }

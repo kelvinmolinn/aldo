@@ -5,8 +5,7 @@
         $mensajeAlerta = "DTE creado con éxito";
     }
 ?>
-
-<form id="frmModal" method="post" action="<?php echo base_url('ventas/admin-facturacion/operacion/guardar/dte'); ?>">
+<form id="frmModal" method="post" action="<?php echo base_url('ventas/admin-facturacion/operacion/guardar/notaCredito'); ?>">
     <div id="modalNotaCredito" class="modal" tabindex="-1" data-backdrop="static" data-keyboard="false">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -18,7 +17,6 @@
                         <!-- Select de Crédito Fiscal -->
                         <div class="col-md-4">
                             <div class="form-select-control">
-                               
                                 <select name="creditoFiscalId" id="creditoFiscalId" class="form-control" style="width: 100%;">
                                     <option value="">Seleccione un crédito fiscal</option>
                                     <?php foreach ($creditosFiscales as $credito) : ?>
@@ -27,38 +25,47 @@
                                 </select>
                             </div>
                         </div>
-                        <!-- Input para Sucursal (readonly) -->
+                        
+                        <!-- Input para Sucursal (nombre legible) -->
                         <div class="col-md-4">
                             <div class="form-outline">
-                                <input type="text" id="sucursal" name="sucursal" class="form-control" value="Sucursal" readonly>
-                                <label class="form-label" for="sucursal">Sucursal</label>
+                                <input type="text" id="sucursalNombre" name="sucursalNombre" class="form-control"  value="Sucursal" readonly>
+                                <label class="form-label" for="sucursalNombre">Sucursal</label>
                             </div>
+                            <input type="hidden" id="sucursalId" name="sucursalId"> <!-- Input oculto para el ID de la sucursal -->
                         </div>
-                        <!-- Input para Tipo DTE (readonly) -->
+
+                        <!-- Input para Tipo DTE (nombre legible) -->
                         <div class="col-md-4">
                             <div class="form-outline">
-                                <input type="text" id="tipoDTE" name="tipoDTE" class="form-control" value="Tipo DTE" readonly>
-                                <label class="form-label" for="tipoDTE">Tipo DTE</label>
+                                <input type="text" id="tipoDTENombre" name="tipoDTENombre" class="form-control" value="Tipo DTE" readonly>
+                                <label class="form-label" for="tipoDTENombre">Tipo DTE</label>
                             </div>
+                            <input type="hidden" id="tipoDTEId" name="tipoDTEId"> <!-- Input oculto para el ID del tipo DTE -->
                         </div>
                     </div>
+
                     <div class="row mt-4">
-                        <!-- Input para Cliente (readonly) -->
+                        <!-- Input para Cliente (nombre legible) -->
                         <div class="col-md-6">
                             <div class="form-outline">
-                                <input type="text" id="cliente" name="cliente" class="form-control" value="Cliente" readonly>
-                                <label class="form-label" for="cliente">Cliente</label>
+                                <input type="text" id="clienteNombre" name="clienteNombre" class="form-control" value="Cliente" readonly>
+                                <label class="form-label" for="clienteNombre">Cliente</label>
                             </div>
+                            <input type="hidden" id="clienteId" name="clienteId"> <!-- Input oculto para el ID del cliente -->
                         </div>
-                        <!-- Input para Vendedor (readonly) -->
+
+                        <!-- Input para Vendedor (nombre legible) -->
                         <div class="col-md-6">
                             <div class="form-outline">
-                                <input type="text" id="vendedor" name="vendedor" class="form-control" value="Vendedor" readonly>
-                                <label class="form-label" for="vendedor">Vendedor</label>
+                                <input type="text" id="vendedorNombre" name="vendedorNombre" class="form-control" value="Vendedor" readonly>
+                                <label class="form-label" for="vendedorNombre">Vendedor</label>
                             </div>
+                            <input type="hidden" id="empleadoIdVendedor" name="empleadoIdVendedor"> <!-- Input oculto para el ID del vendedor -->
                         </div>
                     </div>
                 </div>
+
                 <div class="modal-footer">
                     <button type="submit" id="btnguardarCliente" class="btn btn-primary">
                         <i class="fas fa-save"></i>
@@ -91,11 +98,18 @@ $(document).ready(function() {
                 type: 'POST',
                 data: { facturaId: creditoFiscalId },
                 success: function(response) {
-                    // Prellenar los campos con la información del crédito fiscal
-                    $('#sucursal').val(response.sucursal);       // Prellenar sucursal
-                    $('#tipoDTE').val(response.tipoDTE);         // Prellenar tipo DTE
-                    $('#cliente').val(response.cliente);         // Prellenar cliente
-                    $('#vendedor').val(response.vendedor);       // Prellenar vendedor
+                    // Prellenar los campos con la información del crédito fiscal (nombres y IDs)
+                    $('#sucursalNombre').val(response.sucursal);       // Nombre de la sucursal
+                    $('#sucursalId').val(response.sucursalId);         // ID de la sucursal
+
+                    $('#tipoDTENombre').val(response.tipoDTE);         // Nombre del Tipo DTE
+                    $('#tipoDTEId').val(response.tipoDTEId);           // ID del Tipo DTE
+
+                    $('#clienteNombre').val(response.cliente);         // Nombre del cliente
+                    $('#clienteId').val(response.clienteId);           // ID del cliente
+
+                    $('#vendedorNombre').val(response.vendedor);       // Nombre del vendedor
+                    $('#empleadoIdVendedor').val(response.empleadoIdVendedor);  // ID del vendedor
                 },
                 error: function() {
                     console.error('Error al obtener la información del crédito fiscal.');
@@ -103,7 +117,7 @@ $(document).ready(function() {
             });
         } else {
             // Limpiar los campos si no se selecciona ningún crédito fiscal
-            $('#sucursal, #tipoDTE, #cliente, #vendedor').val('');
+            $('#sucursalNombre, #sucursalId, #tipoDTENombre, #tipoDTEId, #clienteNombre, #clienteId, #vendedorNombre, #empleadoIdVendedor').val('');
         }
     });
 
@@ -139,3 +153,5 @@ $(document).ready(function() {
     });
 });
 </script>
+
+
