@@ -55,7 +55,7 @@ class log_usuarios extends Model
         $logActual = $this->find($logUsuarioId);
         
         if ($logActual) {
-            $concatenarLog = $logActual[$columna] . $texto;
+            $concatenarLog = $logActual[$columna] . ($logActual[$columna] == "" ? "(" : ", (") . date("d/m/Y H:i:s") . ") " . $texto;
             return $this->update($logUsuarioId, [$columna => $concatenarLog]);
         } else {
             // Para prevenir error por si no se creo la session

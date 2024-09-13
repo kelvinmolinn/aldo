@@ -180,7 +180,7 @@ if ($operacion == "editar") {
                             title: '<?php echo $mensajeAlerta; ?>',
                             text: response.mensaje
                         }).then((result) => {
-                            $("#tablaContinuarDTE").DataTable().ajax.reload(null, false);
+                            $("#tablaContinuarNotaCredito").DataTable().ajax.reload(null, false);
                         });
                     } else {
                         Swal.fire({
