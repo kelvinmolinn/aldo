@@ -202,6 +202,7 @@
                                     }).then((result) => {
                                         //$("#tablaContinuarDTE").DataTable().ajax.reload(null, false);
                                         cambiarInterfaz('ventas/admin-facturacion/index', {renderVista:'No'});
+                                        enviarDTE(<?= $facturaId; ?>);
                                     });
                                 } else {
                                     // Insert fallido, mostrar mensaje de error
@@ -220,7 +221,25 @@
                 }
             });
     }
-
+    function enviarDTE(id) {
+        $.ajax({
+            url: '<?php echo base_url('correos/envio/dte'); ?>', // URL correcta
+            type: 'POST',
+            data: { facturaId: id }, // Enviar el facturaId como parámetro
+            success: function(response) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Correo enviado con éxito',
+                    text: 'El DTE se envió con éxito'
+                });
+                
+            },
+            error: function(xhr, status, error) {
+                // Manejar errores si los hay
+                console.error('Error al cargar el DTE:', xhr.responseText);
+            }
+        });
+    }
     function  certificarContingenciaDTE() {
         //alert("Vamos a certificar " + id);
             Swal.fire({
