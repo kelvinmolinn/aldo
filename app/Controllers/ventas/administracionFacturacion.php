@@ -132,7 +132,6 @@ class administracionFacturacion extends Controller
         $modelParametrizaciones = new conf_parametrizaciones();
         $modelCondicion = new cat_16_condicion_pago();
         $logUsuariosModel = new log_usuarios();
-
         $session = session();
 
         $porcentajeIVA = $modelParametrizaciones->select('valorParametrizacion')
@@ -461,7 +460,6 @@ public function tablaFacturacion()
         $facturaId = $this->request->getPost('facturaId');
         $DTEDetalleModel = new fel_facturas_detalle();
         $logUsuariosModel = new log_usuarios();
-
         $session = session();
 
         $productosAgregados = $DTEDetalleModel
@@ -488,8 +486,8 @@ public function tablaFacturacion()
         $operacionDTE = $facturas->update($facturaId, $data);
 
         if ($operacionDTE) {
-            $logUsuariosModel->registrarLogInterfaces("logEdita", "Actualizó el DTE ($facturaId)", $session->get('logUsuarioId'));
-            
+            $logUsuariosModel->registrarLogInterfaces("logEdita", "Actualizó el encabezado del DTE ($facturaId)", $session->get('logUsuarioId'));
+
             return $this->response->setJSON([
                 'success' => true,
                 'mensaje' => 'DTE actualizado correctamente',
@@ -558,241 +556,6 @@ public function tablaFacturacion()
  
     }
 
-/*
-    public function modalNuevoDTEOperacion()
-{
-    $operacion = $this->request->getPost('operacion');
-    $facturaDetalleId = $this->request->getPost('facturaDetalleId');
-    $model = new fel_facturas_detalle();
-    $sucursalModel = new fel_facturas();  
-    $facturaId = $this->request->getPost('facturaId');
-    $productoId = $this->request->getPost('productoId');
-    $precioUnitario = $this->request->getPost('hiddenPrecioUnitario');
-    $cantidadProducto = $this->request->getPost('cantidadProducto');
-    $porcentajeDescuento = $this->request->getPost('porcentajeDescuento');
-
-    // Consulta para traer el 13% de la parametrización
-    $porcentajeIva = new conf_parametrizaciones();
-    $IVA = $porcentajeIva 
-        ->select("valorParametrizacion")
-        ->where("flgElimina", 0)
-        ->where("parametrizacionId", 1)
-        ->first();
-
-    $IvaCalcular = ($precioUnitario * $IVA['valorParametrizacion']) / 100;
-    $precioUnitarioIVA = $precioUnitario + $IvaCalcular;
-    $ivaTotal = $IvaCalcular * $cantidadProducto;
-    $precioUnitarioVenta = $precioUnitario * (1 - ($porcentajeDescuento / 100));
-    $IvaVentaCalcular = ($precioUnitarioVenta * $IVA['valorParametrizacion']) / 100;
-    $precioUnitarioVentaIVA = $precioUnitarioVenta + $IvaVentaCalcular;
-    $totalDetalle = $precioUnitarioVenta * $cantidadProducto;
-    $totalDetalleIVA = $precioUnitarioVentaIVA * $cantidadProducto;
-
-    // Calcular el descuento total para la factura
-    $descuentoTotal = $precioUnitario * ($porcentajeDescuento / 100) * $cantidadProducto;
-
-    // Obtener sucursalId de fel_facturas 
-    $dteData = $sucursalModel->find($facturaId);
-    $sucursalId = $dteData['sucursalId'];  
-    $tipoItemMHId = 1; // Valor por defecto para tipoItemMHId
-
-    // Obtener la existencia actual del producto en la sucursal
-    $productosExistenciasModel = new inv_productos_existencias();
-    $productoExistencia = $productosExistenciasModel->select('existenciaProducto')
-                ->where('flgElimina', 0)
-                ->where('sucursalId', $sucursalId)
-                ->where('productoId', $productoId)
-                ->first();
-
-    if (!$productoExistencia) {
-        return $this->response->setJSON([
-            'success' => false,
-            'mensaje' => 'Producto no encontrado'
-        ]);
-    }
-
-    $existenciaActual = $productoExistencia['existenciaProducto'];
-
-    // Obtener el codigoProducto desde inv_productos
-    $productosModel = new inv_productos();
-    $producto = $productosModel->select('codigoProducto')
-                ->where('productoId', $productoId)
-                ->first();
-
-    if (!$producto) {
-        return $this->response->setJSON([
-            'success' => false,
-            'mensaje' => 'Código de producto no encontrado'
-        ]);
-    }
-
-    $codigoProducto = $producto['codigoProducto'];
-
-    // Verificar si el producto ya está en la reserva
-    $detalleActual = $model->select('cantidadProducto, precioUnitario, porcentajeDescuento, productoId')
-                            ->where('flgElimina', 0)
-                            ->where('facturaId', $facturaId)
-                            ->where('facturaDetalleId', $facturaDetalleId)
-                            ->first();
-
-    if ($operacion == 'editar' && $facturaDetalleId) {
-        // Es una operación de edición
-        $detalleActualEditar = $model->select('cantidadProducto, productoId')
-                                     ->where('flgElimina', 0)
-                                     ->where('facturaId', $facturaId)
-                                     ->where('facturaDetalleId', $facturaDetalleId)
-                                     ->first();
-
-        if (!$detalleActualEditar) {
-            return $this->response->setJSON([
-                'success' => false,
-                'mensaje' => 'Detalle de la factura no encontrado'
-            ]);
-        }
-
-        $cantidadProductoAnterior = $detalleActualEditar['cantidadProducto'];
-        $productoIdAnterior = $detalleActualEditar['productoId'];
-        
-        if ($productoId != $productoIdAnterior || ($cantidadProducto - $cantidadProductoAnterior) > $existenciaActual) {
-            if ($cantidadProducto > $existenciaActual) {
-                return $this->response->setJSON([
-                    'success' => false,
-                    'mensaje' => 'No hay existencias suficientes para realizar el DTE'
-                ]);
-            }
-        }
-
-        // Recalcular los valores basados en la nueva cantidad y producto
-        $precioUnitarioVenta = $precioUnitario * (1 - ($porcentajeDescuento / 100));
-        $precioUnitarioVentaIVA = $precioUnitarioVenta + $IvaVentaCalcular;
-        $totalDetalle = $precioUnitarioVenta * $cantidadProducto;
-        $totalDetalleIVA = $precioUnitarioVentaIVA * $cantidadProducto;
-
-        $data = [
-            'productoId'                => $productoId,
-            'cantidadProducto'          => $cantidadProducto,
-            'precioUnitario'            => $precioUnitario,
-            'porcentajeDescuento'       => $porcentajeDescuento,
-            'precioUnitarioIVA'         => $precioUnitarioIVA,
-            'ivaUnitario'               => $IvaCalcular,
-            'ivaTotal'                  => $ivaTotal,
-            'precioUnitarioVenta'       => $precioUnitarioVenta,
-            'precioUnitarioVentaIVA'    => $precioUnitarioVentaIVA,
-            'totalDetalle'              => $totalDetalle,
-            'totalDetalleIVA'           => $totalDetalleIVA,
-            'codigoProducto'            => $codigoProducto,
-            'tipoItemMHId'              => $tipoItemMHId,
-            'descuentoTotal'            => $descuentoTotal
-        ];
-
-        $operacionDTE = $model->update($facturaDetalleId, $data);
-        
-        if ($operacionDTE) {
-            return $this->response->setJSON([
-                'success' => true,
-                'mensaje' => 'DTE actualizado correctamente',
-                'facturaDetalleId' => $facturaDetalleId
-            ]);
-        } else {
-            return $this->response->setJSON([
-                'success' => false,
-                'mensaje' => 'No se pudo actualizar el DTE'
-            ]);
-        }
-    } else {
-        // Es una operación de agregar o no se especificó facturaDetalleId
-        if ($detalleActual && $detalleActual['cantidadProducto'] > 0) {
-            // El producto ya está en la reserva, actualizar la cantidad
-            $nuevaCantidad = $detalleActual['cantidadProducto'] + $cantidadProducto;
-
-            if ($nuevaCantidad > $existenciaActual) {
-                return $this->response->setJSON([
-                    'success' => false,
-                    'mensaje' => 'No hay existencias suficientes para realizar el DTE'
-                ]);
-            }
-
-            // Recalcular los valores basados en la nueva cantidad
-            $precioUnitarioVenta = $precioUnitario * (1 - ($porcentajeDescuento / 100));
-            $precioUnitarioVentaIVA = $precioUnitarioVenta + $IvaVentaCalcular;
-            $totalDetalle = $precioUnitarioVenta * $nuevaCantidad;
-            $totalDetalleIVA = $precioUnitarioVentaIVA * $nuevaCantidad;
-
-            $descuentoTotal += $precioUnitario * ($porcentajeDescuento / 100) * $nuevaCantidad;
-
-            $data = [
-                'cantidadProducto'          => $nuevaCantidad,
-                'precioUnitario'            => $precioUnitario,
-                'porcentajeDescuento'       => $porcentajeDescuento,
-                'precioUnitarioIVA'         => $precioUnitarioIVA,
-                'ivaUnitario'               => $IvaCalcular,
-                'ivaTotal'                  => $ivaTotal,
-                'precioUnitarioVenta'       => $precioUnitarioVenta,
-                'precioUnitarioVentaIVA'    => $precioUnitarioVentaIVA,
-                'totalDetalle'              => $totalDetalle,
-                'totalDetalleIVA'           => $totalDetalleIVA,
-                'codigoProducto'            => $codigoProducto,
-                'tipoItemMHId'              => $tipoItemMHId,
-                'descuentoTotal'            => $descuentoTotal
-            ];
-
-            $model->set($data)
-                  ->where('flgElimina', 0)
-                  ->where('facturaId', $facturaId)
-                  ->where('productoId', $productoId)
-                  ->update();
-
-            return $this->response->setJSON([
-                'success' => true,
-                'mensaje' => 'Reserva actualizada correctamente',
-                'facturaDetalleId' => $facturaDetalleId
-            ]);
-        } else {
-            // Validar si la existencia es suficiente para una nueva inserción
-            if ($cantidadProducto > $existenciaActual) {
-                return $this->response->setJSON([
-                    'success' => false,
-                    'mensaje' => 'No hay existencias suficientes para realizar la reserva'
-                ]);
-            }
-
-            // Insertar nuevo detalle de reserva
-            $data = [
-                'productoId'                => $productoId,
-                'cantidadProducto'          => $cantidadProducto,
-                'precioUnitario'            => $precioUnitario,
-                'facturaId'                 => $facturaId,
-                'porcentajeDescuento'       => $porcentajeDescuento,
-                'precioUnitarioIVA'         => $precioUnitarioIVA,
-                'ivaUnitario'               => $IvaCalcular,
-                'ivaTotal'                  => $ivaTotal,
-                'precioUnitarioVenta'       => $precioUnitarioVenta,
-                'precioUnitarioVentaIVA'    => $precioUnitarioVentaIVA,
-                'totalDetalle'              => $totalDetalle,
-                'totalDetalleIVA'           => $totalDetalleIVA,
-                'codigoProducto'            => $codigoProducto,
-                'tipoItemMHId'              => $tipoItemMHId,
-                'descuentoTotal'            => $descuentoTotal
-            ];
-
-            $operacionDTE = $model->insert($data);
-
-            if ($operacionDTE) {
-                return $this->response->setJSON([
-                    'success' => true,
-                    'mensaje' => 'DTE agregado correctamente',
-                    'facturaDetalleId' => $model->insertID()
-                ]);
-            } else {
-                return $this->response->setJSON([
-                    'success' => false,
-                    'mensaje' => 'No se pudo insertar el DTE'
-                ]);
-            }
-        }
-    }
-}
-*/
 public function modalNuevoDTEOperacion()
 {
     $operacion = $this->request->getPost('operacion');
@@ -804,6 +567,8 @@ public function modalNuevoDTEOperacion()
     $precioUnitario = $this->request->getPost('hiddenPrecioUnitario');
     $cantidadProducto = $this->request->getPost('cantidadProducto');
     $porcentajeDescuento = $this->request->getPost('porcentajeDescuento');
+    $logUsuariosModel = new log_usuarios();
+    $session = session();
 
     // Consulta para traer el 13% de la parametrización
     $porcentajeIva = new conf_parametrizaciones();
@@ -927,6 +692,7 @@ public function modalNuevoDTEOperacion()
         $operacionDTE = $model->update($facturaDetalleId, $data);
         
         if ($operacionDTE) {
+        $logUsuariosModel->registrarLogInterfaces("logEdita", "Actualizó el detalle del DTE ($facturaDetalleId)", $session->get('logUsuarioId'));
             return $this->response->setJSON([
                 'success' => true,
                 'mensaje' => 'DTE actualizado correctamente',
@@ -969,6 +735,7 @@ public function modalNuevoDTEOperacion()
         $operacionDTE = $model->insert($data);
 
         if ($operacionDTE) {
+            $logUsuariosModel->registrarLogInterfaces("logAgrega", "DTE agregado correctamente (".$model->insertID().")", $session->get('logUsuarioId'));
             return $this->response->setJSON([
                 'success' => true,
                 'mensaje' => 'DTE agregado correctamente',
