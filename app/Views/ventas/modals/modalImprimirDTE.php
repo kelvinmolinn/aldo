@@ -42,10 +42,11 @@
                     title: 'Correo enviado con éxito',
                     text: 'El DTE se envió con éxito'
                 });
+                
             },
             error: function(xhr, status, error) {
                 // Manejar errores si los hay
-                console.error('Error al cargar el JSON:', xhr.responseText);
+                console.error('Error al cargar el DTE:', xhr.responseText);
             }
         });
     }
