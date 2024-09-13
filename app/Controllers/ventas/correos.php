@@ -56,6 +56,7 @@ class correos extends Controller
             return;
         }
 
+        
         if ($email->send()) {
             echo 'Correo enviado exitosamente.';
         } else {
@@ -64,4 +65,5 @@ class correos extends Controller
             print_r($data);
         }
     }
+    
 }

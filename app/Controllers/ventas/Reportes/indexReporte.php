@@ -61,7 +61,7 @@ class indexReporte extends Controller
         $facturaId = isset($_GET['facturaId']) ? intval($_GET['facturaId']) : 0;
 
         $datosDte = $felFactura
-            ->select('cat_04_tipo_transmision.tipoTransmision,cat_17_forma_pago.formaPago,DATE_FORMAT(fel_facturas.fechaEmision, "%d/%m/%Y") as fechaEmision ,fel_facturas.horaEmision,fel_factura_certificacion.numeroControl,fel_factura_certificacion.codigoGeneracion,fel_factura_certificacion.selloRecibido,fel_clientes.cliente,fel_clientes.direccionCliente,fel_clientes.numDocumentoIdentificacion,fel_clientes.nrcCliente,cat_19_actividad_economica.actividadEconomica,fel_clientes.clienteId')
+            ->select('cat_04_tipo_transmision.tipoTransmision,cat_17_forma_pago.formaPago,DATE_FORMAT(fel_facturas.fechaEmision, "%d/%m/%Y") as fechaEmision ,fel_facturas.horaEmision,fel_factura_certificacion.numeroControl,fel_factura_certificacion.codigoGeneracion,fel_factura_certificacion.selloRecibido,fel_clientes.cliente,fel_clientes.direccionCliente,fel_clientes.numDocumentoIdentificacion,fel_clientes.nrcCliente,cat_19_actividad_economica.actividadEconomica,fel_clientes.clienteId,cat_02_tipo_dte.tipoDocumentoDTE')
             ->join('fel_factura_certificacion','fel_factura_certificacion.facturaId = fel_facturas.facturaId')
             ->join('cat_04_tipo_transmision','cat_04_tipo_transmision.tipoTransmisionMHId = fel_factura_certificacion.tipoTransmisionMHId')
             ->join('fel_facturas_pago','fel_facturas_pago.facturaId = fel_facturas.facturaId')
@@ -69,6 +69,7 @@ class indexReporte extends Controller
             ->join('fel_clientes','fel_clientes.clienteId = fel_facturas.clienteId')
             ->join('cat_19_actividad_economica','cat_19_actividad_economica.actividadEconomicaId = fel_clientes.actividadEconomicaId')
             ->join('fel_cliente_contacto', 'fel_cliente_contacto.clienteId = fel_clientes.clienteId')
+            ->join('cat_02_tipo_dte','cat_02_tipo_dte.tipoDTEId = fel_facturas.tipoDTEId')
             ->where('fel_facturas.flgElimina', 0)
             ->where('fel_facturas.facturaId', $facturaId)
             ->where('fel_facturas.estadoFactura','Certificado')
@@ -78,12 +79,14 @@ class indexReporte extends Controller
             ->select('contactoCliente')
             ->where('clienteId', $datosDte['clienteId'])
             ->where('tipoContactoId', 1)
+            ->where('flgElimina', 0)
             ->first();
     
         $correo = $felClienteContacto
             ->select('contactoCliente')
             ->where('clienteId', $datosDte['clienteId'])
             ->where('tipoContactoId', 2)
+            ->where('flgElimina', 0)
             ->first();
 
         $codGeneracion = $datosDte['codigoGeneracion'];
@@ -127,7 +130,7 @@ class indexReporte extends Controller
 
         $pdf->SetXY(50, 10);
         $pdf->SetFillColor(154, 193, 229);
-        $pdf->Cell(150,5,utf8_decode('DOCUMENTO TRIBUTARIO ELECTRONICO'),1,0,'L', true);
+        $pdf->Cell(150,5,utf8_decode('DOCUMENTO TRIBUTARIO ELECTRONICO: ' . $datosDte['tipoDocumentoDTE']),1,0,'L', true);
 
         $pdf->SetFont('Arial', 'B', 8);
         
