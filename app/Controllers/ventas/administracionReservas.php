@@ -798,7 +798,7 @@ public function eliminarReserva(){
     }
 }
 
-
+/*
 public function tablaContinuarReserva()
 {
     $reservaId = $this->request->getPost('reservaId');
@@ -939,6 +939,146 @@ public function tablaContinuarReserva()
     }
 }
 
+*/
+public function tablaContinuarReserva()
+{
+    $reservaId = $this->request->getPost('reservaId');
+    $mostrarReserva = new fel_reservas_detalle();
+    $datos = $mostrarReserva
+        ->select('fel_reservas_detalle.reservaDetalleId,fel_reservas_detalle.reservaId,fel_reservas_detalle.cantidadProducto,fel_reservas_detalle.productoId,fel_reservas_detalle.precioUnitario,fel_reservas_detalle.precioUnitarioIVA,fel_reservas_detalle.porcentajeDescuento,fel_reservas_detalle.precioUnitarioVenta,fel_reservas_detalle.precioUnitarioVentaIVA,fel_reservas_detalle.ivaUnitario,fel_reservas_detalle.ivaTotal,fel_reservas_detalle.totalReservaDetalle,fel_reservas_detalle.totalReservaDetalleIVA,inv_productos.productoId, inv_productos.producto,inv_productos.codigoProducto,cat_14_unidades_medida.unidadMedida')
+        ->join('inv_productos', 'inv_productos.productoId = fel_reservas_detalle.productoId')
+        ->join('cat_14_unidades_medida', 'cat_14_unidades_medida.unidadMedidaId = inv_productos.unidadMedidaId')
+        ->join('fel_reservas', 'fel_reservas.reservaId = fel_reservas_detalle.reservaId')
+        ->where('fel_reservas_detalle.flgElimina', 0)
+        ->where('fel_reservas_detalle.reservaId', $reservaId)
+        ->findAll();
+
+    $output['data'] = array();
+    $n = 1;
+
+    // Variables para sumar los totales
+    $subtotal = 0;
+    $ivaTotal = 0;
+    $totalAPagar = 0;
+    $descuentos = 0;
+
+    foreach ($datos as $columna) {
+        // Construir columnas
+        $columna1 = $n;
+        $columna2 = "<b>Producto:</b> " . $columna['producto'] . "<br><b>Código :</b> " . $columna['codigoProducto'];
+        $columna3 = "<b>Cantidad: </b> " . $columna['cantidadProducto'] . " (" . $columna['unidadMedida'] . ")";
+        $columna4 = "<b>Precio sin IVA: </b> $" . number_format($columna['precioUnitarioVenta'], 2, '.', ',') . "<br><b>Precio con IVA: </b> $" . number_format($columna['precioUnitarioVentaIVA'], 2, '.', ',');
+
+        $columna5 = "<b>Precio sin IVA: </b> $" . number_format($columna['totalReservaDetalle'], 2, '.', ',') . "<br><b>Precio con IVA: </b> $" . number_format($columna['totalReservaDetalleIVA'], 2, '.', ',');
+
+        $columna6 = '
+            <button class="btn btn-primary mb-1" onclick="modalProductoReserva(' . $columna['reservaDetalleId'] . ', `editar`);" data-toggle="tooltip" data-placement="top" title="Editar">
+                <i class="fas fa-pen"></i>
+            </button>
+            <button class="btn btn-danger mb-1" onclick="eliminarReserva(' . $columna['reservaDetalleId'] . ');" data-toggle="tooltip" data-placement="top" title="Eliminar">
+                <i class="fas fa-trash"></i>
+            </button>
+        ';
+
+        // Agregar la fila al array de salida
+        $output['data'][] = array(
+            $columna1,
+            $columna2,
+            $columna3,
+            $columna4,
+            $columna5,
+            $columna6
+        );
+
+        // Sumar los valores de cada columna con round
+        $subtotal += round($columna['totalReservaDetalle'], 2);
+        $ivaTotal += round($columna['ivaTotal'], 2);
+        $totalAPagar += round($columna['totalReservaDetalleIVA'], 2);
+        $descuentos += round(($columna['precioUnitario'] - $columna['precioUnitarioVenta']) * $columna['cantidadProducto'], 2);
+
+        $n++;
+    }
+
+    // Obtener el número de pagos y la suma total de los pagos para la reservaId
+    $reservaPago = new fel_reservas_pago();
+    $pagosReserva = $reservaPago
+        ->select('COUNT(*) as numeroPagos, SUM(ROUND(montoPago, 2)) as totalPagado') // Redondear los pagos
+        ->where('reservaId', $reservaId)
+        ->where('flgElimina', 0)
+        ->first();
+
+    $numeroPagos = $pagosReserva['numeroPagos'];
+    $totalPagado = round($pagosReserva['totalPagado'] ?? 0, 2); // Redondear el total pagado
+
+    // Determinar la clase CSS según la condición
+    $totalPagadoClass = ($totalPagado < $totalAPagar) ? 'text-danger' : 'text-success';
+
+    // Determinar el texto, clase y estado del botón
+    $botonTexto = ($totalPagado < $totalAPagar) ? 'Pagos (' . $numeroPagos . ')' : 'Pagado';
+    $botonClase = ($totalPagado < $totalAPagar) ? 'btn-primary' : 'btn-success';
+    $botonDisabled = ($totalPagado < $totalAPagar) ? '' : 'disabled';
+
+    if ($n > 1) {
+        $output['footer'] = array(
+            '',
+            '',
+            ''
+        );
+
+        $output['footerTotales'] = '
+            <div class="row text-right">
+                <div class="col-8">
+                    <b> Subtotal (=) :</b>
+                </div>
+                <div class="col-4">
+                    $ ' . number_format($subtotal, 2, '.', ',') . '
+                </div>
+            </div>
+            <div class="row text-right">
+                <div class="col-8">
+                    <b>Descuentos (-) :</b>
+                </div>
+                <div class="col-4">
+                    $ ' . number_format($descuentos, 2, '.', ',') . '
+                </div>
+            </div>
+            <div class="row text-right">
+                <div class="col-8">
+                    <b>IVA (+) :</b>
+                </div>
+                <div class="col-4">
+                    $ ' . number_format($ivaTotal, 2, '.', ',') . '
+                </div>
+            </div>
+            <div class="row text-right">
+                <div class="col-8">
+                    <b>Total a pagar (=) :</b>
+                </div>
+                <div class="col-4">
+                    <b>$ ' . number_format($totalAPagar, 2, '.', ',') . ' </b>
+                </div>
+            </div>
+            <div class="row text-right">
+                <div class="col-8">
+                    <b>Total pagado:</b>
+                </div>
+                <div class="col-4">
+                    <b class="' . $totalPagadoClass . '">$ ' . number_format($totalPagado, 2, '.', ',') . ' </b>
+                </div>
+            </div>
+            <div class="row text-right">
+                <div class="col-12">
+                    <button type="button" class="btn ' . $botonClase . ' mb-1" onclick="modalPagoReserva(' . $reservaId . ', `editar`)" data-toggle="tooltip" data-placement="top" title="Pagos">
+                        <i class="fas fa-hand-holding-usd"></i> ' . $botonTexto . '
+                    </button>
+                </div>
+            </div>
+        ';
+        return $this->response->setJSON($output);
+    } else {
+        return $this->response->setJSON(array('data' => '', 'footer' => '')); // No hay datos, devuelve un array vacío
+    }
+}
 
     public function modalPagoReserva(){
         $data['reservaId'] = $this->request->getPost('reservaId');
@@ -951,16 +1091,16 @@ public function tablaContinuarReserva()
         return view('ventas/modals/modalPagosReservas', $data);
     }
 
-
+/*
     public function modalPagoReservaOperacion() {
         $reservaId = $this->request->getPost('reservaId');
-        $montoPago = $this->request->getPost('montoPago');
+        $montoPago = round($this->request->getPost('montoPago'), 2);
         $numComprobantePago = $this->request->getPost('numComprobantePago');
     
         // Obtener la suma de totalReservaDetalle para la reservaId proporcionada
         $detalleReserva = new fel_reservas_detalle();
         $totalReserva = $detalleReserva
-            ->select('SUM(totalReservaDetalleIVA) as total')
+            ->select('SUM(ROUND(totalReservaDetalleIVA, 2)) as total')
             ->where('reservaId', $reservaId)
             ->where('flgElimina', 0)
             ->first();
@@ -968,7 +1108,7 @@ public function tablaContinuarReserva()
         // Obtener la suma de todos los pagos realizados para la reservaId proporcionada
         $reservaPago = new fel_reservas_pago();
         $totalPagosRealizados = $reservaPago
-            ->select('SUM(montoPago) as total')
+            ->select('SUM(ROUND(montoPago, 2)) as total')
             ->where('reservaId', $reservaId)
             ->where('flgElimina', 0)
             ->first();
@@ -1028,7 +1168,85 @@ public function tablaContinuarReserva()
             ]);
         }
     }
+   */
+  
+  public function modalPagoReservaOperacion() {
+    $reservaId = $this->request->getPost('reservaId');
+    $montoPago = round($this->request->getPost('montoPago'), 2); // Asegurar redondeo a 2 decimales
+    $numComprobantePago = $this->request->getPost('numComprobantePago');
+
+    // Obtener la suma de totalReservaDetalle para la reservaId proporcionada
+    $detalleReserva = new fel_reservas_detalle();
+    $totalReserva = $detalleReserva
+        ->select('SUM(ROUND(totalReservaDetalleIVA, 2)) as total') // Redondear la suma total a 2 decimales
+        ->where('reservaId', $reservaId)
+        ->where('flgElimina', 0)
+        ->first();
+
+    // Obtener la suma de todos los pagos realizados para la reservaId proporcionada
+    $reservaPago = new fel_reservas_pago();
+    $totalPagosRealizados = $reservaPago
+        ->select('SUM(ROUND(montoPago, 2)) as total') // Redondear los pagos a 2 decimales
+        ->where('reservaId', $reservaId)
+        ->where('flgElimina', 0)
+        ->first();
+
+    // Verificar si el numComprobantePago ya existe
+    $comprobanteExistente = $reservaPago
+        ->where('numComprobantePago', $numComprobantePago)
+        ->where('reservaId', $reservaId)
+        ->where('flgElimina', 0)
+        ->first();
+
+    // Mensajes de error
+    $errores = [];
+
+    // Verificar que el montoPago no exceda el total de la reserva menos los pagos realizados
+    $totalPagosRealizados = round($totalPagosRealizados['total'] ?? 0, 2); // Asegurar que los pagos previos se redondeen a 2 decimales
+    if ($totalReserva && ($montoPago + $totalPagosRealizados) > $totalReserva['total']) {
+        $errores[] = 'El monto del pago excede el total de la reserva.';
+    }
+
+    if ($comprobanteExistente) {
+        $errores[] = 'El número de comprobante ya existe.';
+    }
+
+    if (!empty($errores)) {
+        return $this->response->setJSON([
+            'success' => false,
+            'mensaje' => implode(' ', $errores)
+        ]);
+    }
+
+    // Datos a insertar
+    $dataInsert = [
+        'reservaId' => $reservaId,
+        'fechaReservaPago' => $this->request->getPost('fechaReservaPago'),
+        'formaPagoMHId' => $this->request->getPost('formaPagoMHId'),
+        'numComprobantePago' => $numComprobantePago,
+        'montoPago' => $montoPago,
+        'comentarioPago' => $this->request->getPost('comentarioPago')
+    ];
+
+    // Insertar datos en la base de datos
+    $operacionReservaPago = $reservaPago->insert($dataInsert);
     
+    if ($operacionReservaPago) {
+        // Si el insert fue exitoso, devuelve el último ID insertado
+        return $this->response->setJSON([
+            'success' => true,
+            'mensaje' => 'Pago agregado correctamente',
+            'reservaPagoId' => $reservaPago->insertID()
+        ]);
+    } else {
+        // Si el insert falló, devuelve un mensaje de error
+        return $this->response->setJSON([
+            'success' => false,
+            'mensaje' => 'No se pudo insertar el pago'
+        ]);
+    }
+}
+ 
 
 
     public function tablePagoReserva(){

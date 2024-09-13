@@ -326,6 +326,8 @@ $routes->group('ventas/admin-facturacion', function($routes) {
     $routes->post('operacion/guardar/notaCredito', 'ventas\administracionFacturacion::modalNotaCreditoperacion');
     $routes->post('vista/continuar/notaCredito', 'ventas\administracionFacturacion::vistaContinuarNotaCredito');
     $routes->post('tabla/continuar/notaCredito', 'ventas\administracionFacturacion::tablaContinuarNotaCredito');
+    $routes->post('modal/nueva/notaCredito', 'ventas\administracionFacturacion::modalNuevoProductoNotaCredito'); 
+    $routes->post('operacion/guardar/NuevaNotaCredito', 'ventas\administracionFacturacion::modalNuevoNotaCreditoOperacion');
 
     $routes->get('pdf/generate', 'ventas\reportes\indexReporte::generate');
 

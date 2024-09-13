@@ -5,12 +5,12 @@ if ($operacion == "editar") {
     $mensajeAlerta = "DTE agregado con éxito";
 }
 ?>
-<form id="frmModal" method="post" action="<?php echo base_url('ventas/admin-facturacion/operacion/guardar/NuevoDTE'); ?>">
-    <div id="modalProductosDTE" class="modal" tabindex="-1" data-backdrop="static" data-keyboard="false">
+<form id="frmModal" method="post" action="<?php echo base_url('ventas/admin-facturacion/operacion/guardar/NuevaNotaCredito'); ?>">
+    <div id="modalProductoNotaCredito" class="modal" tabindex="-1" data-backdrop="static" data-keyboard="false">
         <div class="modal-dialog  modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title"><?= ($operacion == 'editar' ? 'Editar Producto' : 'Agregar productos al DTE'); ?></h5>
+                    <h5 class="modal-title"><?= ($operacion == 'editar' ? 'Editar Producto' : 'Agregar productos a la nota de crédito'); ?></h5>
                 </div>
                 <div class="modal-body">
                     <input type="hidden" id="facturaDetalleId" name="facturaDetalleId" value="<?= $campos['facturaDetalleId'] ?>">
@@ -174,7 +174,7 @@ if ($operacion == "editar") {
                 data: $(this).serialize(),
                 success: function(response) {
                     if (response.success) {
-                        $('#modalProductosDTE').modal('hide');
+                        $('#modalProductoNotaCredito').modal('hide');
                         Swal.fire({
                             icon: 'success',
                             title: '<?php echo $mensajeAlerta; ?>',

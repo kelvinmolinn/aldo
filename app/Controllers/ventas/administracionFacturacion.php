@@ -1046,7 +1046,7 @@ public function tablaContinuarDTE() {
         ->where('flgElimina', 0)
         ->first();
 
-    $numeroPagos = $pagosReserva['numeroPagos'];
+    $numeroPagos = $pagosReserva['numeroPagos'] ?? 0;
     $totalPagado = $pagosReserva['totalPagado'] ?? 0;
 
     $totalPagadoClass = ($totalPagado < $totalAPagar) ? 'text-danger' : 'text-success';
@@ -3265,7 +3265,7 @@ public function modalNotaCreditoperacion()
 
         return view('ventas/vistas/pageContinuarNotaCredito', $data);
     }
-  /*  
+   
     public function tablaContinuarNotaCredito() {
         $facturaId = $this->request->getPost('facturaId');
         $mostrarDTE = new fel_facturas_detalle();
@@ -3427,184 +3427,61 @@ public function modalNotaCreditoperacion()
             return $this->response->setJSON(array('data' => '', 'footer' => ''));
         }
 }
-*/
 
-public function tablaContinuarNotaCredito()
-{
-    // Obtener el ID de la factura relacionada desde el POST
-    $facturaId = $this->request->getPost('facturaId');
-    
-    // Obtener el facturaIdRelacionada desde fel_factura_relacionada
-    $facturaRelacionadaModel = new fel_factura_relacionada();
-    $facturaRelacionada = $facturaRelacionadaModel
-        ->select('facturaIdRelacionada')
-        ->where('facturaId', $facturaId)
+        public function modalNuevoProductoNotaCredito()
+    {
+
+        // Cargar el modelos
+        $productosModel = new inv_productos();
+        $data['producto'] = $productosModel->where('flgElimina', 0)->findAll();
+        $operacion = $this->request->getPost('operacion');
+        $data['productoId'] = $this->request->getPost('productoId');
+        $facturaId = $this->request->getPost('facturaId');
+        $productoId = $this->request->getPost('productoId');
+
+        // Consulta para traer el 13% de la parametrizacion
+        $porcentajeIva = new conf_parametrizaciones;
+        $IVA = $porcentajeIva 
+        ->select("valorParametrizacion")
+        ->where("flgElimina", 0)
+        ->where("parametrizacionId", 1)
         ->first();
-    
-    // Si no existe relación, retornar un error
-    if (!$facturaRelacionada) {
-        return $this->response->setJSON(['data' => '', 'mensaje' => 'No se encontró una factura relacionada.']);
-    }
-
-    // Usar el facturaIdRelacionada para buscar los productos en fel_factura_detalle
-    $mostrarDTE = new fel_facturas_detalle();
-    $datos = $mostrarDTE
-        ->select('fel_facturas_detalle.facturaDetalleId, fel_facturas_detalle.facturaId, fel_facturas_detalle.cantidadProducto, fel_facturas_detalle.productoId, fel_facturas_detalle.conceptoProducto, fel_facturas_detalle.precioUnitario, fel_facturas_detalle.precioUnitarioIVA, fel_facturas_detalle.porcentajeDescuento, fel_facturas_detalle.descuentoTotal, fel_facturas_detalle.precioUnitarioVenta, fel_facturas_detalle.precioUnitarioVentaIVA, fel_facturas_detalle.ivaUnitario, fel_facturas_detalle.ivaTotal, fel_facturas_detalle.totalDetalle, fel_facturas_detalle.totalDetalleIVA, inv_productos.productoId, inv_productos.producto, inv_productos.codigoProducto, cat_14_unidades_medida.unidadMedida')
-        ->join('inv_productos', 'inv_productos.productoId = fel_facturas_detalle.productoId')
-        ->join('cat_14_unidades_medida', 'cat_14_unidades_medida.unidadMedidaId = inv_productos.unidadMedidaId')
-        ->where('fel_facturas_detalle.flgElimina', 0)
-        ->where('fel_facturas_detalle.facturaId', $facturaRelacionada['facturaIdRelacionada']) 
-        ->findAll();
-
-    $output['data'] = array();
-    $n = 1;
-
-    $subtotal = 0;
-    $ivaTotal = 0;
-    $totalAPagar = 0;
-    $descuentos = 0;
-
-    foreach ($datos as $columna) {
-        $columna1 = $n;
-        $conceptoTexto = !empty($columna['conceptoProducto']) ? "<br><b>Concepto :</b> " . $columna['producto'] . " ( " . $columna['conceptoProducto'] . " )" : "";
-        $columna2 = "<b>Producto:</b> " . $columna['producto'] . "<br><b>Código :</b> " . $columna['codigoProducto'] . $conceptoTexto;
-        $columna3 = "<b>sin IVA: </b> $" . number_format($columna['precioUnitario'], 2, '.', ',') . "<br><b>Con IVA: </b> $" . number_format($columna['precioUnitarioIVA'], 2, '.', ',');
-        $columna4 = "<b>Porcentaje: </b> " . number_format($columna['porcentajeDescuento'], 2, '.', ',') . "%" . "<br><b>Total :</b> $" . number_format($columna['descuentoTotal'], 2, '.', ',');
-        $columna5 = "<b>Sin IVA: </b> $" . number_format($columna['precioUnitarioVenta'], 2, '.', ',') . "<br><b>Con IVA: </b> $" . number_format($columna['precioUnitarioVentaIVA'], 2, '.', ',');
-        $columna6 = " <b>Cantidad: </b> " . $columna['cantidadProducto'] . " (" . $columna['unidadMedida'] . ")";
-        $columna7 = "<b>unitario: </b> $" . number_format($columna['ivaUnitario'], 2, '.', ',') . "<br><b>total: </b> $" . number_format($columna['ivaTotal'], 2, '.', ',');
-        $columna8 = "<b>Sin IVA: </b> $" . number_format($columna['totalDetalle'], 2, '.', ',') . "<br><b>Con IVA: </b> $" . number_format($columna['totalDetalleIVA'], 2, '.', ',');
-
-        $columna9 = '
-            <button class="btn btn-primary mb-1" onclick="modalProductoDTE(' . $columna['facturaDetalleId'] . ', `editar`);" data-toggle="tooltip" data-placement="top" title="Editar">
-                <i class="fas fa-pen"></i>
-            </button>
-
-
-            <button class="btn btn-danger mb-1" onclick="eliminarDTE(' . $columna['facturaDetalleId'] . ');" data-toggle="tooltip" data-placement="top" title="Eliminar">
-                <i class="fas fa-trash"></i>
-            </button>
-        ';
-
-        $output['data'][] = array(
-            $columna1,
-            $columna2,
-            $columna3,
-            $columna4,
-            $columna5,
-            $columna6,
-            $columna7,
-            $columna8,
-            $columna9
-        );
-
-        $subtotal += $columna['totalDetalle'];
-        $ivaTotal += $columna['ivaTotal'];
-        $totalAPagar += number_format($columna['totalDetalleIVA'], 2, '.', ',');
-        $descuentos += ($columna['precioUnitario'] - $columna['precioUnitarioVenta']) * $columna['cantidadProducto'];
-
-        $n++;
-    }
-
-    // Cálculo de totales (pagos y otros detalles)
-    // Continuar con la lógica existente de cálculo de subtotales, descuentos, IVA, etc.
-    $DTEPago = new fel_facturas_pago();
-    $pagosReserva = $DTEPago
-        ->select('COUNT(*) as numeroPagos, SUM(totalPago) as totalPagado')
-        ->where('facturaId', $facturaId)
-        ->where('flgElimina', 0)
+     
+        $consultaCompra = $productosModel
+        ->select("productoId, precioVenta")
+        ->where("flgElimina", 0)
+        ->where("productoId", $productoId)
         ->first();
 
-    $numeroPagos = $pagosReserva['numeroPagos'];
-    $totalPagado = $pagosReserva['totalPagado'] ?? 0;
+        if($operacion == 'editar') {
+            $facturaDetalleId = $this->request->getPost('facturaDetalleId');
+            $salidaProducto = new fel_facturas_detalle();
 
-    $totalPagadoClass = ($totalPagado < $totalAPagar) ? 'text-danger' : 'text-success';
-    $botonTexto = ($totalPagado < $totalAPagar) ? 'Pagos (' . $numeroPagos . ')' : 'Pagado';
-    $botonClase = ($totalPagado < $totalAPagar) ? 'btn-primary' : 'btn-success';
-    $botonDisabled = ($totalPagado < $totalAPagar) ? '' : 'disabled';
+            // seleccionar solo los campos que estan en la modal (solo los input y select)
+            $data['campos'] = $salidaProducto->select('fel_facturas_detalle.facturaDetalleId,fel_facturas_detalle.facturaId,fel_facturas_detalle.cantidadProducto,fel_facturas_detalle.precioUnitario,fel_facturas_detalle.porcentajeDescuento,inv_productos.productoId')
+            ->join('inv_productos', 'inv_productos.productoId = fel_facturas_detalle.productoId')
+            ->where('fel_facturas_detalle.flgElimina', 0)
+            ->where('fel_facturas_detalle.facturaDetalleId', $facturaDetalleId)
+            ->first();
+        } else {
 
-    // Nueva consulta para contar los errores de certificación
-    $DTEErrores = new fel_facturas_certificacion_errores();
-    $erroresCertificacion = $DTEErrores
-        ->join('fel_factura_certificacion', 'fel_factura_certificacion.facturaCertificacionId = fel_facturas_certificacion_errores.facturaCertificacionId')
-        ->where('fel_factura_certificacion.facturaId', $facturaId)
-        ->countAllResults();
+            // formar los campos que estan en la modal (input y select) con el nombre equivalente en la BD
+            $data['campos'] = [
+                'facturaDetalleId'    => 0,
+                'facturaId'           => $facturaId,
+                'productoId'          => '',
+                'cantidadProducto'    => '',
+                'precioUnitario'      => '',
+                'porcentajeDescuento' => ''
 
-    if ($n > 1) {
-        $output['footer'] = array(
-            '',
-            '',
-            ''
-        );
+            ];
+        }
+        $data['operacion'] = $operacion;
+        $data['precioUnitarioIVA'] = ($IVA['valorParametrizacion'] / 100) + 1;
 
-        $output['footerTotales'] = '
-            <div class="row text-right">
-                <div class="col-8">
-                    <b> Subtotal (=) :</b>
-                </div>
-                <div class="col-4">
-                    $ ' . number_format($subtotal + $descuentos, 2, '.', ',') . '
-                </div>
-            </div>
-            <div class="row text-right">
-                <div class="col-8">
-                    <b>Descuentos (-) :</b>
-                </div>
-                <div class="col-4">
-                    $ ' . number_format($descuentos, 2, '.', ',') . '
-                </div>
-            </div>
-            <div class="row text-right">
-                <div class="col-8">
-                    <b>IVA (+) :</b>
-                </div>
-                <div class="col-4">
-                    $ ' . number_format($ivaTotal, 2, '.', ',') . '
-                </div>
-            </div>
-            <div class="row text-right">
-                <div class="col-8">
-                    <b>Total a pagar (=) :</b>
-                </div>
-                <div class="col-4">
-                    <b>$ ' . number_format($totalAPagar, 2, '.', ',') . ' </b>
-                </div>
-            </div>
-            <div class="row text-right">
-                <div class="col-8">
-                    <b>Total pagado:</b>
-                </div>
-                <div class="col-4">
-                    <b class="' . $totalPagadoClass . '">$ ' . number_format($totalPagado, 2, '.', ',') . ' </b>
-                </div>
-            </div>
-            <div class="row text-right">
-                <div class="col-12">
-                    <button type="button" class="btn ' . $botonClase . ' mb-1" onclick="modalPagoDTE(`' . $facturaId . '`, `editar`)" data-toggle="tooltip" data-placement="top" title="Pagos" >
-                        <i class="fas fa-hand-holding-usd"></i> ' . $botonTexto . '
-                    </button>
-                </div>
-            </div>
-
-            <div class="row text-right">
-                <div class="col-4">
-                    <button type= "button" class="btn btn-primary mb-1" onclick="modalComplementoDTE(`' . $facturaId . '`, `editar`)" data-toggle="tooltip" data-placement="top" title="Complementos">
-                        <i class="fas fa-clipboard-list"></i> Complementos
-                    </button>
-                </div>
-                <div class="col-4">
-                    <button type= "button" class="btn btn-danger mb-1" onclick="modalErrorDTE(`' . $facturaId . '`)" data-toggle="tooltip" data-placement="top" title="Error de certificación">
-                        <i class="fas fa-ban"></i> Errores de certificación (' . $erroresCertificacion . ')
-                    </button>
-                </div>
-            </div>
-        ';
-
-        return $this->response->setJSON($output);
-    } else {
-        return $this->response->setJSON(array('data' => '', 'footer' => ''));
+        return view('ventas/modals/modalProductoNotaCredito', $data);
+ 
     }
-}
 
     
 

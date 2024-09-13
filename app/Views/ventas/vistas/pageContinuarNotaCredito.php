@@ -58,7 +58,7 @@
 </form>
 <hr>
 <div class="text-right mb-4">
-    <button type="button" id="btnNuevoProveedor" class="btn btn-primary estilo-btn" onclick="modalProductoDTE(0, 'insertar')">
+    <button type="button" id="btnNuevoProveedor" class="btn btn-primary estilo-btn" onclick="modalProductoNotaCredito(0, 'insertar')">
         <i class="fas fa-save"></i> Agregar producto
     </button>
 </div>
@@ -397,14 +397,14 @@
 
 
 
-    function modalProductoDTE(facturaDetalleId, operacion) {
+    function modalProductoNotaCredito(facturaDetalleId, operacion) {
         $.ajax({
-            url: '<?php echo base_url('ventas/admin-facturacion/modal/nuevo/dte'); ?>',
+            url: '<?php echo base_url('ventas/admin-facturacion/modal/nueva/notaCredito'); ?>',
             type: 'POST',
             data: { facturaDetalleId: facturaDetalleId, operacion: operacion, facturaId: <?= $facturaId; ?>},
             success: function(response) {
                 $('#divModalContent').html(response);
-                $('#modalProductosDTE').modal('show');
+                $('#modalProductoNotaCredito').modal('show');
             },
             error: function(xhr, status, error) {
                 console.error(xhr.responseText);
