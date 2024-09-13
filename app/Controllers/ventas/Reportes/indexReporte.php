@@ -108,7 +108,7 @@ class indexReporte extends Controller
 
 
         $datosDteProductos = $felFacturaDetalle
-        ->select('fel_facturas_detalle.facturaId, fel_facturas_detalle.codigoProducto,fel_facturas_detalle.cantidadProducto,cat_14_unidades_medida.abreviaturaUnidadMedida,inv_productos.producto,fel_facturas_detalle.precioUnitario,fel_facturas_detalle.porcentajeDescuento,fel_facturas_detalle.precioUnitarioIVA,fel_facturas_detalle.totalDetalleIVA')
+        ->select('fel_facturas_detalle.facturaId, fel_facturas_detalle.codigoProducto,fel_facturas_detalle.cantidadProducto,cat_14_unidades_medida.abreviaturaUnidadMedida,inv_productos.producto,fel_facturas_detalle.precioUnitario,fel_facturas_detalle.porcentajeDescuento,fel_facturas_detalle.precioUnitarioIVA,fel_facturas_detalle.ivaTotal,fel_facturas_detalle.totalDetalleIVA,fel_facturas_detalle.totalDetalle')
         ->join('inv_productos','inv_productos.productoId = fel_facturas_detalle.productoId')
         ->join('cat_14_unidades_medida','cat_14_unidades_medida.unidadMedidaId = inv_productos.unidadMedidaId')
         ->where('fel_facturas_detalle.flgElimina', 0)
@@ -353,6 +353,7 @@ class indexReporte extends Controller
             $subTotal = 0;
             $montoTotalOperacion = 0;
             $totaPagar = 0;
+
             //for ($i=0; $i < 40; $i++) { 
                 foreach($datosDteProductos AS $datosProductos) {             
                     $n++;
@@ -518,7 +519,7 @@ class indexReporte extends Controller
             $pdf->Cell(30,5,utf8_decode('$'),0,0,'L');
 
         }else if($datosDte['tipoDTEId'] == 2){
-            
+
             $pdf->SetFont('Arial','B',8);
             $pdf->SetXY(10,85);
             $pdf->Cell(10,6,utf8_decode('#'),0,0,'C');
@@ -556,6 +557,7 @@ class indexReporte extends Controller
             $subTotal = 0;
             $montoTotalOperacion = 0;
             $totaPagar = 0;
+            $IVA = 0;
             //for ($i=0; $i < 40; $i++) { 
                 foreach($datosDteProductos AS $datosProductos) {             
                     $n++;
@@ -597,9 +599,10 @@ class indexReporte extends Controller
                         $pdf->SetFont('Arial','',8);
                     }
                     
-                    $ventasTotales += $datosProductos['totalDetalleIVA'];
+                    $ventasTotales += $datosProductos['totalDetalle'];
                     $ivaRetenido = 0.00;
-                    $subTotal += $datosProductos['totalDetalleIVA'];
+                    $subTotal += $datosProductos['totalDetalle'];
+                    $IVA += $datosProductos['ivaTotal'];
                     $montoTotalOperacion += $datosProductos['totalDetalleIVA'];
                     $totaPagar += $datosProductos['totalDetalleIVA'];
 
@@ -620,7 +623,7 @@ class indexReporte extends Controller
                     $pdf->Cell(35,5,utf8_decode($datosProductos['producto']),0,0,'C');
         
                     $pdf->SetXY(115,$alturaDetalle);
-                    $pdf->Cell(25,5,utf8_decode(number_format($datosProductos['precioUnitarioIVA'], 2, '.', ',')),0,0,'R');
+                    $pdf->Cell(25,5,utf8_decode(number_format($datosProductos['precioUnitario'], 2, '.', ',')),0,0,'R');
                     $pdf->SetXY(115,$alturaDetalle);
                     $pdf->Cell(25,5,utf8_decode("$"),0,0,'L');
         
@@ -630,7 +633,7 @@ class indexReporte extends Controller
                     $pdf->Cell(30,5,utf8_decode("%"),0,0,'L');
 
                     $pdf->SetXY(170,$alturaDetalle);
-                    $pdf->Cell(30,5,utf8_decode(number_format($datosProductos['totalDetalleIVA'], 2, '.', ',')),0,0,'R');
+                    $pdf->Cell(30,5,utf8_decode(number_format($datosProductos['totalDetalle'], 2, '.', ',')),0,0,'R');
                     $pdf->SetXY(170,$alturaDetalle);
                     $pdf->Cell(30,5,utf8_decode("$"),0,0,'L');
                     
@@ -687,11 +690,23 @@ class indexReporte extends Controller
 
             $pdf->SetFont('Arial','B',8);
             $pdf->SetXY(115,$alturaDetalle);
-            $pdf->Cell(30,5, utf8_decode('Impuesto al Valos Agregado 13%:'), 0, 0, 'L');
+            $pdf->Cell(30,5, utf8_decode('IVA percibido:'), 0, 0, 'L');
             
             $pdf->SetFont('Arial','',8);
             $pdf->SetXY(170,$alturaDetalle);
             $pdf->Cell(30,5,utf8_decode('0.00'),0,0,'R');
+            $pdf->SetXY(170,$alturaDetalle);
+            $pdf->Cell(30,5,utf8_decode('$'),0,0,'L');
+
+            $alturaDetalle += 5;
+
+            $pdf->SetFont('Arial','B',8);
+            $pdf->SetXY(115,$alturaDetalle);
+            $pdf->Cell(30,5, utf8_decode('Impuesto al Valos Agregado 13%:'), 0, 0, 'L');
+            
+            $pdf->SetFont('Arial','',8);
+            $pdf->SetXY(170,$alturaDetalle);
+            $pdf->Cell(30,5,utf8_decode(number_format($IVA, 2, '.', ',')),0,0,'R');
             $pdf->SetXY(170,$alturaDetalle);
             $pdf->Cell(30,5,utf8_decode('$'),0,0,'L');
 
