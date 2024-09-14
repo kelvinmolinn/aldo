@@ -7,7 +7,7 @@ if ($operacion == "editar") {
 ?>
 <form id="frmModal" method="post" action="<?php echo base_url('ventas/admin-facturacion/operacion/guardar/NuevaNotaCredito'); ?>">
     <div id="modalProductoNotaCredito" class="modal" tabindex="-1" data-backdrop="static" data-keyboard="false">
-        <div class="modal-dialog  modal-lg">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title"><?= ($operacion == 'editar' ? 'Editar Producto' : 'Agregar productos a la nota de crédito'); ?></h5>
@@ -20,14 +20,12 @@ if ($operacion == "editar") {
                         <div class="col-md-4">
                             <select name="productoId" id="productoId" class="form-control" style="width: 100%;" required>
                                 <option></option>
-                                <?php foreach ($producto as $producto) : ?>
-                                    <option value="<?php echo $producto['productoId']; ?>"><?php echo $producto['producto']; ?></option>
-                                <?php endforeach; ?>
+                                <!-- Este select se llenará dinámicamente -->
                             </select>
                         </div>
                         <div class="col-md-4">
                             <div class="form-outline">
-                                <input type="number" id="cantidadProducto" name="cantidadProducto" class="form-control active number-input" min="1" step="1" value="<?= $campos['cantidadProducto']; ?>" required >
+                                <input type="number" id="cantidadProducto" name="cantidadProducto" class="form-control active number-input" min="1" step="1" value="<?= $campos['cantidadProducto']; ?>" required>
                                 <label class="form-label" for="cantidadProducto">Cantidad</label>
                             </div>
                         </div>
@@ -42,10 +40,10 @@ if ($operacion == "editar") {
                             </div>
                         </div>
                     </div>
-                    <div class="row mb-4"> 
+                    <div class="row mb-4">
                         <div class="col-md-4">
                             <div class="form-outline">
-                                <input type="number" id="porcentajeDescuento" name="porcentajeDescuento" class="form-control active number-input" min="0"  max="25" step="0.01" value="<?= $campos['porcentajeDescuento']; ?>" required >
+                                <input type="number" id="porcentajeDescuento" name="porcentajeDescuento" class="form-control active number-input" min="0" max="25" step="0.01" value="<?= $campos['porcentajeDescuento']; ?>" required>
                                 <label class="form-label" for="porcentajeDescuento">Porcentaje de descuento</label>
                             </div>
                         </div>
@@ -84,7 +82,6 @@ if ($operacion == "editar") {
                             </div>
                         </div>
                     </div>
-
                 </div>
                 <div class="modal-footer">
                     <button type="submit" id="btnguardarprodutos" class="btn btn-primary">
@@ -112,30 +109,73 @@ if ($operacion == "editar") {
 
     $(document).ready(function() {
         // Inicializar Select2
-        $("#productoId").select2({ 
+        $("#productoId").select2({
             placeholder: 'Producto'
         });
 
+        // Llamada AJAX para cargar productos al abrir el modal
+        $.ajax({
+            url: 'ventas/admin-facturacion/operacion/select/notaCredito',
+            type: "POST",
+            dataType: "json",
+            data: {
+                facturaId: <?= $campos['facturaId']; ?> // Se pasa el 'facturaId' al servidor
+            },
+            success: function(response) {
+                if (response.success) {
+                    // Vaciar el select de productos antes de llenarlo
+                    $("#productoId").empty().append('<option></option>');
+
+                    // Iterar sobre los productos recibidos y agregarlos al select
+                    $.each(response.producto, function(index, producto) {
+                        $("#productoId").append(
+                            '<option value="' + producto.productoId + '">' + producto.producto + '</option>'
+                        );
+                    });
+
+                    // Refrescar Select2 después de llenar el select
+                    $("#productoId").trigger('change');
+                } else {
+                    console.log("Detalles no encontrados.");
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error(xhr.responseText);
+            }
+        });
+
+        // Calcular precios cuando cambie el producto seleccionado
         $("#productoId").change(function() {
             $.ajax({
-                url: 'select/catalogos-hacienda/producto-precio',
+                url: 'ventas/admin-facturacion/operacion/select/notaCredito',
                 type: "POST",
                 dataType: "json",
                 data: {
-                    productoId: $(this).val()
-                }
-            }).done(function(data) {
-                if (data.length > 0) {
-                    var precioUnitario = data[0]['text'];
-                    $('#precioUnitario').val(precioUnitario).trigger('change');
-                    $('#hiddenPrecioUnitario').val(precioUnitario);
-                    actualizarPrecios(); // Actualizar precios al seleccionar producto
+                    productoId: $(this).val(),
+                    facturaId: <?= $campos['facturaId']; ?>
+                },
+                success: function(response) {
+                    if (response.success) {
+                        var producto = response.producto[0]; // Suponiendo que recibes un único producto
+                        var precioUnitario = producto.precioUnitario || 0;
+
+                        // Actualizar los campos con los valores del producto
+                        $('#precioUnitario').val(precioUnitario).trigger('change');
+                        $('#hiddenPrecioUnitario').val(precioUnitario);
+                        actualizarPrecios();
+                    } else {
+                        console.log("Detalles no encontrados.");
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error(xhr.responseText);
                 }
             });
         });
 
         $('#cantidadProducto, #porcentajeDescuento, #precioUnitario').on('input change', actualizarPrecios);
 
+        // Función para actualizar precios
         function actualizarPrecios() {
             var precioUnitario = parseFloat($('#precioUnitario').val()) || 0;
             var porcentajeDescuento = parseFloat($('#porcentajeDescuento').val()) || 0;
@@ -166,10 +206,11 @@ if ($operacion == "editar") {
             $('#totalDetalleIVA').text(totalDetalleIVA.toFixed(2));
         }
 
+        // Enviar el formulario vía AJAX
         $("#frmModal").submit(function(event) {
             event.preventDefault();
             $.ajax({
-                url: $(this).attr('action'), 
+                url: $(this).attr('action'),
                 type: $(this).attr('method'),
                 data: $(this).serialize(),
                 success: function(response) {
@@ -196,8 +237,8 @@ if ($operacion == "editar") {
             });
         });
 
-        // Inicializar precios al cargar el formulario
+        // Inicializar los precios cuando se carga el formulario
         actualizarPrecios();
-        $("#productoId").val(<?= $campos["productoId"]; ?>).trigger('change'); 
+        $("#productoId").val(<?= $campos["productoId"]; ?>).trigger('change');
     });
 </script>

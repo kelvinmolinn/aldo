@@ -401,7 +401,9 @@
         $.ajax({
             url: '<?php echo base_url('ventas/admin-facturacion/modal/nueva/notaCredito'); ?>',
             type: 'POST',
-            data: { facturaDetalleId: facturaDetalleId, operacion: operacion, facturaId: <?= $facturaId; ?>},
+            data: { facturaDetalleId: facturaDetalleId, 
+                    operacion: operacion, 
+                    facturaId: <?= $facturaId; ?>},
             success: function(response) {
                 $('#divModalContent').html(response);
                 $('#modalProductoNotaCredito').modal('show');

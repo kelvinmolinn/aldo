@@ -2988,7 +2988,7 @@ public function modalNotaCreditoperacion()
             'facturaId'    => $facturaId
         ];
         $session->set([
-            'route'             => 'ventas/admin-facturacion/vista/continuar/dte',
+            'route'             => 'ventas/admin-facturacion/vista/continuar/notaCredito',
             'camposSession'     => json_encode($camposSession)
         ]);
 
@@ -3204,6 +3204,7 @@ public function modalNotaCreditoperacion()
 
         public function modalNuevoProductoNotaCredito()
     {
+        $facturaIdRelacionada = $this->request->getPost('facturaIdRelacionada'); 
 
         // Cargar el modelos
         $productosModel = new inv_productos();
@@ -3256,6 +3257,37 @@ public function modalNotaCreditoperacion()
         return view('ventas/modals/modalProductoNotaCredito', $data);
  
     }
+
+    public function selectNotaCredito()
+    {
+        $facturaId = $this->request->getPost('facturaId'); // Obtener facturaId de la solicitud
+    
+        // Consulta corregida con alias adecuados para las tablas y campos
+        $detalleModel = new fel_facturas_detalle();
+        $productos = $detalleModel
+            ->select('fel_facturas_detalle.productoId, inv_productos.producto')
+            ->join('fel_factura_relacionada', 'fel_factura_relacionada.facturaIdRelacionada = fel_facturas_detalle.facturaId')
+            ->join('inv_productos', 'inv_productos.productoId = fel_facturas_detalle.productoId')
+            ->where('fel_factura_relacionada.facturaId', $facturaId) // facturaId de la nota de crédito
+            ->where('fel_factura_relacionada.flgElimina', 0)
+            ->where('fel_facturas_detalle.flgElimina', 0)
+            ->findAll();
+    
+        if ($productos) {
+            return $this->response->setJSON([
+                'success' => true,
+                'producto' => $productos
+            ]);
+        } else {
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'Detalles no encontrados.'
+            ]);
+        }
+    }
+    
+    
+
 
 
     public function modalNuevoNotaCreditoOperacion()
