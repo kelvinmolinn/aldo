@@ -63,10 +63,6 @@ class correos extends Controller
 
 
 
-
-
-
-
     // Modelos para realizar las consultas
     $facturaModel = new fel_facturas(); 
     $certificacionModel = new fel_factura_certificacion();
