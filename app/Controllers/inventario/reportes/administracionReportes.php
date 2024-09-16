@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Controllers\inventario\reportes;
+use CodeIgniter\Controller;
 
 
 class administracionReportes extends Controller{
@@ -20,7 +21,7 @@ class administracionReportes extends Controller{
                 'camposSession'     => json_encode($camposSession)
             ]);
 
-         return view('inventario/reportes/reportesInventario', $data);
+         return view('inventario/vistas/administracionReportes', $data);
         }
     }
         
