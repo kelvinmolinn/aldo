@@ -13,7 +13,7 @@
     </div>
 </div>
 <script>
-	
+
 function catalogoProductos(){
     $.ajax({
             url: '<?php echo base_url('inventario/admin-reportes/reporte/catalogoProductos'); ?>',
@@ -23,7 +23,7 @@ function catalogoProductos(){
                 // Insertar el contenido de la modal en el cuerpo de la modal
                 $('#divModalContent').html(response);
                 // Mostrar la modal
-                $('#modalAdministracionVerDescargo').modal('show');
+                $('#').modal('show');
             },
         error: function(xhr, status, error) {
             // Manejar errores si los hay
