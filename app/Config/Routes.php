@@ -337,6 +337,10 @@ $routes->group('ventas/admin-facturacion', function($routes) {
 
 });
 
+$routes->group('inventario/admin-reportes', function($routes) {
+  $routes->post('index', 'inventario\reportes\administracionReportes::indexReportes');
+});
+
 $routes->group('ventas/admin-contingencia', function($routes) {
 
     $routes->post('contingencia', 'ventas\administracionContingencia::indexContingencia');

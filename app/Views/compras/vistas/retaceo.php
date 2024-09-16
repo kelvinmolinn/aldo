@@ -35,12 +35,6 @@
         Buscar
     </button>
 </div>
-<form action="<?= base_url('compras/admin-retaceo/pdf/generate'); ?>" method="post">
-    <button type= "submit" id="btnPDF" class="btn btn-primary estilo-btn mb-4">
-        <i class="fas fa-save"></i>
-            PDF
-    </button>
-</form>
 <div class="table-responsive">
     <table class="table table-hover" id="tablaRetaceo" style="width: 100%;">
         <thead>
