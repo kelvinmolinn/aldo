@@ -96,8 +96,8 @@
                             title: '<?php echo $mensajeAlerta; ?>',
                             text: response.mensaje
                         }).then((result) => {
-                            $("#tablaReserva").DataTable().ajax.reload(null, false);
-                            
+                            //$("#tablaReserva").DataTable().ajax.reload(null, false);
+                            cambiarInterfaz('ventas/admin-reservas/vista/actualizar/reserva', {reservaId: response.reservaId});
                         });
                         console.log("Último ID insertado:", response.reservaId);
 

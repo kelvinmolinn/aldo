@@ -274,11 +274,13 @@ $routes->group('ventas/admin-reservas', function($routes) {
     $routes->post('form/anular/reserva', 'ventas\administracionReservas::modalAnularReserva');
     $routes->post('anular/reserva', 'ventas\administracionReservas::operacionAnularReserva');
     $routes->post('form/ver/reserva', 'ventas\administracionReservas::modalVerReserva');
+    $routes->post('form/ver/reserva-facturar', 'ventas\administracionReservas::modalFacturarReserva');
     $routes->post('tabla/verReserva',  'ventas\administracionReservas::tablaVerReserva');
     $routes->post('operacion/finalizar/reserva', 'ventas\administracionReservas::finalizarReserva');
-
+    $routes->post('operacion/finalizar/reserva-facturar', 'ventas\administracionReservas::operacionFacturarReserva');
     
 });
+
 
 $routes->group('ventas/admin-facturacion', function($routes) {
     $routes->post('index', 'ventas\administracionFacturacion::index');

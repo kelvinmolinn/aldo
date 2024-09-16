@@ -18,8 +18,12 @@ use App\Models\fel_clientes;
 use App\Models\vista_usuarios_empleados;
 use App\Models\comp_compras_detalle;
 use App\Models\cat_17_forma_pago;
-
-
+use App\Models\conf_empleados;
+use App\Models\cat_02_tipo_dte;
+use App\Models\cat_16_condicion_pago;
+use App\Models\fel_facturas;
+use App\Models\fel_facturas_detalle;
+use App\Models\fel_facturas_pago;
 use App\Models\comp_proveedores;
 
 class administracionReservas extends Controller
@@ -136,7 +140,7 @@ public function tablaReservas()
     $vistaUsuariosEmpleados = new vista_usuarios_empleados();
     $usuarioIdAgrega = $this->request->getPost("usuarioId");
     $datos = $mostrarReserva
-        ->select('fel_reservas.reservaId,fel_reservas.fechaReserva,fel_reservas.fechaAnulacionReserva,fel_reservas.obsAnulacionReserva,fel_reservas.comentarioReserva,fel_reservas.estadoReserva,conf_sucursales.sucursalId,conf_sucursales.sucursal,fel_clientes.clienteId,fel_clientes.cliente')
+        ->select('fel_reservas.reservaId, fel_reservas.facturaId,fel_reservas.fechaReserva,fel_reservas.fechaAnulacionReserva,fel_reservas.obsAnulacionReserva,fel_reservas.comentarioReserva,fel_reservas.estadoReserva,conf_sucursales.sucursalId,conf_sucursales.sucursal,fel_clientes.clienteId,fel_clientes.cliente')
         ->join('conf_sucursales', 'conf_sucursales.sucursalId = fel_reservas.sucursalId')
         ->join('fel_clientes', 'fel_clientes.clienteId = fel_reservas.clienteId')
         ->where('fel_reservas.flgElimina', 0)
@@ -147,11 +151,16 @@ public function tablaReservas()
     $n = 1; // Variable para contar las filas
     foreach ($datos as $columna) {
         // Determina la clase Bootstrap basada en el estado del descargo
-        $estadoClase = '';
+        $estadoClase = ''; $badgeFacturado = '';
         if ($columna['estadoReserva'] === 'Pendiente') {
             $estadoClase = 'badge badge-secondary';
         } elseif ($columna['estadoReserva'] === 'Finalizado') {
             $estadoClase = 'badge badge-success';
+            if($columna['facturaId'] == "" || is_null($columna['facturaId'])) {
+                $badgeFacturado = '<span class="badge badge-secondary">Pendiente facturar</span>';
+            } else {
+                $badgeFacturado = '<span class="badge badge-success">Facturado</span>';
+            }
         } elseif ($columna['estadoReserva'] === 'Anulado') {
             $estadoClase = 'badge badge-danger';
         }
@@ -160,17 +169,17 @@ public function tablaReservas()
         $columna2 = "<b>Sucursal:</b> " . $columna['sucursal'] . "<br><b>Cliente:</b> " . $columna['cliente'];
 
         // Construir columna 3
-        $columna3 = "<b>Fecha:</b> " . $columna['fechaReserva'];
+        $columna3 = "<b>Fecha:</b> " . date("d/m/Y", strtotime($columna['fechaReserva']));
 
         // Construir columna 4 basada en el estadoReserva
         if ($columna['estadoReserva'] === 'Anulado') {
             $columna4 = 
-                        "<b>Fecha de Anulación:</b> " . $columna['fechaAnulacionReserva'] . "<br>" .
+                        "<b>Fecha de Anulación:</b> " . date("d/m/Y", strtotime($columna['fechaAnulacionReserva'])) . "<br>" .
                         "<b>Motivo/Justificación</b> " . $columna['obsAnulacionReserva'] . "<br>" .
                         "<b>Estado:</b> <span class='" . $estadoClase . "'>" . $columna['estadoReserva'] . "</span>";
         } else {
             $columna4 = "<b>Observación:</b> " . $columna['comentarioReserva'] . "<br>" .
-                        "<b>Estado:</b> <span class='" . $estadoClase . "'>" . $columna['estadoReserva'] . "</span>";
+                        "<b>Estado:</b> <span class='" . $estadoClase . "'>" . $columna['estadoReserva'] . "</span> " . $badgeFacturado;
         }
 
         // Construir botones basado en estadoReserva
@@ -192,12 +201,24 @@ public function tablaReservas()
                 </button>
             ';
         } elseif ($columna['estadoReserva'] === 'Finalizado') {
-            $columna5 = '
+            $columna5 = '';
 
-                <button class="btn btn-primary mb-1" onclick="modalFacturar(`' . $columna['reservaId'] . '`);" data-toggle="tooltip" data-placement="top" title="Facturar">
-                    <i class="fas fa-hand-holding-usd"></i><span> </span>
-                </button>
+            if($columna['facturaId'] == "" || is_null($columna['facturaId'])) {
+                $columna5 .= '
+                    <button class="btn btn-primary mb-1" onclick="modalFacturarReserva(`' . $columna['reservaId'] . '`);" data-toggle="tooltip" data-placement="top" title="Facturar">
+                        <i class="fas fa-hand-holding-usd"></i><span> </span>
+                    </button>
+                ';
+            } else {
+                // Reserva ya facturada, ver DTE
+                $columna5 .= '
+                    <button class="btn btn-info mb-1" onclick="modalVerDTE(`' . $columna['facturaId'] . '`);" data-toggle="tooltip" data-placement="top" title="Ver DTE">
+                        <i class="fas fa-money-check-alt"></i><span> </span>
+                    </button>
+                ';
+            }
 
+            $columna5 .= '
                 <button class="btn btn-info mb-1" onclick="modalVerReserva(`' . $columna['reservaId'] . '`);" data-toggle="tooltip" data-placement="top" title="Ver reserva">
                     <i class="fas fa-eye"></i><span> </span>
                 </button>
@@ -1366,6 +1387,118 @@ public function tablaContinuarReserva()
         return view('ventas/modals/modalVerReserva', $data);
     }
     
+    public function modalFacturarReserva(){
+        $data["reservaId"] = $this->request->getPost('reservaId');
+    
+        $empleadosModel = new conf_empleados();
+        $data['empleados'] = $empleadosModel->where('flgElimina', 0)->findAll();
+        $tipoDTEModel = new cat_02_tipo_dte();
+        $data['tipoDTE'] = $tipoDTEModel->where('flgElimina', 0)->findAll();
+
+        return view('ventas/modals/modalFacturarReserva', $data);
+    }
+
+    public function operacionFacturarReserva() {
+        $modelParametrizaciones = new conf_parametrizaciones();
+        $modelCondicion = new cat_16_condicion_pago();
+        $modelReserva = new fel_reservas();
+        $modelReservaDetalle = new fel_reservas_detalle();
+        $modelFactura = new fel_facturas();
+        $modelFacturaDetalle = new fel_facturas_detalle();
+        $modelReservaPago = new fel_reservas_pago();
+        $modelProductos = new inv_productos();
+        $modelFacturaPago = new fel_facturas_pago();
+
+        $reservaId = $this->request->getPost('reservaId');
+        $tipoDTEId = $this->request->getPost('tipoDTEId');
+        $empleadoIdVendedor = $this->request->getPost('empleadoIdVendedor');
+    
+        $condicionFacturaMHId = $modelCondicion->select('condicionFacturaMHId')
+        ->where('flgElimina', 0)
+        ->where('condicionFacturaMHId', 1)
+        ->first();
+
+        $porcentajeIVA = $modelParametrizaciones->select('valorParametrizacion')
+        ->where('flgElimina', 0)
+        ->where('parametrizacionId', 1)
+        ->first();
+        
+        $reserva = $modelReserva->where('reservaId', $reservaId)->first();
+        $detallesReserva = $modelReservaDetalle->where('reservaId', $reservaId)->where('flgElimina', 0)->findAll();
+
+        $dataFactura = [
+            'sucursalId' => $reserva['sucursalId'],
+            'tipoDTEId' => $tipoDTEId,
+            'fechaEmision' => date('Y-m-d'),
+            'horaEmision' => date('H:i:s'),
+            'clienteId' => $reserva['clienteId'],
+            'empleadoIdVendedor' => $empleadoIdVendedor,
+            'condicionFacturaMHId' => $condicionFacturaMHId,
+            'porcentajeIVA' => $porcentajeIVA,
+            'estadoFactura' => 'Pendiente'
+        ];
+        
+        $facturaId = $modelFactura->insert($dataFactura);
+
+        foreach ($detallesReserva as $detalle) {
+            $producto = $modelProductos->where('productoId', $detalle['productoId'])->first();
+
+            // No hay campo descuentoTotal, lo calculamos aqui
+            $descuentoTotal = ($detalle['precioUnitarioIVA'] * $detalle['cantidadProducto']) - $detalle['totalReservaDetalleIVA'];
+
+            $dataFacturaDetalle = [
+                'facturaId' => $facturaId,
+                'productoId' => $detalle['productoId'],
+                'codigoProducto' => $producto['codigoProducto'],
+                'conceptoProducto' => $producto['producto'], 
+                'tipoItemMHId' => 1,
+                'precioUnitario' => $detalle['precioUnitario'],
+                'precioUnitarioIVA' => $detalle['precioUnitarioIVA'],
+                'cantidadProducto' => $detalle['cantidadProducto'],
+                'ivaUnitario' => $detalle['ivaUnitario'],
+                'ivaTotal' => $detalle['ivaTotal'],
+                'porcentajeDescuento' => $detalle['porcentajeDescuento'],
+                'descuentoTotal' => $descuentoTotal,
+                'precioUnitarioVenta' => $detalle['precioUnitarioVenta'],
+                'precioUnitarioVentaIVA' => $detalle['precioUnitarioVentaIVA'],
+                'totalDetalle' => $detalle['totalReservaDetalle'],
+                'totalDetalleIVA' => $detalle['totalReservaDetalleIVA']
+            ];
+
+            $modelFacturaDetalle->insert($dataFacturaDetalle);
+        }
+
+        $pagosReserva = $modelReservaPago->where('reservaId', $reservaId)->where('flgElimina', 0)->findAll();
+
+        foreach ($pagosReserva as $pago) {
+            $dataFacturaPago = [
+                'facturaId' => $facturaId,
+                'formaPagoMHId' => $pago['formaPagoMHId'],
+                'descripcionPago' => $pago['comentarioPago'],
+                'totalPago' => $pago['montoPago']
+            ];
+
+            $modelFacturaPago->insert($dataFacturaPago);
+        }
+        
+        $dataReservaFacturada = ['facturaId' => $facturaId];
+        $modelReserva->update($reservaId, $dataReservaFacturada);
+
+        $contingenciaActivada = $modelParametrizaciones
+                  ->select('valorParametrizacion')
+                  ->where('flgElimina', 0)
+                  ->where('parametrizacionId', 6)
+                  ->first();
+
+
+        return $this->response->setJSON([
+            'success' => true,
+            'mensaje' => 'Reserva trasladada a facturación con éxito.',
+            'facturaId'    => $facturaId,
+            'contingencia' => $contingenciaActivada,
+        ]);
+    }
+
     public function tablaVerReserva(){
          $reservaId = $this->request->getPost('reservaId');
     $mostrarReserva = new fel_reservas_detalle();

@@ -3,6 +3,12 @@ namespace App\Controllers;
 use App\Models\UsuarioLogin;
 use App\Models\conf_usuarios;
 use App\Models\conf_roles_permisos;
+use App\Models\comp_proveedores;
+use App\Models\fel_clientes;
+use App\Models\fel_reservas;
+use App\Models\fel_reservas_detalle;
+use App\Models\fel_facturas;
+use App\Models\fel_facturas_detalle;
 
 class Panel extends BaseController{
     public function index(){        
@@ -194,19 +200,213 @@ class Panel extends BaseController{
         $session = session();
     
         $usuario = new UsuarioLogin();
+        $modelProveedores = new comp_proveedores();
+        $modelClientes = new fel_clientes();
+        $modelReservas = new fel_reservas();
+        $modelReservasDetalle = new fel_reservas_detalle();
+        $modelFacturas = new fel_facturas();
+        $modelFacturasDetalle = new fel_facturas_detalle();
+
+        $fechaActual = date('Y-m-d');
+
+        $meses = [
+            1 => 'Enero',
+            2 => 'Febrero',
+            3 => 'Marzo',
+            4 => 'Abril',
+            5 => 'Mayo',
+            6 => 'Junio',
+            7 => 'Julio',
+            8 => 'Agosto',
+            9 => 'Septiembre',
+            10 => 'Octubre',
+            11 => 'Noviembre',
+            12 => 'Diciembre'
+        ];
+
+        $fechaInicioMes = date('Y-m-01');
+        $fechaFinMes = date('Y-m-t'); 
+
+        $nombreMes = $meses[date('n')];
 
         $camposSession = [
             'renderVista' => 'No'
         ];
-
-        // Programar aquí el html de las cards o info resumida para el escritorio
 
         $session->set([
             'route'             => 'escritorio/dashboard',
             'camposSession'     => json_encode($camposSession)
         ]);
 
-        return view('Panel/escritorio');
+        $totalProveedores = $modelProveedores
+            ->where('flgElimina', 0)
+            ->where('estadoProveedor', 'Activo')
+            ->countAllResults();
+
+        $totalClientes = $modelClientes
+            ->where('flgElimina', 0)
+            ->where('estadoCliente', 'Activo')
+            ->countAllResults();
+
+        $reservasPendientes = $modelReservas
+            ->where('flgElimina', 0)
+            ->where('estadoReserva', 'Pendiente')
+            ->countAllResults();
+
+        $facturasPendientes = $modelFacturas
+            ->where('flgElimina', 0)
+            ->where('estadoFactura', 'Pendiente')
+            ->countAllResults();
+
+        $montoReservasDia = $modelReservas
+            ->select('SUM(fel_reservas_detalle.totalReservaDetalleIVA) as montoReservadoIVA, SUM(fel_reservas_detalle.totalReservaDetalle) as montoReservado')
+            ->join('fel_reservas_detalle', 'fel_reservas.reservaId = fel_reservas_detalle.reservaId')
+            ->where('fel_reservas.fechaReserva', $fechaActual)
+            ->where('fel_reservas.flgElimina', 0)
+            ->where('fel_reservas_detalle.flgElimina', 0)
+            ->first();
+
+        $reservasHoy = $montoReservasDia['montoReservado'] ?? 0;
+        $reservasHoyIVA = $montoReservasDia['montoReservadoIVA'] ?? 0;
+
+        $montoReservasMes = $modelReservas
+            ->select('SUM(fel_reservas_detalle.totalReservaDetalleIVA) as montoReservadoIVA, SUM(fel_reservas_detalle.totalReservaDetalle) as montoReservado')
+            ->join('fel_reservas_detalle', 'fel_reservas.reservaId = fel_reservas_detalle.reservaId')
+            ->where('fel_reservas.fechaReserva >=', $fechaInicioMes)
+            ->where('fel_reservas.fechaReserva <=', $fechaFinMes)
+            ->where('fel_reservas.flgElimina', 0)
+            ->where('fel_reservas_detalle.flgElimina', 0)
+            ->first();
+
+        $reservasMes = $montoReservasMes['montoReservado'] ?? 0;
+        $reservasMesIVA = $montoReservasMes['montoReservadoIVA'] ?? 0;
+
+        $montoFacturasDia = $modelFacturas
+            ->select('SUM(fel_facturas_detalle.totalDetalle) as montoVenta, SUM(fel_facturas_detalle.totalDetalleIVA) as montoVentaIVA')
+            ->join('fel_facturas_detalle', 'fel_facturas.facturaId = fel_facturas_detalle.facturaId')
+            ->where('fel_facturas.fechaEmision', $fechaActual)
+            ->where('fel_facturas.flgElimina', 0)
+            ->where('fel_facturas_detalle.flgElimina', 0)
+            ->first();
+
+        $ventasHoy = $montoFacturasDia['montoVenta'] ?? 0;
+        $ventasHoyIVA = $montoFacturasDia['montoVentaIVA'] ?? 0;
+
+        $montoFacturasMes = $modelFacturas
+            ->select('SUM(fel_facturas_detalle.totalDetalle) as montoVenta, SUM(fel_facturas_detalle.totalDetalleIVA) as montoVentaIVA')
+            ->join('fel_facturas_detalle', 'fel_facturas.facturaId = fel_facturas_detalle.facturaId')
+            ->where('fel_facturas.fechaEmision >=', $fechaInicioMes)
+            ->where('fel_facturas.fechaEmision <=', $fechaFinMes)
+            ->where('fel_facturas.estadoFactura', 'Certificado')
+            ->where('fel_facturas.flgElimina', 0)
+            ->where('fel_facturas_detalle.flgElimina', 0)
+            ->first();
+
+        $ventasMes = $montoFacturasMes['montoVenta'] ?? 0;
+        $ventasMesIVA = $montoFacturasMes['montoVentaIVA'] ?? 0;
+
+        $productoMasReservadoUnidades = $modelReservasDetalle
+            ->select('inv_productos.producto, SUM(fel_reservas_detalle.cantidadProducto) as totalCantidad')
+            ->join('inv_productos', 'inv_productos.productoId = fel_reservas_detalle.productoId')
+            ->join('fel_reservas', 'fel_reservas.reservaId = fel_reservas_detalle.reservaId')
+            ->where('fel_reservas_detalle.flgElimina', 0)
+            ->where('fel_reservas.flgElimina', 0)
+            ->groupBy('fel_reservas_detalle.productoId')
+            ->orderBy('totalCantidad', 'DESC')
+            ->first();
+
+        if (!$productoMasReservadoUnidades) {
+            $productoMasReservadoUnidadesNombre = "-";
+            $productoMasReservadoUnidadesCantidad = "";
+        } else {
+            $productoMasReservadoUnidadesNombre = $productoMasReservadoUnidades['producto'];
+            $productoMasReservadoUnidadesCantidad = $productoMasReservadoUnidades['totalCantidad'];
+        }
+
+        $productoMasVendidoUnidades = $modelFacturasDetalle
+            ->select('inv_productos.producto, SUM(fel_facturas_detalle.cantidadProducto) as totalCantidad')
+            ->join('inv_productos', 'inv_productos.productoId = fel_facturas_detalle.productoId')
+            ->join('fel_facturas', 'fel_facturas.facturaId = fel_facturas_detalle.facturaId')
+            ->where('fel_facturas_detalle.flgElimina', 0)
+            ->where('fel_facturas.estadoFactura', 'Certificado')
+            ->groupBy('fel_facturas_detalle.productoId')
+            ->orderBy('totalCantidad', 'DESC')
+            ->first();
+
+        if (!$productoMasVendidoUnidades) {
+            $productoMasVendidoUnidadesNombre = "-";
+            $productoMasVendidoUnidadesCantidad = "";
+        } else {
+            $productoMasVendidoUnidadesNombre = $productoMasVendidoUnidades['producto'];
+            $productoMasVendidoUnidadesCantidad = $productoMasVendidoUnidades['totalCantidad'];
+        }
+
+        $productoMasReservadoMonto = $modelReservasDetalle
+            ->select('inv_productos.producto, SUM(fel_reservas_detalle.totalReservaDetalle) as totalMonto, SUM(fel_reservas_detalle.totalReservaDetalleIVA) as totalMontoIVA')
+            ->join('inv_productos', 'inv_productos.productoId = fel_reservas_detalle.productoId')
+            ->join('fel_reservas', 'fel_reservas.reservaId = fel_reservas_detalle.reservaId')
+            ->where('fel_reservas_detalle.flgElimina', 0)
+            ->where('fel_reservas.flgElimina', 0)
+            ->groupBy('fel_reservas_detalle.productoId')
+            ->orderBy('totalMontoIVA', 'DESC')
+            ->first();
+
+        if (!$productoMasReservadoMonto) {
+            $productoMasReservadoMontoNombre = "-";
+            $productoMasReservadoMontoCantidad = "";
+            $productoMasReservadoMontoCantidadIVA = "";
+        } else {
+            $productoMasReservadoMontoNombre = $productoMasReservadoMonto['producto'];
+            $productoMasReservadoMontoCantidad = $productoMasReservadoMonto['totalMonto'];
+            $productoMasReservadoMontoCantidadIVA = $productoMasReservadoMonto['totalMontoIVA'];
+        }
+
+        $productoMasVendidoMonto = $modelFacturasDetalle
+            ->select('inv_productos.producto, SUM(fel_facturas_detalle.totalDetalle) as totalMonto, SUM(fel_facturas_detalle.totalDetalleIVA) as totalMontoIVA')
+            ->join('inv_productos', 'inv_productos.productoId = fel_facturas_detalle.productoId')
+            ->join('fel_facturas', 'fel_facturas.facturaId = fel_facturas_detalle.facturaId')
+            ->where('fel_facturas_detalle.flgElimina', 0)
+            ->where('fel_facturas.estadoFactura', 'Certificado')
+            ->groupBy('fel_facturas_detalle.productoId')
+            ->orderBy('totalMontoIVA', 'DESC')
+            ->first();
+
+        if (!$productoMasVendidoMonto) {
+            $productoMasVendidoMontoNombre = "-";
+            $productoMasVendidoMontoCantidad = "";
+        } else {
+            $productoMasVendidoMontoNombre = $productoMasVendidoMonto['producto'];
+             $productoMasVendidoMontoCantidad = $productoMasVendidoMonto['totalMonto'];
+            $productoMasVendidoMontoCantidadIVA = $productoMasVendidoMonto['totalMontoIVA'];
+        }
+
+        $data = [
+            'totalProveedores' => $totalProveedores,
+            'totalClientes' => $totalClientes,
+            'reservasPendientes' => $reservasPendientes,
+            'facturasPendientes' => $facturasPendientes,
+            'reservasHoy' => $reservasHoy,
+            'reservasHoyIVA' => $reservasHoyIVA,
+            'nombreMes' => ucfirst($nombreMes),
+            'reservasMes' => $reservasMes,
+            'reservasMesIVA' => $reservasMesIVA,
+            'ventasHoy' => $ventasHoy,
+            'ventasHoyIVA' => $ventasHoyIVA,
+            'ventasMes' => $ventasMes,
+            'ventasMesIVA' => $ventasMesIVA,
+            'productoMasReservadoUnidadesNombre' => $productoMasReservadoUnidadesNombre,
+            'productoMasReservadoUnidadesCantidad' => $productoMasReservadoUnidadesCantidad,
+            'productoMasVendidoUnidadesNombre' => $productoMasVendidoUnidadesNombre,
+            'productoMasVendidoUnidadesCantidad' => $productoMasVendidoUnidadesCantidad,
+            'productoMasReservadoMontoNombre' => $productoMasReservadoMontoNombre,
+            'productoMasReservadoMontoCantidad' => $productoMasReservadoMontoCantidad,
+            'productoMasReservadoMontoCantidadIVA' => $productoMasReservadoMontoCantidadIVA,
+            'productoMasVendidoMontoNombre' => $productoMasVendidoMontoNombre,
+            'productoMasVendidoMontoCantidad' => $productoMasVendidoMontoCantidad,
+            'productoMasVendidoMontoCantidadIVA' => $productoMasVendidoMontoCantidadIVA,
+        ];
+
+        return view('Panel/escritorio', $data);
     }
 }
 
