@@ -3253,22 +3253,40 @@ public function modalNotaCreditoperacion()
         return view('ventas/modals/modalProductoNotaCredito', $data);
  
     }
+
 /*
     public function selectNotaCredito()
     {
         $facturaId = $this->request->getPost('facturaId'); // Obtener facturaId de la solicitud
-    
-        // Consulta corregida con alias adecuados para las tablas y campos
+
+        // Consulta corregida para incluir el precio del producto y excluir los productos ya agregados a la nota de crédito
         $detalleModel = new fel_facturas_detalle();
+
+        // Subconsulta para obtener los productos que ya están en el detalle de la nota de crédito
+        $productosAgregados = $detalleModel
+            ->select('productoId')
+            ->where('facturaId', $facturaId)
+            ->where('flgElimina', 0)
+            ->findAll();
+
+        $productosAgregadosIds = array_column($productosAgregados, 'productoId');
+
+        // Consulta para obtener productos que no estén ya en la nota de crédito
         $productos = $detalleModel
-            ->select('fel_facturas_detalle.productoId, inv_productos.producto')
+            ->select('fel_facturas_detalle.productoId, inv_productos.producto, fel_facturas_detalle.precioUnitario')
             ->join('fel_factura_relacionada', 'fel_factura_relacionada.facturaIdRelacionada = fel_facturas_detalle.facturaId')
             ->join('inv_productos', 'inv_productos.productoId = fel_facturas_detalle.productoId')
-            ->where('fel_factura_relacionada.facturaId', $facturaId) // facturaId de la nota de crédito
+            ->where('fel_factura_relacionada.facturaId', $facturaId) // FacturaId de la nota de crédito
             ->where('fel_factura_relacionada.flgElimina', 0)
-            ->where('fel_facturas_detalle.flgElimina', 0)
-            ->findAll();
-    
+            ->where('fel_facturas_detalle.flgElimina', 0);
+
+        // Excluir productos que ya están en la nota de crédito
+        if (!empty($productosAgregadosIds)) {
+            $productos->whereNotIn('fel_facturas_detalle.productoId', $productosAgregadosIds);
+        }
+
+        $productos = $productos->findAll();
+
         if ($productos) {
             return $this->response->setJSON([
                 'success' => true,
@@ -3277,27 +3295,42 @@ public function modalNotaCreditoperacion()
         } else {
             return $this->response->setJSON([
                 'success' => false,
-                'mensaje' => 'Detalles no encontrados.'
+                'mensaje' => 'No hay productos disponibles.'
             ]);
         }
     }
-    
 */
-
-public function selectNotaCredito()
+    public function selectNotaCredito()
 {
     $facturaId = $this->request->getPost('facturaId'); // Obtener facturaId de la solicitud
 
-    // Consulta corregida para incluir el precio del producto
+    // Consulta corregida para incluir el precio del producto y excluir los productos ya agregados a la nota de crédito
     $detalleModel = new fel_facturas_detalle();
+
+    // Subconsulta para obtener los productos que ya están en el detalle de la nota de crédito
+    $productosAgregados = $detalleModel
+        ->select('productoId')
+        ->where('facturaId', $facturaId)
+        ->where('flgElimina', 0)
+        ->findAll();
+
+    $productosAgregadosIds = array_column($productosAgregados, 'productoId');
+
+    // Consulta para obtener productos que no estén ya en la nota de crédito
     $productos = $detalleModel
-        ->select('fel_facturas_detalle.productoId, inv_productos.producto, fel_facturas_detalle.precioUnitario') // Incluir el precio unitario del producto
+        ->select('fel_facturas_detalle.productoId, inv_productos.producto, fel_facturas_detalle.precioUnitario, fel_facturas_detalle.cantidadProducto') // Añadimos cantidadProducto aquí
         ->join('fel_factura_relacionada', 'fel_factura_relacionada.facturaIdRelacionada = fel_facturas_detalle.facturaId')
         ->join('inv_productos', 'inv_productos.productoId = fel_facturas_detalle.productoId')
-        ->where('fel_factura_relacionada.facturaId', $facturaId) // facturaId de la nota de crédito
+        ->where('fel_factura_relacionada.facturaId', $facturaId) // FacturaId de la nota de crédito
         ->where('fel_factura_relacionada.flgElimina', 0)
-        ->where('fel_facturas_detalle.flgElimina', 0)
-        ->findAll();
+        ->where('fel_facturas_detalle.flgElimina', 0);
+
+    // Excluir productos que ya están en la nota de crédito
+    if (!empty($productosAgregadosIds)) {
+        $productos->whereNotIn('fel_facturas_detalle.productoId', $productosAgregadosIds);
+    }
+
+    $productos = $productos->findAll();
 
     if ($productos) {
         return $this->response->setJSON([
@@ -3307,10 +3340,11 @@ public function selectNotaCredito()
     } else {
         return $this->response->setJSON([
             'success' => false,
-            'mensaje' => 'Detalles no encontrados.'
+            'mensaje' => 'No hay productos disponibles.'
         ]);
     }
 }
+
 
     public function modalNuevoNotaCreditoOperacion()
 {

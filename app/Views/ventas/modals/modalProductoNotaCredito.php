@@ -107,7 +107,7 @@ if ($operacion == "editar") {
         });
     });
 
-    $(document).ready(function() {
+$(document).ready(function() {
     // Inicializar Select2
     $("#productoId").select2({
         placeholder: 'Producto'
@@ -129,14 +129,14 @@ if ($operacion == "editar") {
                 // Iterar sobre los productos recibidos y agregarlos al select
                 $.each(response.producto, function(index, producto) {
                     $("#productoId").append(
-                        '<option value="' + producto.productoId + '" data-precio="' + producto.precioUnitario + '">' + producto.producto + '</option>'
+                        '<option value="' + producto.productoId + '" data-precio="' + producto.precioUnitario + '" data-cantidad-original="' + producto.cantidadProducto + '">' + producto.producto + '</option>'
                     );
                 });
 
                 // Refrescar Select2 después de llenar el select
                 $("#productoId").trigger('change');
             } else {
-                console.log("Detalles no encontrados.");
+                console.log("No hay productos disponibles.");
             }
         },
         error: function(xhr, status, error) {
@@ -146,17 +146,33 @@ if ($operacion == "editar") {
 
     // Calcular precios cuando cambie el producto seleccionado
     $("#productoId").change(function() {
-        var selectedOption = $("#productoId option:selected");
-        var precioUnitario = selectedOption.data('precio') || 0;
+        var selectedOption = $(this).find('option:selected');
+        var precioUnitario = selectedOption.data('precio');
+        var cantidadOriginal = selectedOption.data('cantidad-original');
 
-        // Actualizar el campo de precio unitario con el valor del producto seleccionado
+        // Actualizar los campos con los valores del producto
         $('#precioUnitario').val(precioUnitario).trigger('change');
         $('#hiddenPrecioUnitario').val(precioUnitario);
-        actualizarPrecios(); // Llamar a la función de actualización
+        $('#cantidadProducto').attr('max', cantidadOriginal); // Establecer el máximo permitido en el campo de cantidad
+        actualizarPrecios();
     });
 
-    // Ejecutar la actualización de precios cuando cambien cantidad, descuento o precio
-    $('#cantidadProducto, #porcentajeDescuento, #precioUnitario').on('input change', actualizarPrecios);
+    $('#cantidadProducto, #porcentajeDescuento, #precioUnitario').on('input change', function() {
+        // Validar que la cantidad no sea mayor a la cantidad original
+        var cantidadOriginal = $("#productoId").find('option:selected').data('cantidad-original');
+        var cantidadIngresada = $('#cantidadProducto').val();
+
+        if (parseFloat(cantidadIngresada) > parseFloat(cantidadOriginal)) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'La cantidad ingresada no puede ser mayor que la cantidad original (' + cantidadOriginal + ')'
+            });
+            $('#cantidadProducto').val(cantidadOriginal); // Revertir a la cantidad original
+        } else {
+            actualizarPrecios();
+        }
+    });
 
     // Función para actualizar precios
     function actualizarPrecios() {
@@ -164,7 +180,7 @@ if ($operacion == "editar") {
         var porcentajeDescuento = parseFloat($('#porcentajeDescuento').val()) || 0;
         var cantidadProducto = parseFloat($('#cantidadProducto').val()) || 0;
 
-        // Calcular el precio unitario de venta con descuento
+        // Calcular el precio unitario de venta
         var precioUnitarioVenta = precioUnitario * (1 - (porcentajeDescuento / 100));
         $('#precioUnitarioVenta').val(precioUnitarioVenta.toFixed(2));
 
@@ -174,15 +190,14 @@ if ($operacion == "editar") {
         var precioUnitarioVentaIVA = precioUnitarioVenta + ivaVenta;
 
         // Calcular IVA unitario y total
-        var ivaUnitario = ivaVenta;
+        var ivaUnitario = precioUnitarioVentaIVA - precioUnitarioVenta;
         var ivaTotal = ivaUnitario * cantidadProducto;
 
-        // Actualizar los campos del IVA y precios totales
         $('#precioUnitarioVentaIVA').text(precioUnitarioVentaIVA.toFixed(2));
         $('#ivaUnitario').val(ivaUnitario.toFixed(2));
         $('#ivaTotal').val(ivaTotal.toFixed(2));
 
-        // Calcular el total del detalle
+        // Calcular el total de la reserva
         var totalDetalle = precioUnitarioVenta * cantidadProducto;
         $('#totalDetalle').val(totalDetalle.toFixed(2));
 
