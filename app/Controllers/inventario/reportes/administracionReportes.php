@@ -3,6 +3,7 @@
 namespace App\Controllers\inventario\reportes;
 use CodeIgniter\Controller;
 
+use App\Models\inv_productos;
 
 class administracionReportes extends Controller{
 
@@ -23,6 +24,36 @@ class administracionReportes extends Controller{
 
          return view('inventario/vistas/administracionReportes', $data);
         }
+    }
+    public function reporteCatalogoproducto(){
+            $invProductos = new inv_productos();
+            $data['variable'] = 0;
+
+            $data['datos'] = $invProductos
+                    ->select('inv_productos.codigoProducto,inv_productos.producto,inv_productos.descripcionProducto,inv_productos_plataforma.productoPlataforma,inv_productos_tipo.productoTipo,cat_14_unidades_medida.unidadMedida,inv_productos.flgProductoVenta,inv_productos.existenciaMinima')
+                    ->join('inv_productos_plataforma','inv_productos_plataforma.productoPlataformaId = inv_productos.productoPlataformaId')
+                    ->join('inv_productos_tipo','inv_productos_tipo.productoTipoId = inv_productos.productoTipoId')
+                    ->join('cat_14_unidades_medida','cat_14_unidades_medida.unidadMedidaId = inv_productos.unidadMedidaId')
+                    ->where('inv_productos.flgElimina', 0)
+                    ->where('inv_productos.estadoProducto','Activo')
+                    ->findAll();
+            $n = 0;
+            $codigo = "";
+            $producto = "";
+            $descripcion = "";
+
+            /*foreach ($datos AS $productos) {
+                $n++;                 
+                $codigo = $productos['codigoProducto'];
+                $producto = $productos['producto'];
+                $descripcion = $productos['descripcionProducto'];
+            }
+
+             $data['n'] = $n;
+             $data['codigo'] = $codigo;
+             $data['producto'] = $producto;
+             $data['descripcion'] = $descripcion;*/
+         return view('inventario/reportes/reporteCatalogoproductos', $data);
     }
         
 }

@@ -3,7 +3,7 @@
 <div class="row">
     <div class="col-md-2">
         <button type="button" id="" class="btn btn-primary" onclick="catalogoProductos();">
-            Catalogo de productos
+            Cátalogo de productos
         </button>
     </div>
     <div class="col-md-2">
@@ -23,7 +23,7 @@ function catalogoProductos(){
                 // Insertar el contenido de la modal en el cuerpo de la modal
                 $('#divModalContent').html(response);
                 // Mostrar la modal
-                $('#').modal('show');
+                $('#modalReporteCatalogoProducto').modal('show');
             },
         error: function(xhr, status, error) {
             // Manejar errores si los hay
