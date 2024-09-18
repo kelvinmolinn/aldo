@@ -3075,10 +3075,6 @@ public function modalNotaCreditoperacion()
             $columna8 = "<b>Sin IVA: </b> $" . number_format($columna['totalDetalle'], 2, '.', ',') . "<br><b>Con IVA: </b> $" . number_format($columna['totalDetalleIVA'], 2, '.', ',');
 
             $columna9 = '
-                <button class="btn btn-primary mb-1" onclick="modalProductoDTE(' . $columna['facturaDetalleId'] . ', `editar`);" data-toggle="tooltip" data-placement="top" title="Editar">
-                    <i class="fas fa-pen"></i>
-                </button>
-
 
                 <button class="btn btn-danger mb-1" onclick="eliminarDTE(' . $columna['facturaDetalleId'] . ');" data-toggle="tooltip" data-placement="top" title="Eliminar">
                     <i class="fas fa-trash"></i>
@@ -3257,7 +3253,7 @@ public function modalNotaCreditoperacion()
         return view('ventas/modals/modalProductoNotaCredito', $data);
  
     }
-
+/*
     public function selectNotaCredito()
     {
         $facturaId = $this->request->getPost('facturaId'); // Obtener facturaId de la solicitud
@@ -3286,9 +3282,35 @@ public function modalNotaCreditoperacion()
         }
     }
     
-    
+*/
 
+public function selectNotaCredito()
+{
+    $facturaId = $this->request->getPost('facturaId'); // Obtener facturaId de la solicitud
 
+    // Consulta corregida para incluir el precio del producto
+    $detalleModel = new fel_facturas_detalle();
+    $productos = $detalleModel
+        ->select('fel_facturas_detalle.productoId, inv_productos.producto, fel_facturas_detalle.precioUnitario') // Incluir el precio unitario del producto
+        ->join('fel_factura_relacionada', 'fel_factura_relacionada.facturaIdRelacionada = fel_facturas_detalle.facturaId')
+        ->join('inv_productos', 'inv_productos.productoId = fel_facturas_detalle.productoId')
+        ->where('fel_factura_relacionada.facturaId', $facturaId) // facturaId de la nota de crédito
+        ->where('fel_factura_relacionada.flgElimina', 0)
+        ->where('fel_facturas_detalle.flgElimina', 0)
+        ->findAll();
+
+    if ($productos) {
+        return $this->response->setJSON([
+            'success' => true,
+            'producto' => $productos
+        ]);
+    } else {
+        return $this->response->setJSON([
+            'success' => false,
+            'mensaje' => 'Detalles no encontrados.'
+        ]);
+    }
+}
 
     public function modalNuevoNotaCreditoOperacion()
 {

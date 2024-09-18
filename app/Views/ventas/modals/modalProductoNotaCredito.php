@@ -108,137 +108,122 @@ if ($operacion == "editar") {
     });
 
     $(document).ready(function() {
-        // Inicializar Select2
-        $("#productoId").select2({
-            placeholder: 'Producto'
-        });
+    // Inicializar Select2
+    $("#productoId").select2({
+        placeholder: 'Producto'
+    });
 
-        // Llamada AJAX para cargar productos al abrir el modal
+    // Llamada AJAX para cargar productos al abrir el modal
+    $.ajax({
+        url: 'ventas/admin-facturacion/operacion/select/notaCredito',
+        type: "POST",
+        dataType: "json",
+        data: {
+            facturaId: <?= $campos['facturaId']; ?> // Se pasa el 'facturaId' al servidor
+        },
+        success: function(response) {
+            if (response.success) {
+                // Vaciar el select de productos antes de llenarlo
+                $("#productoId").empty().append('<option></option>');
+
+                // Iterar sobre los productos recibidos y agregarlos al select
+                $.each(response.producto, function(index, producto) {
+                    $("#productoId").append(
+                        '<option value="' + producto.productoId + '" data-precio="' + producto.precioUnitario + '">' + producto.producto + '</option>'
+                    );
+                });
+
+                // Refrescar Select2 después de llenar el select
+                $("#productoId").trigger('change');
+            } else {
+                console.log("Detalles no encontrados.");
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error(xhr.responseText);
+        }
+    });
+
+    // Calcular precios cuando cambie el producto seleccionado
+    $("#productoId").change(function() {
+        var selectedOption = $("#productoId option:selected");
+        var precioUnitario = selectedOption.data('precio') || 0;
+
+        // Actualizar el campo de precio unitario con el valor del producto seleccionado
+        $('#precioUnitario').val(precioUnitario).trigger('change');
+        $('#hiddenPrecioUnitario').val(precioUnitario);
+        actualizarPrecios(); // Llamar a la función de actualización
+    });
+
+    // Ejecutar la actualización de precios cuando cambien cantidad, descuento o precio
+    $('#cantidadProducto, #porcentajeDescuento, #precioUnitario').on('input change', actualizarPrecios);
+
+    // Función para actualizar precios
+    function actualizarPrecios() {
+        var precioUnitario = parseFloat($('#precioUnitario').val()) || 0;
+        var porcentajeDescuento = parseFloat($('#porcentajeDescuento').val()) || 0;
+        var cantidadProducto = parseFloat($('#cantidadProducto').val()) || 0;
+
+        // Calcular el precio unitario de venta con descuento
+        var precioUnitarioVenta = precioUnitario * (1 - (porcentajeDescuento / 100));
+        $('#precioUnitarioVenta').val(precioUnitarioVenta.toFixed(2));
+
+        // Calcular el IVA unitario y total
+        var ivaPorcentaje = 13; // Suponiendo un IVA del 13%
+        var ivaVenta = (precioUnitarioVenta * ivaPorcentaje) / 100;
+        var precioUnitarioVentaIVA = precioUnitarioVenta + ivaVenta;
+
+        // Calcular IVA unitario y total
+        var ivaUnitario = ivaVenta;
+        var ivaTotal = ivaUnitario * cantidadProducto;
+
+        // Actualizar los campos del IVA y precios totales
+        $('#precioUnitarioVentaIVA').text(precioUnitarioVentaIVA.toFixed(2));
+        $('#ivaUnitario').val(ivaUnitario.toFixed(2));
+        $('#ivaTotal').val(ivaTotal.toFixed(2));
+
+        // Calcular el total del detalle
+        var totalDetalle = precioUnitarioVenta * cantidadProducto;
+        $('#totalDetalle').val(totalDetalle.toFixed(2));
+
+        var totalDetalleIVA = precioUnitarioVentaIVA * cantidadProducto;
+        $('#totalDetalleIVA').text(totalDetalleIVA.toFixed(2));
+    }
+
+    // Enviar el formulario vía AJAX
+    $("#frmModal").submit(function(event) {
+        event.preventDefault();
         $.ajax({
-            url: 'ventas/admin-facturacion/operacion/select/notaCredito',
-            type: "POST",
-            dataType: "json",
-            data: {
-                facturaId: <?= $campos['facturaId']; ?> // Se pasa el 'facturaId' al servidor
-            },
+            url: $(this).attr('action'),
+            type: $(this).attr('method'),
+            data: $(this).serialize(),
             success: function(response) {
                 if (response.success) {
-                    // Vaciar el select de productos antes de llenarlo
-                    $("#productoId").empty().append('<option></option>');
-
-                    // Iterar sobre los productos recibidos y agregarlos al select
-                    $.each(response.producto, function(index, producto) {
-                        $("#productoId").append(
-                            '<option value="' + producto.productoId + '">' + producto.producto + '</option>'
-                        );
+                    $('#modalProductoNotaCredito').modal('hide');
+                    Swal.fire({
+                        icon: 'success',
+                        title: '<?php echo $mensajeAlerta; ?>',
+                        text: response.mensaje
+                    }).then((result) => {
+                        $("#tablaContinuarNotaCredito").DataTable().ajax.reload(null, false);
                     });
-
-                    // Refrescar Select2 después de llenar el select
-                    $("#productoId").trigger('change');
                 } else {
-                    console.log("Detalles no encontrados.");
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'No se completó la operación',
+                        text: response.mensaje
+                    });
                 }
             },
             error: function(xhr, status, error) {
                 console.error(xhr.responseText);
             }
         });
-
-        // Calcular precios cuando cambie el producto seleccionado
-        $("#productoId").change(function() {
-            $.ajax({
-                url: 'ventas/admin-facturacion/operacion/select/notaCredito',
-                type: "POST",
-                dataType: "json",
-                data: {
-                    productoId: $(this).val(),
-                    facturaId: <?= $campos['facturaId']; ?>
-                },
-                success: function(response) {
-                    if (response.success) {
-                        var producto = response.producto[0]; // Suponiendo que recibes un único producto
-                        var precioUnitario = producto.precioUnitario || 0;
-
-                        // Actualizar los campos con los valores del producto
-                        $('#precioUnitario').val(precioUnitario).trigger('change');
-                        $('#hiddenPrecioUnitario').val(precioUnitario);
-                        actualizarPrecios();
-                    } else {
-                        console.log("Detalles no encontrados.");
-                    }
-                },
-                error: function(xhr, status, error) {
-                    console.error(xhr.responseText);
-                }
-            });
-        });
-
-        $('#cantidadProducto, #porcentajeDescuento, #precioUnitario').on('input change', actualizarPrecios);
-
-        // Función para actualizar precios
-        function actualizarPrecios() {
-            var precioUnitario = parseFloat($('#precioUnitario').val()) || 0;
-            var porcentajeDescuento = parseFloat($('#porcentajeDescuento').val()) || 0;
-            var cantidadProducto = parseFloat($('#cantidadProducto').val()) || 0;
-
-            // Calcular el precio unitario de venta
-            var precioUnitarioVenta = precioUnitario * (1 - (porcentajeDescuento / 100));
-            $('#precioUnitarioVenta').val(precioUnitarioVenta.toFixed(2));
-
-            // Calcular el IVA unitario y total
-            var ivaPorcentaje = 13; // Suponiendo un IVA del 13%
-            var ivaVenta = (precioUnitarioVenta * ivaPorcentaje) / 100;
-            var precioUnitarioVentaIVA = precioUnitarioVenta + ivaVenta;
-
-            // Calcular IVA unitario y total
-            var ivaUnitario = precioUnitarioVentaIVA - precioUnitarioVenta;
-            var ivaTotal = ivaUnitario * cantidadProducto;
-
-            $('#precioUnitarioVentaIVA').text(precioUnitarioVentaIVA.toFixed(2));
-            $('#ivaUnitario').val(ivaUnitario.toFixed(2));
-            $('#ivaTotal').val(ivaTotal.toFixed(2));
-
-            // Calcular el total de la reserva
-            var totalDetalle = precioUnitarioVenta * cantidadProducto;
-            $('#totalDetalle').val(totalDetalle.toFixed(2));
-
-            var totalDetalleIVA = precioUnitarioVentaIVA * cantidadProducto;
-            $('#totalDetalleIVA').text(totalDetalleIVA.toFixed(2));
-        }
-
-        // Enviar el formulario vía AJAX
-        $("#frmModal").submit(function(event) {
-            event.preventDefault();
-            $.ajax({
-                url: $(this).attr('action'),
-                type: $(this).attr('method'),
-                data: $(this).serialize(),
-                success: function(response) {
-                    if (response.success) {
-                        $('#modalProductoNotaCredito').modal('hide');
-                        Swal.fire({
-                            icon: 'success',
-                            title: '<?php echo $mensajeAlerta; ?>',
-                            text: response.mensaje
-                        }).then((result) => {
-                            $("#tablaContinuarNotaCredito").DataTable().ajax.reload(null, false);
-                        });
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'No se completó la operación',
-                            text: response.mensaje
-                        });
-                    }
-                },
-                error: function(xhr, status, error) {
-                    console.error(xhr.responseText);
-                }
-            });
-        });
-
-        // Inicializar los precios cuando se carga el formulario
-        actualizarPrecios();
-        $("#productoId").val(<?= $campos["productoId"]; ?>).trigger('change');
     });
+
+    // Inicializar los precios cuando se carga el formulario
+    actualizarPrecios();
+    $("#productoId").val(<?= $campos["productoId"]; ?>).trigger('change');
+});
+
 </script>
