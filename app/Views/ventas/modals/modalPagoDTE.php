@@ -96,6 +96,7 @@
                                     }).then((result) => {
                                         $("#tablaPagoDTE").DataTable().ajax.reload(null, false);
                                         $("#tablaContinuarDTE").DataTable().ajax.reload(null, false);
+                                        $("#tablaContinuarNotaCredito").DataTable().ajax.reload(null, false);
                                     });
                                 } else {
                                     // Insert fallido, mostrar mensaje de error
@@ -136,6 +137,7 @@
                         }).then((result) => {
                             $("#tablaPagoDTE").DataTable().ajax.reload(null, false);
                             $("#tablaContinuarDTE").DataTable().ajax.reload(null, false);
+                            $("#tablaContinuarNotaCredito").DataTable().ajax.reload(null, false);
                             
                         });
                         console.log("Último ID insertado:", response.facturaPagoId);
