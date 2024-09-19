@@ -13,28 +13,49 @@
     </div>
 </div>
 <script>
-
-function catalogoProductos(){
-    $.ajax({
-            url: '<?php echo base_url('inventario/admin-reportes/reporte/catalogoProductos'); ?>',
+    function reportePreciosProducto(facturaId) {
+        $.ajax({
+            url: '<?php echo base_url('ventas/admin-facturacion/form/imprimir/dte'); ?>',
             type: 'POST',
-            data: { }, // Pasar el ID del módulo como parámetro
+            data: { facturaId: facturaId }, // Pasar el ID de la factura como parámetro
             success: function(response) {
                 // Insertar el contenido de la modal en el cuerpo de la modal
                 $('#divModalContent').html(response);
+
+                // Asumimos que el modal ya tiene un iframe con el ID `pdfFrame`
+                var pdfUrl = '<?php echo base_url("ventas/admin-facturacion/pdf/generate"); ?>' + '?facturaId=' + facturaId;
+                $('#pdfFrame').attr('src', pdfUrl);
+
                 // Mostrar la modal
-                $('#modalReporteCatalogoProducto').modal('show');
+                $('#modalImprimirDTE').modal('show');
             },
-        error: function(xhr, status, error) {
-            // Manejar errores si los hay
-            console.error(xhr.responseText);
-        }
+            error: function(xhr, status, error) {
+                // Manejar errores si los hay
+                console.error(xhr.responseText);
+            }
+        });
+    }
+    function catalogoProductos(){
+        $.ajax({
+                url: '<?php echo base_url('inventario/admin-reportes/reporte/catalogoProductos'); ?>',
+                type: 'POST',
+                data: { }, // Pasar el ID del módulo como parámetro
+                success: function(response) {
+                    // Insertar el contenido de la modal en el cuerpo de la modal
+                    $('#divModalContent').html(response);
+                    // Mostrar la modal
+                    $('#modalReporteCatalogoProducto').modal('show');
+                },
+            error: function(xhr, status, error) {
+                // Manejar errores si los hay
+                console.error(xhr.responseText);
+            }
+        });
+    }
+
+    $(document).ready(function() {
+
+        tituloVentana("Reportes");
+
     });
-}
-
-$(document).ready(function() {
-
-    tituloVentana("Reportes");
-
-});
 </script>

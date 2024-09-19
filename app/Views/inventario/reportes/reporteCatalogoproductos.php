@@ -29,11 +29,16 @@
                                             <th>Unidad de medida</th>
                                             <th>Producto para venta</th>
                                             <th>Existencia mínima</th>
-                                            <th>Sucursal</th>
+                                            <?php 
+                                                foreach ($sucurales AS $suc) {
+                                                    $sucursalAgrega = $suc['sucursal'];
+                                                    echo '<th>'.$sucursalAgrega.'</th>';
+                                                }
+                                            ?>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <?php echo
+                                        <?php
                                             $n = 0; 
                                             foreach ($datos AS $productos) {
                                                 $n++;
@@ -46,7 +51,7 @@
                                                 
                                                 echo '
                                                     <tr>
-                                                        <td>'.$n.'</td>                        
+                                                        <td>'.$n.'</td>                       
                                                         <td>"'.$productos['codigoProducto'].'"</td>
                                                         <td>'.$productos['producto'].'</td>
                                                         <td>'.$productos['descripcionProducto'].'</td>
@@ -55,11 +60,14 @@
                                                         <td>'.$productos['unidadMedida'].'</td>
                                                         <td>'.$productoVenta.'</td>
                                                         <td>'.$productos['existenciaMinima'].'</td>
-                                                        <td>'.$productos['codigoProducto'].'</td>
-                                                    </tr>
+                                                        
                                                 ';
+                                               foreach ($sucurales as $suc) {
+                                                    // Usamos el array que se preparó con las existencias para cada producto y sucursal
+                                                    echo '<td>'.$existencias[$productos['productoId']][$suc['sucursalId']].'</td>';
+                                                }
 
-
+                                                echo '</tr>';
                                             }
                                         ?>
 
