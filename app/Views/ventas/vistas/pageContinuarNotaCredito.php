@@ -99,7 +99,7 @@
                     <i class="fas fa-save"></i>
                     Certificar DTE con error
                 </button>
-                <button type="submit" id="btnCertificarDTE" class="btn btn-primary" onclick="certificarDTE();">
+                <button type="submit" id="btnCertificarDTE" class="btn btn-primary" onclick="certificarNotaCredito();">
                     <i class="fas fa-save"></i>
                     Certificar DTE
                 </button>
@@ -167,11 +167,11 @@
             });
     }
 
-    function  certificarDTE() {
+    function  certificarNotaCredito() {
         //alert("Vamos a certificar " + id);
             Swal.fire({
                 title: '¿Estás seguro que desea certificar el DTE?',
-                text: "Se certificará el DTE.",
+                text: "Se certificará la nota de crédito.",
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
@@ -182,7 +182,7 @@
                 if (result.isConfirmed) {
                     // Si el usuario confirma, enviar la solicitud AJAX para certificar 
                         $.ajax({
-                            url: '<?php echo base_url('ventas/admin-facturacion/operacion/certificar/dte'); ?>',
+                            url: '<?php echo base_url('ventas/admin-facturacion/operacion/certificar/notaCredito'); ?>',
                             type: 'POST',
                             data: {
                                facturaId : '<?= $facturaId; ?>'
@@ -192,7 +192,7 @@
                                 if (response.success) {
                                     Swal.fire({
                                         icon: 'success',
-                                        title: 'DTE certificado con Éxito!',
+                                        title: 'Nota de crédito certificada con Éxito!',
                                         text: response.mensaje
                                     }).then((result) => {
                                         //$("#tablaContinuarNotaCredito").DataTable().ajax.reload(null, false);

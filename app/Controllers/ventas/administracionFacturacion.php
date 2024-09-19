@@ -85,7 +85,10 @@ class administracionFacturacion extends Controller
         $data['empleados'] = $empleadosModel->where('flgElimina', 0)->findAll();
 
         $tipoDTEModel = new cat_02_tipo_dte();
-        $data['tipoDTE'] = $tipoDTEModel->where('flgElimina', 0)->findAll();
+        $data['tipoDTE'] = $tipoDTEModel
+            ->where('flgElimina', 0)
+            ->whereNotIn('tipoDTEId', [4]) // Excluir tipoDTEId 4
+            ->findAll();
 
         $operacion = $this->request->getPost('operacion');
         $data['sucursalId'] = $this->request->getPost('sucursalId');
@@ -425,6 +428,7 @@ public function tablaFacturacion()
         $data['tipoDTE'] = $tipoDTE
             ->select("tipoDTEId,tipoDocumentoDTE")
             ->where("flgElimina", 0)
+            ->whereNotIn('tipoDTEId', [4]) // Excluir tipoDTEId 4
             ->findAll();
 
         $data['empleados'] = $empleados
@@ -3254,52 +3258,7 @@ public function modalNotaCreditoperacion()
  
     }
 
-/*
-    public function selectNotaCredito()
-    {
-        $facturaId = $this->request->getPost('facturaId'); // Obtener facturaId de la solicitud
 
-        // Consulta corregida para incluir el precio del producto y excluir los productos ya agregados a la nota de crédito
-        $detalleModel = new fel_facturas_detalle();
-
-        // Subconsulta para obtener los productos que ya están en el detalle de la nota de crédito
-        $productosAgregados = $detalleModel
-            ->select('productoId')
-            ->where('facturaId', $facturaId)
-            ->where('flgElimina', 0)
-            ->findAll();
-
-        $productosAgregadosIds = array_column($productosAgregados, 'productoId');
-
-        // Consulta para obtener productos que no estén ya en la nota de crédito
-        $productos = $detalleModel
-            ->select('fel_facturas_detalle.productoId, inv_productos.producto, fel_facturas_detalle.precioUnitario')
-            ->join('fel_factura_relacionada', 'fel_factura_relacionada.facturaIdRelacionada = fel_facturas_detalle.facturaId')
-            ->join('inv_productos', 'inv_productos.productoId = fel_facturas_detalle.productoId')
-            ->where('fel_factura_relacionada.facturaId', $facturaId) // FacturaId de la nota de crédito
-            ->where('fel_factura_relacionada.flgElimina', 0)
-            ->where('fel_facturas_detalle.flgElimina', 0);
-
-        // Excluir productos que ya están en la nota de crédito
-        if (!empty($productosAgregadosIds)) {
-            $productos->whereNotIn('fel_facturas_detalle.productoId', $productosAgregadosIds);
-        }
-
-        $productos = $productos->findAll();
-
-        if ($productos) {
-            return $this->response->setJSON([
-                'success' => true,
-                'producto' => $productos
-            ]);
-        } else {
-            return $this->response->setJSON([
-                'success' => false,
-                'mensaje' => 'No hay productos disponibles.'
-            ]);
-        }
-    }
-*/
     public function selectNotaCredito()
 {
     $facturaId = $this->request->getPost('facturaId'); // Obtener facturaId de la solicitud
@@ -3536,6 +3495,220 @@ public function modalNotaCreditoperacion()
     }
 }
 
+public function certificarNotaCredito()
+{
+    // Intentar obtener los valores desde la solicitud POST
+    $facturaId = $this->request->getPost('facturaId');
+    $facturaDetalleId = $this->request->getPost('facturaDetalleId');
+    $retaceoDetalleId = $this->request->getPost('retaceoDetalleId'); 
+    
+    // Verificar si el ID de la factura está disponible
+    if (!$facturaId) {
+        return $this->response->setJSON([
+            'success' => false,
+            'mensaje' => 'No se pudo obtener el ID de la factura.',
+        ]);
+    }
+
+    // Obtener sucursalId y fechaEmision desde fel_facturas
+    $facturaModel = new fel_facturas();
+    $factura = $facturaModel
+        ->select('sucursalId, fechaEmision')
+        ->where('facturaId', $facturaId)
+        ->first();
+
+    // Verificar si la factura existe
+    if (!$factura) {
+        return $this->response->setJSON([
+            'success' => false,
+            'mensaje' => 'Factura no encontrada.',
+        ]);
+    }
+
+    // Extraer sucursalId y fechaEmision
+    $sucursalId = $factura['sucursalId'];
+    $fechaEmision = $factura['fechaEmision'];
+
+    // Obtener el modelo para manejar los productos, existencias y costos
+    $productosExistenciasModel = new inv_productos_existencias();
+    $detalleModel = new fel_facturas_detalle();
+    $modelKardex = new inv_kardex();
+    $productosInfoModel = new inv_productos();
+    $comprasDetalleModel = new comp_compras_detalle();
+    $retaceoDetalleModel = new comp_retaceo_detalle();
+    $modelFacturaPago = new fel_facturas_pago();
+
+    // Obtener los detalles de los productos asociados a la factura
+    $productosFactura = $detalleModel
+        ->select('productoId, cantidadProducto, precioUnitarioVenta, porcentajeDescuento')
+        ->where('facturaId', $facturaId)
+        ->where('flgElimina', 0)
+        ->findAll();
+
+    // Verificar si no se han agregado productos al detalle
+    if (empty($productosFactura)) {
+        return $this->response->setJSON([
+            'success' => false,
+            'mensaje' => 'No se puede certificar el DTE. No se han agregado productos al detalle de la factura.'
+        ]);
+    }
+
+    foreach ($productosFactura as $producto) {
+        $productoId = $producto['productoId'];
+        $cantidadProducto = $producto['cantidadProducto'];
+   
+        // Obtener la existencia actual del producto en la sucursal
+        $productoExistencia = $productosExistenciasModel
+            ->select('productoExistenciaId, existenciaProducto')
+            ->where('sucursalId', $sucursalId)
+            ->where('productoId', $productoId)
+            ->where('flgElimina', 0)
+            ->first();
+
+        if (!$productoExistencia || $cantidadProducto > $productoExistencia['existenciaProducto']) {
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => "No hay existencias suficientes para el producto ID $productoId en la sucursal $sucursalId.",
+            ]);
+        }
+
+        // Obtener datos adicionales del producto
+        $productoInfo = $productosInfoModel->find($productoId);
+
+        // Obtener el costo FOB
+        $costoFOBResult = $comprasDetalleModel
+            ->select('precioUnitario')
+            ->where('productoId', $productoId)
+            ->where('flgElimina', 0)
+            ->orderBy('compraDetalleId', 'DESC')
+            ->first();
+        
+        $costoFOB = $costoFOBResult ? $costoFOBResult['precioUnitario'] : 0;
+
+        // Obtener el costo promedio y el precio de venta del producto
+        $costoPromedio = $productoInfo ? $productoInfo['CostoPromedio'] : 0;
+        $precioVentaUnitario = $productoInfo ? $productoInfo['precioVenta'] : 0;
+
+        // Verificar si se obtuvo retaceoDetalleId y obtener costo unitario retaceo
+        if ($retaceoDetalleId) {
+            $retaceoInfo = $retaceoDetalleModel->find($retaceoDetalleId);
+            $costoUnitarioRetaceo = $retaceoInfo ? $retaceoInfo['costoUnitarioRetaceo'] : 0;
+        } else {
+            $costoUnitarioRetaceo = 0;
+        }
+
+        // Calcular valores para la entrada del Kardex
+        $existenciaAntes = $productoExistencia['existenciaProducto'];
+        $existenciaDespues = $existenciaAntes + $cantidadProducto;
+        $precioVentaUnitarioConDescuento = $producto['precioUnitarioVenta'] * (1 - $producto['porcentajeDescuento'] / 100);
+
+            // Obtener el total a pagar para la reserva
+            $totalAPagar = $detalleModel
+                ->select('SUM(totalDetalleIVA) as totalAPagar')
+                ->where('facturaId', $facturaId)
+                ->where('flgElimina', 0)
+                ->first()['totalAPagar'];
+
+            // Obtener el total pagado 
+            $totalPagado = $modelFacturaPago
+                ->select('SUM(totalPago) as totalPagado')
+                ->where('facturaId', $facturaId)
+                ->where('flgElimina', 0)
+                ->first()['totalPagado'];
+
+            // Asegurarse de que ambos valores tengan dos decimales
+            $totalAPagar = round($totalAPagar, 2);
+            $totalPagado = round($totalPagado, 2);
+
+            // Validar que el total pagado sea mayor o igual al total a pagar
+            if ($totalPagado < $totalAPagar) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'mensaje' => 'No se puede certificar el DTE. El total pagado es menor al total a pagar.'
+                ]);
+            }
+
+        // Insertar en Kardex
+        $modelKardex->insert([
+            'tipoMovimiento' => 'Entrada',
+            'descripcionMovimiento' => "Entrada registrada por emisión de nota de crédito: $facturaId",
+            'productoExistenciaId' => $productoExistencia['productoExistenciaId'],
+            'existenciaAntesMovimiento' => $existenciaAntes,
+            'cantidadMovimiento' => $cantidadProducto,
+            'existenciaDespuesMovimiento' => $existenciaDespues,
+            'costoUnitarioFOB' => $costoFOB,
+            'costoUnitarioRetaceo' => $costoUnitarioRetaceo,
+            'costoPromedio' => $costoPromedio,
+            'precioVentaUnitario' => $precioVentaUnitarioConDescuento,
+            'fechaDocumento' => $fechaEmision, // Usar la fechaEmision obtenida
+            'fechaMovimiento' => date('Y-m-d H:i:s'),
+            'tablaMovimiento' => 'fel_factura_detalle',
+            'tablaMovimientoId' => $facturaDetalleId
+        ]);
+
+        // Actualizar la existencia en inv_productos_existencias
+        $productosExistenciasModel->update($productoExistencia['productoExistenciaId'], [
+            'existenciaProducto' => $existenciaDespues
+        ]);
+    }
+
+    // Obtener datos de la sucursal
+    $confSucursalModel = new conf_sucursales();
+    $sucursalData = $confSucursalModel->find($sucursalId);
+    $codEstablecimientoMH = $sucursalData['codEstablecimientoMH'];
+    $puntoVentaMH = $sucursalData['puntoVentaMH'];
+
+    // Obtener el codigoMH del tipo de DTE (asumimos que tienes $tipoDTEId)
+    $tipoDTEId = 1; // Asumimos un valor para $tipoDTEId, ajusta según tu necesidad
+    $tipoDTEModel = new cat_02_tipo_dte();
+    $tipoDTEData = $tipoDTEModel->find($tipoDTEId);
+    $codigoMH = $tipoDTEData['codigoMH'];
+
+    // Generar numeroControl
+    $numeroControl = "DTE-{$codigoMH}-{$codEstablecimientoMH}-{$puntoVentaMH}" . str_pad($facturaId, 15, '0', STR_PAD_LEFT);
+
+    // Generar codigoGeneracion usando la función codigo de generacion() y convertir a mayúsculas
+    $codigoGeneracionNota = strtoupper($this->codigoGeneracionNota());
+
+    // Simular selloRecibido y convertir a mayúsculas
+    $selloRecibido = strtoupper("REC-" . bin2hex(random_bytes(10)) . "-MH");
+
+    // Insertar en fel_factura_certificacion
+    $certificacionModel = new fel_factura_certificacion();
+
+    $certificacionModel->insert([
+        'facturaId' => $facturaId,
+        'numeroControl' => $numeroControl,
+        'codigoGeneracion' => $codigoGeneracionNota,
+        'tipoTransmisionMHId' => 1,  // Valor estático según lo especificado
+        'selloRecibido' => $selloRecibido,
+        'descripcionMensaje' => 'Recibido',
+        'estadoCertificacion' => 'Certificado'
+    ]);
+
+    // Actualizar el estado de la reserva
+    $dataReservaEstado = [
+        'estadoFactura' => "Certificado"
+    ];
+    $facturaModel->update($facturaId, $dataReservaEstado);
+
+    // Retornar la respuesta exitosa
+    return $this->response->setJSON([
+        'success' => true,
+        'mensaje' => 'Certificación de DTE exitosa'
+    ]);
+}
+private function codigoGeneracionNota() {
+    if (function_exists('com_create_guid') === true) {
+        return trim(com_create_guid(), '{}');
+    }
+    
+    $data = PHP_MAJOR_VERSION < 7 ? openssl_random_pseudo_bytes(16) : random_bytes(16);
+    $data[6] = chr(ord($data[6]) & 0x0f | 0x40);    // Set version to 0100
+    $data[8] = chr(ord($data[8]) & 0x3f | 0x80);    // Set bits 6-7 to 10
+    
+    return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
+}
     
 
         
