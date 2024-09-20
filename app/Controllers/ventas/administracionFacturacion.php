@@ -2830,10 +2830,10 @@ private function generarJSONTipo2($factura, $certificacion, $cliente, $telefono,
             ->where('fel_facturas.tipoDTEId', '2')  // Crédito Fiscal
             ->where('fel_factura_certificacion.estadoCertificacion', 'Certificado')
             //->where('fel_factura_certificacion.estadoCertificacion', 'Pendiente')
-            ->whereNotIn('fel_facturas.facturaId', function($query) {
-                $query->select('facturaIdRelacionada')
-                    ->from('fel_factura_relacionada');
-            })
+            //->whereNotIn('fel_facturas.facturaId', function($query) {
+              //  $query->select('facturaIdRelacionada')
+                //    ->from('fel_factura_relacionada');
+           //})
             ->findAll();
 
     
