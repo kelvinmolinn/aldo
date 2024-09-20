@@ -338,11 +338,14 @@ $routes->group('ventas/admin-facturacion', function($routes) {
 
 });
 
-$routes->group('inventario/admin-reportes', function($routes) {
-  $routes->post('index', 'inventario\reportes\administracionReportes::indexReportes');
-  $routes->post('reporte/catalogoProductos','inventario\reportes\administracionReportes::reporteCatalogoproducto');
+    $routes->group('inventario/admin-reportes', function($routes) {
+      $routes->post('index', 'inventario\reportes\administracionReportes::indexReportes');
+      $routes->post('reporte/catalogoProductos','inventario\reportes\administracionReportes::reporteCatalogoproducto');
+      $routes->post('modal/precio/productos','inventario\reportes\administracionReportes::modalPreciosProductos');
 
-});
+      $routes->get('reporte/pdf/precios/productos', 'inventario\reportes\reportePreciosProducto::preciosProductos');
+
+    });
 
 $routes->group('ventas/admin-contingencia', function($routes) {
 

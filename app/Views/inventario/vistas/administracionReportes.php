@@ -7,27 +7,27 @@
         </button>
     </div>
     <div class="col-md-2">
-        <button type="button" id="" class="btn btn-primary" onclick="">
+        <button type="button" id="" class="btn btn-primary" onclick="reportePreciosProducto();">
             Precio de productos
         </button>
     </div>
 </div>
 <script>
-    function reportePreciosProducto(facturaId) {
+    function reportePreciosProducto() {
         $.ajax({
-            url: '<?php echo base_url('ventas/admin-facturacion/form/imprimir/dte'); ?>',
+            url: '<?php echo base_url('inventario/admin-reportes/modal/precio/productos'); ?>',
             type: 'POST',
-            data: { facturaId: facturaId }, // Pasar el ID de la factura como parámetro
+            data: {}, // Pasar el ID de la factura como parámetro
             success: function(response) {
                 // Insertar el contenido de la modal en el cuerpo de la modal
                 $('#divModalContent').html(response);
 
                 // Asumimos que el modal ya tiene un iframe con el ID `pdfFrame`
-                var pdfUrl = '<?php echo base_url("ventas/admin-facturacion/pdf/generate"); ?>' + '?facturaId=' + facturaId;
+                var pdfUrl = '<?php echo base_url("inventario/admin-reportes/reporte/pdf/precios/productos"); ?>';
                 $('#pdfFrame').attr('src', pdfUrl);
 
                 // Mostrar la modal
-                $('#modalImprimirDTE').modal('show');
+                $('#modalPreciosProducto').modal('show');
             },
             error: function(xhr, status, error) {
                 // Manejar errores si los hay

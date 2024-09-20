@@ -66,5 +66,13 @@ class administracionReportes extends Controller{
 
          return view('inventario/reportes/reporteCatalogoproductos', $data);
     }
+    public function modalPreciosProductos(){
+
+            $data['variable'] = 0;
+
+
+         return view('inventario/reportes/reportePreciosProductos', $data);
+        
+    }
         
 }

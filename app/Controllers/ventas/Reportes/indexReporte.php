@@ -61,15 +61,16 @@ class indexReporte extends Controller
         $facturaId = isset($_GET['facturaId']) ? intval($_GET['facturaId']) : 0;
 
         $datosDte = $felFactura
-            ->select('cat_04_tipo_transmision.tipoTransmision,cat_17_forma_pago.formaPago,DATE_FORMAT(fel_facturas.fechaEmision, "%d/%m/%Y") as fechaEmision ,fel_facturas.horaEmision,fel_factura_certificacion.numeroControl,fel_factura_certificacion.codigoGeneracion,fel_factura_certificacion.selloRecibido,fel_clientes.cliente,fel_clientes.direccionCliente,fel_clientes.numDocumentoIdentificacion,fel_clientes.nrcCliente,cat_19_actividad_economica.actividadEconomica,fel_clientes.clienteId,cat_02_tipo_dte.tipoDocumentoDTE,cat_02_tipo_dte.tipoDTEId')
+            ->select('cat_04_tipo_transmision.tipoTransmision,cat_17_forma_pago.formaPago,DATE_FORMAT(fel_facturas.fechaEmision, "%d/%m/%Y") as fechaEmision ,fel_facturas.horaEmision,fel_factura_certificacion.numeroControl,fel_factura_certificacion.codigoGeneracion,fel_factura_certificacion.selloRecibido,fel_clientes.cliente,fel_clientes.direccionCliente,fel_clientes.numDocumentoIdentificacion,fel_clientes.nrcCliente,cat_19_actividad_economica.actividadEconomica,fel_clientes.clienteId,cat_02_tipo_dte.tipoDocumentoDTE,cat_02_tipo_dte.tipoDTEId,cat_29_tipo_persona.tipoPersonaId')
             ->join('fel_factura_certificacion','fel_factura_certificacion.facturaId = fel_facturas.facturaId')
             ->join('cat_04_tipo_transmision','cat_04_tipo_transmision.tipoTransmisionMHId = fel_factura_certificacion.tipoTransmisionMHId')
             ->join('fel_facturas_pago','fel_facturas_pago.facturaId = fel_facturas.facturaId')
             ->join('cat_17_forma_pago','cat_17_forma_pago.formaPagoMHId = fel_facturas_pago.formaPagoMHId')
             ->join('fel_clientes','fel_clientes.clienteId = fel_facturas.clienteId')
             ->join('cat_19_actividad_economica','cat_19_actividad_economica.actividadEconomicaId = fel_clientes.actividadEconomicaId')
-            ->join('fel_cliente_contacto', 'fel_cliente_contacto.clienteId = fel_clientes.clienteId')
+            ->join('fel_cliente_contacto', 'fel_cliente_contacto.clienteId = fel_clientes.clienteId', 'left')
             ->join('cat_02_tipo_dte','cat_02_tipo_dte.tipoDTEId = fel_facturas.tipoDTEId')
+            ->join('cat_29_tipo_persona','cat_29_tipo_persona.tipoPersonaId = fel_clientes.tipoPersonaId')
             ->where('fel_facturas.flgElimina', 0)
             ->where('fel_facturas.facturaId', $facturaId)
             ->where('fel_facturas.estadoFactura','Certificado')
@@ -88,6 +89,10 @@ class indexReporte extends Controller
             ->where('tipoContactoId', 2)
             ->where('flgElimina', 0)
             ->first();
+        
+        $telefonoCliente = isset($telefono['contactoCliente']) ? $telefono['contactoCliente'] : '';
+        $correoCliente = isset($correo['contactoCliente']) ? $correo['contactoCliente'] : 'aldo@aldo.com';
+
 
         $codGeneracion = $datosDte['codigoGeneracion'];
         $numControl = $datosDte['numeroControl'];
@@ -102,9 +107,7 @@ class indexReporte extends Controller
         $numeroIdentificacion = $datosDte['numDocumentoIdentificacion'];
         $nrc = $datosDte['nrcCliente'];
 
-        
-        $telefonoCliente = isset($telefono['contactoCliente']) ? $telefono['contactoCliente'] : '';
-        $correoCliente = $correo['contactoCliente'];
+
 
 
         $datosDteProductos = $felFacturaDetalle
