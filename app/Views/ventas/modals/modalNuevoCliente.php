@@ -15,9 +15,10 @@
                 <div class="modal-body">
                     <input type="hidden" id="clienteId" name="clienteId" value="<?= $campos['clienteId'] ?>">
                     <input type="hidden" id="operacion" name="operacion" value="<?= $operacion; ?>">
+
                     <div class="row">
                         <div class="col-md-4">
-                        <div class="form-select-control">
+                            <div class="form-select-control">
                                 <select name="selectTipoPersona" id="selectTipoPersona" style="width: 100%;" required>
                                     <option value=""></option>
                                     <?php foreach ($tipoPersona as $tipoPersona){ ?>
@@ -26,6 +27,10 @@
                                 </select>
                             </div>
                         </div>
+                    </div>
+
+                    <!-- Campos que siempre se mostrarán -->
+                    <div class="row mt-4">
                         <div class="col-md-4">
                             <div class="form-outline">
                                 <input type="text" id="cliente" name="cliente" class="form-control" value="<?= $campos['cliente']; ?>" required>
@@ -33,41 +38,7 @@
                             </div>
                         </div>
                         <div class="col-md-4">
-                            <div class="form-outline">
-                                <input type="text" id="clienteComercial" name="clienteComercial" class="form-control numero"  value="<?= $campos['clienteComercial']; ?>" required>
-                                <label class="form-label" for="clienteComercial">Nombre comercial</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row mt-4">
-                        <div class="col-md-6">
-                        <div class="form-select-control">
-                                <select name="selectTipoContribuyente" id="selectTipoContribuyente" style="width: 100%;" required>
-                                    <option value=""></option>
-                                    <?php foreach ($tipoContribuyente as $tipoContribuyente){ ?>
-                                        <option value="<?php echo $tipoContribuyente['tipoContribuyenteId']; ?>"><?php echo $tipoContribuyente['tipoContribuyente']; ?></option>
-                                    <?php } ?>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-outline">
-                                <input type="text" id="nrcCliente" name="nrcCliente" class="form-control" min ="0" value="<?= $campos['nrcCliente']; ?>">
-                                <label class="form-label" for="nrcCliente">NRC</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row mt-4">
-                        <div class="col-md-12">
-                        <div class="form-select-control">
-                                <select name="selectActividadEconomica" id="selectActividadEconomica" style="width: 100%;" required>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row mt-4">
-                        <div class="col-md-6">
-                        <div class="form-select-control">
+                            <div class="form-select-control">
                                 <select name="selectTipoDocumento" id="selectTipoDocumento" style="width: 100%;" required>
                                     <option value=""></option>
                                     <?php foreach ($documentoIdentificacion as $documentoIdentificacion){ ?>
@@ -76,64 +47,101 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="form-outline">
-                                <input type="text" id="numeroDocumento" name="numeroDocumento" class="form-control" value="<?= $campos['numDocumentoIdentificacion']; ?>" min ="0" required>
-                                <label class="form-label" for="numeroDocumento">Numero del documento</label>
+                                <input type="text" id="numeroDocumento" name="numeroDocumento" class="form-control" value="<?= $campos['numDocumentoIdentificacion']; ?>" required>
+                                <label class="form-label" for="numeroDocumento">Número del documento</label>
                             </div>
                         </div>
                     </div>
-                    <div class="row mt-4">
-                    <div class="col-md-4">
-                        <div class="form-select-control">
-                            <select name="selectPaisCliente" id="selectPaisCliente" style="width: 100%;" required>
-                                <option value="61">El Salvador</option>
-                                <?php foreach ($pais as $pais) { ?>
-                                    <option value="<?php echo $pais['paisId']; ?>"><?php echo $pais['pais']; ?></option>
-                                <?php } ?>
-                            </select>
-                        </div>
-                        </div>
-                        <div class="col-md-4">
-                        <div class="form-select-control">
-                            <select name="selectDepartamentoCliente" id="selectDepartamentoCliente" style="width: 100%;">
-                                <option></option>
-                            </select>
-                        </div>
-                        </div>
 
+                    <div class="row mt-4">
                         <div class="col-md-4">
                             <div class="form-select-control">
-                            <select name="selectMunicipioCliente" id="selectMunicipioCliente" style="width: 100%;">
-                                 <option></option>
-                            </select>
+                                <select name="selectPaisCliente" id="selectPaisCliente" style="width: 100%;" required>
+                                    <option value="61">El Salvador</option>
+                                    <?php foreach ($pais as $pais) { ?>
+                                        <option value="<?php echo $pais['paisId']; ?>"><?php echo $pais['pais']; ?></option>
+                                    <?php } ?>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-select-control">
+                                <select name="selectDepartamentoCliente" id="selectDepartamentoCliente" style="width: 100%;" required>
+                                    <option></option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-select-control">
+                                <select name="selectMunicipioCliente" id="selectMunicipioCliente" style="width: 100%;" required>
+                                    <option></option>
+                                </select>
                             </div>
                         </div>
                     </div>
+
                     <div class="row mt-4">
                         <div class="col-md-12">
                             <div class="form-outline">
-                                <input type="text" id="direccionCliente" name="direccionCliente" class="form-control" min ="0" value="<?= $campos['direccionCliente']; ?>" >
-                                <label class="form-label" for="selectDireccionCliente">Dirección del cliente</label>
+                                <input type="text" id="direccionCliente" name="direccionCliente" class="form-control" value="<?= $campos['direccionCliente']; ?>" required>
+                                <label class="form-label" for="direccionCliente">Dirección del cliente</label>
                             </div>
                         </div>
                     </div>
 
+                    <!-- Campos adicionales solo para persona jurídica -->
+                    <div id="camposJuridicos" style="display: none;">
+                        <div class="row mt-4">
+                            <div class="col-md-4">
+                                <div class="form-outline">
+                                    <input type="text" id="clienteComercial" name="clienteComercial" class="form-control numero" value="<?= $campos['clienteComercial']; ?>">
+                                    <label class="form-label" for="clienteComercial">Nombre comercial</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-select-control">
+                                    <select name="selectTipoContribuyente" id="selectTipoContribuyente" style="width: 100%;">
+                                        <option value=""></option>
+                                        <?php foreach ($tipoContribuyente as $tipoContribuyente){ ?>
+                                            <option value="<?php echo $tipoContribuyente['tipoContribuyenteId']; ?>"><?php echo $tipoContribuyente['tipoContribuyente']; ?></option>
+                                        <?php } ?>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-outline">
+                                    <input type="text" id="nrcCliente" name="nrcCliente" class="form-control" value="<?= $campos['nrcCliente']; ?>">
+                                    <label class="form-label" for="nrcCliente">NRC</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-4">
+                            <div class="col-md-12">
+                                <div class="form-select-control">
+                                    <select name="selectActividadEconomica" id="selectActividadEconomica" style="width: 100%;">
+                                        <!-- Aquí se carga la actividad económica mediante AJAX -->
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+
                 <div class="modal-footer">
                     <button type="submit" id="btnguardarCliente" class="btn btn-primary">
-                        <i class="fas fa-save"></i>
-                        Guardar
+                        <i class="fas fa-save"></i> Guardar
                     </button>
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">
-                        <i class="fas fa-times-circle"></i>
-                        Cerrar
+                        <i class="fas fa-times-circle"></i> Cerrar
                     </button>
                 </div>
             </div>
         </div>
     </div>
 </form>
+
 
 <script>
     //catalogos-hacienda/actividad-economica
@@ -172,6 +180,22 @@
             placeholder: 'Municipio',
             dropdownParent: $('#modalClientes')
         });
+
+    // Mostrar u ocultar campos según el tipo de persona seleccionado
+    $("#selectTipoPersona").change(function() {
+        var tipoPersona = $(this).val();
+        if (tipoPersona == "1") {  // Persona natural
+            $("#camposJuridicos").hide();
+            $("#clienteComercial").val(null);
+            $("#nrcCliente").val(null);
+            $("#selectTipoContribuyente").val(null);
+            $("#selectActividadEconomica").val(null);
+            $("#clienteComercial, #nrcCliente, #selectTipoContribuyente, #selectActividadEconomica").prop('required', false);
+        } else if (tipoPersona == "2") {  // Persona jurídica
+            $("#camposJuridicos").show();
+            $("#clienteComercial, #nrcCliente, #selectTipoContribuyente, #selectActividadEconomica").prop('required', true);
+        }
+    }).trigger('change');  // Se llama el trigger para mostrar los campos correctamente al cargar
 
 
 

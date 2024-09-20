@@ -125,7 +125,7 @@ class administracionClientes extends Controller
         $data['operacion'] = $operacion;
         return view('ventas/modals/modalNuevoCliente', $data);
     }
-
+/*
     public function modalClienteOperacion(){
         $operacion      = $this->request->getPost('operacion');
         $clienteId    = $this->request->getPost('clienteId');
@@ -178,6 +178,62 @@ class administracionClientes extends Controller
     }
 }
 
+*/
+public function modalClienteOperacion() {
+    $operacion = $this->request->getPost('operacion');
+    $clienteId = $this->request->getPost('clienteId');
+    $clientes = $this->request->getPost('cliente');
+    $cliente = new fel_clientes();
+
+    if ($cliente->existeCliente($clientes, $clienteId)) {
+        return $this->response->setJSON([
+            'success' => false,
+            'mensaje' => 'El cliente ya está registrado en la base de datos'
+        ]);
+    } else {
+        $tipoPersonaId = $this->request->getPost('selectTipoPersona');
+
+        $data = [
+            'tipoPersonaId' => $tipoPersonaId,
+            'documentoIdentificacionId' => $this->request->getPost('selectTipoDocumento'),
+            'nrcCliente' => ($tipoPersonaId == "1") ? null : $this->request->getPost('nrcCliente'), // Solo asignar si es persona jurídica
+            'numDocumentoIdentificacion' => $this->request->getPost('numeroDocumento'),
+            'cliente' => $this->request->getPost('cliente'),
+            'clienteComercial' => ($tipoPersonaId == "1") ? null : $this->request->getPost('clienteComercial'), // Solo asignar si es persona jurídica
+            'actividadEconomicaId' => ($tipoPersonaId == "1") ? null : $this->request->getPost('selectActividadEconomica'), // Solo asignar si es persona jurídica
+            'tipoContribuyenteId' => ($tipoPersonaId == "1") ? null : $this->request->getPost('selectTipoContribuyente'), // Solo asignar si es persona jurídica
+            'paisId' => $this->request->getPost('selectPaisCliente'),
+            'paisCiudadId' => $this->request->getPost('selectDepartamentoCliente'),
+            'paisEstadoId' => $this->request->getPost('selectMunicipioCliente'),
+            'direccionCliente' => $this->request->getPost('direccionCliente'),
+            'estadoCliente' => "Activo"
+        ];
+
+        if ($operacion == 'editar') {
+            $operacionCliente = $cliente->update($this->request->getPost('clienteId'), $data);
+        } else {
+            // Insertar datos en la base de datos
+            $operacionCliente = $cliente->insert($data);
+        }
+
+        if ($operacionCliente) {
+            // Si el insert fue exitoso, devuelve el último ID insertado
+            return $this->response->setJSON([
+                'success' => true,
+                'mensaje' => 'Cliente ' . ($operacion == 'editar' ? 'actualizado' : 'agregado') . ' correctamente',
+                'clienteId' => ($operacion == 'editar' ? $this->request->getPost('clienteId') : $cliente->insertID())
+            ]);
+        } else {
+            // Si el insert falló, devuelve un mensaje de error
+            return $this->response->setJSON([
+                'success' => false,
+                'mensaje' => 'No se pudo insertar el Cliente'
+            ]);
+        }
+    }
+}
+
+/*
     public function tablaClientes(){
         $mostrarClientes = new fel_clientes();
 
@@ -231,6 +287,81 @@ class administracionClientes extends Controller
             return $this->response->setJSON(array('data' => '')); // No hay datos, devuelve un array vacío
         }
     }
+
+    */
+public function tablaClientes() {
+    $mostrarClientes = new fel_clientes();
+
+    $datos = $mostrarClientes
+        ->select('fel_clientes.clienteId, fel_clientes.tipoPersonaId, fel_clientes.documentoIdentificacionId, fel_clientes.nrcCliente, fel_clientes.numDocumentoIdentificacion, fel_clientes.cliente, fel_clientes.clienteComercial, cat_19_actividad_economica.actividadEconomica, cat_29_tipo_persona.tipoPersona, fel_clientes.tipoContribuyenteId, fel_clientes.direccionCliente, cat_tipo_contribuyente.tipoContribuyente')
+        ->join('cat_19_actividad_economica', 'cat_19_actividad_economica.actividadEconomicaId = fel_clientes.actividadEconomicaId', 'left')
+        ->join('cat_29_tipo_persona', 'cat_29_tipo_persona.tipoPersonaId = fel_clientes.tipoPersonaId', 'left')
+        ->join('cat_tipo_contribuyente', 'cat_tipo_contribuyente.tipoContribuyenteId = fel_clientes.tipoContribuyenteId', 'left')
+        ->where('fel_clientes.flgElimina', 0)
+        ->orderBy('fel_clientes.clienteId', 'ASC')
+        ->findAll();
+
+    // Construye el array de salida
+    $output['data'] = array();
+    $n = 1; // Variable para contar las filas
+    foreach ($datos as $columna) {
+        // Verifica si el cliente es persona natural
+        $isPersonaNatural = ($columna['tipoPersonaId'] == "1");
+
+        // Verifica si algún campo es null y lo reemplaza con un guion "-"
+        $tipoPersona = isset($columna['tipoPersona']) && $columna['tipoPersona'] !== null ? $columna['tipoPersona'] : '-';
+        $cliente = isset($columna['cliente']) && $columna['cliente'] !== null ? $columna['cliente'] : '-';
+        $actividadEconomica = !$isPersonaNatural && isset($columna['actividadEconomica']) && $columna['actividadEconomica'] !== null ? $columna['actividadEconomica'] : '-';
+        $direccionCliente = isset($columna['direccionCliente']) && $columna['direccionCliente'] !== null ? $columna['direccionCliente'] : '-';
+        $tipoContribuyente = !$isPersonaNatural && isset($columna['tipoContribuyente']) && $columna['tipoContribuyente'] !== null ? $columna['tipoContribuyente'] : '-';
+        $nrcCliente = !$isPersonaNatural && isset($columna['nrcCliente']) && $columna['nrcCliente'] !== null ? $columna['nrcCliente'] : '-';
+        $numDocumentoIdentificacion = isset($columna['numDocumentoIdentificacion']) && $columna['numDocumentoIdentificacion'] !== null ? $columna['numDocumentoIdentificacion'] : '-';
+
+        // Construye las columnas con los valores correspondientes
+        $columna1 = $n;
+        $columna2 = "<b>Tipo de persona: </b>" . $tipoPersona . "<br>" . "<b>Cliente:</b> " . $cliente . "<br>" . "<b>Giro:</b> " . $actividadEconomica . "<br>" . "<b>Dirección:</b> " . $direccionCliente;
+
+        // Si es persona jurídica, mostramos los detalles adicionales; si no, los omitimos
+        if (!$isPersonaNatural) {
+            $columna3 = "<b>Categoría: </b>" . $tipoContribuyente . "<br>" . "<b>NRC:</b> " . $nrcCliente . "<br>" . "<b>Documento:</b> " . $numDocumentoIdentificacion;
+        } else {
+            // Si es persona natural, mostramos solo el documento de identificación
+            $columna3 = "<b>Documento:</b> " . $numDocumentoIdentificacion;
+        }
+
+        // Botones de acción
+        $columna4 = '
+            <button type="button" class="btn btn-primary mb-1" onclick="modalClientes(`' . $columna['clienteId'] . '`, `editar`);" data-toggle="tooltip" data-placement="top" title="Editar">
+                <i class="fas fa-pencil-alt"></i>
+            </button>';
+        $columna4 .= '
+            <button type="button" class="btn btn-primary mb-1" onclick="modalContactoClientes(`' . $columna['clienteId'] . '`, `editar`)" data-toggle="tooltip" data-placement="top" title="Contactos">
+                <i class="fas fa-address-book"></i>
+            </button>';
+        $columna4 .= '
+            <button type="button" class="btn btn-primary mb-1" onclick="modalHistorialVentas()" data-toggle="tooltip" data-placement="top" title="Historial de ventas">
+                <i class="fas fa-history"></i>
+            </button>';
+
+        // Añade las columnas a la salida
+        $output['data'][] = array(
+            $columna1,
+            $columna2,
+            $columna3,
+            $columna4
+        );
+
+        $n++;
+    }
+
+    // Verifica si hay datos
+    if ($n > 1) {
+        return $this->response->setJSON($output);
+    } else {
+        return $this->response->setJSON(array('data' => '')); // No hay datos, devuelve un array vacío
+    }
+}
+
 
     public function modalContactoCliente(){
         $data['clienteId'] = $this->request->getPost('clienteId');

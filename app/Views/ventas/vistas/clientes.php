@@ -14,7 +14,7 @@
             <tr>
                 <th>#</th>
                 <th>Cliente</th>
-                <th>Facturación</th>
+                <th>Detalles</th>
                 <th>Acciones</th>
             </tr>
         </thead>
