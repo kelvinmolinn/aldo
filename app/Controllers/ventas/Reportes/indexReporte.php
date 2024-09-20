@@ -67,7 +67,7 @@ class indexReporte extends Controller
             ->join('fel_facturas_pago','fel_facturas_pago.facturaId = fel_facturas.facturaId')
             ->join('cat_17_forma_pago','cat_17_forma_pago.formaPagoMHId = fel_facturas_pago.formaPagoMHId')
             ->join('fel_clientes','fel_clientes.clienteId = fel_facturas.clienteId')
-            ->join('cat_19_actividad_economica','cat_19_actividad_economica.actividadEconomicaId = fel_clientes.actividadEconomicaId')
+            ->join('cat_19_actividad_economica','cat_19_actividad_economica.actividadEconomicaId = fel_clientes.actividadEconomicaId', 'left')
             ->join('fel_cliente_contacto', 'fel_cliente_contacto.clienteId = fel_clientes.clienteId', 'left')
             ->join('cat_02_tipo_dte','cat_02_tipo_dte.tipoDTEId = fel_facturas.tipoDTEId')
             ->join('cat_29_tipo_persona','cat_29_tipo_persona.tipoPersonaId = fel_clientes.tipoPersonaId')
