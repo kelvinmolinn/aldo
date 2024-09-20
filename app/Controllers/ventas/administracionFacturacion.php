@@ -277,7 +277,7 @@ public function tablaFacturacion()
             if ($columna['tipoDTEId'] == 4) {
                 // Cambiar la ruta del botón para tipoDTEId = 4
                 $columna6 = '
-                    <button class="btn btn-primary mb-1" onclick="cambiarInterfaz(`ventas/admin-facturacion/vista/continuar/notaCredito`, ' . htmlspecialchars(json_encode($jsonActualizarReserva)) . ');" data-toggle="tooltip" data-placement="top" title="Continuar Nota de Remisión">
+                    <button class="btn btn-primary mb-1" onclick="cambiarInterfaz(`ventas/admin-facturacion/vista/continuar/notaCredito`, ' . htmlspecialchars(json_encode($jsonActualizarReserva)) . ');" data-toggle="tooltip" data-placement="top" title="Continuar Nota de Crédito">
                         <i class="fas fa-sync-alt"></i> <span> </span>
                     </button>
                     <button class="btn btn-danger mb-1" onclick="modalAnularDTE(' . $columna['facturaId'] . ')" data-toggle="tooltip" data-placement="top" title="Anular">
