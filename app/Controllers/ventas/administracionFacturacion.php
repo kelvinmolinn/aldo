@@ -2177,212 +2177,322 @@ public function tablaVerJSON() {
         $data = $this->generarJSONTipo2($factura, $certificacion, $cliente, $telefono, $correo, $detalles, $totalGravada, $totalIva, $totalDescu, $porcentajeDescuento, $totalEnLetras, $pagosData);
     }
 
+         elseif ($factura['tipoDTEId'] == 4) {
+        // JSON para tipoDTEId = 2
+        $data = $this->generarJSONTipo4($factura, $certificacion, $cliente, $telefono, $correo, $detalles, $totalGravada, $totalIva, $totalDescu, $porcentajeDescuento, $totalEnLetras, $pagosData);
+    }
+
     return $this->response->setJSON($data);
 }
 
-// Método para generar el JSON para tipoDTEId = 1
-private function generarJSONTipo1($factura, $certificacion, $cliente, $telefono, $correo, $detalles, $totalGravada, $totalIva, $totalDescu, $porcentajeDescuento, $totalEnLetras, $pagosData) {
-    return [
-        "identificacion" => [
-            "version" => 1,
-            "ambiente" => "0",
-            "tipoDte" => $factura['tipoDTEId'],
-            "numeroControl" => $certificacion['numeroControl'],
-            "codigoGeneracion" => strtoupper($certificacion['codigoGeneracion']),
-            "tipoModelo" => 1,
-            "tipoOperacion" => 1,
-            "tipoContingencia" => null,
-            "motivoContin" => null,
-            "fecEmi" => date('Y-m-d', strtotime($factura['fechaEmision'])),
-            "horEmi" => date('H:i:s', strtotime($factura['horaEmision'])),
-            "tipoMoneda" => "USD"
-        ],
-        "emisor" => [
-            "nit" => "03863624-1",
-            "nrc" => "329956-5",
-            "nombre" => "BELTRAN. ABIGAIL ELIZABETH",
-            "codActividad" => 502,
-            "descActividad" => "VENTA AL POR MENOR DE OTROS PRODUCTOS N.C.P",
-            "nombreComercial" => "ALDO GAMES STORE",
-            "direccion" => [
-                "departamento" => 6,
-                "municipio" => 214,
-                "complemento" => "POLIG. B, RES. LOS ELISEOS #9, SAN SALVADOR, SAN SALVADOR"
+    // Método para generar el JSON para tipoDTEId = 1
+    private function generarJSONTipo1($factura, $certificacion, $cliente, $telefono, $correo, $detalles, $totalGravada, $totalIva, $totalDescu, $porcentajeDescuento, $totalEnLetras, $pagosData) {
+        return [
+            "identificacion" => [
+                "version" => 1,
+                "ambiente" => "0",
+                "tipoDte" => $factura['tipoDTEId'],
+                "numeroControl" => $certificacion['numeroControl'],
+                "codigoGeneracion" => strtoupper($certificacion['codigoGeneracion']),
+                "tipoModelo" => 1,
+                "tipoOperacion" => 1,
+                "tipoContingencia" => null,
+                "motivoContin" => null,
+                "fecEmi" => date('Y-m-d', strtotime($factura['fechaEmision'])),
+                "horEmi" => date('H:i:s', strtotime($factura['horaEmision'])),
+                "tipoMoneda" => "USD"
             ],
-            "telefono" => "79221469",
-            "correo" => "aldogamesstore@gmail.com"
-        ],
-        "receptor" => [
-            "tipoDocumento" => $cliente['documentoIdentificacionId'],
-            "numDocumento" => $cliente['numDocumentoIdentificacion'],
-            "nombre" => $cliente['cliente'],
-            "codActividad" => $cliente['actividadEconomicaId'],
-            "direccion" => [
-                "departamento" => $cliente['paisCiudadId'],
-                "municipio" => $cliente['paisEstadoId'],
-                "complemento" => $cliente['direccionCliente']
+            "emisor" => [
+                "nit" => "03863624-1",
+                "nrc" => "329956-5",
+                "nombre" => "BELTRAN. ABIGAIL ELIZABETH",
+                "codActividad" => 502,
+                "descActividad" => "VENTA AL POR MENOR DE OTROS PRODUCTOS N.C.P",
+                "nombreComercial" => "ALDO GAMES STORE",
+                "direccion" => [
+                    "departamento" => 6,
+                    "municipio" => 214,
+                    "complemento" => "POLIG. B, RES. LOS ELISEOS #9, SAN SALVADOR, SAN SALVADOR"
+                ],
+                "telefono" => "79221469",
+                "correo" => "aldogamesstore@gmail.com"
             ],
-            "telefono" => $telefono ? $telefono['contactoCliente'] : null,
-            "correo" => $correo ? $correo['contactoCliente'] : null,
-        ],
-        "cuerpoDocumento" => array_map(function($detalle) {
-            return [
-                "cantidad" => $detalle['cantidadProducto'],
-                "numeroDocumento" => null,
-                "codigo" => $detalle['codigoProducto'],
-                "codTributo" => null,
-                "tipoItem" => $detalle['tipoItemMHId'],
-                "uniMedida" => $detalle['unidadMedidaId'],
-                "descripcion" => $detalle['producto'],
-                "precioUni" => $detalle['precioUnitario'],
-                "montoDescu" => $detalle['descuentoTotal'],
-                "ventaNoSuj" => 0,
-                "ventaExenta" => 0,
-                "ventaGravada" => $detalle['totalDetalleIVA'],
-                "tributo" => null,
-                "ivaItem" => $detalle['ivaUnitario']
-            ];
-        }, $detalles),
-        "resumen" => [
-            "totalNoSuj" => 0,
-            "totalExenta" => 0,
-            "totalGravada" => number_format($totalGravada, 2, '.', ','),
-            "subTotalVentas" => number_format($totalGravada, 2, '.', ','),
-            "descuNoSuj" => 0,
-            "descuExenta" => 0,
-            "descuGravada" => number_format($totalDescu, 2, '.', ','),
-            "porcentajeDescuento" => number_format($porcentajeDescuento, 2, '.', ','),
-            "totalDescu" => number_format($totalDescu, 2, '.', ','),
-            "tributos" => null,
-            "subTotal" => number_format($totalGravada, 2, '.', ','),
-            "ivaRete1" => 0,
-            "reteRenta" => 0,
-            "montoTotalOperacion" => number_format($totalGravada + $totalIva - $totalDescu, 2, '.', ','),
-            "totalNoGravado" => 0,
-            "totalPagar" => number_format($totalGravada + $totalIva - $totalDescu, 2, '.', ','),
-            "totalLetras" => $totalEnLetras,
-            "totalIva" => number_format($totalIva, 2, '.', ','),
-            "saldoFavor" => 0,
-            "condicionOperacion" => 1,
-            "pagos" => $pagosData,
-            "numPagoElectronico" => null
-        ]
-    ];
-}
-
-// Método para generar el JSON para tipoDTEId = 2
-private function generarJSONTipo2($factura, $certificacion, $cliente, $telefono, $correo, $detalles, $totalGravada, $totalIva, $totalDescu, $porcentajeDescuento, $totalEnLetras, $pagosData) {
-    return [
-        "identificacion" => [
-            "version" => 3,
-            "ambiente" => "01",
-            "tipoDte" => "02",
-            "numeroControl" => $certificacion['numeroControl'],
-            "codigoGeneracion" => strtoupper($certificacion['codigoGeneracion']),
-            "tipoModelo" => 1,
-            "tipoOperacion" => 1,
-            "tipoContingencia" => null,
-            "motivoContin" => null,
-            "fecEmi" => date('Y-m-d', strtotime($factura['fechaEmision'])),
-            "horEmi" => date('H:i:s', strtotime($factura['horaEmision'])),
-            "tipoMoneda" => "USD"
-        ],
-        "emisor" => [
-            "nit" => "03863624-1",
-            "nrc" => "329956-5",
-            "nombre" => "BELTRAN. ABIGAIL ELIZABETH",
-            "codActividad" => 502,
-            "descActividad" => "VENTA AL POR MENOR DE OTROS PRODUCTOS N.C.P",
-            "nombreComercial" => "ALDO GAMES STORE",
-            "direccion" => [
-                "departamento" => 6,
-                "municipio" => 214,
-                "complemento" => "POLIG. B, RES. LOS ELISEOS #9, SAN SALVADOR, SAN SALVADOR"
+            "receptor" => [
+                "tipoDocumento" => $cliente['documentoIdentificacionId'],
+                "numDocumento" => $cliente['numDocumentoIdentificacion'],
+                "nombre" => $cliente['cliente'],
+                "codActividad" => $cliente['actividadEconomicaId'],
+                "direccion" => [
+                    "departamento" => $cliente['paisCiudadId'],
+                    "municipio" => $cliente['paisEstadoId'],
+                    "complemento" => $cliente['direccionCliente']
+                ],
+                "telefono" => $telefono ? $telefono['contactoCliente'] : null,
+                "correo" => $correo ? $correo['contactoCliente'] : null,
             ],
-            "telefono" => "79221469",
-            "correo" => "aldogamesstore@gmail.com"
-        ],
-        "receptor" => [
-            "nit" => $cliente['numDocumentoIdentificacion'],
-            "nrc" => $cliente['nrcCliente'],
-            "nombre" => $cliente['cliente'],
-            "codActividad" => $cliente['actividadEconomicaId'],
-            "descActividad" => "Cría de aves de corral y producción de huevos",
-            "nombreComercial" => $cliente['clienteComercial'],
-            "direccion" => [
-                "departamento" => $cliente['paisCiudadId'],
-                "municipio" => $cliente['paisEstadoId'],
-                "complemento" => $cliente['direccionCliente']
-            ],
-            "telefono" => $telefono ? $telefono['contactoCliente'] : null,
-            "correo" => $correo ? $correo['contactoCliente'] : null,
-        ],
-        "cuerpoDocumento" => array_map(function($detalle) {
-            return [
-                "numItem" => 1,
-                "tipoItem" => $detalle['tipoItemMHId'],
-                "numeroDocumento" => null,
-                "cantidad" => $detalle['cantidadProducto'],
-                "codigo" => $detalle['codigoProducto'],
-                "uniMedida" => $detalle['unidadMedidaId'],
-                "descripcion" => $detalle['producto'],
-                "precioUni" => $detalle['precioUnitario'],
-                "montoDescu" => $detalle['descuentoTotal'],
-                "ventaGravada" => $detalle['totalDetalleIVA'],
-                "tributos" => ["20"], // Tributos asumidos
-                "psv" => 0,
-                "noGravado" => 0
-            ];
-        }, $detalles),
-        "resumen" => [
-            "totalNoSuj" => 0,
-            "totalExenta" => 0,
-            "totalGravada" => number_format($totalGravada, 2, '.', ','),
-            "subTotalVentas" => number_format($totalGravada, 2, '.', ','),
-            "descuNoSuj" => 0,
-            "descuExenta" => 0,
-            "descuGravada" => number_format($totalDescu, 2, '.', ','),
-            "porcentajeDescuento" => number_format($porcentajeDescuento, 2, '.', ','),
-            "totalDescu" => number_format($totalDescu, 2, '.', ','),
-            "tributos" => [
-                [
-                    "codigo" => "20",
-                    "descripcion" => "Impuesto al Valor Agregado 13%",
-                    "valor" => number_format($totalIva, 2, '.', ',')
-                ]
-            ],
-            "subTotal" => number_format($totalGravada, 2, '.', ','),
-            "ivaPerci1" => 17.5,
-            "ivaRete1" => 0,
-            "reteRenta" => 0,
-            "montoTotalOperacion" => number_format($totalGravada + $totalIva - $totalDescu, 2, '.', ','),
-            "totalNoGravado" => 0,
-            "totalPagar" => number_format($totalGravada + $totalIva - $totalDescu, 2, '.', ','),
-            "totalLetras" => $totalEnLetras,
-            "saldoFavor" => 0,
-            "condicionOperacion" => 1,
-            "pagos" => $pagosData,
-            "numPagoElectronico" => null
-        ]
-    ];
-}
-
-
-    // Función para convertir números a letras
-    private function numeroALetras($numero) {
-        $formatter = new \NumberFormatter("es", \NumberFormatter::SPELLOUT);
-        $entero = floor($numero);
-        $fraccion = round(($numero - $entero) * 100);
-
-        $texto = $formatter->format($entero);
-        $texto .= " dólares";
-
-        if ($fraccion > 0) {
-            $texto .= " con " . $formatter->format($fraccion) . " centavos";
-        }
-
-        return ucfirst($texto);
+            "cuerpoDocumento" => array_map(function($detalle) {
+                return [
+                    "cantidad" => $detalle['cantidadProducto'],
+                    "numeroDocumento" => null,
+                    "codigo" => $detalle['codigoProducto'],
+                    "codTributo" => null,
+                    "tipoItem" => $detalle['tipoItemMHId'],
+                    "uniMedida" => $detalle['unidadMedidaId'],
+                    "descripcion" => $detalle['producto'],
+                    "precioUni" => $detalle['precioUnitario'],
+                    "montoDescu" => $detalle['descuentoTotal'],
+                    "ventaNoSuj" => 0,
+                    "ventaExenta" => 0,
+                    "ventaGravada" => $detalle['totalDetalleIVA'],
+                    "tributo" => null,
+                    "ivaItem" => $detalle['ivaUnitario']
+                ];
+            }, $detalles),
+            "resumen" => [
+                "totalNoSuj" => 0,
+                "totalExenta" => 0,
+                "totalGravada" => number_format($totalGravada, 2, '.', ','),
+                "subTotalVentas" => number_format($totalGravada, 2, '.', ','),
+                "descuNoSuj" => 0,
+                "descuExenta" => 0,
+                "descuGravada" => number_format($totalDescu, 2, '.', ','),
+                "porcentajeDescuento" => number_format($porcentajeDescuento, 2, '.', ','),
+                "totalDescu" => number_format($totalDescu, 2, '.', ','),
+                "tributos" => null,
+                "subTotal" => number_format($totalGravada, 2, '.', ','),
+                "ivaRete1" => 0,
+                "reteRenta" => 0,
+                "montoTotalOperacion" => number_format($totalGravada + $totalIva - $totalDescu, 2, '.', ','),
+                "totalNoGravado" => 0,
+                "totalPagar" => number_format($totalGravada + $totalIva - $totalDescu, 2, '.', ','),
+                "totalLetras" => $totalEnLetras,
+                "totalIva" => number_format($totalIva, 2, '.', ','),
+                "saldoFavor" => 0,
+                "condicionOperacion" => 1,
+                "pagos" => $pagosData,
+                "numPagoElectronico" => null
+            ]
+        ];
     }
+
+    // Método para generar el JSON para tipoDTEId = 2
+    private function generarJSONTipo2($factura, $certificacion, $cliente, $telefono, $correo, $detalles, $totalGravada, $totalIva, $totalDescu, $porcentajeDescuento, $totalEnLetras, $pagosData) {
+        return [
+            "identificacion" => [
+                "version" => 3,
+                "ambiente" => "01",
+                "tipoDte" => "02",
+                "numeroControl" => $certificacion['numeroControl'],
+                "codigoGeneracion" => strtoupper($certificacion['codigoGeneracion']),
+                "tipoModelo" => 1,
+                "tipoOperacion" => 1,
+                "tipoContingencia" => null,
+                "motivoContin" => null,
+                "fecEmi" => date('Y-m-d', strtotime($factura['fechaEmision'])),
+                "horEmi" => date('H:i:s', strtotime($factura['horaEmision'])),
+                "tipoMoneda" => "USD"
+            ],
+            "emisor" => [
+                "nit" => "03863624-1",
+                "nrc" => "329956-5",
+                "nombre" => "BELTRAN. ABIGAIL ELIZABETH",
+                "codActividad" => 502,
+                "descActividad" => "VENTA AL POR MENOR DE OTROS PRODUCTOS N.C.P",
+                "nombreComercial" => "ALDO GAMES STORE",
+                "direccion" => [
+                    "departamento" => 6,
+                    "municipio" => 214,
+                    "complemento" => "POLIG. B, RES. LOS ELISEOS #9, SAN SALVADOR, SAN SALVADOR"
+                ],
+                "telefono" => "79221469",
+                "correo" => "aldogamesstore@gmail.com"
+            ],
+            "receptor" => [
+                "nit" => $cliente['numDocumentoIdentificacion'],
+                "nrc" => $cliente['nrcCliente'],
+                "nombre" => $cliente['cliente'],
+                "codActividad" => $cliente['actividadEconomicaId'],
+               // "descActividad" => "Cría de aves de corral y producción de huevos",
+                "nombreComercial" => $cliente['clienteComercial'],
+                "direccion" => [
+                    "departamento" => $cliente['paisCiudadId'],
+                    "municipio" => $cliente['paisEstadoId'],
+                    "complemento" => $cliente['direccionCliente']
+                ],
+                "telefono" => $telefono ? $telefono['contactoCliente'] : null,
+                "correo" => $correo ? $correo['contactoCliente'] : null,
+            ],
+            "cuerpoDocumento" => array_map(function($detalle) {
+                return [
+                    "numItem" => 1,
+                    "tipoItem" => $detalle['tipoItemMHId'],
+                    "numeroDocumento" => null,
+                    "cantidad" => $detalle['cantidadProducto'],
+                    "codigo" => $detalle['codigoProducto'],
+                    "uniMedida" => $detalle['unidadMedidaId'],
+                    "descripcion" => $detalle['producto'],
+                    "precioUni" => $detalle['precioUnitario'],
+                    "montoDescu" => $detalle['descuentoTotal'],
+                    "ventaGravada" => $detalle['totalDetalleIVA'],
+                    "tributos" => [""], // Tributos asumidos
+                    "psv" => 0,
+                    "noGravado" => 0
+                ];
+            }, $detalles),
+            "resumen" => [
+                "totalNoSuj" => 0,
+                "totalExenta" => 0,
+                "totalGravada" => number_format($totalGravada, 2, '.', ','),
+                "subTotalVentas" => number_format($totalGravada, 2, '.', ','),
+                "descuNoSuj" => 0,
+                "descuExenta" => 0,
+                "descuGravada" => number_format($totalDescu, 2, '.', ','),
+                "porcentajeDescuento" => number_format($porcentajeDescuento, 2, '.', ','),
+                "totalDescu" => number_format($totalDescu, 2, '.', ','),
+                "tributos" => [
+                    [
+                        "codigo" => "",
+                        "descripcion" => "Impuesto al Valor Agregado 13%",
+                        "valor" => number_format($totalIva, 2, '.', ',')
+                    ]
+                ],
+                "subTotal" => number_format($totalGravada, 2, '.', ','),
+                "ivaPerci1" => 17.5,
+                "ivaRete1" => 0,
+                "reteRenta" => 0,
+                "montoTotalOperacion" => number_format($totalGravada + $totalIva - $totalDescu, 2, '.', ','),
+                "totalNoGravado" => 0,
+                "totalPagar" => number_format($totalGravada + $totalIva - $totalDescu, 2, '.', ','),
+                "totalLetras" => $totalEnLetras,
+                "saldoFavor" => 0,
+                "condicionOperacion" => 1,
+                "pagos" => $pagosData,
+                "numPagoElectronico" => null
+            ]
+        ];
+    }
+
+    // Método para generar el JSON para tipoDTEId = 4
+    private function generarJSONTipo4($factura, $certificacion, $cliente, $telefono, $correo, $detalles, $totalGravada, $totalIva, $totalDescu, $porcentajeDescuento, $totalEnLetras, $pagosData) {
+        return [
+            "identificacion" => [
+                "version" => 3,
+                "ambiente" => "01",
+                "tipoDte" => "02",
+                "numeroControl" => $certificacion['numeroControl'],
+                "codigoGeneracion" => strtoupper($certificacion['codigoGeneracion']),
+                "tipoModelo" => 1,
+                "tipoOperacion" => 1,
+                "tipoContingencia" => null,
+                "motivoContin" => null,
+                "fecEmi" => date('Y-m-d', strtotime($factura['fechaEmision'])),
+                "horEmi" => date('H:i:s', strtotime($factura['horaEmision'])),
+                "tipoMoneda" => "USD"
+            ],
+
+              "documentoRelacionado"=> [
+                  "tipoDocumento"=> "04",
+                  "tipoGeneracion"=> 2,
+                  "numeroDocumento"=> "2",
+                  "fechaEmision"=> "2024-09-28"
+                
+              ],
+
+            "emisor" => [
+                "nit" => "03863624-1",
+                "nrc" => "329956-5",
+                "nombre" => "BELTRAN. ABIGAIL ELIZABETH",
+                "codActividad" => 502,
+                "descActividad" => "VENTA AL POR MENOR DE OTROS PRODUCTOS N.C.P",
+                "nombreComercial" => "ALDO GAMES STORE",
+                "direccion" => [
+                    "departamento" => 6,
+                    "municipio" => 214,
+                    "complemento" => "POLIG. B, RES. LOS ELISEOS #9, SAN SALVADOR, SAN SALVADOR"
+                ],
+                "telefono" => "79221469",
+                "correo" => "aldogamesstore@gmail.com"
+            ],
+            "receptor" => [
+                "nit" => $cliente['numDocumentoIdentificacion'],
+                "nrc" => $cliente['nrcCliente'],
+                "nombre" => $cliente['cliente'],
+                "codActividad" => $cliente['actividadEconomicaId'],
+                //"descActividad" => "Cría de aves de corral y producción de huevos",
+                "nombreComercial" => $cliente['clienteComercial'],
+                "direccion" => [
+                    "departamento" => $cliente['paisCiudadId'],
+                    "municipio" => $cliente['paisEstadoId'],
+                    "complemento" => $cliente['direccionCliente']
+                ],
+                "telefono" => $telefono ? $telefono['contactoCliente'] : null,
+                "correo" => $correo ? $correo['contactoCliente'] : null,
+            ],
+            "cuerpoDocumento" => array_map(function($detalle) {
+                return [
+                    "numItem" => 1,
+                    "tipoItem" => $detalle['tipoItemMHId'],
+                    "numeroDocumento" => null,
+                    "cantidad" => $detalle['cantidadProducto'],
+                    "codigo" => $detalle['codigoProducto'],
+                    "uniMedida" => $detalle['unidadMedidaId'],
+                    "descripcion" => $detalle['producto'],
+                    "precioUni" => $detalle['precioUnitario'],
+                    "montoDescu" => $detalle['descuentoTotal'],
+                    "ventaGravada" => $detalle['totalDetalleIVA'],
+                    "tributos" => [""], // Tributos asumidos
+                    "psv" => 0,
+                    "noGravado" => 0
+                ];
+            }, $detalles),
+            "resumen" => [
+                "totalNoSuj" => 0,
+                "totalExenta" => 0,
+                "totalGravada" => number_format($totalGravada, 2, '.', ','),
+                "subTotalVentas" => number_format($totalGravada, 2, '.', ','),
+                "descuNoSuj" => 0,
+                "descuExenta" => 0,
+                "descuGravada" => number_format($totalDescu, 2, '.', ','),
+                "porcentajeDescuento" => number_format($porcentajeDescuento, 2, '.', ','),
+                "totalDescu" => number_format($totalDescu, 2, '.', ','),
+                "tributos" => [
+                    [
+                        "codigo" => "",
+                        "descripcion" => "Impuesto al Valor Agregado 13%",
+                        "valor" => number_format($totalIva, 2, '.', ',')
+                    ]
+                ],
+                "subTotal" => number_format($totalGravada, 2, '.', ','),
+                "ivaPerci1" => 17.5,
+                "ivaRete1" => 0,
+                "reteRenta" => 0,
+                "montoTotalOperacion" => number_format($totalGravada + $totalIva - $totalDescu, 2, '.', ','),
+                "totalNoGravado" => 0,
+                "totalPagar" => number_format($totalGravada + $totalIva - $totalDescu, 2, '.', ','),
+                "totalLetras" => $totalEnLetras,
+                "saldoFavor" => 0,
+                "condicionOperacion" => 1,
+                "pagos" => $pagosData,
+                "numPagoElectronico" => null
+            ]
+        ];
+    }
+
+        // Función para convertir números a letras
+        private function numeroALetras($numero) {
+            $formatter = new \NumberFormatter("es", \NumberFormatter::SPELLOUT);
+            $entero = floor($numero);
+            $fraccion = round(($numero - $entero) * 100);
+
+            $texto = $formatter->format($entero);
+            $texto .= " dólares";
+
+            if ($fraccion > 0) {
+                $texto .= " con " . $formatter->format($fraccion) . " centavos";
+            }
+
+            return ucfirst($texto);
+        }
 
     public function activarContingencia(){
         $parametrizacion = new conf_parametrizaciones();
