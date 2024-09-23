@@ -147,6 +147,7 @@ class administracionRetaceo extends Controller
 
     public function modalAnularRetaceo(){
         $comp_retaceo = new comp_retaceo();
+        $compRetaceoDetalle = new comp_retaceo_detalle();
 
         $retaceoId = $this->request->getPost('retaceoId');
 
@@ -155,6 +156,20 @@ class administracionRetaceo extends Controller
         ->where('flgElimina', 0)
         ->where('retaceoId', $retaceoId)
         ->first();
+
+        $costoTotal = 0;
+        $datos = $compRetaceoDetalle 
+                ->select('costoTotal')
+                ->where('flgElimina', 0)
+                ->where('retaceoId', $retaceoId)
+                ->findAll();
+
+        foreach($datos AS $costo){
+            $costoTotal += $costo['costoTotal'];
+        }
+
+        $data['costoTotalRetaceo'] = $costoTotal;
+
         $data['variable'] = 0;
         return view('compras/modals/modalAnularRetaceo', $data);
     }

@@ -22,7 +22,7 @@
                     </div>
                     <div class="row mb-2">
                         <div class="col-md-6">
-                            <label> Costo total:</label>
+                            <label> Costo total:</label> $ <?php echo $costoTotalRetaceo;?>
                         </div>
                     </div>
                     <div class="row">

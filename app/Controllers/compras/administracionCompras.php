@@ -39,7 +39,9 @@ class administracionCompras extends Controller
         return view('compras/vistas/compras', $data);
     }
     public function tablaCompras(){
-        $com_compras = new comp_compras;
+        $com_compras = new comp_compras();
+        $compComprasDetalle = new comp_compras_detalle();
+
 
         $contadorFiltros = 0;
         $numFactura = $this->request->getPost('numFactura');
@@ -49,13 +51,14 @@ class administracionCompras extends Controller
         $consultaCompras = $com_compras
                 ->select('cat_tipo_contribuyente.tipoContribuyenteId,comp_compras.compraId,comp_proveedores.tipoProveedorOrigen, cat_02_tipo_dte.tipoDocumentoDTE, 
                           DATE_FORMAT(comp_compras.fechaDocumento, "%d-%m-%Y") as fechaDocumento, comp_compras.numFactura,
-                          cat_20_paises.pais,comp_proveedores.proveedor,comp_proveedores.proveedorComercial,comp_compras.estadoCompra')
+                          cat_20_paises.pais,cat_20_paises.paisId,comp_proveedores.proveedor,comp_proveedores.proveedorComercial,comp_compras.estadoCompra')
                 ->join('comp_proveedores','comp_proveedores.proveedorId = comp_compras.proveedorId')
                 ->join('cat_tipo_contribuyente','cat_tipo_contribuyente.tipoContribuyenteId = comp_proveedores.tipoContribuyenteId')
                 ->join('cat_02_tipo_dte','cat_02_tipo_dte.tipoDTEId = comp_compras.tipoDTEId')
                 ->join('cat_20_paises','cat_20_paises.paisId = comp_compras.paisId')
                 ->where('comp_compras.flgElimina', 0)
-                ->where('comp_compras.flgRetaceo', 'No');
+                /*->where('comp_compras.flgRetaceo', 'No')*/;
+
 
         if($numFactura != "") {
             $consultaCompras->like('comp_compras.numFactura', $numFactura);
@@ -72,6 +75,17 @@ class administracionCompras extends Controller
             $contadorFiltros++;
         }
 
+        $porcentajeIva = new conf_parametrizaciones;
+
+        $IVAPercibido = $porcentajeIva 
+            ->select("valorParametrizacion")
+            ->where("flgElimina", 0)
+            ->where("parametrizacionId", 3)
+            ->first(); 
+        $percepcionIVA = ($IVAPercibido['valorParametrizacion'] / 100);
+        //$data['ivaPercibido'] = $percepcionIVA;
+        
+
         // Construye el array de salida
         $output['data'] = array();
         $n = 0; // Variable para contar las filas
@@ -79,6 +93,7 @@ class administracionCompras extends Controller
             $datos = $consultaCompras->findAll();
 
             foreach ($datos as $columna) {
+
                 $n++;
                 if($columna['estadoCompra'] == "Pendiente"){
                     $estadoCompra = "<span class='font-weight-bold text-warning'>".$columna['estadoCompra']."</span>";
@@ -90,7 +105,45 @@ class administracionCompras extends Controller
                 $columna2 = "<b>Numero de factura: </b>" . $columna['numFactura'] ."<br>" . "<b>País: </b>" . $columna['pais'] ."<br>" . "<b>Fecha de la compra: </b>" . $columna['fechaDocumento'] . "<br>" . "<b>Estado de la compra: </b> ". $estadoCompra;
 
                 $columna3 = "<b>proveedor: </b>". $columna['proveedor'] ."<br>" . "<b>Nombre comercial: </b>". $columna['proveedorComercial'] ."<br>" ."<b>Tipo proveedor: </b>" . $columna['tipoProveedorOrigen'] ."<br>" . "<b>Tipo factura: </b>" . $columna['tipoDocumentoDTE'];
-                $columna4 = "<b>Monto: </b>$ 125.00";
+
+                $columna4 = "<b>Monto: $</b> 0.00";
+
+
+                $detalleCompra = $compComprasDetalle
+                    ->select('ivaTotal,totalCompraDetalle,totalCompraDetalleIVA')
+                    ->where('flgElimina', 0)
+                    ->where('compraId', $columna['compraId'])
+                    ->findAll();
+                $totalConIVA = 0;
+                $totalSinIVA = 0;
+                $totalIVA = 0;
+                foreach($detalleCompra AS $detalleCompra){
+                    $totalConIVA += $detalleCompra['totalCompraDetalleIVA'];
+                    $totalSinIVA += $detalleCompra['totalCompraDetalle'];
+                    $totalIVA += $detalleCompra['ivaTotal'];
+                }
+               
+               $Percibido = $totalSinIVA * $percepcionIVA;
+
+               $totalPagar = $totalSinIVA + $totalIVA + $Percibido;
+               $totalPagarSinPercepcion = $totalSinIVA + $totalIVA;
+               $totalPagarInternacional = $totalSinIVA;
+
+
+
+                if($columna['paisId'] == 61) {
+                    if($columna['tipoContribuyenteId'] == 3){
+                        $columna4 = "<b>Monto: $</b>".number_format($totalPagar, 2, '.', ',');
+                    } else {
+                        if($totalSinIVA >= 100.00){
+                            $columna4 = "<b>Monto: $</b>".number_format($totalPagarSinPercepcion, 2, '.', ',');
+                        } else {
+
+                        }
+                    }
+                }  else {
+                    $columna4 = "<b>Monto: $</b>".number_format($totalPagarInternacional, 2, '.', ',');
+                }
                 
                 $jsonActualizarCompra = [
                     "compraId"              => $columna['compraId'],
@@ -98,6 +151,12 @@ class administracionCompras extends Controller
                 ];
 
                 if($columna['estadoCompra'] == "Finalizada"){
+                    $columna5 = '
+                        <button class="btn btn-primary mb-1" onclick="cambiarInterfaz(`compras/admin-compras/vista/ver/compra`, '.htmlspecialchars(json_encode($jsonActualizarCompra)).');" data-toggle="tooltip" data-placement="top" title="Ver compra">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    ';
+                }else if($columna['estadoCompra'] == "Aplicado"){
                     $columna5 = '
                         <button class="btn btn-primary mb-1" onclick="cambiarInterfaz(`compras/admin-compras/vista/ver/compra`, '.htmlspecialchars(json_encode($jsonActualizarCompra)).');" data-toggle="tooltip" data-placement="top" title="Ver compra">
                             <i class="fas fa-eye"></i>
@@ -534,11 +593,36 @@ class administracionCompras extends Controller
                         ';
 
                     } else {
-
+                        $output['footerTotales'] = '
+                            <b>
+                            <div class="row text-right">
+                                <div class="col-8">
+                                    Subtotal
+                                </div>
+                                <div class="col-4">
+                                    $ '.number_format($totalSinIVA, 2, '.', ',').'
+                                </div>
+                            </div>
+                            <div class="row text-right">
+                                <div class="col-8">
+                                    IVA 13%
+                                </div>
+                                <div class="col-4">
+                                    $ '.number_format($totalIVA, 2, '.', ',').'
+                                </div>
+                            </div>
+                            <div class="row text-right">
+                                <div class="col-8">
+                                    Total a pagar
+                                </div>
+                                <div class="col-4">
+                                    $ '.number_format($totalPagarSinPercepcion, 2, '.', ',').'
+                                </div>
+                            </div>                 
+                            </b>
+                        ';
                     }
                     // IMPORTANTE: EL TOTAL A PAGAR NETO ES MAYOR O IGUAL A $100.00, PERO EL PROVEEDOR NO FUE REGISTRADO COMO GRAN CONTRIBUYENTE, POR FAVOR ACTUALICE LA INFORMACIÓN DEL PROVEEDOR PARA PODER APLICAR LA PERCEPCIÓN.
-
-
                 }
 
             }  else {
