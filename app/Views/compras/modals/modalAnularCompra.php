@@ -1,41 +1,28 @@
-<form id="frmModal" method="post" action="<?php echo base_url('compras/admin-retaceo/anular/retaceo'); ?>">
-    <div id="modalAnularRetaceo" class="modal" tabindex="-1" data-backdrop="static" data-keyboard="false">
+<form id="frmModal" method="post" action="<?php echo base_url('compras/admin-compras/anular/compra'); ?>">
+    <div id="modalAnularCompra" class="modal" tabindex="-1" data-backdrop="static" data-keyboard="false">
         <div class="modal-dialog  modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Modal Anular Retaceo</h5>
+                    <h5 class="modal-title">Modal Anular Compra</h5>
                 </div>
                 <div class="modal-body">
-                    <input type="hidden" id="retaceoId" name="retaceoId" Value="<?php echo $campos['retaceoId']?>">
+                    <input type="hidden" id="compraId" name="compraId" Value="<?php echo $campos['compraId']?>">
                     <div class="row mb-2">
                         <div class="col-md-4">
-                                <label>Numero de retaceo: </label><?php echo $campos['numRetaceo']?>
-                        </div>
-                    </div>
-                    <div class="row mb-2">
-                        <div class="col-md-6">
-                            <label> total flete: </label> $ <?php echo $campos['totalFlete']?>
-                        </div>
-                        <div class="col-md-6">
-                            <label> total gastos: </label> $ <?php echo $campos['totalGastos']?>
-                        </div>
-                    </div>
-                    <div class="row mb-2">
-                        <div class="col-md-6">
-                            <label> Costo total:</label> $ <?php echo $costoTotalRetaceo;?>
+                                <label>Numero de la compra: </label> <?php echo $campos['numFactura']?>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-12">
                             <div class="form-outline">
-                                <textarea name="observacionAnulacion" id="observacionAnulacion" class="form-control" style="width: 100%;" required></textarea>
-                                <label class="form-label" for="observacionAnulacion">Observación</label>
+                                <textarea name="observacionCompra" id="observacionCompra" class="form-control" style="width: 100%;" required></textarea>
+                                <label class="form-label" for="observacionCompra">Observación</label>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" id="btnAnularRetaceo" class="btn btn-primary">
+                    <button type="submit" id="btnAnularCompra" class="btn btn-primary">
                         <i class="fas fa-save"></i>
                         Anular
                     </button>
@@ -54,8 +41,8 @@
         $("#frmModal").submit(function(event) {
             event.preventDefault();
             Swal.fire({
-            title: '¿Estás seguro que desea anular el retaceo?',
-            text: "Se anulara el retaceo seleccionado.",
+            title: '¿Estás seguro que desea anular la compra?',
+            text: "Se anulara la compra seleccionada.",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
@@ -72,13 +59,13 @@
                         console.log(response);
                         if (response.success) {
                             // Insert exitoso, ocultar modal y mostrar mensaje
-                            $('#modalAnularRetaceo').modal('hide');
+                            $('#modalAnularCompra').modal('hide');
                             Swal.fire({
                                 icon: 'success',
                                 title: 'retaceo anulado con éxito',
                                 text: response.mensaje
                             }).then((result) => {
-                                $("#tablaRetaceo").DataTable().ajax.reload(null, false);
+                                $("#tablaCompras").DataTable().ajax.reload(null, false);
 
                             });
                         } else {

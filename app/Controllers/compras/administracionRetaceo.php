@@ -33,6 +33,7 @@ class administracionRetaceo extends Controller
 
     public function tablaRetaceo(){
         $comp_retaceo = new comp_retaceo;
+        $compRetaceoDetalle = new comp_retaceo_detalle();
 
         $consultaRetaceo = $comp_retaceo
                 ->select('retaceoId,numRetaceo,totalFlete,totalGastos,estadoRetaceo')
@@ -44,38 +45,52 @@ class administracionRetaceo extends Controller
         $n = 0;
         foreach($consultaRetaceo as $consultaRetaceo){
             $n++;
+            $numeroFacturas = [];
+            $consultaFacturas = $compRetaceoDetalle
+                ->select('comp_compras.numFactura,comp_retaceo_detalle.costoTotal')
+                ->join('comp_compras_detalle','comp_compras_detalle.compraDetalleId = comp_retaceo_detalle.compraDetalleId')
+                ->join('comp_compras','comp_compras.compraId = comp_compras_detalle.compraId')
+                ->where('comp_retaceo_detalle.retaceoId',$consultaRetaceo['retaceoId'])
+                ->where('comp_retaceo_detalle.flgElimina', 0)
+                ->findAll();
+
+            $totalCosto = 0;
+            foreach($consultaFacturas AS $facturas){
+                $numeroFacturas[] = $facturas['numFactura'];
+                $totalCosto += $facturas['costoTotal'];
+            }
+
+            $numeroFacturasString = implode(', ', $numeroFacturas);
             // Aquí construye tus columnas
             if ($consultaRetaceo['estadoRetaceo'] == "Finalizado") {
                 $estadoRetaceo = "<span class='font-weight-bold text-success'>".$consultaRetaceo['estadoRetaceo']."</span>";
 
-                $columna1 = $n;
-                $columna2 = "<b>N° de retaceo: </b> ".$consultaRetaceo['numRetaceo'] . "<br>" . "<b>Factura(s): </b> " . "<br>" . "<b>Estado: </b> ".$estadoRetaceo . "<br>" . "<b>Total de productos: </b> ";
-        
-                $columna3 = "<b>Flete: </b> ". number_format($consultaRetaceo['totalFlete'], 2, ".", ",") . "<br>" . "<b>Gastos: </b> ". number_format($consultaRetaceo['totalGastos'], 2, ".", ",") . "<br>" . "<b>Costo total: </b> ";
+            }else{
+                $estadoRetaceo = "<span class='font-weight-bold text-warning'>".$consultaRetaceo['estadoRetaceo']."</span>";
+            }
 
+            $ExisteProducto = $compRetaceoDetalle
+                ->where("flgElimina",0)
+                ->where('retaceoId', $consultaRetaceo['retaceoId'])
+                ->countAllResults();
+
+            $columna1 = $n;
+            $columna2 = "<b>N° de retaceo: </b> ".$consultaRetaceo['numRetaceo'] . "<br>" . "<b>Factura(s): </b> ".$numeroFacturasString . "<br>" . "<b>Estado: </b> ".$estadoRetaceo . "<br>" . "<b>Total de productos: </b> ".$ExisteProducto;
+        
+            $columna3 = "<b>Flete: </b> ". number_format($consultaRetaceo['totalFlete'], 2, ".", ",") . "<br>" . "<b>Gastos: </b> ". number_format($consultaRetaceo['totalGastos'], 2, ".", ",") . "<br>" . "<b>Costo total: </b>$ ".number_format($totalCosto, 2, ".", ",");
+
+
+            
+            if ($consultaRetaceo['estadoRetaceo'] == "Finalizado") {
                 $jsonContinuarRetaceo = [
                     "retaceoId"      => $consultaRetaceo['retaceoId']
                 ];
 
                 $columna4 = '
-                                <button type= "button" class="btn btn-primary mb-1" onclick="cambiarInterfaz();" data-toggle="tooltip" data-placement="top" title="Ver retaceo">
-                                    <i class="fas fa-sync-alt"></i>
-                                </button>';
-        
-                $output['data'][] = array(
-                    $columna1,
-                    $columna2,
-                    $columna3,
-                    $columna4
-                );
-            }else{
-                $estadoRetaceo = "<span class='font-weight-bold text-warning'>".$consultaRetaceo['estadoRetaceo']."</span>";
-                
-                $columna1 = $n;
-                $columna2 = "<b>N° de retaceo: </b> ".$consultaRetaceo['numRetaceo'] . "<br>" . "<b>Factura(s): </b> " . "<br>" . "<b>Estado: </b> ".$estadoRetaceo . "<br>" . "<b>Total de productos: </b> ";
-        
-                $columna3 = "<b>Flete: </b> ". number_format($consultaRetaceo['totalFlete'], 2, ".", ",") . "<br>" . "<b>Gastos: </b> ". number_format($consultaRetaceo['totalGastos'], 2, ".", ",") . "<br>" . "<b>Costo total: </b> ";
-
+                        <button type= "button" class="btn btn-primary mb-1" onclick="cambiarInterfaz(`compras/admin-retaceo/vista/ver/retaceo`,'.htmlspecialchars(json_encode($jsonContinuarRetaceo)).');" data-toggle="tooltip" data-placement="top" title="Ver retaceo">
+                            <i class="fas fa-eye"></i>
+                        </button>';
+            }else{                
                 $jsonContinuarRetaceo = [
                     "retaceoId"      => $consultaRetaceo['retaceoId']
                 ];
@@ -90,14 +105,14 @@ class administracionRetaceo extends Controller
                                     <i class="fas fa-ban"></i>
                                 </button>
                             ';
-        
+            }
+
                 $output['data'][] = array(
                     $columna1,
                     $columna2,
                     $columna3,
                     $columna4
                 );
-            }
 
         }
         // Verifica si hay datos
@@ -277,7 +292,7 @@ class administracionRetaceo extends Controller
         $numDocumento = $this->request->getPost('numDocumento');
 
         $consultaRetaceoDetalle = $compRetaceoDetalle
-                ->select("comp_retaceo_detalle.retaceoDetalleId,comp_retaceo_detalle.retaceoId,comp_retaceo_detalle.compraDetalleId,comp_retaceo_detalle.cantidadProducto,comp_retaceo_detalle.precioFOBUnitario,comp_retaceo_detalle.importe,comp_retaceo_detalle.flete,comp_retaceo_detalle.gasto,comp_retaceo_detalle.DAI,comp_retaceo_detalle.costoUnitarioRetaceo,comp_retaceo_detalle.costoTotal,inv_productos.codigoProducto,inv_productos.producto")
+                ->select("comp_retaceo_detalle.retaceoDetalleId,comp_retaceo_detalle.retaceoId,comp_retaceo_detalle.compraDetalleId,comp_retaceo_detalle.cantidadProducto,comp_retaceo_detalle.precioFOBUnitario,comp_retaceo_detalle.importe,comp_retaceo_detalle.flete,comp_retaceo_detalle.gasto,comp_retaceo_detalle.DAI,comp_retaceo_detalle.costoUnitarioRetaceo,comp_retaceo_detalle.costoTotal,inv_productos.codigoProducto,inv_productos.producto,inv_productos.precioVenta")
                 ->join("comp_compras_detalle", "comp_compras_detalle.compraDetalleId = comp_retaceo_detalle.compraDetalleId")
                 ->join("inv_productos", "inv_productos.productoId = comp_compras_detalle.productoId")
                 ->where("comp_retaceo_detalle.flgElimina", 0)
@@ -312,7 +327,7 @@ class administracionRetaceo extends Controller
 
             $columna10 = "$ " . number_format($tableRetaceoDetalle['costoTotal'], 2, ".", ",");
 
-            $columna11 = "$ " . number_format(0.00, 2, ".", ",");
+            $columna11 = "$ " . number_format($tableRetaceoDetalle['precioVenta'], 2, ".", ",");
 
             $jsonDAI = [
                 "codigoProducto"        => $tableRetaceoDetalle['codigoProducto'],
@@ -321,9 +336,9 @@ class administracionRetaceo extends Controller
             ];
             
             $columna12 = '  
-                            <button class="btn btn-primary mb-1" onclick="modalAgregarDAI('.htmlspecialchars(json_encode($jsonDAI)).')" data-toggle="tooltip" data-placement="top" title="DAI">
-                                <i class="fas fa-address-book"></i> DAI
-                            </button>';
+                <button class="btn btn-primary mb-1" onclick="modalAgregarDAI('.htmlspecialchars(json_encode($jsonDAI)).')" data-toggle="tooltip" data-placement="top" title="DAI">
+                    <i class="fas fa-address-book"></i> DAI
+                </button>';
 
             $output['data'][] = array(
                 $columna1,
@@ -351,12 +366,12 @@ class administracionRetaceo extends Controller
         // Verifica si hay datos
         if ($n > 0) {
                 $output['footer'] = array(
-                    '<div class="text-right"><b>Total</b></div>',
-                    '<div class="text-right"><b>'.number_format($totalCantidad, 0, ".", ",").'</b></div>',
-                    '<div class="text-right"><b>$ '.number_format($totalPrecioUnitarioFOB, 2, ".", ",").'</b></div>',
-                    '<div class="text-right"><b>$ '.number_format($totalFlete, 2, ".", ",").'</b></div>',
-                    '<div class="text-right"><b>$ '.number_format($totalGastos, 2, ".", ",").'</b></div>',
-                    '<div class="text-right"><b>$ '.number_format($totalCosto, 2, ".", ",").'</b></div>'
+                    '<div class="text-left"><b>Total</b></div>',
+                    '<div class="text-left"><b>'.number_format($totalCantidad, 0, ".", ",").'</b></div>',
+                    '<div class="text-left"><b>$ '.number_format($totalPrecioUnitarioFOB, 2, ".", ",").'</b></div>',
+                    '<div class="text-left"><b>$ '.number_format($totalFlete, 2, ".", ",").'</b></div>',
+                    '<div class="text-left"><b>$ '.number_format($totalGastos, 2, ".", ",").'</b></div>',
+                    '<div class="text-left"><b>$ '.number_format($totalCosto, 2, ".", ",").'</b></div>'
                  );
             return $this->response->setJSON($output);
         } else {
@@ -693,5 +708,125 @@ class administracionRetaceo extends Controller
             ]);
         }
 
+    }
+    public function vistaVerRetaceo(){
+        $session = session();
+
+        $comp_retaceo = new comp_retaceo();
+
+        $retaceoId = $this->request->getPost('retaceoId');
+
+        $consultaRetaceo = $comp_retaceo
+                ->select("numRetaceo,fechaRetaceo,totalFlete,totalGastos")
+                ->where("flgElimina", 0)
+                ->where("retaceoId", $retaceoId)
+                ->first();   
+
+        $data['camposEncabezado'] = [
+            'numRetaceo'         => $consultaRetaceo['numRetaceo'],
+            'fechaRetaceo'       => $consultaRetaceo['fechaRetaceo'],
+            'totalFlete'         => $consultaRetaceo['totalFlete'],
+            'totalGastos'        => $consultaRetaceo['totalGastos']
+            // Sacar estos valores de la consulta
+        ];
+
+        $data['retaceoId'] = $retaceoId;
+
+        $data['variable'] = 0;
+
+        $camposSession = [
+            'renderVista' => 'No',
+            'retaceoId'   => $retaceoId
+        ];
+        $session->set([
+            'route'             => 'compras/admin-retaceo/vista/ver/retaceo',
+            'camposSession'     => json_encode($camposSession)
+        ]);
+
+        return view('compras/vistas/pageVerRetaceo', $data);
+    }
+    public function tablaVerRetaceo(){
+        $compRetaceoDetalle = new comp_retaceo_detalle();
+        $output['data'] = array();
+        $n = 0;
+
+        $retaceoId = $this->request->getPost('retaceoId');
+        $numDocumento = $this->request->getPost('numDocumento');
+
+        $consultaRetaceoDetalle = $compRetaceoDetalle
+            ->select("comp_retaceo_detalle.retaceoDetalleId,comp_retaceo_detalle.retaceoId,comp_retaceo_detalle.compraDetalleId,comp_retaceo_detalle.cantidadProducto,comp_retaceo_detalle.precioFOBUnitario,comp_retaceo_detalle.importe,comp_retaceo_detalle.flete,comp_retaceo_detalle.gasto,comp_retaceo_detalle.DAI,comp_retaceo_detalle.costoUnitarioRetaceo,comp_retaceo_detalle.costoTotal,inv_productos.codigoProducto,inv_productos.producto,inv_productos.precioVenta")
+            ->join("comp_compras_detalle", "comp_compras_detalle.compraDetalleId = comp_retaceo_detalle.compraDetalleId")
+            ->join("inv_productos", "inv_productos.productoId = comp_compras_detalle.productoId")
+            ->where("comp_retaceo_detalle.flgElimina", 0)
+            ->where("comp_retaceo_detalle.retaceoId", $retaceoId)
+            ->findAll();
+
+        $totalCantidad = 0;
+        $totalPrecioUnitarioFOB = 0;
+        $totalFlete = 0;
+        $totalGastos = 0;
+        $totalCosto = 0;
+
+        foreach($consultaRetaceoDetalle AS $tableRetaceoDetalle){
+            $n++;
+            // Aquí construye tus columnas
+            $columna1 = $n;
+            $columna2 = "(".$tableRetaceoDetalle['codigoProducto'].")". $tableRetaceoDetalle['producto'];
+
+            $columna3 = number_format($tableRetaceoDetalle['cantidadProducto'], 0, ".", ",");
+
+            $columna4 = "$ " . number_format($tableRetaceoDetalle['precioFOBUnitario'], 2, ".", ",");
+
+            $columna5 = "$ " . number_format($tableRetaceoDetalle['importe'], 2, ".", ",");
+
+            $columna6 = "$ " . number_format($tableRetaceoDetalle['flete'], 2, ".", ",");
+
+            $columna7 = "$ " . number_format($tableRetaceoDetalle['gasto'], 2, ".", ",");
+
+            $columna8 = "$ " . number_format($tableRetaceoDetalle['DAI'], 2, ".", ",");
+
+            $columna9 = "$ " . number_format($tableRetaceoDetalle['costoUnitarioRetaceo'], 2, ".", ",");
+
+            $columna10 = "$ " . number_format($tableRetaceoDetalle['costoTotal'], 2, ".", ",");
+
+            $columna11 = "$ " . number_format($tableRetaceoDetalle['precioVenta'], 2,".", ",");
+
+
+            $output['data'][] = array(
+                $columna1,
+                $columna2,
+                $columna3,
+                $columna4,
+                $columna5,
+                $columna6,
+                $columna7,
+                $columna8,
+                $columna9,
+                $columna10,
+                $columna11
+            );
+
+            $totalCantidad += $tableRetaceoDetalle['cantidadProducto'];
+            $totalPrecioUnitarioFOB += $tableRetaceoDetalle['precioFOBUnitario'];
+            $totalFlete += $tableRetaceoDetalle['flete'];
+            $totalGastos += $tableRetaceoDetalle['gasto'];
+            $totalCosto += $tableRetaceoDetalle['costoTotal'];
+        } 
+
+
+        // Verifica si hay datos
+        if ($n > 0) {
+                $output['footer'] = array(
+                    '<div class="text-left"><b>Total</b></div>',
+                    '<div class="text-left"><b>'.number_format($totalCantidad, 0, ".", ",").'</b></div>',
+                    '<div class="text-left"><b>$ '.number_format($totalPrecioUnitarioFOB, 2, ".", ",").'</b></div>',
+                    '<div class="text-left"><b>$ '.number_format($totalFlete, 2, ".", ",").'</b></div>',
+                    '<div class="text-left"><b>$ '.number_format($totalGastos, 2, ".", ",").'</b></div>',
+                    '<div class="text-left"><b>$ '.number_format($totalCosto, 2, ".", ",").'</b></div>'
+                 );
+            return $this->response->setJSON($output);
+        } else {
+            return $this->response->setJSON(array('data' => '', 'footer'=>'')); // No hay datos, devuelve un array vacío
+        }
     }
 }

@@ -10,7 +10,7 @@
         <div class="row mb-2">
             <div class="col-md-4">
                 <div class="form-select-control">
-                    <select name="tipoDocumento" id="tipoDocumento" style="width: 100%;" required>
+                    <select name="tipoDocumento" id="tipoDocumento" style="width: 100%;" required disabled>
                         <option value=""></option>
                         <?php foreach ($tipoDTE as $tipoDTE){ ?>
                             <option value="<?php echo $tipoDTE['tipoDTEId']; ?>"><?php echo $tipoDTE['tipoDocumentoDTE']; ?></option>
@@ -20,14 +20,14 @@
             </div>
             <div class="col-md-4">
                 <div class="form-outline">
-                    <input type="text" id="numeroFactura" name="numeroFactura" class="form-control active" required>
+                    <input type="text" id="numeroFactura" name="numeroFactura" class="form-control active" required disabled>
                     <label class="form-label" for="numeroFactura">Numero de documento</label>
 
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="form-outline">
-                    <input type="date" id="fechaFactura" name="fechaFactura" class="form-control active" required>
+                    <input type="date" id="fechaFactura" name="fechaFactura" class="form-control active" required disabled>
                     <label class="form-label" for="fechaFactura">Fecha documento</label>
                 </div>
             </div>
@@ -36,7 +36,7 @@
         <div class="row mb-2">
             <div class="col-md-4">
                 <div class="form-select-control">
-                    <select name="selectProveedor" id="selectProveedor" style="width: 100%;" required>
+                    <select name="selectProveedor" id="selectProveedor" style="width: 100%;" required disabled>
                         <option value=""></option>
                         <?php 
                             foreach ($selectProveedor as $selectProveedor){ 
@@ -50,7 +50,7 @@
             </div>
             <div class="col-md-4">
                 <div class="form-select-control">
-                    <select name="selectPais" id="selectPais" style="width: 100%;" required>
+                    <select name="selectPais" id="selectPais" style="width: 100%;" required disabled>
                         <option value=""></option>
                         <?php foreach ($selectPais as $selectPais){ ?>
                             <option value="<?php echo $selectPais['paisId']; ?>"><?php echo $selectPais['pais']; ?></option>
@@ -60,7 +60,7 @@
             </div>
             <div class="col-md-4">
                 <div class="form-select-control">
-                    <select name="selectRetaceo" id="selectRetaceo" style="width: 100%;" required>
+                    <select name="selectRetaceo" id="selectRetaceo" style="width: 100%;" required disabled>
                         <option value=""></option>
                         <option value="Si">Si</option>
                         <option value="No">No</option>

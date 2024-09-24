@@ -97,8 +97,10 @@ class administracionCompras extends Controller
                 $n++;
                 if($columna['estadoCompra'] == "Pendiente"){
                     $estadoCompra = "<span class='font-weight-bold text-warning'>".$columna['estadoCompra']."</span>";
+                }else if($columna['estadoCompra'] == "Anulado"){
+                    $estadoCompra = "<span class='font-weight-bold text-danger'>".$columna['estadoCompra']."</span>";
                 }else{
-                    $estadoCompra = "<span class='font-weight-bold text-success'>".$columna['estadoCompra']."</span>";
+                    $estadoCompra = "<span class='font-weight-bold text-success'>".$columna['estadoCompra']."</span>";                    
                 }
                 // Aquí construye tus columnas
                 $columna1 = $n;
@@ -162,6 +164,12 @@ class administracionCompras extends Controller
                             <i class="fas fa-eye"></i>
                         </button>
                     ';
+                }else if($columna['estadoCompra'] == "Anulado"){
+                    $columna5 = '
+                        <button class="btn btn-primary mb-1" onclick="cambiarInterfaz(`compras/admin-compras/vista/ver/compra`, '.htmlspecialchars(json_encode($jsonActualizarCompra)).');" data-toggle="tooltip" data-placement="top" title="Ver compra">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    ';
                 }else{
                     $columna5 = '
                         <button type= "button" class="btn btn-primary mb-1" onclick="cambiarInterfaz(`compras/admin-compras/vista/actualizar/compra`, '.htmlspecialchars(json_encode($jsonActualizarCompra)).');" data-toggle="tooltip" data-placement="top" title="Continuar compra">
@@ -170,7 +178,7 @@ class administracionCompras extends Controller
                     ';
 
                     $columna5 .= '
-                        <button class="btn btn-danger mb-1" onclick="" data-toggle="tooltip" data-placement="top" title="Anular compra">
+                        <button class="btn btn-danger mb-1" onclick="modalAnularCompra('.$columna['compraId'].')" data-toggle="tooltip" data-placement="top" title="Anular compra">
                             <i class="fas fa-ban"></i>
                         </button>
                     ';
@@ -1396,10 +1404,35 @@ class administracionCompras extends Controller
                         ';
 
                     } else {
-
+                        $output['footerTotales'] = '
+                            <b>
+                            <div class="row text-right">
+                                <div class="col-8">
+                                    Subtotal
+                                </div>
+                                <div class="col-4">
+                                    $ '.number_format($totalSinIVA, 2, '.', ',').'
+                                </div>
+                            </div>
+                            <div class="row text-right">
+                                <div class="col-8">
+                                    IVA 13%
+                                </div>
+                                <div class="col-4">
+                                    $ '.number_format($totalIVA, 2, '.', ',').'
+                                </div>
+                            </div>
+                            <div class="row text-right">
+                                <div class="col-8">
+                                    Total a pagar
+                                </div>
+                                <div class="col-4">
+                                    $ '.number_format($totalPagarSinPercepcion, 2, '.', ',').'
+                                </div>
+                            </div>                 
+                            </b>
+                        ';
                     }
-                    // IMPORTANTE: EL TOTAL A PAGAR NETO ES MAYOR O IGUAL A $100.00, PERO EL PROVEEDOR NO FUE REGISTRADO COMO GRAN CONTRIBUYENTE, POR FAVOR ACTUALICE LA INFORMACIÓN DEL PROVEEDOR PARA PODER APLICAR LA PERCEPCIÓN.
-
 
                 }
 
@@ -1436,5 +1469,47 @@ class administracionCompras extends Controller
         } else {
             return $this->response->setJSON(array('data' => '', 'footer'=>'')); // No hay datos, devuelve un array vacío
         }
+    }
+
+    public function modalAnularCompra(){
+        $compCompras = new comp_compras();
+
+        $compraId = $this->request->getPost('compraId');
+
+        $data['campos'] = $compCompras
+        ->select('compraId,numFactura')
+        ->where('flgElimina', 0)
+        ->where('compraId', $compraId)
+        ->first();
+
+        $data['variable'] = 0;
+        return view('compras/modals/modalAnularCompra', $data);
+    }
+
+    public function operacionAnularCompra(){
+            $anularCompra = new comp_compras();
+        
+            $compraId = $this->request->getPost('compraId');
+            $observacionCompra = $this->request->getPost('observacionCompra');
+
+            $data = [
+                'estadoCompra' => "Anulado",
+                'fechaAnulacion' => date('Y-m-d H:i:s'),
+                'obsAnulacion'  =>  $observacionCompra
+            ];
+            
+            $anularCompra->update($compraId, $data);
+
+            if($anularCompra) {
+                return $this->response->setJSON([
+                    'success' => true,
+                    'mensaje' => 'Retaceo Anulado correctamente'
+                ]);
+            } else {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'mensaje' => 'No se pudo anular el retaceo'
+                ]);
+            }
     }
 }

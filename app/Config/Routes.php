@@ -217,7 +217,10 @@ $routes->group('compras/admin-compras', function($routes) {
     $routes->post('finalizar/compra', 'compras\administracionCompras::finalizarCompra');
     $routes->post('vista/ver/compra', 'compras\administracionCompras::vistaVerCompra');
     $routes->post('tabla/ver/compra', 'compras\administracionCompras::tablaVerCompra');
-    
+    $routes->post('form/anular/compra', 'compras\administracionCompras::modalAnularCompra');
+    $routes->post('anular/compra', 'compras\administracionCompras::operacionAnularCompra');
+
+
 });
 
 $routes->group('compras/admin-retaceo', function($routes) {
@@ -236,8 +239,10 @@ $routes->group('compras/admin-retaceo', function($routes) {
     $routes->post('calcular/retaceo', 'compras\administracionRetaceo::calcularRetaceo');    
     $routes->post('operacion/dai/retaceo', 'compras\administracionRetaceo::modalOperacionDai');
     $routes->post('operacion/finalizar/retaceo', 'compras\administracionRetaceo::finalizarRetaceo');
+    $routes->post('vista/ver/retaceo', 'compras\administracionRetaceo::vistaVerRetaceo');
+    $routes->post('tabla/ver/retaceo', 'compras\administracionRetaceo::tablaVerRetaceo');
     
-    $routes->post('pdf/generate', 'compras\Reportes\indexReporte::generate');
+    //$routes->post('pdf/generate', 'compras\Reportes\indexReporte::generate');
 
 });
 
