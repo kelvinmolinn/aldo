@@ -10,12 +10,7 @@
                 </div>
                 <div class="modal-body">
                     <div class="row">
-                        <div class="col-2">
-                            <button id="btnReporteExcel" type="button" class="btn btn-success btn-sm" onclick="">
-                                <i class="fas fa-file-excel"></i> Excel
-                            </button>                            
-                        </div>
-                        <div class="col-10">
+                        <div class="col-12">
                             <div id="divModalContent">
                                 <iframe id="pdfFrame" src="" width="100%"></iframe>
                             </div> 

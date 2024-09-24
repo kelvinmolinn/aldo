@@ -3,6 +3,8 @@
 namespace App\Controllers\inventario\reportes;
 require_once(APPPATH . 'Libraries/fpdf/fpdf.php');
 
+use App\Models\inv_productos;
+use App\Models\conf_parametrizaciones;
 
 use CodeIgniter\Controller;
 use FPDF;
@@ -43,6 +45,8 @@ class reportePreciosProducto extends Controller
 {
 
     public function preciosProductos(){
+        $invProductos = new inv_productos();
+        $confParametrizaciones = new conf_parametrizaciones();
 
         $pdf = new PDF();
         $pdf->AliasNbPages();
@@ -58,7 +62,7 @@ class reportePreciosProducto extends Controller
         $pdf->SetXY(10,20);
 
         $pdf->SetFont('Arial', '', 10);
-        $pdf->Cell(15,5,utf8_decode('#'),1,0,'C');
+        $pdf->Cell(15,10,utf8_decode('#'),1,0,'C');
 
         $pdf->SetXY(25,20);
 
@@ -67,18 +71,70 @@ class reportePreciosProducto extends Controller
 
         $pdf->SetXY(60, 20); // Posicionar la celda
         $pdf->SetFont('Arial', '', 10);
-        $pdf->MultiCell(50, 5, utf8_decode("Plataforma\nOtro texto aquí"), 1, 'C');
+        $pdf->MultiCell(50, 5, utf8_decode("Plataforma\nCategoria"), 1, 'C');
 
         $pdf->SetXY(110,20);
 
         $pdf->SetFont('Arial', '', 10);
-        $pdf->Cell(45,5,utf8_decode('Precio de venta (sin IVA)'),1,0,'C');
+        $pdf->Cell(45,10,utf8_decode('Precio de venta (sin IVA)'),1,0,'C');
 
         $pdf->SetXY(155,20);
 
         $pdf->SetFont('Arial', '', 10);
-        $pdf->Cell(45,5,utf8_decode('Precio de venta (con IVA)'),1,0,'C');
+        $pdf->Cell(45,10,utf8_decode('Precio de venta (con IVA)'),1,0,'C');
 
+        $precios = $invProductos
+            ->select('inv_productos.codigoProducto,inv_productos.producto,inv_productos_plataforma.productoPlataforma,inv_productos_tipo.productoTipo,inv_productos.precioVenta')
+            ->join('inv_productos_plataforma',"inv_productos_plataforma.productoPlataformaId = inv_productos.productoPlataformaId")
+            ->join('inv_productos_tipo','inv_productos_tipo.productoTipoId = inv_productos.productoTipoId')
+            ->where('inv_productos.flgElimina', 0)
+            ->findAll();
+
+        $n = 0;  
+        $y = 30;    
+        foreach ($precios AS $preciosProducto) {
+            $n++;
+            $codigo = $preciosProducto['codigoProducto'];
+            $producto = $preciosProducto['producto'];
+            $plataforma = $preciosProducto['productoPlataforma'];
+            $categoria = $preciosProducto['productoTipo'];
+            $precioSinIva = $preciosProducto['precioVenta'];
+
+            $precioIVA = $confParametrizaciones
+                ->select('valorParametrizacion')
+                ->where('flgElimina', 0)
+                ->where('parametrizacionId', 1)
+                ->first();
+
+            $calculoIVA = $precioIVA['valorParametrizacion'] / 100;
+
+            $IVA = $precioSinIva * $calculoIVA;
+
+            $precioConIva = $precioSinIva + $IVA;
+
+            $pdf->SetXY(10,$y);
+            $pdf->SetFont('Arial', '', 8);
+            $pdf->Cell(15,10,utf8_decode($n),1,0,'C');
+
+            $pdf->SetXY(25,$y);
+            $pdf->SetFont('Arial', '', 8);
+            $pdf->Cell(35,10,utf8_decode("(".$codigo.") ".$producto),1,0,'C');
+
+            $pdf->SetXY(60, $y); // Posicionar la celda
+            $pdf->SetFont('Arial', '', 8);
+            $pdf->MultiCell(50, 5, utf8_decode($plataforma."\n".$categoria), 1, 'C');
+
+            $pdf->SetXY(110,$y);
+            $pdf->SetFont('Arial', '', 8);
+            $pdf->Cell(45,10,utf8_decode("$ ".number_format($precioSinIva, 2, '.', ',')),1,0,'C');
+
+            $pdf->SetXY(155,$y);
+            $pdf->SetFont('Arial', '', 8);
+            $pdf->Cell(45,10,utf8_decode("$ ".number_format($precioConIva, 2, '.', ',')),1,0,'C');
+
+            $y += 10;
+
+        }
 
         $this->response->setHeader('Content-Type', 'application/pdf');
   
