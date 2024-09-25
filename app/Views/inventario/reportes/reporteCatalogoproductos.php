@@ -99,8 +99,8 @@
     $(document).ready(function() {
         $("#btnReporteExcel").click(function(e) {
             $("#tblReporteCatalogoProductos").table2excel({
-                name: `<?php echo 'Nombre'; ?>`,
-                filename: `<?php echo 'Otro'; ?>`
+                name: `<?php echo 'Catalogo de productos'; ?>`,
+                filename: `<?php echo 'Catalogo de productos'; ?>`
             });
         });
 

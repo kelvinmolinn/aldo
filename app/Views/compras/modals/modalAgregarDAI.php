@@ -21,7 +21,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-outline">
-                                <input type="number" id="DAI" name="DAI" class="form-control active" required>
+                                <input type="number" id="DAI" name="DAI" class="form-control active" step="0.01" required>
                                 <label class="form-label" for="DAI">DAI</label>
                             </div>
                         </div>    
