@@ -25,6 +25,7 @@ use App\Models\fel_facturas;
 use App\Models\fel_facturas_detalle;
 use App\Models\fel_facturas_pago;
 use App\Models\comp_proveedores;
+use App\Models\log_usuarios;
 
 class administracionReservas extends Controller
 {
@@ -92,6 +93,8 @@ class administracionReservas extends Controller
             $operacion = $this->request->getPost('operacion');
             $reservaId = $this->request->getPost('reservaId');
             $model = new fel_reservas();
+            $logUsuariosModel = new log_usuarios();
+            $session = session();
             $modelParametrizaciones = new conf_parametrizaciones();
 
             $porcentajeIVA = $modelParametrizaciones->select('valorParametrizacion')
@@ -110,17 +113,20 @@ class administracionReservas extends Controller
         
             if ($operacion == 'editar') {
                 $operacionReserva = $model->update($this->request->getPost('reservaId'), $data);
+                $reservaIdLog = $this->request->getPost('reservaId');
             } else {
                 // Insertar datos en la base de datos
                 $operacionReserva = $model->insert($data);
+                $reservaIdLog = $model->insertID();
             }
         
             if ($operacionReserva) {
+                $logUsuariosModel->registrarLogInterfaces("logAgrega", "Agregó una nueva reserva (".$reservaIdLog.")", $session->get('logUsuarioId'));
                 // Si el insert fue exitoso, devuelve el último ID insertado
                 return $this->response->setJSON([
                     'success' => true,
                     'mensaje' => 'Reserva ' . ($operacion == 'editar' ? 'actualizada' : 'agregada') . ' correctamente',
-                    'reservaId' => ($operacion == 'editar' ? $this->request->getPost('reservaId') : $model->insertID())
+                    'reservaId' => $reservaIdLog
                 ]);
             } else {
                 // Si el insert falló, devuelve un mensaje de error
@@ -311,6 +317,8 @@ public function tablaReservas()
     function vistaActualizarReservaOperacion(){
         $reservas = new fel_reservas;
         $reservaId = $this->request->getPost('reservaId');
+        $logUsuariosModel = new log_usuarios();
+        $session = session();
             // Verificar si hay productos agregados al traslado
             $reservaDetalleModel = new fel_reservas_detalle();
             $productosAgregados = $reservaDetalleModel
@@ -337,6 +345,7 @@ public function tablaReservas()
             $operacionReserva = $reservas->update($this->request->getPost('reservaId'), $data);
 
         if ($operacionReserva) {
+            $logUsuariosModel->registrarLogInterfaces("logEdita", "Actualizó una reserva ($reservaId)", $session->get('logUsuarioId'));
             // Si el insert fue exitoso, devuelve el último ID insertado
             return $this->response->setJSON([
                 'success' => true,
@@ -613,6 +622,8 @@ public function tablaReservas()
         $precioUnitario = $this->request->getPost('hiddenPrecioUnitario');
         $cantidadProducto = $this->request->getPost('cantidadProducto');
         $porcentajeDescuento = $this->request->getPost('porcentajeDescuento');
+        $logUsuariosModel = new log_usuarios();
+        $session = session();
     
         // Consulta para traer el 13% de la parametrización
         $porcentajeIva = new conf_parametrizaciones;
@@ -698,6 +709,7 @@ public function tablaReservas()
             $operacionReserva = $model->update($reservaDetalleId, $data);
             
             if ($operacionReserva) {
+                $logUsuariosModel->registrarLogInterfaces("logEdita", "Actualizó el detalle de la reserva ($reservaDetalleId)", $session->get('logUsuarioId'));
                 return $this->response->setJSON([
                     'success' => true,
                     'mensaje' => 'Reserva actualizada correctamente',
@@ -780,6 +792,7 @@ public function tablaReservas()
                 $operacionReserva = $model->insert($data);
     
                 if ($operacionReserva) {
+                    $logUsuariosModel->registrarLogInterfaces("logAgrega", "Emitió un nuevo detalle a la reserva (".$model->insertID().")", $session->get('logUsuarioId'));
                     return $this->response->setJSON([
                         'success' => true,
                         'mensaje' => 'Reserva agregada correctamente',
@@ -800,6 +813,8 @@ public function tablaReservas()
 public function eliminarReserva(){
         
     $eliminarReserva = new fel_reservas_detalle();
+    $logUsuariosModel = new log_usuarios();
+    $session = session();
     
     $reservaDetalleId = $this->request->getPost('reservaDetalleId');
     $data = ['flgElimina' => 1];
@@ -807,6 +822,8 @@ public function eliminarReserva(){
     $eliminarReserva->update($reservaDetalleId, $data);
 
     if($eliminarReserva) {
+        $logUsuariosModel->registrarLogInterfaces("logElimina", "Eliminó un producto de la reserva ($reservaDetalleId)", $session->get('logUsuarioId'));
+            //update 
         return $this->response->setJSON([
             'success' => true,
             'mensaje' => 'Reserva de producto eliminado correctamente'
@@ -1195,6 +1212,8 @@ public function tablaContinuarReserva()
     $reservaId = $this->request->getPost('reservaId');
     $montoPago = round($this->request->getPost('montoPago'), 2); // Asegurar redondeo a 2 decimales
     $numComprobantePago = $this->request->getPost('numComprobantePago');
+    $logUsuariosModel = new log_usuarios();
+    $session = session();
 
     // Obtener la suma de totalReservaDetalle para la reservaId proporcionada
     $detalleReserva = new fel_reservas_detalle();
@@ -1253,6 +1272,7 @@ public function tablaContinuarReserva()
     $operacionReservaPago = $reservaPago->insert($dataInsert);
     
     if ($operacionReservaPago) {
+        $logUsuariosModel->registrarLogInterfaces("logAgrega", "Emitió un nuevo pago a la reserva (".$reservaPago->insertID().")", $session->get('logUsuarioId'));
         // Si el insert fue exitoso, devuelve el último ID insertado
         return $this->response->setJSON([
             'success' => true,
@@ -1318,6 +1338,8 @@ public function tablaContinuarReserva()
     public function eliminarReservaPago(){
         
         $eliminarReservaPago = new fel_reservas_pago();
+        $logUsuariosModel = new log_usuarios();
+        $session = session();
         
         $reservaPagoId = $this->request->getPost('reservaPagoId');
         $data = ['flgElimina' => 1];
@@ -1325,6 +1347,7 @@ public function tablaContinuarReserva()
         $eliminarReservaPago->update($reservaPagoId, $data);
     
         if($eliminarReservaPago) {
+            $logUsuariosModel->registrarLogInterfaces("logElimina", "Eliminó el abono/pago  ($reservaPagoId)", $session->get('logUsuarioId'));
             return $this->response->setJSON([
                 'success' => true,
                 'mensaje' => 'Pago eliminado correctamente'
@@ -1355,6 +1378,8 @@ public function tablaContinuarReserva()
     
     public function operacionAnularReserva(){
         $anularReserva = new fel_reservas();
+        $logUsuariosModel = new log_usuarios();
+        $session = session();
         
             $reservaId = $this->request->getPost('reservaId');
             $obsAnulacionReserva = $this->request->getPost('obsAnulacionReserva');
@@ -1369,6 +1394,7 @@ public function tablaContinuarReserva()
             $anularReserva->update($reservaId, $data);
 
             if($anularReserva) {
+                $logUsuariosModel->registrarLogInterfaces("logEdita", "Anuló la reserva ($reservaId)", $session->get('logUsuarioId'));
                 return $this->response->setJSON([
                     'success' => true,
                     'mensaje' => 'Reserva Anulada correctamente'
@@ -1664,6 +1690,8 @@ public function tablaContinuarReserva()
         $modelReserva = new fel_reservas();
         $modelReservaDetalle = new fel_reservas_detalle();
         $modelReservaPago = new fel_reservas_pago();
+        $logUsuariosModel = new log_usuarios();
+        $session = session();
 
         // Obtener el total a pagar para la reserva
         $totalAPagar = $modelReservaDetalle
@@ -1692,6 +1720,8 @@ public function tablaContinuarReserva()
             'estadoReserva' => "Finalizado"
         ];
         $modelReserva->update($reservaId, $dataReservaEstado);
+
+        $logUsuariosModel->registrarLogInterfaces("logEdita", "Finalizó la reserva ($reservaId)", $session->get('logUsuarioId'));
         
         return $this->response->setJSON([
             'success' => true,
