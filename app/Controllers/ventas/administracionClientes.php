@@ -12,6 +12,7 @@ use App\Models\cat_tipo_contribuyente;
 use App\Models\cat_20_paises;
 use App\Models\cat_12_paises_ciudades;
 use App\Models\cat_13_paises_estados;
+use App\Models\log_usuarios;
 
 class administracionClientes extends Controller
 {
@@ -184,6 +185,8 @@ public function modalClienteOperacion() {
     $clienteId = $this->request->getPost('clienteId');
     $clientes = $this->request->getPost('cliente');
     $cliente = new fel_clientes();
+    $logUsuariosModel = new log_usuarios();
+    $session = session();
 
     if ($cliente->existeCliente($clientes, $clienteId)) {
         return $this->response->setJSON([
@@ -210,6 +213,7 @@ public function modalClienteOperacion() {
         ];
 
         if ($operacion == 'editar') {
+            $logUsuariosModel->registrarLogInterfaces("logEdita", "Actualizó el cliente ($clienteId)", $session->get('logUsuarioId'));
             $operacionCliente = $cliente->update($this->request->getPost('clienteId'), $data);
         } else {
             // Insertar datos en la base de datos
@@ -217,6 +221,7 @@ public function modalClienteOperacion() {
         }
 
         if ($operacionCliente) {
+            $logUsuariosModel->registrarLogInterfaces("logAgrega", "Agregó un nuevo cliente (".$cliente->insertID().")", $session->get('logUsuarioId'));
             // Si el insert fue exitoso, devuelve el último ID insertado
             return $this->response->setJSON([
                 'success' => true,
@@ -335,13 +340,10 @@ public function tablaClientes() {
                 <i class="fas fa-pencil-alt"></i>
             </button>';
         $columna4 .= '
-            <button type="button" class="btn btn-primary mb-1" onclick="modalContactoClientes(`' . $columna['clienteId'] . '`, `editar`)" data-toggle="tooltip" data-placement="top" title="Contactos">
+            <button type="button" class="btn btn-success mb-1" onclick="modalContactoClientes(`' . $columna['clienteId'] . '`, `editar`)" data-toggle="tooltip" data-placement="top" title="Contactos">
                 <i class="fas fa-address-book"></i>
             </button>';
-        $columna4 .= '
-            <button type="button" class="btn btn-primary mb-1" onclick="modalHistorialVentas()" data-toggle="tooltip" data-placement="top" title="Historial de ventas">
-                <i class="fas fa-history"></i>
-            </button>';
+
 
         // Añade las columnas a la salida
         $output['data'][] = array(
@@ -374,6 +376,8 @@ public function tablaClientes() {
         $clienteId    = $this->request->getPost('clienteId');
         
         $clienteContacto = new fel_cliente_contacto();
+        $logUsuariosModel = new log_usuarios();
+        $session = session();
 
 
         $data = [
@@ -386,6 +390,7 @@ public function tablaClientes() {
         $operacionCliente = $clienteContacto->insert($data);
         
         if ($operacionCliente) {
+            $logUsuariosModel->registrarLogInterfaces("logAgrega", "Agregó un nuevo contacto al cliente (".$clienteContacto->insertID().")", $session->get('logUsuarioId'));
             // Si el insert fue exitoso, devuelve el último ID insertado
             return $this->response->setJSON([
                 'success'               => true,
@@ -476,6 +481,8 @@ public function tablaClientes() {
     }
     public function eliminarContacto(){
         $eliminarContacto = new fel_cliente_contacto();
+        $logUsuariosModel = new log_usuarios();
+        $session = session();
     
         $clienteContactoId = $this->request->getPost('clienteContactoId');
         $data = ['flgElimina' => 1];
@@ -483,6 +490,8 @@ public function tablaClientes() {
         $eliminarContacto->update($clienteContactoId, $data);
 
         if($eliminarContacto) {
+
+            $logUsuariosModel->registrarLogInterfaces("logElimina", "Eliminó el contacto ($clienteContactoId)", $session->get('logUsuarioId'));
             return $this->response->setJSON([
                 'success' => true,
                 'mensaje' => 'Contacto eliminado correctamente'
