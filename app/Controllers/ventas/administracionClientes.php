@@ -221,7 +221,7 @@ public function modalClienteOperacion() {
         }
 
         if ($operacionCliente) {
-            $logUsuariosModel->registrarLogInterfaces("logAgrega", "Agregó un nuevo cliente (".$cliente->insertID().")", $session->get('logUsuarioId'));
+            $logUsuariosModel->registrarLogInterfaces("logAgrega", "Agregó un nuevo cliente", $session->get('logUsuarioId'));
             // Si el insert fue exitoso, devuelve el último ID insertado
             return $this->response->setJSON([
                 'success' => true,
