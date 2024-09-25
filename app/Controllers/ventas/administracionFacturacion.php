@@ -920,6 +920,8 @@ $erroresCertificacion = $DTEErrores
 public function eliminarDTE(){
         
     $eliminarDTE = new fel_facturas_detalle();
+    $logUsuariosModel = new log_usuarios();
+    $session = session();
     
     $facturaDetalleId = $this->request->getPost('facturaDetalleId');
     $data = ['flgElimina' => 1];
@@ -927,6 +929,7 @@ public function eliminarDTE(){
     $eliminarDTE->update($facturaDetalleId, $data);
 
     if($eliminarDTE) {
+        $logUsuariosModel->registrarLogInterfaces("logElimina", "Eliminó el producto del DTE", $session->get('logUsuarioId'));
         return $this->response->setJSON([
             'success' => true,
             'mensaje' => 'Producto de dte eliminado correctamente'
@@ -944,6 +947,7 @@ public function eliminarDTE(){
 
         $data['facturaId'] = $this->request->getPost('facturaId');
         $formaPagoModel = new cat_17_forma_pago();
+
         // Obtener las formas de pago
         $data['formaPago'] = $formaPagoModel
             ->select("formaPagoMHId, formaPago")
@@ -955,6 +959,9 @@ public function eliminarDTE(){
 public function modalPagoDTEOperacion() {
     $facturaId = $this->request->getPost('facturaId');
     $totalPago = round($this->request->getPost('totalPago'), 2); // Aproximar a dos decimales
+    $logUsuariosModel = new log_usuarios();
+    $session = session();
+
 
     // Obtener la suma de totalReservaDetalle para la facturaId proporcionada
     $detalleReserva = new fel_facturas_detalle();
@@ -1000,6 +1007,8 @@ public function modalPagoDTEOperacion() {
     $operacionReservaPago = $reservaPago->insert($dataInsert);
     
     if ($operacionReservaPago) {
+
+        $logUsuariosModel->registrarLogInterfaces("logAgrega", "Agregó un nuevo pago (".$reservaPago->insertID().")", $session->get('logUsuarioId'));
         // Si el insert fue exitoso, devuelve el último ID insertado
         return $this->response->setJSON([
             'success' => true,
@@ -1094,6 +1103,8 @@ public function modalPagoDTEOperacion() {
 
         public function operacionConceptoDTE(){
         $conceptoDTE = new fel_facturas_detalle();
+        $logUsuariosModel = new log_usuarios();
+        $session = session();
         
             $facturaDetalleId = $this->request->getPost('facturaDetalleId');
             $conceptoProducto = $this->request->getPost('conceptoProducto');
@@ -1105,6 +1116,8 @@ public function modalPagoDTEOperacion() {
             $conceptoDTE->update($facturaDetalleId, $data);
 
             if($conceptoDTE) {
+            $logUsuariosModel->registrarLogInterfaces("logAgrega", "Agregó un nuevo concepto", $session->get('logUsuarioId'));
+            // Si el insert fue exitoso, devuelve el último ID insertado
                 return $this->response->setJSON([
                     'success' => true,
                     'mensaje' => 'Concepto agregado correctamente'
@@ -1135,6 +1148,8 @@ public function modalComplementoDTEOperacion() {
     $facturaId = $this->request->getPost('facturaId');
     $tipoComplemento = $this->request->getPost('tipoComplemento'); 
     $complementoFactura = $this->request->getPost('complementoFactura'); 
+    $logUsuariosModel = new log_usuarios();
+    $session = session();
 
 
     // Datos a insertar
@@ -1148,6 +1163,7 @@ public function modalComplementoDTEOperacion() {
     $operacionComplemento = $complementoDTE->insert($dataInsert);
     
     if ($operacionComplemento) {
+         $logUsuariosModel->registrarLogInterfaces("logAgrega", "Agregó un complemento al producto (".$complementoDTE->insertID().")", $session->get('logUsuarioId'));
         // Si el insert fue exitoso, devuelve el último ID insertado
         return $this->response->setJSON([
             'success' => true,
@@ -1204,6 +1220,8 @@ public function modalComplementoDTEOperacion() {
         public function eliminarDTEComplemento(){
         
         $eliminarDTEComplemento = new fel_facturas_complemento();
+        $logUsuariosModel = new log_usuarios();
+        $session = session();
         
         $facturaComplementoId = $this->request->getPost('facturaComplementoId');
         $data = ['flgElimina' => 1];
@@ -1211,6 +1229,7 @@ public function modalComplementoDTEOperacion() {
         $eliminarDTEComplemento->update($facturaComplementoId, $data);
     
         if($eliminarDTEComplemento) {
+            $logUsuariosModel->registrarLogInterfaces("logElimina", "Eliminó el complemento del DTE ($facturaComplementoId)", $session->get('logUsuarioId'));
             return $this->response->setJSON([
                 'success' => true,
                 'mensaje' => 'Complemento eliminado correctamente'
@@ -1612,7 +1631,7 @@ public function certificarDTEError()
     // Retornar la respuesta exitosa
     return $this->response->setJSON([
         'success' => true,
-        'mensaje' => 'Certificación con error'
+        'mensaje' => 'Error al certificar'
     ]);
 }
 
@@ -1683,6 +1702,8 @@ public function invalidarDTE()
     $facturaId = $this->request->getPost('facturaId');
     $facturaDetalleId = $this->request->getPost('facturaDetalleId');
     $retaceoDetalleId = $this->request->getPost('retaceoDetalleId'); 
+    $logUsuariosModel = new log_usuarios();
+    $session = session();
     
     // Verificar si el ID de la factura está disponible
     if (!$facturaId) {
@@ -1870,6 +1891,8 @@ public function invalidarDTE()
     ];
     $facturaModel->update($facturaId, $dataReservaEstado);
 
+
+    $logUsuariosModel->registrarLogInterfaces("logEdita", "Invalidación de DTE ($facturaId)", $session->get('logUsuarioId'));
     // Retornar la respuesta exitosa
     return $this->response->setJSON([
         'success' => true,
@@ -2496,6 +2519,8 @@ public function tablaVerJSON() {
 
     public function activarContingencia(){
         $parametrizacion = new conf_parametrizaciones();
+        $logUsuariosModel = new log_usuarios();
+        $session = session();
         
         $data = [
             'valorParametrizacion'   => 2
@@ -2505,6 +2530,7 @@ public function tablaVerJSON() {
             $operacionContingencia = $parametrizacion->update(6, $data);
 
         if ($operacionContingencia) {
+            $logUsuariosModel->registrarLogInterfaces("logAgrega", "Activó la contingencia", $session->get('logUsuarioId'));
             // Si el insert fue exitoso, devuelve el último ID insertado
             return $this->response->setJSON([
                 'success' => true,
@@ -2525,7 +2551,9 @@ public function tablaVerJSON() {
     // Intentar obtener los valores desde la solicitud POST
         $facturaId = $this->request->getPost('facturaId');
         $facturaDetalleId = $this->request->getPost('facturaDetalleId');
-        $retaceoDetalleId = $this->request->getPost('retaceoDetalleId'); 
+        $retaceoDetalleId = $this->request->getPost('retaceoDetalleId');
+        $logUsuariosModel = new log_usuarios();
+        $session = session(); 
         
         // Verificar si el ID de la factura está disponible
         if (!$facturaId) {
@@ -2716,7 +2744,7 @@ public function tablaVerJSON() {
             'estadoFactura' => "Certificado"
         ];
         $facturaModel->update($facturaId, $dataReservaEstado);
-
+        $logUsuariosModel->registrarLogInterfaces("logAgrega", "Certificación de DTE ", $session->get('logUsuarioId'));
         // Retornar la respuesta exitosa
         return $this->response->setJSON([
             'success' => true,
@@ -2835,6 +2863,8 @@ public function tablaVerJSON() {
 
         $felFacturaContingencia = new fel_factura_contingencia();
         $felFacturaContingenciaDetalle = new fel_factura_contingencia_detalle();
+        $logUsuariosModel = new log_usuarios();
+        $session = session();
 
         $facturaId          = $this->request->getPost('facturaId');
         $fechaInicio        = $this->request->getPost('fechaInicio');
@@ -2890,6 +2920,8 @@ public function tablaVerJSON() {
         // Update para cerrar la contingencia
 
         if ($operacionFinalizarContingencia) {
+
+            $logUsuariosModel->registrarLogInterfaces("logEdita", "finalizó una Contingencia  ($facturaContingenciaId)", $session->get('logUsuarioId'));
             return $this->response->setJSON([
                 'success' => true,
                 'mensaje' => 'Contingencia finalizada con éxito',
