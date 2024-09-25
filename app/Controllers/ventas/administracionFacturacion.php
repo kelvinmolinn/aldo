@@ -1249,6 +1249,8 @@ public function certificarDTE()
     $facturaId = $this->request->getPost('facturaId');
     $facturaDetalleId = $this->request->getPost('facturaDetalleId');
     $retaceoDetalleId = $this->request->getPost('retaceoDetalleId'); 
+    $logUsuariosModel = new log_usuarios();
+    $session = session();
     
     // Verificar si el ID de la factura está disponible
     if (!$facturaId) {
@@ -1440,6 +1442,7 @@ public function certificarDTE()
     ];
     $facturaModel->update($facturaId, $dataReservaEstado);
 
+    $logUsuariosModel->registrarLogInterfaces("logAgrega", "Certificó el DTE ($facturaId)", $session->get('logUsuarioId'));
     // Retornar la respuesta exitosa
     return $this->response->setJSON([
         'success' => true,
