@@ -367,6 +367,8 @@ public function tablaFacturacion()
 
     public function operacionAnularDTE(){
         $anularDTE = new fel_facturas();
+        $logUsuariosModel = new log_usuarios();
+        $session = session();
         
             $facturaId = $this->request->getPost('facturaId');
             $obsAnulacion = $this->request->getPost('obsAnulacion');
@@ -380,6 +382,8 @@ public function tablaFacturacion()
             $anularDTE->update($facturaId, $data);
 
             if($anularDTE) {
+
+                $logUsuariosModel->registrarLogInterfaces("logEdita", "Anuló el  DTE ($facturaId)", $session->get('logUsuarioId'));
                 return $this->response->setJSON([
                     'success' => true,
                     'mensaje' => 'DTE Anulado correctamente'

@@ -11,6 +11,7 @@ use App\Models\cat_29_tipo_persona;
 use App\Models\cat_22_documentos_identificacion;
 use App\Models\cat_19_actividad_economica;
 use App\Models\cat_tipo_contribuyente;
+use App\Models\log_usuarios;
 
 class administracionProveedores extends Controller
 {
@@ -56,14 +57,16 @@ class administracionProveedores extends Controller
                     <i class="fas fa-pencil-alt"></i>
                 </button>
             ';
-            $columna4 .= '
+      /*      $columna4 .= '
                 <button class="btn btn-primary mb-1" onclick="" data-toggle="tooltip" data-placement="top" title="Historial de compras">
                     <i class="fas fa-history"></i>
                 </button>
             ';
 
+            */
+
             $columna4 .= '
-                <button class="btn btn-primary mb-1" onclick="modalContactoProveedor(`'.$columna['proveedorId'].'`,`'.$columna['proveedor'].'`);" data-toggle="tooltip" data-placement="top" title="Contactos">
+                <button class="btn btn-success mb-1" onclick="modalContactoProveedor(`'.$columna['proveedorId'].'`,`'.$columna['proveedor'].'`);" data-toggle="tooltip" data-placement="top" title="Contactos">
                     <i class="fas fa-address-book"></i>
                 </button>
             ';
@@ -108,6 +111,8 @@ class administracionProveedores extends Controller
     public function modalProveedores(){
         
         $operacion = $this->request->getPost('operacion');
+        $logUsuariosModel = new log_usuarios();
+        $session = session();
 
         $catTipoPersona = new cat_29_tipo_persona;
         $data['tipoPersona'] = $catTipoPersona
@@ -164,6 +169,8 @@ class administracionProveedores extends Controller
     public function modalProveedorOperacion(){
         $operacion      = $this->request->getPost('operacion');
         $proveedorId    = $this->request->getPost('proveedorId');
+        $logUsuariosModel = new log_usuarios();
+        $session = session();
         
         $proveedor = new comp_proveedores();
 
@@ -228,6 +235,7 @@ class administracionProveedores extends Controller
             $operacionProveedor = $proveedor->insert($data);
         }
         if ($operacionProveedor) {
+            $logUsuariosModel->registrarLogInterfaces("logAgrega", "Agregó un nuevo proveedor (".$proveedor->insertID().")", $session->get('logUsuarioId'));
             // Si el insert fue exitoso, devuelve el último ID insertado
             return $this->response->setJSON([
                 'success' => true,
@@ -252,8 +260,9 @@ class administracionProveedores extends Controller
 
     public function agregarContacto(){
         $proveedorId    = $this->request->getPost('proveedorId');
-        
         $proveedorContacto = new comp_proveedores_contacto();
+        $logUsuariosModel = new log_usuarios();
+        $session = session();
 
 
         $data = [
@@ -266,6 +275,7 @@ class administracionProveedores extends Controller
         $operacionProveedor = $proveedorContacto->insert($data);
         
         if ($operacionProveedor) {
+            $logUsuariosModel->registrarLogInterfaces("logAgrega", "Agregó un contacto al proveedor, Id del contacto: (".$proveedorContacto->insertID().")", $session->get('logUsuarioId'));
             // Si el insert fue exitoso, devuelve el último ID insertado
             return $this->response->setJSON([
                 'success'               => true,

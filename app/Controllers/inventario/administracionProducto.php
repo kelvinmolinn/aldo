@@ -179,12 +179,14 @@ class AdministracionProducto extends Controller
                 }*/
             }
 
-            $columna5 .= '
+          /*  $columna5 .= '
                 <button class="btn btn-info mb-1 " onclick="modalHistorial(`'.$columna['productoId'].'`);" data-toggle="tooltip" data-placement="top" title="Historiales">
                     <span></span>
                     <i class="fas fa-clock"></i>
                 </button>
             ';
+
+            */
 
             if ($columna['estadoProducto'] == 'Activo') {
                 $mensaje = "¿Estás seguro que desea deshabilitar el producto?";
