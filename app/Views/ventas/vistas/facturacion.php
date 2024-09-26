@@ -2,10 +2,10 @@
 <hr>
 <div class="row mb-4">
     <div class="col-md-12 text-right">
-        <!--<button type= "button" id="btnNuevaReserva" class="btn btn-secondary estilo-btn d-inline" onclick="modalNotaCredito()">
+        <button type= "button" id="btnNuevaReserva" class="btn btn-secondary estilo-btn d-inline" onclick="modalNotaCredito()">
             <i class="fas fa-file-alt"></i>
             Nota de crédito
-        </button> -->
+        </button>
         <?php
              if($activarContingencia['valorParametrizacion'] == 1){
         ?>

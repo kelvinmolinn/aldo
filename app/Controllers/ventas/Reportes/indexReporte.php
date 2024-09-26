@@ -8,6 +8,7 @@ use App\Models\fel_facturas_detalle;
 use App\Models\fel_clientes;
 use App\Models\fel_cliente_contacto;
 use App\Models\fel_facturas_complemento;
+use App\Models\fel_factura_relacionada;
 
 use CodeIgniter\Controller;
 use FPDF;
@@ -54,6 +55,7 @@ class indexReporte extends Controller
         $felClientes = new fel_clientes();
         $felClienteContacto = new fel_cliente_contacto();
         $felFacturasComplemento = new fel_facturas_complemento();
+        $felFacturaRelacionada = new fel_factura_relacionada();
 
         $pdf = new PDF();
         $pdf->AliasNbPages();
@@ -124,6 +126,12 @@ class indexReporte extends Controller
         ->where('facturaId', $facturaId)
         ->first();
 
+        $facturaRelacionada = $felFacturaRelacionada
+        ->select('facturaIdRelacionada')
+        ->where('flgElimina', 0)
+        ->where('facturaId', $facturaId)
+        ->first();
+        
         $complemento =  isset($datosDteComplementos['complementoFactura']) ? $datosDteComplementos['complementoFactura'] : '';
         
         //$x = 100;
@@ -749,6 +757,7 @@ class indexReporte extends Controller
             $pdf->Cell(30,5,utf8_decode(number_format($totaPagar, 2, '.', ',')),0,0,'R');
             $pdf->SetXY(170,$alturaDetalle);
             $pdf->Cell(30,5,utf8_decode('$'),0,0,'L');
+
         }else if($datosDte['tipoDTEId'] == 4){
 
             $pdf->SetFont('Arial','B',8);
@@ -882,10 +891,22 @@ class indexReporte extends Controller
             $pdf->SetFont('Arial','B',8);
             $pdf->SetXY(10,$alturaDetalle);
             $pdf->MultiCell(70, 6, utf8_decode('Complemento:'), 0, 'L');
+            
 
             $pdf->SetFont('Arial','',8);
             $pdf->SetXY(30,$alturaDetalle);
             $pdf->MultiCell(50,6, utf8_decode($complemento), 0, 'L');
+
+            $alturaDetalle +=5;
+            $pdf->SetFont('Arial','B',8);
+            $pdf->SetXY(10,$alturaDetalle);
+            $pdf->Cell(70, 6, utf8_decode('Factura relacionada:'), 0, 'L');
+
+            $pdf->SetFont('Arial','',8);
+            $pdf->SetXY(40,$alturaDetalle);
+            $pdf->MultiCell(50,6, utf8_decode($facturaRelacionada['facturaIdRelacionada']), 0, 'L');
+
+            $alturaDetalle -=5;
 
             $pdf->SetFont('Arial','B',8);
             $pdf->SetXY(115,$alturaDetalle);

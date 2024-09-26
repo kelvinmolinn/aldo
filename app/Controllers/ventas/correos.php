@@ -278,7 +278,7 @@ class correos extends Controller
                 "nrc" => $cliente['nrcCliente'],
                 "nombre" => $cliente['cliente'],
                 "codActividad" => $cliente['actividadEconomicaId'],
-                "descActividad" => "Cría de aves de corral y producción de huevos",
+                //"descActividad" => "Cría de aves de corral y producción de huevos",
                 "nombreComercial" => $cliente['clienteComercial'],
                 "direccion" => [
                     "departamento" => $cliente['paisCiudadId'],
@@ -336,6 +336,112 @@ class correos extends Controller
                 "numPagoElectronico" => null
             ]
         );
+    } elseif ($factura['tipoDTEId'] == 4) {
+        // JSON para tipoDTEId = 4
+        $jsonDTE = array(
+            "identificacion" => [
+                "version" => 3,
+                "ambiente" => "01",
+                "tipoDte" => "02",
+                "numeroControl" => $certificacion['numeroControl'],
+                "codigoGeneracion" => strtoupper($certificacion['codigoGeneracion']),
+                "tipoModelo" => 1,
+                "tipoOperacion" => 1,
+                "tipoContingencia" => null,
+                "motivoContin" => null,
+                "fecEmi" => date('Y-m-d', strtotime($factura['fechaEmision'])),
+                "horEmi" => date('H:i:s', strtotime($factura['horaEmision'])),
+                "tipoMoneda" => "USD"
+            ],
+
+              "documentoRelacionado"=> [
+                  "tipoDocumento"=> "04",
+                  "tipoGeneracion"=> 2,
+                  "numeroDocumento"=> "2",
+                  "fechaEmision"=> "2024-09-28"
+                
+              ],
+
+            "emisor" => [
+                "nit" => "03863624-1",
+                "nrc" => "329956-5",
+                "nombre" => "BELTRAN. ABIGAIL ELIZABETH",
+                "codActividad" => 502,
+                "descActividad" => "VENTA AL POR MENOR DE OTROS PRODUCTOS N.C.P",
+                "nombreComercial" => "ALDO GAMES STORE",
+                "direccion" => [
+                    "departamento" => 6,
+                    "municipio" => 214,
+                    "complemento" => "POLIG. B, RES. LOS ELISEOS #9, SAN SALVADOR, SAN SALVADOR"
+                ],
+                "telefono" => "79221469",
+                "correo" => "aldogamesstore@gmail.com"
+            ],
+            "receptor" => [
+                "nit" => $cliente['numDocumentoIdentificacion'],
+                "nrc" => $cliente['nrcCliente'],
+                "nombre" => $cliente['cliente'],
+                "codActividad" => $cliente['actividadEconomicaId'],
+                //"descActividad" => "Cría de aves de corral y producción de huevos",
+                "nombreComercial" => $cliente['clienteComercial'],
+                "direccion" => [
+                    "departamento" => $cliente['paisCiudadId'],
+                    "municipio" => $cliente['paisEstadoId'],
+                    "complemento" => $cliente['direccionCliente']
+                ],
+                "telefono" => $telefono ? $telefono['contactoCliente'] : null,
+                "correo" => $correo ? $correo['contactoCliente'] : null,
+            ],
+            "cuerpoDocumento" => array_map(function($detalle) {
+                return [
+                    "numItem" => 1,
+                    "tipoItem" => $detalle['tipoItemMHId'],
+                    "numeroDocumento" => null,
+                    "cantidad" => $detalle['cantidadProducto'],
+                    "codigo" => $detalle['codigoProducto'],
+                    "uniMedida" => $detalle['unidadMedidaId'],
+                    "descripcion" => $detalle['producto'],
+                    "precioUni" => $detalle['precioUnitario'],
+                    "montoDescu" => $detalle['descuentoTotal'],
+                    "ventaGravada" => $detalle['totalDetalleIVA'],
+                    "tributos" => [""], // Tributos asumidos
+                    "psv" => 0,
+                    "noGravado" => 0
+                ];
+            }, $detalles),
+            "resumen" => [
+                "totalNoSuj" => 0,
+                "totalExenta" => 0,
+                "totalGravada" => number_format($totalGravada, 2, '.', ','),
+                "subTotalVentas" => number_format($totalGravada, 2, '.', ','),
+                "descuNoSuj" => 0,
+                "descuExenta" => 0,
+                "descuGravada" => number_format($totalDescu, 2, '.', ','),
+                "porcentajeDescuento" => number_format($porcentajeDescuento, 2, '.', ','),
+                "totalDescu" => number_format($totalDescu, 2, '.', ','),
+                "tributos" => [
+                    [
+                        "codigo" => "",
+                        "descripcion" => "Impuesto al Valor Agregado 13%",
+                        "valor" => number_format($totalIva, 2, '.', ',')
+                    ]
+                ],
+                "subTotal" => number_format($totalGravada, 2, '.', ','),
+                "ivaPerci1" => 17.5,
+                "ivaRete1" => 0,
+                "reteRenta" => 0,
+                "montoTotalOperacion" => number_format($totalGravada + $totalIva - $totalDescu, 2, '.', ','),
+                "totalNoGravado" => 0,
+                "totalPagar" => number_format($totalGravada + $totalIva - $totalDescu, 2, '.', ','),
+                "totalLetras" => $totalEnLetras,
+                "saldoFavor" => 0,
+                "condicionOperacion" => 1,
+                "pagos" => $pagosData,
+                "numPagoElectronico" => null
+            ]
+        );
+    }else{
+
     }
 
         $json = json_encode($jsonDTE, JSON_PRETTY_PRINT);

@@ -3,7 +3,7 @@
 namespace App\Controllers\compras\reportes;
 use CodeIgniter\Controller;
 
-use App\Models\comp_compras;
+use App\Models\comp_compras_detalle;
 
 class administracionReportesCompras extends Controller{
 
@@ -32,15 +32,18 @@ class administracionReportesCompras extends Controller{
     }
     
     public function reporteDetalleCompras(){
-        $compCompras = new comp_compras();
+        $compComprasDetalle = new comp_compras_detalle();
         $data['variable'] = 0;
 
         $tipoCompra = $this->request->getPost('tipoCompra');
 
-        $data['detalles'] = $compCompras 
-            ->select('DATE_FORMAT(comp_compras.fechaDocumento, "%d-%m-%Y") as fechaDocumento,comp_compras.numFactura,cat_02_tipo_dte.tipoDocumentoDTE')
+        $data['detalles'] = $compComprasDetalle 
+            ->select('DATE_FORMAT(comp_compras.fechaDocumento, "%d-%m-%Y") as fechaDocumento,comp_compras.numFactura,cat_02_tipo_dte.tipoDocumentoDTE,comp_proveedores.proveedor,inv_productos.codigoProducto,inv_productos.producto,comp_compras_detalle.precioUnitario,comp_compras_detalle.precioUnitarioIVA,comp_compras_detalle.cantidadProducto,comp_compras_detalle.ivaUnitario,comp_compras_detalle.totalCompraDetalle,comp_compras_detalle.totalCompraDetalleIVA')
+            ->join('comp_compras','comp_compras.compraId = comp_compras_detalle.compraId')
             ->join('cat_02_tipo_dte','cat_02_tipo_dte.tipoDTEId = comp_compras.tipoDTEId')
-            ->where('comp_compras.flgElimina', 0)
+            ->join('comp_proveedores','comp_proveedores.proveedorId = comp_compras.proveedorId')
+            ->join('inv_productos', 'inv_productos.productoId = comp_compras_detalle.productoId')
+            ->where('comp_compras_detalle.flgElimina', 0)
             ->where('comp_compras.tipoCompra', $tipoCompra)
             ->findAll();
 
