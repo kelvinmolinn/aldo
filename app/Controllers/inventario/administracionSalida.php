@@ -15,6 +15,8 @@ use App\Models\conf_parametrizaciones;
 use App\Models\inv_descargos;
 use App\Models\inv_descargos_detalle;
 use App\Models\vista_usuarios_empleados;
+use App\Models\log_usuarios;
+
 
 class AdministracionSalida extends Controller
 {
@@ -77,6 +79,8 @@ class AdministracionSalida extends Controller
             $model = new inv_descargos();
             $session = session();
             $usuarioIdAgrega = $session->get("usuarioId");
+            $logUsuariosModel = new log_usuarios();
+        
     
             $data = [
                 'sucursalId'        => $this->request->getPost('sucursalId'),
@@ -87,13 +91,16 @@ class AdministracionSalida extends Controller
             ];
         
             if ($operacion == 'editar') {
+               
                 $operacionSalida = $model->update($this->request->getPost('descargosId'), $data);
             } else {
+                
                 // Insertar datos en la base de datos
                 $operacionSalida = $model->insert($data);
             }
         
             if ($operacionSalida) {
+                $logUsuariosModel->registrarLogInterfaces("logAgrega", "Agregó un nuevo Descargo/Salida (".$model->insertID().")", $session->get('logUsuarioId'));
                 // Si el insert fue exitoso, devuelve el último ID insertado
                 return $this->response->setJSON([
                     'success' => true,
@@ -259,6 +266,8 @@ public function modalNuevaSalidaOperacion()
     $descargosId = $this->request->getPost('descargosId');
     $productoId = $this->request->getPost('productoId');
     $cantidadDescargo = $this->request->getPost('cantidadDescargo');
+    $logUsuariosModel = new log_usuarios();
+    $session = session();
     
     //Necesito Traer sucursalId de inv_descargos 
     $descargoData = $sucursalModel->find($descargosId);
@@ -336,13 +345,16 @@ public function modalNuevaSalidaOperacion()
     ];
 
     if ($operacion == 'editar' && $descargoDetalleId) {
+        $logUsuariosModel->registrarLogInterfaces("logEdita", "Actualizó el producto del detalle de la salida/Descargo ($descargoDetalleId)", $session->get('logUsuarioId'));
         $operacionSalida = $model->update($descargoDetalleId, $data);
     } else {
+        $logUsuariosModel->registrarLogInterfaces("logAgrega", "Agregó producro al detalle de la salida/Descargo ", $session->get('logUsuarioId'));
         // Insertar datos en la base de datos
         $operacionSalida = $model->insert($data);
     }
 
     if ($operacionSalida) {
+        
         // Si el insert fue exitoso, devuelve el último ID insertado
         return $this->response->setJSON([
             'success' => true,
@@ -361,6 +373,8 @@ public function modalNuevaSalidaOperacion()
 public function eliminarSalida(){
     
     $eliminarSalida = new inv_descargos_detalle();
+    $logUsuariosModel = new log_usuarios();
+    $session = session();
     
     $descargoDetalleId = $this->request->getPost('descargoDetalleId');
     $data = ['flgElimina' => 1];
@@ -368,6 +382,7 @@ public function eliminarSalida(){
     $eliminarSalida->update($descargoDetalleId, $data);
 
     if($eliminarSalida) {
+        $logUsuariosModel->registrarLogInterfaces("logElimina", "Eliminó el producto del detalle de la salida ($descargoDetalleId)", $session->get('logUsuarioId'));
         return $this->response->setJSON([
             'success' => true,
             'mensaje' => 'Salida de producto eliminado correctamente'
@@ -543,6 +558,8 @@ public function tablaContinuarSalida()
         $productosModel = new Inv_Productos_Existencias();
         $modelKardex = new Inv_Kardex();
         $productosInfoModel = new Inv_Productos();
+        $logUsuariosModel = new log_usuarios();
+        $session = session();
 
         $datos = $modelDescargosDetalle
             ->select('inv_descargos_detalle.descargoDetalleId, inv_descargos_detalle.productoId, inv_descargos_detalle.descargosId, inv_descargos_detalle.cantidadDescargo, inv_descargos_detalle.obsDescargoDetalle, inv_descargos.sucursalId, inv_descargos.estadoDescargo')
@@ -610,6 +627,9 @@ public function tablaContinuarSalida()
                 'estadoDescargo' => "Finalizado"
             ];
             $modelDescargos->update($descargosId, $dataDescargoEstado);
+
+
+            $logUsuariosModel->registrarLogInterfaces("logEdita", "Finalizó el Descargo/Salida ($descargosId)", $session->get('logUsuarioId'));
 
             return $this->response->setJSON([
                 'success' => true,
