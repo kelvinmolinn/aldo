@@ -12,6 +12,7 @@ use App\Models\comp_compras_detalle;
 use App\Models\inv_kardex;
 use App\Models\inv_productos_existencias;
 use App\Models\inv_productos;
+use App\Models\log_usuarios;
 
 class administracionRetaceo extends Controller
 {
@@ -131,6 +132,8 @@ class administracionRetaceo extends Controller
 
     public function modalRetaceoOperacion(){
         $comp_retaceo = new comp_retaceo;
+        $logUsuariosModel = new log_usuarios();
+        $session = session();
         
         $data = [
             "numRetaceo"       => $this->request->getPost('numeroFactura'),
@@ -145,6 +148,7 @@ class administracionRetaceo extends Controller
         $nuevoRetaceo = $comp_retaceo->insert($data);
 
         if ($nuevoRetaceo) {
+            $logUsuariosModel->registrarLogInterfaces("logAgrega", "Emitió un nuevo encabezado de Retaceo (".$comp_retaceo->insertID().")", $session->get('logUsuarioId'));
             // Si el insert fue exitoso, devuelve el último ID insertado
             return $this->response->setJSON([
                 'success' => true,
@@ -163,8 +167,9 @@ class administracionRetaceo extends Controller
     public function modalAnularRetaceo(){
         $comp_retaceo = new comp_retaceo();
         $compRetaceoDetalle = new comp_retaceo_detalle();
-
         $retaceoId = $this->request->getPost('retaceoId');
+        $logUsuariosModel = new log_usuarios();
+        $session = session();
 
         $data['campos'] = $comp_retaceo
         ->select('retaceoId,numRetaceo,totalFlete,totalGastos,estadoRetaceo')
@@ -191,9 +196,10 @@ class administracionRetaceo extends Controller
 
     public function operacionAnularRetaceo(){
         $anularRetaceo = new comp_retaceo();
-        
-            $retaceoId = $this->request->getPost('retaceoId');
-            $observacionAnulacion = $this->request->getPost('observacionAnulacion');
+        $retaceoId = $this->request->getPost('retaceoId');
+        $observacionAnulacion = $this->request->getPost('observacionAnulacion');
+        $logUsuariosModel = new log_usuarios();
+        $session = session();
 
             $data = [
                 'flgElimina'    => 0,
@@ -204,6 +210,7 @@ class administracionRetaceo extends Controller
             $anularRetaceo->update($retaceoId, $data);
 
             if($anularRetaceo) {
+                $logUsuariosModel->registrarLogInterfaces("logEdita", "Anuló el retaceo ($retaceoId)", $session->get('logUsuarioId'));
                 return $this->response->setJSON([
                     'success' => true,
                     'mensaje' => 'Retaceo Anulado correctamente'
@@ -255,6 +262,8 @@ class administracionRetaceo extends Controller
 
     public function vistaActualizarRetaceo(){
         $comp_retaceo = new comp_retaceo();
+        $logUsuariosModel = new log_usuarios();
+        $session = session();
 
         $data = [
             'numRetaceo'        => $this->request->getPost('numeroRetaceo'),
@@ -268,6 +277,7 @@ class administracionRetaceo extends Controller
             $operacionRetaceo = $comp_retaceo->update($this->request->getPost('retaceoId'), $data);
 
         if ($operacionRetaceo) {
+            $logUsuariosModel->registrarLogInterfaces("logEdita", "Actualizó el encabezado del retaceo", $session->get('logUsuarioId'));
             // Si el insert fue exitoso, devuelve el último ID insertado
             return $this->response->setJSON([
                 'success' => true,
@@ -418,9 +428,10 @@ class administracionRetaceo extends Controller
         
         $compraDetalle = new comp_compras_detalle();
         $comp_compras = new comp_compras();
-
         $compraRetaceo = $this->request->getPost('selectCompraRetaceo');
         $retaceoId = $this->request->getPost('retaceoId');
+        $logUsuariosModel = new log_usuarios();
+        $session = session();
 
 
         $compDetalle = $compraDetalle
@@ -456,6 +467,7 @@ class administracionRetaceo extends Controller
             $operacionEstadoCompra = $comp_compras->update($compraId, $data);
 
         if ($operacionEstadoCompra) {
+            $logUsuariosModel->registrarLogInterfaces("logAgrega", "Agregó una compra al retaceo ", $session->get('logUsuarioId'));
             // Si el insert fue exitoso, devuelve el último ID insertado
             return $this->response->setJSON([
                 'success' => true,
@@ -545,8 +557,10 @@ class administracionRetaceo extends Controller
     }
     public function modalOperacionDai(){
         $retaceoDetalle = new comp_retaceo_detalle();
-        
         $retaceoDetalleId = $this->request->getPost('retaceoDetalleId');
+        $logUsuariosModel = new log_usuarios();
+        $session = session();
+
 
         $data = [
             'DAI'       => $this->request->getPost('DAI')
@@ -556,6 +570,7 @@ class administracionRetaceo extends Controller
             $operacionCalculoDAI = $retaceoDetalle->update($retaceoDetalleId, $data);
 
         if ($operacionCalculoDAI) {
+            $logUsuariosModel->registrarLogInterfaces("logAgrega", "Agregó el impuesto DAI al retaceo ", $session->get('logUsuarioId'));
             // Si el insert fue exitoso, devuelve el último ID insertado
             return $this->response->setJSON([
                 'success' => true,
@@ -579,6 +594,8 @@ class administracionRetaceo extends Controller
         $comprasDetalle = new comp_compras_detalle();
         $invProductos = new inv_productos();
         $comp_compras = new comp_compras();
+        $logUsuariosModel = new log_usuarios();
+        $session = session();
 
         $retaceoId = $this->request->getPost('retaceoId');
         $observacionFinalizarRetaceo = $this->request->getPost('observacionFinalizarCompra');
@@ -694,6 +711,7 @@ class administracionRetaceo extends Controller
 
 
         if ($operacionEstadoRetaceo) {
+            $logUsuariosModel->registrarLogInterfaces("logEdita", "Finalizó el retaceo ($retaceoId)", $session->get('logUsuarioId'));
             // Si el insert fue exitoso, devuelve el último ID insertado
             return $this->response->setJSON([
                 'success' => true,
