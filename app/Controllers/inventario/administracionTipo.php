@@ -5,6 +5,8 @@ namespace App\Controllers\inventario;
 use CodeIgniter\Controller;
 use App\Models\inv_productos_tipo;
 use App\Models\inv_productos;
+use App\Models\log_usuarios;
+
 class AdministracionTipo extends Controller
 {
 
@@ -50,6 +52,8 @@ class AdministracionTipo extends Controller
     public function eliminarTipo()
     {
         $productoTipoId = $this->request->getPost('productoTipoId');
+        $logUsuariosModel = new log_usuarios();
+        $session = session();
         
         // Verificar si el tipo de producto está asignado a algún producto
         $productosModel = new Inv_Productos();
@@ -68,6 +72,7 @@ class AdministracionTipo extends Controller
         $resultado = $eliminarTipo->update($productoTipoId, $data);
 
         if ($resultado) {
+            $logUsuariosModel->registrarLogInterfaces("logElimina", "Eliminó un tipo de producto ($productoTipoId)", $session->get('logUsuarioId'));
             return $this->response->setJSON([
                 'success' => true,
                 'mensaje' => 'Tipo de producto eliminado correctamente'
@@ -137,6 +142,8 @@ class AdministracionTipo extends Controller
         $model = new inv_productos_tipo();
         $productoTipo = $this->request->getPost('productoTipo');
         $productoTipoId = $this->request->getPost('productoTipoId');
+        $logUsuariosModel = new log_usuarios();
+        $session = session();
 
         if ($model->existeTipo($productoTipo, $productoTipoId)) {
             return $this->response->setJSON([
@@ -157,6 +164,7 @@ class AdministracionTipo extends Controller
             }
         
             if ($operacionTipo) {
+                $logUsuariosModel->registrarLogInterfaces("logAgrega", "Agregó un nuevo tipo de producto (".$model->insertID().")", $session->get('logUsuarioId'));
                 // Si el insert fue exitoso, devuelve el último ID insertado
                 return $this->response->setJSON([
                     'success' => true,

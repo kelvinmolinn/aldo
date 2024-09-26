@@ -2,10 +2,10 @@
 
 namespace App\Controllers\inventario;
 use CodeIgniter\Controller;
-
-
 use App\Models\inv_productos_plataforma;
 use App\Models\inv_productos;
+use App\Models\log_usuarios;
+
 class AdministracionPlataforma extends Controller
 {
 
@@ -51,6 +51,8 @@ class AdministracionPlataforma extends Controller
     public function eliminarPlataforma()
     {
         $productoPlataformaId = $this->request->getPost('productoPlataformaId');
+        $logUsuariosModel = new log_usuarios();
+        $session = session();
         
         // Verificar si la plataforma de producto está asignada a algún producto
         $productosModel = new Inv_Productos();
@@ -69,6 +71,7 @@ class AdministracionPlataforma extends Controller
         $resultado = $eliminarPlataforma->update($productoPlataformaId, $data);
 
         if ($resultado) {
+            $logUsuariosModel->registrarLogInterfaces("logElimina", "Eliminó una plataforma ($productoPlataformaId)", $session->get('logUsuarioId'));
             return $this->response->setJSON([
                 'success' => true,
                 'mensaje' => 'Plataforma de producto eliminada correctamente'
@@ -133,12 +136,13 @@ class AdministracionPlataforma extends Controller
     public function modalPlataformaOperacion()
     {
 
-
-            // Continuar con la operación de inserción o actualización en la base de datos
-            $operacion = $this->request->getPost('operacion');
-            $model = new inv_productos_plataforma();
-            $productoPlataforma = $this->request->getPost('productoPlataforma');
-            $productoPlataformaId = $this->request->getPost('productoPlataformaId');
+        // Continuar con la operación de inserción o actualización en la base de datos
+        $operacion = $this->request->getPost('operacion');
+        $model = new inv_productos_plataforma();
+        $productoPlataforma = $this->request->getPost('productoPlataforma');
+        $productoPlataformaId = $this->request->getPost('productoPlataformaId');
+        $logUsuariosModel = new log_usuarios();
+        $session = session();
 
         if ($model->existePlataforma($productoPlataforma, $productoPlataformaId)) {
             return $this->response->setJSON([
@@ -159,6 +163,7 @@ class AdministracionPlataforma extends Controller
             }
         
             if ($operacionPlataforma) {
+                $logUsuariosModel->registrarLogInterfaces("logAgrega", "Agregó una nueva plataforma (".$model->insertID().")", $session->get('logUsuarioId'));
                 // Si el insert fue exitoso, devuelve el último ID insertado
                 return $this->response->setJSON([
                     'success' => true,

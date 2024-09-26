@@ -5,6 +5,8 @@ namespace App\Controllers\inventario;
 use CodeIgniter\Controller;
 use App\Models\cat_14_unidades_medida;
 use App\Models\inv_productos;
+use App\Models\log_usuarios;
+
 class AdministracionUnidades extends Controller
 {
     public function index()
@@ -50,7 +52,8 @@ class AdministracionUnidades extends Controller
     public function eliminarUnidades()
     {
         $unidadMedidaId = $this->request->getPost('unidadMedidaId');
-        
+        $logUsuariosModel = new log_usuarios();
+        $session = session();
         // Verificar si la unidad de medida está asignada a algún producto
         $productosModel = new Inv_Productos();
         $productoAsignado = $productosModel->where('unidadMedidaId', $unidadMedidaId)->first();
@@ -68,6 +71,7 @@ class AdministracionUnidades extends Controller
         $resultado = $eliminarUnidades->update($unidadMedidaId, $data);
 
         if ($resultado) {
+            $logUsuariosModel->registrarLogInterfaces("logElimina", "Eliminó una unidad de medida ($unidadMedidaId)", $session->get('logUsuarioId'));
             return $this->response->setJSON([
                 'success' => true,
                 'mensaje' => 'Unidad de medida eliminada correctamente'
@@ -87,6 +91,8 @@ class AdministracionUnidades extends Controller
             'unidadMedida' => 'required|is_unique[cat_14_unidades_medida.unidadMedida]',
             'abreviaturaUnidadMedida' => 'required|is_unique[cat_14_unidades_medida.abreviaturaUnidadMedida]'
         ]);
+        $logUsuariosModel = new log_usuarios();
+        $session = session();
     
         // Ejecutar la validación
         if (!$validation->withRequest($this->request)->run()) {
@@ -114,6 +120,7 @@ class AdministracionUnidades extends Controller
         }
     
         if ($operacionUnidad) {
+            $logUsuariosModel->registrarLogInterfaces("logAgrega", "Agregó una nueva unidad de medida (".$model->insertID().")", $session->get('logUsuarioId'));
             // Si el insert fue exitoso, devuelve el último ID insertado
             return $this->response->setJSON([
                 'success' => true,
