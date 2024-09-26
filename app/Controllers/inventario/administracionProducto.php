@@ -15,6 +15,7 @@ use App\Models\conf_parametrizaciones;
 use App\Models\vista_usuarios_empleados;
 use App\Models\fel_reservas;
 use App\Models\fel_reservas_detalle;
+use App\Models\log_usuarios;
 
 class AdministracionProducto extends Controller
 {
@@ -227,6 +228,8 @@ class AdministracionProducto extends Controller
     public function eliminarProducto(){
     
         $eliminarProducto = new inv_productos();
+        $logUsuariosModel = new log_usuarios();
+        $session = session();
         
         $productoId = $this->request->getPost('productoId');
         $data = ['flgElimina' => 1];
@@ -234,6 +237,7 @@ class AdministracionProducto extends Controller
         $eliminarProducto->update($productoId, $data);
 
         if($eliminarProducto) {
+            $logUsuariosModel->registrarLogInterfaces("logElimina", "Eliminó el producto ($productoId)", $session->get('logUsuarioId'));
             return $this->response->setJSON([
                 'success' => true,
                 'mensaje' => 'Producto eliminado correctamente'
@@ -254,6 +258,8 @@ class AdministracionProducto extends Controller
         $operacion = $this->request->getPost('operacion');
         $productoId = $this->request->getPost('productoId');
         $model = new inv_productos();
+        $logUsuariosModel = new log_usuarios();
+        $session = session();
 
         if ($model->existeCodigo($codigoProducto, $productoId)) {
             return $this->response->setJSON([
@@ -275,8 +281,11 @@ class AdministracionProducto extends Controller
         ];
     
         if ($operacion == 'editar') {
+            $logUsuariosModel->registrarLogInterfaces("logEdita", "Actualizó el producto ($productoId)", $session->get('logUsuarioId'));
             $operacionProducto = $model->update($this->request->getPost('productoId'), $data);
         } else {
+
+            $logUsuariosModel->registrarLogInterfaces("logAgrega", "Agregó un nuevo producto", $session->get('logUsuarioId'));
             // Insertar datos en la base de datos
             $operacionProducto = $model->insert($data);
         }
@@ -440,6 +449,8 @@ class AdministracionProducto extends Controller
     $operacion = $this->request->getPost('operacion');
     $productoExistenciaId = $this->request->getPost('productoExistenciaId');
     $kardexId = $this->request->getPost('kardexId');
+    $logUsuariosModel = new log_usuarios();
+    $session = session();
 
 
     // Crear instancia del modelo
@@ -525,10 +536,10 @@ class AdministracionProducto extends Controller
 
     public function ActivarDesactivar(){
         $desactivarActivarProducto = new inv_productos();
-    
-
         $productoId = $this->request->getPost('productoId');
         $estadoProducto = $this->request->getPost('estadoProducto');
+        $logUsuariosModel = new log_usuarios();
+        $session = session();
 
         if($estadoProducto == 'Activo'){
             $data = ['estadoProducto' => 'Inactivo'];
@@ -540,6 +551,7 @@ class AdministracionProducto extends Controller
         $desactivarActivarProducto->update($productoId, $data);
 
         if($desactivarActivarProducto) {
+            $logUsuariosModel->registrarLogInterfaces("logEdita", "Actualizó el estado del producto ($productoId)", $session->get('logUsuarioId'));
             return $this->response->setJSON([
                 'success' => true,
                 'mensaje' => 'Se cambió el estado con éxito'
@@ -617,6 +629,8 @@ class AdministracionProducto extends Controller
     
     $productoId = $this->request->getPost('productoId');
     $precioVentaNuevo = $this->request->getPost('precioVentaNuevo');
+    $logUsuariosModel = new log_usuarios();
+    $session = session();
 
     // Obtener el precioVenta y costoPromedio actual de inv_productos
     $producto = $productoModel->select('precioVenta, costoPromedio, costoUnitarioFOB')->where('productoId', $productoId)->first();
@@ -643,8 +657,11 @@ class AdministracionProducto extends Controller
 
     // Realizar la operación de inserción en log_productos_precios
     if ($operacion == 'editar') {
+        $logUsuariosModel->registrarLogInterfaces("logEdita", "Actualizó el precio del productp ($productoId)", $session->get('logUsuarioId'));
         $operacionPrecio = $model->update($this->request->getPost('logProductoPrecioId'), $dataLog);
     } else {
+
+        $logUsuariosModel->registrarLogInterfaces("logAgrega", "Agregó un nuevo precio al producto", $session->get('logUsuarioId'));
         $operacionPrecio = $model->insert($dataLog);
     }
 
