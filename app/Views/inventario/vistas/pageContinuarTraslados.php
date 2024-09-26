@@ -70,7 +70,7 @@
     <div class="text-right">
             <button type="submit" id="btnguardarTraslado" class="btn btn-primary">
                 <i class="fas fa-pencil-alt"></i>
-                Actualizar compra
+                Actualizar traslado
             </button>
         </div>
 </form>

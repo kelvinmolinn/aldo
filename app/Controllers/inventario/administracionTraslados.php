@@ -18,6 +18,7 @@ use App\Models\vista_usuarios_empleados;
 use App\Models\conf_empleados;
 use App\Models\comp_compras_detalle; 
 use App\Models\comp_retaceo_detalle;
+use App\Models\log_usuarios;
 
 class AdministracionTraslados extends Controller
 {
@@ -88,6 +89,8 @@ class AdministracionTraslados extends Controller
             $operacion = $this->request->getPost('operacion');
             $trasladosId = $this->request->getPost('trasladosId');
             $model = new inv_traslados();
+            $logUsuariosModel = new log_usuarios();
+            $session = session();
 
     
             $data = [
@@ -103,11 +106,13 @@ class AdministracionTraslados extends Controller
             if ($operacion == 'editar') {
                 $operacionSalida = $model->update($this->request->getPost('trasladosId'), $data);
             } else {
+
                 // Insertar datos en la base de datos
                 $operacionSalida = $model->insert($data);
             }
         
             if ($operacionSalida) {
+                $logUsuariosModel->registrarLogInterfaces("logAgrega", "Agregó un nuevo encabezado para el traslado (".$model->insertID().")", $session->get('logUsuarioId'));
                 // Si el insert fue exitoso, devuelve el último ID insertado
                 return $this->response->setJSON([
                     'success' => true,
@@ -300,6 +305,8 @@ class AdministracionTraslados extends Controller
         $trasladosId = $this->request->getPost('trasladosId');
         $productoId = $this->request->getPost('productoId');
         $cantidadTraslado = $this->request->getPost('cantidadTraslado');
+        $logUsuariosModel = new log_usuarios();
+        $session = session();
         
         //Necesito Traer sucursalId de inv_traslados 
         $trasladoData = $sucursalModel->find($trasladosId);
@@ -401,6 +408,8 @@ class AdministracionTraslados extends Controller
     public function eliminarTraslado(){
         
         $eliminarTraslado = new inv_traslados_detalles();
+        $logUsuariosModel = new log_usuarios();
+        $session = session();
         
         $trasladoDetalleId = $this->request->getPost('trasladoDetalleId');
         $data = ['flgElimina' => 1];
@@ -408,6 +417,7 @@ class AdministracionTraslados extends Controller
         $eliminarTraslado->update($trasladoDetalleId, $data);
 
         if($eliminarTraslado) {
+            $logUsuariosModel->registrarLogInterfaces("logElimina", "Eliminó el producto del traslado detalle ($trasladoDetalleId)", $session->get('logUsuarioId'));
             return $this->response->setJSON([
                 'success' => true,
                 'mensaje' => 'Traslado de producto eliminado correctamente'
@@ -481,6 +491,8 @@ class AdministracionTraslados extends Controller
     function vistaActualizarTrasladoOperacion(){
         $traslados = new inv_traslados;
         $trasladosId = $this->request->getPost('trasladosId');
+        $logUsuariosModel = new log_usuarios();
+        $session = session();
             // Verificar si hay productos agregados al traslado
             $productosModel = new inv_traslados_detalles();
             $productosAgregados = $productosModel
@@ -509,6 +521,7 @@ class AdministracionTraslados extends Controller
             $operacionCompra = $traslados->update($this->request->getPost('trasladosId'), $data);
 
         if ($operacionCompra) {
+            $logUsuariosModel->registrarLogInterfaces("logEdita", "Actualizó el encabezado del traslado ($trasladosId)", $session->get('logUsuarioId'));
             // Si el insert fue exitoso, devuelve el último ID insertado
             return $this->response->setJSON([
                 'success' => true,
@@ -531,6 +544,8 @@ class AdministracionTraslados extends Controller
         $trasladosId = $this->request->getPost('trasladosId');
         $trasladoDetalleId = $this->request->getPost('trasladoDetalleId');
         $retaceoDetalleId = $this->request->getPost('retaceoDetalleId'); // Asumiendo que este valor viene de la solicitud
+        $logUsuariosModel = new log_usuarios();
+        $session = session();
         
         $modelTrasladosDetalle = new inv_traslados_detalles();
         $modelTraslados = new inv_traslados();
@@ -717,7 +732,7 @@ class AdministracionTraslados extends Controller
             ];
             $modelTraslados->update($trasladosId, $dataTrasladoEstado);
         }
-
+        $logUsuariosModel->registrarLogInterfaces("logEdita", "Actualizó el estado del traslado a finalizado ($trasladosId)", $session->get('logUsuarioId'));
         return $this->response->setJSON([
             'success' => true,
             'mensaje' => 'Todos los productos tienen suficiente existencia para el traslado.',
