@@ -108,7 +108,7 @@
                             title: 'Operación completada:',
                             text: response.mensaje
                         }).then((result) => {
-                            cambiarInterfaz('ventas/admin-facturacion/vista/continuar/dte', {facturaId: response.facturaId, contigencia: response.contigencia});
+                            cambiarInterfaz('ventas/admin-facturacion/vista/continuar/dte', {facturaId: response.facturaId, contingencia: response.contingencia});
                         });
                     } else {
                         // Insert fallido, mostrar mensaje de error con Sweet Alert

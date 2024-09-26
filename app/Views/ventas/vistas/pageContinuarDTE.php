@@ -111,7 +111,7 @@
                 <?php 
                     }else{
                 ?>
-                <button type="submit" id="btnCertificarDTE" class="btn btn-primary" onclick="certificarContingenciaDTE();">
+                <button type="submit" id="btnCertificarContingenciaDTE" class="btn btn-primary" onclick="certificarContingenciaDTE();">
                     <i class="fas fa-save"></i>
                     Finalizar DTE en contingencia
                 </button>

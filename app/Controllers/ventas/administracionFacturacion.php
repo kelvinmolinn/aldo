@@ -401,9 +401,11 @@ public function tablaFacturacion()
         $session = session();
         $facturaId = $this->request->getPost('facturaId');
         $contingencia = $this->request->getPost('contingencia');
+
         $camposSession = [
             'renderVista' => 'No',
-            'facturaId'    => $facturaId
+            'facturaId'    => $facturaId,
+            'contingencia' => $contingencia
         ];
         $session->set([
             'route'             => 'ventas/admin-facturacion/vista/continuar/dte',

@@ -1516,12 +1516,13 @@ public function tablaContinuarReserva()
                   ->where('parametrizacionId', 6)
                   ->first();
 
+        $contingencia = $contingenciaActivada['valorParametrizacion'];
 
         return $this->response->setJSON([
             'success' => true,
             'mensaje' => 'Reserva trasladada a facturación con éxito.',
             'facturaId'    => $facturaId,
-            'contingencia' => $contingenciaActivada,
+            'contingencia' => $contingencia,
         ]);
     }
 
