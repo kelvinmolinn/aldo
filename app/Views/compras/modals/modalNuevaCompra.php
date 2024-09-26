@@ -160,23 +160,31 @@
 
         $("#selectTipoCompra").on('change', function() {
             if ($(this).val() == 'Local') {
-                $("#selectPais").val('61').trigger('change');
-                $("#selectPais").prop('readonly', true);
+                $("#selectPais").val('61').trigger('change');  // Seleccionar El Salvador
+                $("#selectPais option[value='61']").show();    // Asegurarse de que El Salvador esté visible
+                $("#selectPais").prop('disabled', true);
+
                 $("#proveedorLocal").show();
                 $("#proveedorInternacional").hide();
                 $("#select").hide();
                 $("#selectVacio").prop('required', false);
                 $("#selectProveedor").prop('required', true);
                 $("#selectProveedorInternacionales").prop('required', false);
+
+                $("#selectRetaceo").val('No').trigger('change');
+                $("#selectRetaceo").prop('disabled', true);
             } else {
-                $("#selectPais").val('').trigger('change');
-                $("#selectPais").prop('readonly', false);
+                $("#selectPais").prop('disabled', false);
+
                 $("#proveedorInternacional").show();
                 $("#proveedorLocal").hide();
                 $("#select").hide();
                 $("#selectVacio").prop('required', false);
                 $("#selectProveedor").prop('required', false);
                 $("#selectProveedorInternacionales").prop('required', true);
+
+                $("#selectRetaceo").val('').trigger('change'); // Opcional: resetear el valor para que el usuario elija
+                $("#selectRetaceo").prop('disabled', false);
             }
         });
 

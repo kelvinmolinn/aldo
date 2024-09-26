@@ -211,6 +211,7 @@ class administracionCompras extends Controller
         $data['tipoDTE'] = $tipoDte
                         ->select("tipoDTEId,tipoDocumentoDTE")
                         ->where("flgElimina", 0)
+                        ->whereNotIn('tipoDTEId', [4])
                         ->findAll();
         $data['selectProveedor'] = $proveedor
                         ->select("proveedorId,proveedor")
