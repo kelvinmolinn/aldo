@@ -118,7 +118,10 @@ class reportePreciosProducto extends Controller
 
             $pdf->SetXY(25,$y);
             $pdf->SetFont('Arial', '', 8);
-            $pdf->Cell(35,10,utf8_decode("(".$codigo.") ".$producto),1,0,'C');
+            $pdf->MultiCell(35,4,utf8_decode("(".$codigo.") ".$producto),0,'C');
+
+            $pdf->SetXY(25,$y);
+            $pdf->Cell(35,10,'',1, 1,'C');
 
             $pdf->SetXY(60, $y); // Posicionar la celda
             $pdf->SetFont('Arial', '', 8);
@@ -126,11 +129,20 @@ class reportePreciosProducto extends Controller
 
             $pdf->SetXY(110,$y);
             $pdf->SetFont('Arial', '', 8);
-            $pdf->Cell(45,10,utf8_decode("$ ".number_format($precioSinIva, 2, '.', ',')),1,0,'C');
+            $pdf->Cell(45,10,utf8_decode("$ ".number_format($precioSinIva, 2, '.', ',')),1,0,'R');
+
+            $pdf->SetXY(110,$y);
+            $pdf->SetFont('Arial', '', 8);
+            $pdf->Cell(45,10,utf8_decode("$ "),1,0,'L');
+
 
             $pdf->SetXY(155,$y);
             $pdf->SetFont('Arial', '', 8);
-            $pdf->Cell(45,10,utf8_decode("$ ".number_format($precioConIva, 2, '.', ',')),1,0,'C');
+            $pdf->Cell(45,10,utf8_decode("$ ".number_format($precioConIva, 2, '.', ',')),1,0,'R');
+
+            $pdf->SetXY(155,$y);
+            $pdf->SetFont('Arial', '', 8);
+            $pdf->Cell(45,10,utf8_decode("$ "),1,0,'L');
 
             $y += 10;
 

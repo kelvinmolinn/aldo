@@ -1,3 +1,10 @@
+<style>
+    /* Definir una altura máxima para el modal */
+    .modal-fullscreen .modal-body {
+        max-height: calc(100vh - 200px); /* Ajusta este valor según lo que necesites */
+        overflow-y: auto; /* Permite el desplazamiento vertical */
+    }
+</style>
 <form id="frmModal" method="post" action="">
     <div id="modalReporteCatalogoProducto" class="modal fade modal-fullscreen" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
         <div class="modal-dialog modal-xl" role="document">
@@ -16,7 +23,7 @@
                             </button>                            
                         </div>
                         <div class="col-10">
-                            <div class= "table-responsive">
+                            <div class= "table-responsive" >
                                 <table id="tblReporteCatalogoProductos" name = "tblReporteCatalogoProductos" class="table table-hover" style="width: 100%;">
                                     <thead>
                                         <tr>

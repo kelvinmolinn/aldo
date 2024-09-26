@@ -1,3 +1,4 @@
+
 <form id="frmModal" method="post" action="">
     <div id="modalConsolidadoCompras" class="modal fade modal-fullscreen" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
         <div class="modal-dialog modal-xl" role="document">

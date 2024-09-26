@@ -1,3 +1,10 @@
+<style>
+    /* Definir una altura máxima para el modal */
+    .modal-fullscreen .modal-body {
+        max-height: calc(100vh - 200px); /* Ajusta este valor según lo que necesites */
+        overflow-y: auto; /* Permite el desplazamiento vertical */
+    }
+</style>
 <form id="frmModal" method="post" action="">
     <div id="modalDetalleVentas" class="modal fade modal-fullscreen" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
         <div class="modal-dialog modal-xl" role="document">
