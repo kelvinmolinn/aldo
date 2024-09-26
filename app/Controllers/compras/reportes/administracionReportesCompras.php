@@ -47,8 +47,6 @@ class administracionReportesCompras extends Controller{
             ->where('comp_compras.tipoCompra', $tipoCompra)
             ->findAll();
 
-
-
         return view('compras/reportes/reporteDetalleCompras', $data);
     }    
 }

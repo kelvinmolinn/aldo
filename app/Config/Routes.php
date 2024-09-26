@@ -361,6 +361,15 @@ $routes->group('ventas/admin-facturacion', function($routes) {
       
     });
 
+    $routes->group('ventas/admin-reportes', function($routes) {
+      $routes->post('index', 'ventas\reportes\administracionReportesVentas::indexReportes');
+      $routes->post('modal/consolidado/ventas', 'ventas\reportes\administracionReportesVentas::modalConsolidadoVentas');
+      $routes->get('reporte/pdf/consolidado/ventas', 'ventas\reportes\reporteConsolidadoVentas::consolidadoVentas');
+
+      $routes->post('reporte/detalle/ventas', 'ventas\reportes\administracionReportesVentas::reporteDetalleVentas');
+
+    });
+
 $routes->group('ventas/admin-contingencia', function($routes) {
 
     $routes->post('contingencia', 'ventas\administracionContingencia::indexContingencia');

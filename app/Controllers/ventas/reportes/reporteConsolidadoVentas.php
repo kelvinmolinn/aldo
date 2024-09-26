@@ -1,10 +1,9 @@
 <?php
 
-namespace App\Controllers\compras\reportes;
+namespace App\Controllers\ventas\reportes;
 require_once(APPPATH . 'Libraries/fpdf/fpdf.php');
 
-use App\Models\comp_compras;
-use App\Models\comp_compras_detalle;
+use App\Models\fel_facturas_detalle;
 
 use CodeIgniter\Controller;
 use FPDF;
@@ -41,17 +40,17 @@ class PDF extends FPDF
     }
 }
 
-class reporteConsolidadoCompras extends Controller
+class reporteConsolidadoVentas extends Controller
 {
 
-    public function consolidadoCompras(){
-        $compCompras = new comp_compras();
-        $compComprasDetalle = new comp_compras_detalle();
+    public function consolidadoVentas(){
+        $felFacturasDetalle = new fel_facturas_detalle();
 
         $pdf = new PDF();
         $pdf->AliasNbPages();
 
-        $tipoCompra = $this->request->getGet('tipoCompra');
+        $fechaInicio = $this->request->getGet('fechaInicio');
+        $fechaFin = $this->request->getGet('fechaFin');
 
         //$x = 100;
         //$xx = 131;
@@ -59,7 +58,7 @@ class reporteConsolidadoCompras extends Controller
         $pdf->AddPage();
         $pdf->SetXY(10, 10);
         $pdf->SetFont('Arial', 'B', 15);
-        $pdf->Cell(190,5,utf8_decode('Reporte de consolidado de compras'),0,0,'C');
+        $pdf->Cell(190,5,utf8_decode('Reporte de consolidado de ventas'),0,0,'C');
 
         $pdf->SetXY(10,20);
         $pdf->SetFont('Arial', '', 8);
@@ -75,7 +74,7 @@ class reporteConsolidadoCompras extends Controller
         $pdf->Cell(30,10,utf8_decode('Fecha de documento'),1,0,'C');
 
         $pdf->SetXY(115,20);
-        $pdf->Cell(40,10,utf8_decode('Proveedor'),1,0,'C');
+        $pdf->Cell(40,10,utf8_decode('Cliente'),1,0,'C');
 
         $pdf->SetXY(155,20);
         $pdf->Cell(45,10,utf8_decode('Total de la compra'),1,0,'C');
@@ -83,16 +82,18 @@ class reporteConsolidadoCompras extends Controller
         $n = 0;  
         $y = 30;    
 
-        $datosCompra = $compComprasDetalle 
-            ->select('cat_02_tipo_dte.tipoDocumentoDTE,comp_compras.numFactura,DATE_FORMAT(comp_compras.fechaDocumento, "%d-%m-%Y") as fechaDocumento, comp_proveedores.proveedor,comp_compras_detalle.totalCompraDetalle,comp_compras_detalle.totalCompraDetalleIVA')
-            ->join('comp_compras','comp_compras.compraId = comp_compras_detalle.compraId')
-            ->join('cat_02_tipo_dte','cat_02_tipo_dte.tipoDTEId = comp_compras.tipoDTEId')
-            ->join('comp_proveedores','comp_proveedores.proveedorId = comp_compras.proveedorId')
-            ->where('comp_compras_detalle.flgElimina', 0)
-            ->where('comp_compras.tipoCompra', $tipoCompra)
+        $datosFactura = $felFacturasDetalle
+            ->select('cat_02_tipo_dte.tipoDocumentoDTE,fel_facturas.facturaId, DATE_FORMAT(fel_facturas.fechaEmision, "%d-%m-%Y") as fechaEmision,fel_clientes.cliente,fel_facturas_detalle.totalDetalleIVA')
+            ->join('fel_facturas','fel_facturas.facturaId = fel_facturas_detalle.facturaId')
+            ->join('cat_02_tipo_dte','cat_02_tipo_dte.tipoDTEId = fel_facturas.tipoDTEId')
+            ->join('fel_clientes','fel_clientes.clienteId = fel_facturas.clienteId')
+            ->where('fel_facturas_detalle.flgElimina', 0)
+            ->where('fel_facturas.estadoFactura','Certificado')
+            ->where('fel_facturas.fechaEmision >=', $fechaInicio)
+            ->where('fel_facturas.fechaEmision <=', $fechaFin)
             ->findAll();
-            
-        foreach ($datosCompra AS $datos) {
+
+        foreach ($datosFactura AS $datos) {
             $n++;
 
             $pdf->SetXY(10,$y);
@@ -103,21 +104,16 @@ class reporteConsolidadoCompras extends Controller
             $pdf->Cell(30,10,utf8_decode($datos['tipoDocumentoDTE']),1,0,'C');
 
             $pdf->SetXY(50, $y);
-            $pdf->Cell(35, 10, utf8_decode($datos['numFactura']), 1,0, 'C');
+            $pdf->Cell(35, 10, utf8_decode($datos['facturaId']), 1,0, 'C');
 
             $pdf->SetXY(85,$y);
-            $pdf->Cell(30,10,utf8_decode($datos['fechaDocumento']),1,0,'C');
+            $pdf->Cell(30,10,utf8_decode($datos['fechaEmision']),1,0,'C');
 
             $pdf->SetXY(115,$y);
-            $pdf->Cell(40,10,utf8_decode($datos['proveedor']),1,0,'C');
+            $pdf->Cell(40,10,utf8_decode($datos['cliente']),1,0,'C');
 
-            if($tipoCompra == "Local"){
-                $pdf->SetXY(155,$y);
-                $pdf->Cell(45,10,utf8_decode("$ ".number_format($datos['totalCompraDetalleIVA'], 2, '.', ',')),1,0,'C');
-            }else{
-                $pdf->SetXY(155,$y);
-                $pdf->Cell(45,10,utf8_decode("$ ".number_format($datos['totalCompraDetalle'], 2, '.', ',')),1,0,'C');
-            }
+            $pdf->SetXY(155,$y);
+            $pdf->Cell(45,10,utf8_decode("$ ".number_format($datos['totalDetalleIVA'], 2, '.', ',')),1,0,'C');
 
             $y += 10;
         }
