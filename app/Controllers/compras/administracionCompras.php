@@ -20,15 +20,14 @@ use App\Models\inv_kardex;
 use App\Models\conf_parametrizaciones;
 use App\Models\conf_sucursales;
 use App\Models\inv_productos_existencias;
+use App\Models\log_usuarios;
 
 class administracionCompras extends Controller
 {
     //ESTE CONTROLLERS ES DE PERMISOS 
     public function index(){
         $session = session();
-
         $data['variable'] = 0;
-
         $camposSession = [
             'renderVista' => 'No'
         ];
@@ -41,13 +40,11 @@ class administracionCompras extends Controller
     public function tablaCompras(){
         $com_compras = new comp_compras();
         $compComprasDetalle = new comp_compras_detalle();
-
-
         $contadorFiltros = 0;
         $numFactura = $this->request->getPost('numFactura');
         $fechaDocumento = $this->request->getPost('fechaFactura');
         $filtroProveedor = $this->request->getPost('nombreProveedor');
-        
+
         $consultaCompras = $com_compras
                 ->select('cat_tipo_contribuyente.tipoContribuyenteId,comp_compras.compraId,comp_proveedores.tipoProveedorOrigen, cat_02_tipo_dte.tipoDocumentoDTE, 
                           DATE_FORMAT(comp_compras.fechaDocumento, "%d-%m-%Y") as fechaDocumento, comp_compras.numFactura,
@@ -243,6 +240,8 @@ class administracionCompras extends Controller
         // Consulta para traer el 13% de la parametrizacion
         $porcentajeIva = new conf_parametrizaciones;
         $compras = new comp_compras;
+        $logUsuariosModel = new log_usuarios();
+        $session = session();
 
         $IVA = $porcentajeIva 
         ->select("valorParametrizacion")
@@ -307,6 +306,7 @@ class administracionCompras extends Controller
             }
 
             if ($operacionCompra) {
+                $logUsuariosModel->registrarLogInterfaces("logAgrega", "Emitió una nueva compra (".$compras->insertID().")", $session->get('logUsuarioId'));
                 // Si el insert fue exitoso, devuelve el último ID insertado
                 return $this->response->setJSON([
                     'success' => true,
@@ -399,6 +399,8 @@ class administracionCompras extends Controller
 
     function vistaActualizarCompraOperacion(){
         $compras = new comp_compras;
+        $logUsuariosModel = new log_usuarios();
+        $session = session();
 
         $data = [
             'proveedorId'       => $this->request->getPost('selectProveedor'),
@@ -414,6 +416,7 @@ class administracionCompras extends Controller
             $operacionCompra = $compras->update($this->request->getPost('compraId'), $data);
 
         if ($operacionCompra) {
+            $logUsuariosModel->registrarLogInterfaces("logEdita", "Actualizó el encabezado de la compra", $session->get('logUsuarioId'));
             // Si el insert fue exitoso, devuelve el último ID insertado
             return $this->response->setJSON([
                 'success' => true,
@@ -746,18 +749,15 @@ class administracionCompras extends Controller
 
     function modalProductosOperacion(){
         $comprasDetalle = new comp_compras_detalle;
-
         $operacion = $this->request->getPost('operacion');
         $compraDetalleId = $this->request->getPost('compraDetalleId');
-
         $ivaMultiplicar =   $this->request->getPost('ivaMultiplicar');
         $cantidad =         $this->request->getPost('cantidadProducto');
         $precioUnitarioIva =   $this->request->getPost('costoUnitario');
-
         $precioUnitarioInternacional = $this->request->getPost('costoUnitario');
-
-
         $paisId =   $this->request->getPost('paisId');
+        $logUsuariosModel = new log_usuarios();
+        $session = session();
 
         if($paisId == 61) {
             $precioUnitario         = $precioUnitarioIva / $ivaMultiplicar;
@@ -792,6 +792,7 @@ class administracionCompras extends Controller
                     $productoCompras = $comprasDetalle->update($this->request->getPost('compraDetalleId'), $data);
     
                 if ($productoCompras) {
+        
                     // Si el insert fue exitoso, devuelve el último ID insertado
                     return $this->response->setJSON([
                         'success' => true,
@@ -819,6 +820,7 @@ class administracionCompras extends Controller
                     $productoCompras = $comprasDetalle->update($this->request->getPost('compraDetalleId'), $data);
 
                 if ($productoCompras) {
+                 
                     // Si el insert fue exitoso, devuelve el último ID insertado
                     return $this->response->setJSON([
                         'success' => true,
@@ -862,6 +864,7 @@ class administracionCompras extends Controller
                     $productoCompras = $comprasDetalle->update($compraDetalleId, $data);
         
                     if($productoCompras) {
+                        $logUsuariosModel->registrarLogInterfaces("logAgrega", "Emitió una compra al detalle, con Pendiente (".$comprasDetalle->insertID().")", $session->get('logUsuarioId'));
                         // Si el insert fue exitoso, devuelve el último ID insertado
                         return $this->response->setJSON([
                             'success' => true,
@@ -887,6 +890,7 @@ class administracionCompras extends Controller
                         $productoCompras = $comprasDetalle->update($this->request->getPost('compraDetalleId'), $data);
     
                     if ($productoCompras) {
+                        $logUsuariosModel->registrarLogInterfaces("logAgrega", "Emitió una compra al detalle, con Pendiente (".$comprasDetalle->insertID().")", $session->get('logUsuarioId'));
                         // Si el insert fue exitoso, devuelve el último ID insertado
                         return $this->response->setJSON([
                             'success' => true,
@@ -950,6 +954,7 @@ class administracionCompras extends Controller
                      $productoCompras = $comprasDetalle->insert($data);
 
                     if ($productoCompras) {
+                        $logUsuariosModel->registrarLogInterfaces("logAgrega", "Agregó un producto a la compra detalle", $session->get('logUsuarioId'));
                         // Si el insert fue exitoso, devuelve el último ID insertado
                         return $this->response->setJSON([
                             'success' => true,
@@ -970,13 +975,14 @@ class administracionCompras extends Controller
     }
     function eliminarProductoCompra(){
         $eliminarProducto = new comp_compras_detalle();
-        
-            $compraDetalleId = $this->request->getPost('compraDetalleId');
-            $data = ['flgElimina' => 1];
-            
-            $eliminar = $eliminarProducto->update($compraDetalleId, $data);
+        $compraDetalleId = $this->request->getPost('compraDetalleId');
+        $data = ['flgElimina' => 1];
+        $eliminar = $eliminarProducto->update($compraDetalleId, $data);
+        $logUsuariosModel = new log_usuarios();
+        $session = session();
 
             if($eliminar) {
+                $logUsuariosModel->registrarLogInterfaces("logElimina", "Eliminó el producto del detalle ($compraDetalleId)", $session->get('logUsuarioId'));
                 return $this->response->setJSON([
                     'success' => true,
                     'mensaje' => 'Producto eliminado correctamente'
@@ -995,8 +1001,9 @@ class administracionCompras extends Controller
         $inv_kardex = new inv_kardex;
         $inv_productos_existencias = new inv_productos_existencias;
         $inv_productos = new inv_productos;
-    
         $compraId = $this->request->getPost("compraId");
+        $logUsuariosModel = new log_usuarios();
+        $session = session();
 
         $compras = $comp_compras 
             ->select("compraId,sucursalId,fechaDocumento,flgRetaceo")
@@ -1015,6 +1022,7 @@ class administracionCompras extends Controller
             $updateEstadoCompraRetaceo = $comp_compras->update($compraId,$dataCompraRetaceo);
 
             if ($updateEstadoCompraRetaceo) {
+                $logUsuariosModel->registrarLogInterfaces("logEdita", "Actualizó el estado de la compra a Finalizado ", $session->get('logUsuarioId'));
                 // Si el insert fue exitoso, devuelve el último ID insertado
                 return $this->response->setJSON([
                     'success' => true,
@@ -1165,6 +1173,7 @@ class administracionCompras extends Controller
             $updateEstadoCompra = $comp_compras->update($compraId,$dataCompra);
 
             if ($updateEstadoCompra) {
+                $logUsuariosModel->registrarLogInterfaces("logEdita", "Actualizó el estado de la compra a Finalizado ", $session->get('logUsuarioId'));
                 // Si el insert fue exitoso, devuelve el último ID insertado
                 return $this->response->setJSON([
                     'success' => true,
@@ -1488,9 +1497,11 @@ class administracionCompras extends Controller
 
     public function operacionAnularCompra(){
             $anularCompra = new comp_compras();
-        
             $compraId = $this->request->getPost('compraId');
             $observacionCompra = $this->request->getPost('observacionCompra');
+            $logUsuariosModel = new log_usuarios();
+            $session = session();
+
 
             $data = [
                 'estadoCompra' => "Anulado",
@@ -1501,9 +1512,10 @@ class administracionCompras extends Controller
             $anularCompra->update($compraId, $data);
 
             if($anularCompra) {
+                $logUsuariosModel->registrarLogInterfaces("logEdita", "Anuló la compra", $session->get('logUsuarioId'));
                 return $this->response->setJSON([
                     'success' => true,
-                    'mensaje' => 'Retaceo Anulado correctamente'
+                    'mensaje' => 'Compra anulada correctamente'
                 ]);
             } else {
                 return $this->response->setJSON([

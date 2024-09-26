@@ -867,11 +867,12 @@ public function tablaKardexProducto()
     $datos = $mostrarKardex
         ->select('conf_sucursales.sucursal, inv_kardex.tipoMovimiento, inv_kardex.descripcionMovimiento, 
                   inv_kardex.existenciaAntesMovimiento, inv_kardex.cantidadMovimiento, inv_kardex.existenciaDespuesMovimiento, 
-                  inv_kardex.fechaMovimiento')
+                  inv_kardex.fechaMovimiento,inv_kardex.kardexId')
         ->join('inv_productos_existencias', 'inv_productos_existencias.productoExistenciaId = inv_kardex.productoExistenciaId')
         ->join('conf_sucursales', 'conf_sucursales.sucursalId = inv_productos_existencias.sucursalId')
         ->where('inv_kardex.flgElimina', 0)
-        ->where('inv_productos_existencias.productoId', $productoId);
+        ->where('inv_productos_existencias.productoId', $productoId)
+        ->orderBy('kardexId', 'DESC');
 
     // Si se seleccionó una sucursal específica, añadir el filtro
     if (!empty($sucursalId)) {
