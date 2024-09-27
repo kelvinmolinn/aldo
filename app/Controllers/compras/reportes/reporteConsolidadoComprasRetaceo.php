@@ -41,10 +41,10 @@ class PDF extends FPDF
     }
 }
 
-class reporteConsolidadoCompras extends Controller
+class reporteConsolidadoComprasRetaceo extends Controller
 {
 
-    public function consolidadoCompras(){
+    public function consolidadoComprasRetaceo(){
         $compCompras = new comp_compras();
         $compComprasDetalle = new comp_compras_detalle();
 
@@ -84,13 +84,13 @@ class reporteConsolidadoCompras extends Controller
         $y = 30;    
 
         $datosCompra = $compComprasDetalle 
-            ->select('cat_02_tipo_dte.tipoDocumentoDTE,comp_compras.numFactura,DATE_FORMAT(comp_compras.fechaDocumento, "%d-%m-%Y") as fechaDocumento, comp_proveedores.proveedor,comp_compras_detalle.totalCompraDetalle,comp_compras_detalle.totalCompraDetalleIVA')
+            ->select('cat_02_tipo_dte.tipoDocumentoDTE,comp_compras.numFactura,DATE_FORMAT(comp_compras.fechaDocumento, "%d-%m-%Y") as fechaDocumento, comp_proveedores.proveedor,comp_compras_detalle.totalCompraDetalle,comp_compras_detalle.totalCompraDetalleIVA,comp_retaceo_detalle.costoTotal')
             ->join('comp_compras','comp_compras.compraId = comp_compras_detalle.compraId')
             ->join('cat_02_tipo_dte','cat_02_tipo_dte.tipoDTEId = comp_compras.tipoDTEId')
             ->join('comp_proveedores','comp_proveedores.proveedorId = comp_compras.proveedorId')
+            ->join('comp_retaceo_detalle','comp_retaceo_detalle.compraDetalleId = comp_compras_detalle.compraDetalleId')
             ->where('comp_compras_detalle.flgElimina', 0)
-            ->where('comp_compras.flgRetaceo', 'No')
-            ->where('comp_compras.tipoCompra', $tipoCompra)
+            ->where('comp_compras.flgRetaceo', 'Si')
             ->findAll();
             
         foreach ($datosCompra AS $datos) {
@@ -112,13 +112,9 @@ class reporteConsolidadoCompras extends Controller
             $pdf->SetXY(115,$y);
             $pdf->Cell(40,10,utf8_decode($datos['proveedor']),1,0,'C');
 
-            if($tipoCompra == "Local"){
-                $pdf->SetXY(155,$y);
-                $pdf->Cell(45,10,utf8_decode("$ ".number_format($datos['totalCompraDetalleIVA'], 2, '.', ',')),1,0,'C');
-            }else{
-                $pdf->SetXY(155,$y);
-                $pdf->Cell(45,10,utf8_decode("$ ".number_format($datos['totalCompraDetalle'], 2, '.', ',')),1,0,'C');
-            }
+            $pdf->SetXY(155,$y);
+            $pdf->Cell(45,10,utf8_decode("$ ".number_format($datos['costoTotal'], 2, '.', ',')),1,0,'C');
+
 
             $y += 10;
         }

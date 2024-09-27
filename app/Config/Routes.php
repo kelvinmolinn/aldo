@@ -359,6 +359,9 @@ $routes->group('ventas/admin-facturacion', function($routes) {
 
       $routes->post('reporte/detalle/compras', 'compras\reportes\administracionReportesCompras::reporteDetalleCompras');
       
+      $routes->post('modal/consolidado/compras/retaceo', 'compras\reportes\administracionReportesCompras::modalConsolidadoComprasRetaceo');
+      $routes->get('reporte/pdf/consolidado/compras/retaceo', 'compras\reportes\reporteConsolidadoComprasRetaceo::consolidadoComprasRetaceo');
+      $routes->post('reporte/detalle/compras/retaceo', 'compras\reportes\administracionReportesCompras::reporteDetalleComprasRetaceo');
     });
 
     $routes->group('ventas/admin-reportes', function($routes) {

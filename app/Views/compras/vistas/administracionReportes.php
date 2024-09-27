@@ -20,11 +20,38 @@
         </div>
     </div>
 </div>
-<div class="row mt-3">
+<div class="row mt-3 mb-4">
     <div class="col-md-3">
         <button type="button" id="btnReporte" class="btn btn-primary">Generar reporte</button>
     </div>
 </div>
+
+<h2>Reportes con retaceo</h2>
+<div class="row mt-4">
+    <div class="col-md-4">
+        <div class="form-select-control mb-4">
+            <select name="reporteRetaceo" id="reporteRetaceo" style="width: 100%;">
+                <option value=""></option>
+                <option value="consolidadoComprasRetaceo">Consolidado de compras</option>
+                <option value="detalleComprasRetaceo">Detalle de compras</option>
+            </select>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div id="divTipoCompraRetaceo" class="form-select-control">
+            <select name="tipoCompraRetaceo" id="tipoCompraRetaceo" style="width: 100%;">
+                <option value=""></option>
+                <option value="Internacional">Compra Internacional</option>
+            </select>
+        </div>
+    </div>
+</div>
+<div class="row mt-3">
+    <div class="col-md-3">
+        <button type="button" id="btnReporteRetaceo" class="btn btn-primary">Generar reporte</button>
+    </div>
+</div>
+
 <script>
     function reporteConsolidadoCompras() {
         var tipoCompra = $("#tipoCompra").val();         
@@ -69,9 +96,61 @@
             }
         });
     }
+    function reporteConsolidadoComprasRetaceo() {
+        var tipoCompraRetaceo = $("#tipoCompraRetaceo").val();         
+        $.ajax({
+            url: '<?php echo base_url('compras/admin-reportes/modal/consolidado/compras/retaceo'); ?>',
+            type: 'POST',
+            data: {
+                tipoCompraRetaceo: tipoCompraRetaceo
+            }, // Pasar el ID de la factura como parámetro
+            success: function(response) {
+                // Insertar el contenido de la modal en el cuerpo de la modal
+                $('#divModalContent').html(response);
+
+                // Asumimos que el modal ya tiene un iframe con el ID `pdfFrame`
+                var pdfUrl = '<?php echo base_url("compras/admin-reportes/reporte/pdf/consolidado/compras/retaceo"); ?>' + '?tipoCompraRetaceo=' + tipoCompraRetaceo;
+                $('#pdfFrame').attr('src', pdfUrl);
+
+                // Mostrar la modal
+                $('#modalConsolidadoComprasRetaceo').modal('show');
+            },
+            error: function(xhr, status, error) {
+                // Manejar errores si los hay
+                console.error(xhr.responseText);
+            }
+        });
+    }
+    function reporteDetalleComprasRetaceo(){
+        var tipoCompraRetaceo = $("#tipoCompraRetaceo").val(); 
+        $.ajax({
+                url: '<?php echo base_url('compras/admin-reportes/reporte/detalle/compras/retaceo'); ?>',
+                type: 'POST',
+                data: { tipoCompraRetaceo: tipoCompraRetaceo }, // Pasar el ID del módulo como parámetro
+                success: function(response) {
+                    // Insertar el contenido de la modal en el cuerpo de la modal
+                    $('#divModalContent').html(response);
+                    // Mostrar la modal
+                    $('#modalDetalleComprasRetaceo').modal('show');
+                },
+            error: function(xhr, status, error) {
+                // Manejar errores si los hay
+                console.error(xhr.responseText);
+            }
+        });
+    }
 
     $(document).ready(function() {
         tituloVentana("Reportes");
+        
+        $("#reporteRetaceo").select2({
+            placeholder: 'Tipo reporte'
+        });
+
+        $("#tipoCompraRetaceo").select2({
+            placeholder: 'Tipo compra'
+        });
+
         $("#reporte").select2({
             placeholder: 'Tipo reporte'
         });
@@ -92,6 +171,24 @@
             } else {
 
                 $("#divTipoCompra").hide();
+            }
+        });
+
+        $("#btnReporteRetaceo").click(function(e) {
+            if($("#reporteRetaceo").val() == "consolidadoComprasRetaceo") {
+                if($("#tipoCompraRetaceo").val() != "") {
+                    reporteConsolidadoComprasRetaceo();
+                } else {
+                    alert("seleccione el tipo de compra");
+                }
+            } else if($("#reporteRetaceo").val() == "detalleComprasRetaceo") {
+                if($("#tipoCompraRetaceo").val() != "") {
+                    reporteDetalleComprasRetaceo();
+                } else {
+                    alert("seleccione el tipo de compra");
+                }
+            } else {
+                alert("reporte no definido");
             }
         });
 
