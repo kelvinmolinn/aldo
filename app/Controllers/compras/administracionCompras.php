@@ -48,7 +48,7 @@ class administracionCompras extends Controller
         $consultaCompras = $com_compras
                 ->select('cat_tipo_contribuyente.tipoContribuyenteId,comp_compras.compraId,comp_proveedores.tipoProveedorOrigen, cat_02_tipo_dte.tipoDocumentoDTE, 
                           DATE_FORMAT(comp_compras.fechaDocumento, "%d-%m-%Y") as fechaDocumento, comp_compras.numFactura,
-                          cat_20_paises.pais,cat_20_paises.paisId,comp_proveedores.proveedor,comp_proveedores.proveedorComercial,comp_compras.estadoCompra')
+                          cat_20_paises.pais,cat_20_paises.paisId,comp_proveedores.proveedor,comp_proveedores.proveedorComercial,comp_compras.estadoCompra,comp_compras.tipoCompra')
                 ->join('comp_proveedores','comp_proveedores.proveedorId = comp_compras.proveedorId')
                 ->join('cat_tipo_contribuyente','cat_tipo_contribuyente.tipoContribuyenteId = comp_proveedores.tipoContribuyenteId')
                 ->join('cat_02_tipo_dte','cat_02_tipo_dte.tipoDTEId = comp_compras.tipoDTEId')
@@ -146,7 +146,8 @@ class administracionCompras extends Controller
                 
                 $jsonActualizarCompra = [
                     "compraId"              => $columna['compraId'],
-                    "tipoContribuyenteId"   => $columna['tipoContribuyenteId']
+                    "tipoContribuyenteId"   => $columna['tipoContribuyenteId'],
+                    "tipoCompra"            => $columna['tipoCompra']
                 ];
 
                 if($columna['estadoCompra'] == "Finalizada"){
@@ -281,8 +282,8 @@ class administracionCompras extends Controller
                     'tipoDTEId'         => $this->request->getPost('tipoDocumento'),
                     'fechaDocumento'    => $this->request->getPost('fechaFactura'),
                     'numFactura'        => $this->request->getPost('numeroFactura'),
-                    'paisId'            => $this->request->getPost('selectPais'),
-                    'flgRetaceo'        => $this->request->getPost('selectRetaceo'),
+                    'paisId'            => "61",
+                    'flgRetaceo'        => "No",
                     'estadoCompra'      => 'Pendiente',
                     'porcentajeIva'     => $IvaCalcular
                 ];
@@ -304,10 +305,11 @@ class administracionCompras extends Controller
                 ];
                 // Insertar datos en la base de datos
                 $operacionCompra = $compras->insert($data);
+                
             }
 
             if ($operacionCompra) {
-                $logUsuariosModel->registrarLogInterfaces("logAgrega", "Emitió una nueva compra (".$compras->insertID().")", $session->get('logUsuarioId'));
+               // $logUsuariosModel->registrarLogInterfaces("logAgrega", "Emitió una nueva compra (".$compras->insertID().")", $session->get('logUsuarioId'));
                 // Si el insert fue exitoso, devuelve el último ID insertado
                 return $this->response->setJSON([
                     'success' => true,
@@ -330,7 +332,8 @@ class administracionCompras extends Controller
 
         $compraId = $this->request->getPost('compraId');
         $tipoContribuyenteId = $this->request->getPost('tipoContribuyenteId');
-        
+        $tipoCompra = $this->request->getPost('tipoCompra');
+
         $tipoDte = new cat_02_tipo_dte;
         $proveedor = new comp_proveedores;
         $pais = new cat_20_paises;
@@ -355,6 +358,7 @@ class administracionCompras extends Controller
                         
         $data['compraId'] = $compraId;
         $data['tipoContribuyenteId'] = $tipoContribuyenteId;
+        $data['tipoCompra'] = $tipoCompra;
 
         // Consulta para traer los valores de los input que se pueden actualizar
         $consultaCompra = $compras
@@ -403,6 +407,8 @@ class administracionCompras extends Controller
         $logUsuariosModel = new log_usuarios();
         $session = session();
 
+        $tipoCompra = $this->request->getPost('tipoCompra');
+        
         $data = [
             'proveedorId'       => $this->request->getPost('selectProveedor'),
             'tipoDTEId'         => $this->request->getPost('tipoDocumento'),

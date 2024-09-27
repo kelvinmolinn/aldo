@@ -2,11 +2,20 @@
 <hr>
 <div class="row mb-4">
     <div class="col-md-12 text-right">
+        <?php 
+            $session = session();
+            if(in_array(23, $session->get('permisosUsuario'))) {
+        ?>
         <button type= "button" id="btnNuevaReserva" class="btn btn-secondary estilo-btn d-inline" onclick="modalNotaCredito()">
             <i class="fas fa-file-alt"></i>
             Nota de crédito
         </button>
+        <?php 
+            }
+        ?>
         <?php
+        $session = session();
+        if(in_array(24, $session->get('permisosUsuario'))) {
              if($activarContingencia['valorParametrizacion'] == 1){
         ?>
         <form id="frmActivarContingencia" method="post" action="<?php echo base_url('ventas/admin-facturacion/activar/contingencia'); ?>" class="d-inline">
@@ -24,6 +33,7 @@
         </button>
         <?php 
              }
+        }
         ?>
         <button type= "button" id="btnNuevaReserva" class="btn btn-primary estilo-btn d-inline" onclick="modalEmitirDTE()">
             <i class="fas fa-save"></i>

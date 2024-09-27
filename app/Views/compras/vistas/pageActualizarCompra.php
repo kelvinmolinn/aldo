@@ -1,6 +1,7 @@
 
 <form id="frmActualizarCompra" method="post" action="<?php echo base_url('compras/admin-compras/operacion/actualizar/compra'); ?>">
     <input type="hidden" id="compraId" name="compraId" value="<?= $compraId; ?>">
+    <input type="hidden" id="tipoCompra" name="tipoCompra" value="<?= $tipoCompra; ?>">
     <h2 id="tituloEncabezadoCompra">Continuar compra - Número de documento: <?php echo $camposEncabezado["numFactura"];?></h2>
     <hr>
     <button type= "button" id="btnRegresarCompra" class="btn btn-secondary estilo-btn mb-4">
@@ -52,7 +53,8 @@
                 <div class="form-select-control">
                     <select name="selectPais" id="selectPais" style="width: 100%;" required>
                         <option value=""></option>
-                        <?php foreach ($selectPais as $selectPais){ ?>
+                        <?php 
+                            foreach ($selectPais as $selectPais){ ?>
                             <option value="<?php echo $selectPais['paisId']; ?>"><?php echo $selectPais['pais']; ?></option>
                         <?php } ?>
                     </select>

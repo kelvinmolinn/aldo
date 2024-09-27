@@ -160,6 +160,11 @@
 
         $("#selectTipoCompra").on('change', function() {
             if ($(this).val() == 'Local') {
+
+                if ($("#selectPais option[value='61']").length === 0) {
+                    $("#selectPais").append('<option value="61">El Salvador</option>');
+                }
+
                 $("#selectPais").val('61').trigger('change');  // Seleccionar El Salvador
                 $("#selectPais option[value='61']").show();    // Asegurarse de que El Salvador esté visible
                 $("#selectPais").prop('disabled', true);
@@ -174,7 +179,10 @@
                 $("#selectRetaceo").val('No').trigger('change');
                 $("#selectRetaceo").prop('disabled', true);
             } else {
-                $("#selectPais").prop('disabled', false);
+
+                $("#selectPais").val('').trigger('change');
+                $("#selectPais option[value='61']").remove();    // Eliminar El Salvador del select
+                $("#selectPais").prop('disabled', false);   // Habilitar selección de país
 
                 $("#proveedorInternacional").show();
                 $("#proveedorLocal").hide();
