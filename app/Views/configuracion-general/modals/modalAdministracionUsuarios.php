@@ -132,6 +132,9 @@
             placeholder: 'Roles'
         });
 
+
+        $('#duiUsuario').inputmask('99999999-9');
+
         $("#frmModal").submit(function(event) {
             event.preventDefault();
             $.ajax({
