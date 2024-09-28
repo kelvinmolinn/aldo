@@ -1419,7 +1419,7 @@ public function tablaContinuarReserva()
         $empleadosModel = new conf_empleados();
         $data['empleados'] = $empleadosModel->where('flgElimina', 0)->findAll();
         $tipoDTEModel = new cat_02_tipo_dte();
-        $data['tipoDTE'] = $tipoDTEModel->where('flgElimina', 0)->findAll();
+        $data['tipoDTE'] = $tipoDTEModel->where('flgElimina', 0) ->whereNotIn('tipoDTEId', [4]) ->findAll();
 
         return view('ventas/modals/modalFacturarReserva', $data);
     }
