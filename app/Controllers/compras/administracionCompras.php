@@ -243,7 +243,7 @@ class administracionCompras extends Controller
         // Consulta para traer el 13% de la parametrizacion
         $porcentajeIva = new conf_parametrizaciones;
         $compras = new comp_compras;
-        $compProveedores = new comp_proveedores();
+        $compProveedores = new comp_proveedores;
 
         $logUsuariosModel = new log_usuarios();
         $session = session();
@@ -265,12 +265,19 @@ class administracionCompras extends Controller
         $sucursal = $this->request->getPost('selectSucursal');
         // Verificar si el numFactura ya existe
         $contribuyente = $compProveedores
-        ->select('cat_tipo_contribuyente.tipoContribuyenteId')
-        ->join('cat_tipo_contribuyente', 'cat_tipo_contribuyente.tipoContribuyenteId = comp_proveedores.tipoContribuyenteId')
-        ->where('comp_proveedores.proveedorId', $proveedorId)
-        ->where('comp_proveedores.flgElimina', 0)
+        ->select('tipoContribuyenteId')
+        //->join('cat_tipo_contribuyente', 'cat_tipo_contribuyente.tipoContribuyenteId = comp_proveedores.tipoContribuyenteId')
+        ->where('proveedorId', $proveedorId)
+        ->where('flgElimina', 0)
         ->first();
 
+        if ($contribuyente) {
+            $tipoContribuyenteId = $contribuyente['tipoContribuyenteId'];
+        } else {
+            // Si no se encuentra el contribuyente, asigna un valor predeterminado o maneja el error
+            $tipoContribuyenteId = null; // O maneja la ausencia de datos de otra forma
+        }
+        
         $facturaExistente = $compras
             ->where('numFactura', $numFactura)
             ->where('proveedorId', $proveedorId)
@@ -325,7 +332,7 @@ class administracionCompras extends Controller
                     'success' => true,
                     'mensaje' => 'Compra agregada correctamente',
                     'compraId' =>  $compras->insertID(),
-                    'tipoContribuyenteId' => $contribuyente['tipoContribuyenteId'] // Pendiente
+                    'tipoContribuyenteId' => $tipoContribuyenteId // Pendiente
                 ]);
             } else {
                 // Si el insert falló, devuelve un mensaje de error
