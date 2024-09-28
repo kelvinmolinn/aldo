@@ -60,12 +60,7 @@
         </div>
         <div class="row">
           <div class="col-8">
-            <div class="icheck-primary mb-4">
-              <input type="checkbox" id="remember">
-              <label for="remember">
-                Mostrar contraseña
-              </label>
-            </div>
+            
           </div>
           <!-- /.col -->
         
@@ -80,9 +75,7 @@
         </div>          
       </form>
       <br>
-      <p class="mt-4">
-        <a href="forgot-password.html">¿Olvidó su contraseña?</a>
-      </p>
+
     </div>
     <!-- /.login-card-body -->
   </div>
