@@ -208,6 +208,7 @@ class administracionCompras extends Controller
         $proveedor = new comp_proveedores;
         $pais = new cat_20_paises;
         $sucursal = new conf_sucursales;
+        $catTipoContribuyente = new cat_tipo_contribuyente();
 
         $data['tipoDTE'] = $tipoDte
                         ->select("tipoDTEId,tipoDocumentoDTE")
@@ -242,6 +243,8 @@ class administracionCompras extends Controller
         // Consulta para traer el 13% de la parametrizacion
         $porcentajeIva = new conf_parametrizaciones;
         $compras = new comp_compras;
+        $compProveedores = new comp_proveedores();
+
         $logUsuariosModel = new log_usuarios();
         $session = session();
 
@@ -261,6 +264,13 @@ class administracionCompras extends Controller
         $tipoCompra = $this->request->getPost('selectTipoCompra');
         $sucursal = $this->request->getPost('selectSucursal');
         // Verificar si el numFactura ya existe
+        $contribuyente = $compProveedores
+        ->select('cat_tipo_contribuyente.tipoContribuyenteId')
+        ->join('cat_tipo_contribuyente', 'cat_tipo_contribuyente.tipoContribuyenteId = comp_proveedores.tipoContribuyenteId')
+        ->where('comp_proveedores.proveedorId', $proveedorId)
+        ->where('comp_proveedores.flgElimina', 0)
+        ->first();
+
         $facturaExistente = $compras
             ->where('numFactura', $numFactura)
             ->where('proveedorId', $proveedorId)
@@ -315,7 +325,7 @@ class administracionCompras extends Controller
                     'success' => true,
                     'mensaje' => 'Compra agregada correctamente',
                     'compraId' =>  $compras->insertID(),
-                    'tipoContribuyenteId' => 1 // Pendiente
+                    'tipoContribuyenteId' => $contribuyente['tipoContribuyenteId'] // Pendiente
                 ]);
             } else {
                 // Si el insert falló, devuelve un mensaje de error
