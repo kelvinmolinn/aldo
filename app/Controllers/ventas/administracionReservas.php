@@ -635,12 +635,13 @@ public function tablaReservas()
     
         $IvaCalcular = ($precioUnitario * $IVA['valorParametrizacion']) / 100;
         $precioUnitarioIVA = $precioUnitario + $IvaCalcular;
-        $ivaTotal = $IvaCalcular * $cantidadProducto;
         $precioUnitarioVenta = $precioUnitario * (1 - ($porcentajeDescuento / 100));
         $IvaVentaCalcular = ($precioUnitarioVenta * $IVA['valorParametrizacion']) / 100;
         $precioUnitarioVentaIVA = $precioUnitarioVenta + $IvaVentaCalcular;
         $totalReservaDetalle = $precioUnitarioVenta * $cantidadProducto;
         $totalReservaDetalleIVA = $precioUnitarioVentaIVA * $cantidadProducto;
+        $ivaUnitario = $precioUnitarioVentaIVA - $precioUnitarioVenta;
+        $ivaTotal = $ivaUnitario * $cantidadProducto;
     
         // Necesito Traer sucursalId de fel_reservas 
         $reservaData = $sucursalModel->find($reservaId);
@@ -1069,7 +1070,7 @@ public function tablaContinuarReserva()
                     <b> Subtotal (=) :</b>
                 </div>
                 <div class="col-4">
-                    $ ' . number_format($subtotal, 2, '.', ',') . '
+                    $ ' . number_format($subtotal + $descuentos, 2, '.', ',') . '
                 </div>
             </div>
             <div class="row text-right">
